@@ -70,7 +70,7 @@ export class ResponsiveView extends VerovioView {
             this.element.style.width = this.element.parentElement.style.width;
         }
 
-        if (this.ui && this.element && this.svgWrapper) {
+        if (this.element && this.svgWrapper) {
             this.updateSVGDimensions();
             // Reset pageHeight and pageWidth to match the effective scaled viewport width
             this.app.verovioOptions.scale = this.currentScale;

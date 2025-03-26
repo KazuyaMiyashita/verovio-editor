@@ -148,7 +148,7 @@ export class DocumentView extends VerovioView {
         this.element.style.height = this.element.parentElement.style.height;
         this.element.style.width = this.element.parentElement.style.width;
 
-        if (this.ui && this.docWrapper) {
+        if (this.docWrapper) {
             this.currentDocMargin = this.app.options.documentViewMargin * this.currentScale / 100;
 
             this.currentPageWidth = this.app.verovioOptions.pageWidth * this.currentScale / 100;

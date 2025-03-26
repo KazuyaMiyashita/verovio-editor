@@ -10,7 +10,6 @@ import { appendDivTo } from './utils/functions.js';
 
 export class AppStatusbar extends GenericView {
     active: boolean;
-    ui: Object;
     statustext: HTMLDivElement;
     element: HTMLDivElement;
 

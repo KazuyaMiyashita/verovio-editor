@@ -13,7 +13,6 @@ export class GenericView {
     id: string;
     active: boolean;
     customEventManager: CustomEventManager;
-    ui: Object;
 
     constructor(div: HTMLDivElement, app: App) {
         // Root element in which verovio-ui is created
@@ -40,8 +39,6 @@ export class GenericView {
         this.customEventManager.bind(this, 'onUpdateView', this.onUpdateView);
         this.customEventManager.bind(this, 'onEditData', this.onEditData);
         this.customEventManager.bind(this, 'onZoom', this.onZoom);
-
-        this.ui = {};
     }
 
     destroy(): void {

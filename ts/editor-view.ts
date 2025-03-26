@@ -59,7 +59,7 @@ export class EditorView extends ResponsiveView {
     updateSVGDimensions(): void {
         super.updateSVGDimensions();
 
-        if (this.ui && this.svgOverlay) {
+        if (this.svgOverlay) {
             this.svgOverlay.style.height = this.svgWrapper.style.height;
             this.svgOverlay.style.width = this.svgWrapper.style.width;
         }

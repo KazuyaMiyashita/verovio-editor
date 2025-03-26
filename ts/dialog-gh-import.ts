@@ -73,7 +73,7 @@ export class DialogGhImport extends Dialog {
         this.loading = appendDivTo(this.content, { class: `vrv-dialog-gh-loading` });
         this.list = appendDivTo(this.content, { class: `vrv-dialog-gh-list` });
         this.selection = appendDivTo(this.content, { class: `vrv-dialog-gh-selection` });
-        this.breadCrumbs = appendDivTo(this.content, { class: `vrv-dialog-breadcrumbs` });
+        this.breadCrumbs = appendDivTo(this.content, { class: `vrv-path-breadcrumbs` });
 
         // Hide the OK button because the selection is done by clicking on a file
         this.okBtn.style.display = 'none';
@@ -137,7 +137,7 @@ export class DialogGhImport extends Dialog {
     }
 
     addCrumb(name: string, value: number): void {
-        const crumb: HTMLDivElement = appendDivTo(this.breadCrumbs, { class: `vrv-dialog-breadcrumb` });
+        const crumb: HTMLDivElement = appendDivTo(this.breadCrumbs, { class: `vrv-path-breadcrumbs` });
         crumb.innerHTML = name;
         crumb.dataset.value = value.toString();
         this.eventManager.bind(crumb, 'click', this.selectCrumb);

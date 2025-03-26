@@ -26,7 +26,6 @@ export class GenericView {
         this.customEventManager.bind(this, 'onUpdateView', this.onUpdateView);
         this.customEventManager.bind(this, 'onEditData', this.onEditData);
         this.customEventManager.bind(this, 'onZoom', this.onZoom);
-        this.ui = {};
     }
     destroy() {
         // Nothing at this level

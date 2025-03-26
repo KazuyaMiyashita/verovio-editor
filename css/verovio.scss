@@ -45,7 +45,7 @@ $filtered-background-grey-active: invert($background-active);
 $toolbar-height: 36px;
 $menu-height: 18px;
 $statusbar-height: 20px;
-$editor-tool-panel-width: 0px;
+$editor-tool-panel-width: 300px;
 $editor-keyboard-height: 0px; //110px;
 $btn-height: 40px;
 $dialog-gh-list-height: 350px;
@@ -243,10 +243,13 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
             ////////////////////////////////////////////////////////////////////////
 
             .vrv-editor-tool-panel {
-                min-width: $editor-tool-panel-width;
-                background-color: $background;
-                border-top: 1px solid $background-border;
-                border-bottom: 1px solid $background-border;
+                min-width: $editor-tool-panel-width;                
+                max-width: $editor-tool-panel-width;
+                background-color: lighten($doc-background, 15%);
+                border-right: 5px solid $background-border;
+                border-left: 5px solid $background-border;
+                padding: 5px;
+                //border-bottom: 1px solid $background-border;
             }
 
             .vrv-keyboard-panel {
@@ -853,14 +856,16 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
     // Path breadcrumbs
     ////////////////////////////////////////////////////////////////////////
 
-    .vrv-dialog-breadcrumbs {
+    .vrv-path-breadcrumbs {
         display: flex;
-        flex-wrap: wrap;
+        flex-wrap: nowrap;
+        flex-shrink: 0;
         align-items: center;
-        margin-top: 10px;
+        //margin-top: 10px;
         background-color: $background;
+        overflow-x: scroll;
 
-        .vrv-dialog-breadcrumb {
+        .vrv-path-breadcrumbs {
             justify-content: center;
             align-items: center;
             min-height: 40px;
@@ -870,17 +875,17 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
             padding-right: 4px;
         }
 
-        .vrv-dialog-breadcrumb:first-child {
+        .vrv-path-breadcrumbs:first-child {
             padding-left: 8px;
             padding-right: 4px;
         }
 
-        .vrv-dialog-breadcrumb:after {
+        .vrv-path-breadcrumbs:after {
             padding-left: 8px;
             content: "/\00a0";
         }
 
-        .vrv-dialog-breadcrumb:hover {
+        .vrv-path-breadcrumbs:hover {
             filter: $hover-filter;
             background-color: $filtered-primary;
             cursor: pointer;
@@ -943,7 +948,7 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
     }
 
     ////////////////////////////////////////////////////////////////////////
-    // Dialog form
+    // Keyboard
     ////////////////////////////////////////////////////////////////////////
 
     .vrv-keyboard-navigator {
@@ -1045,6 +1050,48 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
                 padding-top: 25px;
             }
         }
+    }
+
+    ////////////////////////////////////////////////////////////////////////
+    // Tree
+    ////////////////////////////////////////////////////////////////////////
+    
+    $node-height: 20;
+    $node-indent: 16px;
+    $node-margin: 2px;
+    $node-label-padding: 5px;
+    
+    .vrv-tree-root {
+      .vrv-node-label {
+        padding: $node-label-padding;
+        border: 1px solid $background;
+        min-height: $node-height;
+        background: $background-light;
+        color: $text-color;
+      }
+      .vrv-tree-node {
+        cursor: pointer;
+        position: relative;
+        margin-left: $node-indent;
+        min-height: $node-height;
+        margin-top: $node-margin;
+      }
+      .vrv-tree-node::before {
+        position: absolute;
+        content: "";
+        width: 15px;
+        height: 10px;
+        background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIiIGhlaWdodD0iNyIgdmlld0JveD0iMCAwIDEyIDciIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cGF0aCBkPSJNNiA3TDAgMEgxMkw2IDdaIiBmaWxsPSIjMDAwIi8+Cjwvc3ZnPg==');
+  background-repeat: no-repeat;
+        left: calc(-#{$node-indent});
+        top: 11px;
+        display: inline-block;
+        transform: rotate(-90deg);
+      }
+      .vrv-tree-node.open::before {
+        transform: rotate(0deg);
+      }
+      
     }
 }
 

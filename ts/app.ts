@@ -30,6 +30,7 @@ import { VerovioView } from './verovio-view.js';
 
 import { appendAnchorTo, appendDivTo, appendInputTo, appendLinkTo, appendTextAreaTo } from './utils/functions.js';
 import { aboutMsg, reloadMsg, resetMsg, version } from './utils/messages.js';
+import { GenericTree } from './generic-tree.js';
 
 let filter = '/svg/filter.xml';
 
@@ -450,7 +451,6 @@ export class App {
     startLoading(msg: string, light: boolean = false): void {
         if (light) {
             this.views.style.pointerEvents = 'none';
-            //this.ui.views.style.opacity = '0.6';
         }
         else {
             this.views.style.overflow = 'hidden';

@@ -323,7 +323,6 @@ export class App {
     startLoading(msg, light = false) {
         if (light) {
             this.views.style.pointerEvents = 'none';
-            //this.ui.views.style.opacity = '0.6';
         }
         else {
             this.views.style.overflow = 'hidden';

@@ -11,6 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import { Dialog } from './dialog.js';
+import { EditorMusicTree } from './editor-music-tree.js';
 import { EditorToolbar } from './editor-toolbar.js';
 import { EditorView } from './editor-view.js';
 import { EventManager } from './event-manager.js';
@@ -31,6 +32,8 @@ export class EditorPanel extends GenericView {
         this.customEventManager.addToPropagationList(this.editorToolbar.customEventManager);
         this.hSplit = appendDivTo(this.element, { class: `vrv-h-split` });
         this.toolPanel = appendDivTo(this.hSplit, { class: `vrv-editor-tool-panel` });
+        this.treeView = new EditorMusicTree(this.toolPanel, this.app);
+        this.customEventManager.addToPropagationList(this.treeView.customEventManager);
         this.vSplit = appendDivTo(this.hSplit, { class: `vrv-v-split` });
         this.split = appendDivTo(this.vSplit, { class: `vrv-split` });
         this.keyboard = appendDivTo(this.vSplit, { class: `vrv-keyboard-panel` });
@@ -74,9 +77,9 @@ export class EditorPanel extends GenericView {
     updateSize() {
         this.element.style.height = this.element.parentElement.style.height;
         this.element.style.width = this.element.parentElement.style.width;
-        this.toolPanel.style.display = 'none';
+        //this.toolPanel.style.display = 'none';
         this.keyboard.style.display = 'none';
-        //this.toolPanel.style.display = this.xmlEditorView.isEnabled() ? 'none' : 'block';
+        this.toolPanel.style.display = this.xmlEditorView.isEnabled() ? 'none' : 'block';
         //this.keyboard.style.display = this.xmlEditorView.isEnabled() ? 'none' : 'flex';
         // Force the toolbar to be displayed when re-activate because the it does not have received the event yet
         this.toolbar.style.display = 'block';
