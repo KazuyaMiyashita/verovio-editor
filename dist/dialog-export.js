@@ -2,7 +2,7 @@
  * The DialogExport class for setting parameter when exporting MEI.
  */
 import { Dialog } from './dialog.js';
-import { appendDivTo, appendInputTo } from './utils/functions.js';
+import { appendDivTo, appendInputTo } from '@utils/functions.js';
 export class DialogExport extends Dialog {
     constructor(div, app, title) {
         super(div, app, title, { icon: "info", type: Dialog.Type.OKCancel });

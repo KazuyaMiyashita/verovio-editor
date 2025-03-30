@@ -13,7 +13,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 import { Deferred } from './deferred.js';
 import { EventManager } from './event-manager.js';
-import { appendDetailsTo, appendDivTo, appendSummaryTo, insertDivBefore } from './utils/functions.js';
+import { appendDetailsTo, appendDivTo, appendSummaryTo, insertDivBefore } from '@utils/functions.js';
 export class Dialog {
     constructor(div, app, title, options) {
         this.options = Object.assign({

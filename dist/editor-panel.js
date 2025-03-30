@@ -10,14 +10,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { Dialog } from './dialog.js';
-import { EditorMusicTree } from './editor-music-tree.js';
-import { EditorToolbar } from './editor-toolbar.js';
+import { Dialog } from './dialogs/dialog.js';
+import { EditorMusicTree } from './editor/editor-music-tree.js';
+import { EditorToolbar } from './toolbars/editor-toolbar.js';
 import { EditorView } from './editor-view.js';
-import { EventManager } from './event-manager.js';
-import { GenericView } from './generic-view.js';
-import { Keyboard } from './keyboard.js';
-import { XMLEditorView } from './xml-editor-view.js';
+import { EventManager } from './events/event-manager.js';
+import { GenericView } from './utils/generic-view.js';
+import { Keyboard } from './midi/keyboard.js';
+import { XMLEditorView } from './xml/xml-editor-view.js';
 import { editedXML } from './utils/messages.js';
 import { appendDivTo } from './utils/functions.js';
 export class EditorPanel extends GenericView {

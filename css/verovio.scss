@@ -746,11 +746,6 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
                 a:visited {
                     color: $text-color
                 }
-
-                .vrv-dialog-tab-selected {
-                    @extend .vrv-selectable;
-                    padding: 10px;
-                }
             }
 
             .vrv-dialog-bottom {
@@ -761,30 +756,36 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
     }
 
     ////////////////////////////////////////////////////////////////////////
-    // Dialog tabs
+    // Tab group
     ////////////////////////////////////////////////////////////////////////
 
-    .vrv-dialog-tabs {
-        display: flex;
-        align-items: center;
-
-        .vrv-dialog-tab {
-            @extend .vrv-text-no-select;
-            @extend .vrv-clickable;
-            @extend .vrv-activable;
-            @extend .vrv-selectable;
-            background-color: $background-toggled;
-            min-height: 40px;
-            min-width: 50px;
-            max-height: 40px;
+    .vrv-tab-group {
+        .vrv-tab-selectors {
             display: flex;
-            justify-content: center;
             align-items: center;
-            padding: 0px 10px;
+    
+            .vrv-tab-selector {
+                @extend .vrv-text-no-select;
+                @extend .vrv-clickable;
+                @extend .vrv-activable;
+                @extend .vrv-selectable;
+                background-color: $background-toggled;
+                min-height: 40px;
+                min-width: 50px;
+                max-height: 40px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                padding: 0px 10px;
+            }
+    
+            .vrv-tab-selector:not(:last-child) {
+                border-right: 1px solid $background-border;
+            }
         }
-
-        .vrv-dialog-tab:not(:last-child) {
-            border-right: 1px solid $background-border;
+        .vrv-tab-content {
+            background-color: $background;
+            padding: 10px;
         }
     }
 

@@ -4,7 +4,7 @@
  */
 
 import { App } from './app.js';
-import { GenericView } from './generic-view.js';
+import { GenericView } from './utils/generic-view.js';
 
 import { appendDivTo } from './utils/functions.js';
 

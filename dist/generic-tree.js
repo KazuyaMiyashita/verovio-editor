@@ -1,5 +1,13 @@
 import { GenericView } from './generic-view.js';
 import { appendDivTo } from './utils/functions.js';
+function buildTree(nodeData) {
+    const { id = null, element, attributes = {}, children = [], isTextNode = false } = nodeData;
+    const node = new TreeNode(id, element, attributes, [], isTextNode);
+    if (Array.isArray(children)) {
+        node.children = children.map(buildTree);
+    }
+    return node;
+}
 export class GenericTree extends GenericView {
     constructor(div, app) {
         super(div, app);
@@ -15,14 +23,6 @@ export class GenericTree extends GenericView {
     fromJson(json) {
         if (!json || !json.element)
             throw new Error("Invalid JSON data: Missing 'element' property");
-        function buildTree(nodeData) {
-            const { id = null, element, attributes = {}, children = [], isTextNode = false } = nodeData;
-            const node = new TreeNode(id, element, attributes, [], isTextNode);
-            if (Array.isArray(children)) {
-                node.children = children.map(buildTree);
-            }
-            return node;
-        }
         this.root = buildTree(json);
         this.rootElement = appendDivTo(this.element, { class: `vrv-tree-root` });
         this.root.html(this.rootElement);
@@ -96,6 +96,19 @@ const jsonData = {
     }
   ]
 };
+
+Get Score
+Mdiv / Score / ScoreDef
+	Page children without system + Score child
+
+GetSection
+Section / Ending
+	System children without div, measure, scoreDef, pb, sb, expansion
+
+GetContext
+Find element in page / find element in doc
+	SB, PB, DIV, MEASURE, SCOREDEF
+
 
 const tree = Tree.fromJson(jsonData);
 

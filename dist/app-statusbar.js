@@ -2,7 +2,7 @@
  * The AppStatusbar class is the implementation of the application status.
  * Events are attached to the App.eventManager.
  */
-import { GenericView } from './generic-view.js';
+import { GenericView } from './utils/generic-view.js';
 import { appendDivTo } from './utils/functions.js';
 export class AppStatusbar extends GenericView {
     constructor(div, app) {

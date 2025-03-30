@@ -11,7 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import { DialogGhImport } from './dialog-gh-import.js';
-import { appendDivTo, appendInputTo, appendTextAreaTo } from './utils/functions.js';
+import { appendDivTo, appendInputTo, appendTextAreaTo } from '@utils/functions.js';
 export class DialogGhExport extends DialogGhImport {
     constructor(div, app, title, options, githubManager) {
         options.okLabel = 'Commit and push';

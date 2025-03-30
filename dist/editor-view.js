@@ -11,11 +11,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { ResponsiveView } from './responsive-view.js';
-import { CursorPointer } from './cursor-pointer.js';
-import { ActionManager } from './action-manager.js';
+import { ResponsiveView } from './verovio/responsive-view.js';
+import { EditorCursorPointer } from './editor/editor-cursor-pointer.js';
+import { ActionManager } from './events/action-manager.js';
 import { appendDivTo, appendMidiPlayerTo } from './utils/functions.js';
-import { midiScale } from './utils/midi-scale.js';
+import { midiScale } from './midi/midi-scale.js';
 export class EditorView extends ResponsiveView {
     constructor(div, app, verovio) {
         super(div, app, verovio);
@@ -24,7 +24,7 @@ export class EditorView extends ResponsiveView {
         // add the svgOverlay for dragging
         this.svgOverlay = appendDivTo(this.element, { class: `vrv-svg-overlay`, style: { position: `absolute` } });
         this.cursor = appendDivTo(this.element, { class: `vrv-editor-cursor` });
-        this.cursorPointer = new CursorPointer(this.cursor, this);
+        this.cursorPointer = new EditorCursorPointer(this.cursor, this);
         // synchronized scrolling between svg overlay and wrapper
         this.eventManager.bind(this.svgOverlay, 'scroll', this.scrollListener);
         this.eventManager.bind(this.svgOverlay, 'mouseleave', this.mouseLeaveListener);

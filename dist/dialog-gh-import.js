@@ -11,7 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import { Dialog } from './dialog.js';
-import { appendDivTo } from './utils/functions.js';
+import { appendDivTo } from '@utils/functions.js';
 export class DialogGhImport extends Dialog {
     constructor(div, app, title, options, githubManager) {
         super(div, app, title, options);

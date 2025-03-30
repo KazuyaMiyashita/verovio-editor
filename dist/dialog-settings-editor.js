@@ -2,7 +2,7 @@
  * The DialogSettinsEditor class for the editor settings.
  */
 import { Dialog } from './dialog.js';
-import { appendDivTo, appendOptionTo, appendSelectTo } from './utils/functions.js';
+import { appendDivTo, appendOptionTo, appendSelectTo } from '@utils/functions.js';
 export class DialogSettingsEditor extends Dialog {
     constructor(div, app, title, options, appOptions) {
         super(div, app, title, options);

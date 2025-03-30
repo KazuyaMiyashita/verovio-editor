@@ -12,27 +12,27 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import { AppStatusbar } from './app-statusbar.js';
-import { AppToolbar } from './app-toolbar.js';
-import { Dialog } from './dialog.js';
-import { DialogAbout } from './dialog-about.js';
-import { DialogExport } from './dialog-export.js';
-import { DialogGhExport } from './dialog-gh-export.js';
-import { DialogGhImport } from './dialog-gh-import.js';
-import { DialogSelection } from './dialog-selection.js';
-import { DialogSettingsEditor } from './dialog-settings-editor.js';
-import { DialogSettingsVerovio } from './dialog-settings-verovio.js';
-import { DocumentView } from './document-view.js';
-import { CustomEventManager } from './custom-event-manager.js';
-import { EditorPanel } from './editor-panel.js';
-import { EventManager } from './event-manager.js';
-import { FileStack } from './file-stack.js';
-import { GitHubManager } from './github-manager.js';
-import { MidiPlayer } from './midi-player.js';
-import { MidiToolbar } from './midi-toolbar.js';
-import { PDFGenerator } from './pdf-generator.js';
-import { ResponsiveView } from './responsive-view.js';
-import { RNGLoader } from './rng-loader.js';
-import { PDFWorkerProxy, VerovioWorkerProxy, ValidatorWorkerProxy } from './worker-proxy.js';
+import { AppToolbar } from './toolbars/app-toolbar.js';
+import { Dialog } from './dialogs/dialog.js';
+import { DialogAbout } from './dialogs/dialog-about.js';
+import { DialogExport } from './dialogs/dialog-export.js';
+import { DialogGhExport } from './dialogs/dialog-gh-export.js';
+import { DialogGhImport } from './dialogs/dialog-gh-import.js';
+import { DialogSelection } from './dialogs/dialog-selection.js';
+import { DialogSettingsEditor } from './dialogs/dialog-settings-editor.js';
+import { DialogSettingsVerovio } from './dialogs/dialog-settings-verovio.js';
+import { DocumentView } from './document/document-view.js';
+import { CustomEventManager } from './events/custom-event-manager.js';
+import { EditorPanel } from './editor/editor-panel.js';
+import { EventManager } from './events/event-manager.js';
+import { FileStack } from './utils/file-stack.js';
+import { GitHubManager } from './utils/github-manager.js';
+import { MidiPlayer } from './midi/midi-player.js';
+import { MidiToolbar } from './toolbars/midi-toolbar.js';
+import { PDFGenerator } from './document/pdf-generator.js';
+import { ResponsiveView } from './verovio/responsive-view.js';
+import { RNGLoader } from './xml/rng-loader.js';
+import { PDFWorkerProxy, VerovioWorkerProxy, ValidatorWorkerProxy } from './utils/worker-proxy.js';
 import { appendAnchorTo, appendDivTo, appendInputTo, appendLinkTo, appendTextAreaTo } from './utils/functions.js';
 import { aboutMsg, reloadMsg, resetMsg, version } from './utils/messages.js';
 let filter = '/svg/filter.xml';
@@ -649,23 +649,6 @@ export class App {
             const dlgRes = yield dlg.show();
             if (dlgRes === 1) {
             }
-        });
-    }
-    xmlOverwriteMEI(e) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const element = e.target;
-            let params = {};
-            if (element.dataset.noIds == 'true')
-                params["removeIds"] = true;
-            const mei = yield this.verovio.getMEI(params);
-            this.mei = mei;
-            let event = new CustomEvent('onUpdateData', {
-                detail: {
-                    currentId: this.clientId,
-                    caller: this.view
-                }
-            });
-            this.customEventManager.dispatch(event);
         });
     }
     settingsEditor(e) {

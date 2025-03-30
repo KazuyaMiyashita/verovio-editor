@@ -1,4 +1,4 @@
-import { Deferred } from "./deferred.js";
+import { Deferred } from "./events/deferred.js";
 let id = 1;
 let callList = new Map;
 export class WorkerProxy {

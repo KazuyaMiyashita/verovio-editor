@@ -2,7 +2,7 @@
  * The DialogSelect class for selecting a part of a score.
  */
 import { Dialog } from './dialog.js';
-import { appendDivTo, appendInputTo } from './utils/functions.js';
+import { appendDivTo, appendInputTo } from '@utils/functions.js';
 export class DialogSelection extends Dialog {
     constructor(div, app, title, options, selection) {
         super(div, app, title, options);

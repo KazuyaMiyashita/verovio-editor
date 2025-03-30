@@ -7,8 +7,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { EventManager } from './event-manager.js';
-import { GenericTree } from './generic-tree.js';
+import { EventManager } from './events/event-manager.js';
+import { GenericTree } from './utils/generic-tree.js';
 import { appendDivTo } from './utils/functions.js';
 export class EditorMusicTree extends GenericTree {
     constructor(div, app) {

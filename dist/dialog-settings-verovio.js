@@ -11,7 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import { Dialog } from './dialog.js';
-import { appendDivTo, appendInputTo, appendOptionTo, appendSelectTo, appendSpanTo } from './utils/functions.js';
+import { appendDivTo, appendInputTo, appendOptionTo, appendSelectTo, appendSpanTo } from '@utils/functions.js';
 const VEROVIO_DISABLED_OPTIONS = [
     // Input and page layout options
     "adjustPageHeight",

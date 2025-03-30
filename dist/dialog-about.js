@@ -11,8 +11,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import { Dialog } from './dialog.js';
-import { appendDivTo } from './utils/functions.js';
-import { changelogUrl, libraries, licenseUrl } from './utils/messages.js';
+import { appendDivTo } from '@utils/functions.js';
+import { changelogUrl, libraries, licenseUrl } from '@utils/messages.js';
 export class DialogAbout extends Dialog {
     constructor(div, app, title) {
         super(div, app, title, { okLabel: "Close", icon: "info", type: Dialog.Type.Msg });

@@ -1,9 +1,9 @@
 /**
- * The CursorPointer class
+ * The EditorCursorPointer class
  */
 import { appendDivTo } from './utils/functions.js';
 ;
-export class CursorPointer {
+export class EditorCursorPointer {
     constructor(div, editorView) {
         // Root element in which verovio-ui is created
         this.element = div;
