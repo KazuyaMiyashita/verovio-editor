@@ -15,7 +15,7 @@ interface SelectedItem {
 
 export class EditorCursorPointer {
     div: HTMLDivElement;
-    editorView: EditorView;
+    editorViewObj: EditorView;
 
     lines: HTMLDivElement;
     pointer: HTMLDivElement;
@@ -72,7 +72,7 @@ export class EditorCursorPointer {
         this.div = div;
 
         // EditorView object
-        this.editorView = editorView;
+        this.editorViewObj = editorView;
 
         this.lines = appendDivTo(this.div, { class: `vrv-cursor-lines` });
         this.pointer = appendDivTo(this.div, { class: `vrv-cursor-pointer` });
@@ -197,7 +197,7 @@ export class EditorCursorPointer {
     }
 
     initStaff(node: SVGElement): void {
-        this.staffNode = this.editorView.getClosestMEIElement(node, "staff");
+        this.staffNode = this.editorViewObj.getClosestMEIElement(node, "staff");
 
         if (!this.staffNode) return;
 

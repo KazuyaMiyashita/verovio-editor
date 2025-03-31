@@ -8,7 +8,7 @@ export class EditorCursorPointer {
         // Root element in which verovio-ui is created
         this.div = div;
         // EditorView object
-        this.editorView = editorView;
+        this.editorViewObj = editorView;
         this.lines = appendDivTo(this.div, { class: `vrv-cursor-lines` });
         this.pointer = appendDivTo(this.div, { class: `vrv-cursor-pointer` });
         this.activated = false;
@@ -105,7 +105,7 @@ export class EditorCursorPointer {
         this.lines.style.backgroundSize = `${this.currentLedgerlineWidth / this.pixPerPix}px ${this.currentHeight / this.pixPerPix}px`;
     }
     initStaff(node) {
-        this.staffNode = this.editorView.getClosestMEIElement(node, "staff");
+        this.staffNode = this.editorViewObj.getClosestMEIElement(node, "staff");
         if (!this.staffNode)
             return;
         let staffLines = this.staffNode.querySelectorAll('g.staff > path');

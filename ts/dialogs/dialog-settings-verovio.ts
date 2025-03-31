@@ -53,8 +53,8 @@ export class DialogSettingsVerovio extends Dialog {
     private verovioDisabled: Array<string>;
     changedOptions: Options;
 
-    tab: HTMLDivElement;
-    tabGroup: TabGroup;
+    tabGroup: HTMLDivElement;
+    tabGroupObj: TabGroup;
 
     constructor(div: HTMLDivElement, app: App, title: string, options: Dialog.Options, selection: Object, verovioProxy: VerovioWorkerProxy) {
         super(div, app, title, options);
@@ -62,8 +62,8 @@ export class DialogSettingsVerovio extends Dialog {
         this.verovioDisabled = VEROVIO_DISABLED_OPTIONS;
         this.verovio = verovioProxy;
 
-        this.tab = appendDivTo(this.content, { class: `vrv-tab-group` });
-        this.tabGroup = new TabGroup(this.tab, app);
+        this.tabGroup = appendDivTo(this.content, { class: `vrv-tab-group` });
+        this.tabGroupObj = new TabGroup(this.tabGroup, app);
 
         this.box.style.maxWidth = `800px`;
 
@@ -95,7 +95,7 @@ export class DialogSettingsVerovio extends Dialog {
 
             const group = availableOptions.groups[groupKey];
 
-            let tab = this.tabGroup.addTab(tabNames[groupKey]);
+            let tab = this.tabGroupObj.addTab(tabNames[groupKey]);
             let fields = appendDivTo(tab.div, { class: `vrv-dialog-form` });
 
             for (const optionKey in group.options) {

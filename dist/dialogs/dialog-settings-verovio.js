@@ -54,8 +54,8 @@ export class DialogSettingsVerovio extends Dialog {
         super(div, app, title, options);
         this.verovioDisabled = VEROVIO_DISABLED_OPTIONS;
         this.verovio = verovioProxy;
-        this.tab = appendDivTo(this.content, { class: `vrv-tab-group` });
-        this.tabGroup = new TabGroup(this.tab, app);
+        this.tabGroup = appendDivTo(this.content, { class: `vrv-tab-group` });
+        this.tabGroupObj = new TabGroup(this.tabGroup, app);
         this.box.style.maxWidth = `800px`;
         this.addButton("Reset", this.reset);
     }
@@ -82,7 +82,7 @@ export class DialogSettingsVerovio extends Dialog {
                 if (skip.includes(groupKey))
                     continue;
                 const group = availableOptions.groups[groupKey];
-                let tab = this.tabGroup.addTab(tabNames[groupKey]);
+                let tab = this.tabGroupObj.addTab(tabNames[groupKey]);
                 let fields = appendDivTo(tab.div, { class: `vrv-dialog-form` });
                 for (const optionKey in group.options) {
                     if (this.verovioDisabled.includes(optionKey))
