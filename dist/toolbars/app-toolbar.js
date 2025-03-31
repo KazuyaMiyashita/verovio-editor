@@ -25,7 +25,7 @@ export class AppToolbar extends Toolbar {
         ////////////////////////////////////////////////////////////////////////
         // View selection
         ////////////////////////////////////////////////////////////////////////
-        const viewSelectorMenu = appendDivTo(this.element, { class: `vrv-menu` });
+        const viewSelectorMenu = appendDivTo(this.div, { class: `vrv-menu` });
         this.viewSelector = appendDivTo(viewSelectorMenu, { class: `vrv-btn-icon-left`, style: { backgroundImage: `url(${iconsLayout})` }, 'data-before': `View` });
         const viewSelectorSubmenuContent = appendDivTo(viewSelectorMenu, { class: `vrv-menu-content` });
         appendDivTo(viewSelectorSubmenuContent, { class: `vrv-v-separator` });
@@ -54,7 +54,7 @@ export class AppToolbar extends Toolbar {
         ////////////////////////////////////////////////////////////////////////
         // File
         ////////////////////////////////////////////////////////////////////////
-        const fileMenu = appendDivTo(this.element, { class: `vrv-menu` });
+        const fileMenu = appendDivTo(this.div, { class: `vrv-menu` });
         if (!app.options.enableEditor)
             fileMenu.style.display = 'none';
         this.fileMenuBtn = appendDivTo(fileMenu, { class: `vrv-btn-text`, 'data-before': `File` });
@@ -86,7 +86,7 @@ export class AppToolbar extends Toolbar {
         ////////////////////////////////////////////////////////////////////////
         // GitHub
         ////////////////////////////////////////////////////////////////////////
-        this.githubMenu = appendDivTo(this.element, { class: `vrv-menu`, style: { dissplay: `none` } });
+        this.githubMenu = appendDivTo(this.div, { class: `vrv-menu`, style: { display: `none` } });
         appendDivTo(this.githubMenu, { class: `vrv-btn-text`, 'data-before': `GitHub` });
         const githubMenuContent = appendDivTo(this.githubMenu, { class: `vrv-menu-content` });
         appendDivTo(githubMenuContent, { class: `vrv-v-separator` });
@@ -97,7 +97,7 @@ export class AppToolbar extends Toolbar {
         ////////////////////////////////////////////////////////////////////////
         // Navigation
         ////////////////////////////////////////////////////////////////////////
-        this.pageControls = appendDivTo(this.element, { class: `vrv-btn-group` });
+        this.pageControls = appendDivTo(this.div, { class: `vrv-btn-group` });
         appendDivTo(this.pageControls, { class: `vrv-h-separator` });
         this.prevPage = appendDivTo(this.pageControls, { class: `vrv-btn-icon-left`, style: { backgroundImage: `url(${iconsArrowLeft})` }, 'data-before': `Previous` });
         this.app.eventManager.bind(this.prevPage, 'click', this.app.prevPage);
@@ -106,7 +106,7 @@ export class AppToolbar extends Toolbar {
         ////////////////////////////////////////////////////////////////////////
         // Zoom
         ////////////////////////////////////////////////////////////////////////
-        this.zoomControls = appendDivTo(this.element, { class: `vrv-btn-group` });
+        this.zoomControls = appendDivTo(this.div, { class: `vrv-btn-group` });
         appendDivTo(this.zoomControls, { class: `vrv-h-separator` });
         this.zoomOut = appendDivTo(this.zoomControls, { class: `vrv-btn-icon-left`, style: { backgroundImage: `url(${iconsZoomOut})` }, 'data-before': `Zoom out` });
         this.app.eventManager.bind(this.zoomOut, 'click', this.app.zoomOut);
@@ -115,13 +115,13 @@ export class AppToolbar extends Toolbar {
         ////////////////////////////////////////////////////////////////////////
         // Sub-toolbars
         ////////////////////////////////////////////////////////////////////////
-        this.midiPlayerSubToolbar = appendDivTo(this.element, {});
-        this.editorSubToolbar = appendDivTo(this.element, {});
+        this.midiPlayerSubToolbar = appendDivTo(this.div, {});
+        this.editorSubToolbar = appendDivTo(this.div, {});
         ////////////////////////////////////////////////////////////////////////
         // Settings
         ////////////////////////////////////////////////////////////////////////
-        appendDivTo(this.element, { class: `vrv-h-separator` });
-        const settingsMenu = appendDivTo(this.element, { class: `vrv-menu` });
+        appendDivTo(this.div, { class: `vrv-h-separator` });
+        const settingsMenu = appendDivTo(this.div, { class: `vrv-menu` });
         if (!app.options.enableEditor)
             settingsMenu.style.display = 'none';
         appendDivTo(settingsMenu, { class: `vrv-btn-icon-left`, style: { backgroundImage: `url(${iconsSettings})` }, 'data-before': `Settings` });
@@ -134,8 +134,8 @@ export class AppToolbar extends Toolbar {
         ////////////////////////////////////////////////////////////////////////
         // Help
         ////////////////////////////////////////////////////////////////////////
-        appendDivTo(this.element, { class: `vrv-h-separator` });
-        const helpMenu = appendDivTo(this.element, { class: `vrv-menu` });
+        appendDivTo(this.div, { class: `vrv-h-separator` });
+        const helpMenu = appendDivTo(this.div, { class: `vrv-menu` });
         if (!app.options.enableEditor)
             helpMenu.style.display = 'none';
         appendDivTo(helpMenu, { class: `vrv-btn-text`, 'data-before': `Help` });
@@ -148,7 +148,7 @@ export class AppToolbar extends Toolbar {
         ////////////////////////////////////////////////////////////////////////
         // Login
         ////////////////////////////////////////////////////////////////////////
-        this.loginGroup = appendDivTo(this.element, { class: `vrv-btn-group-right` });
+        this.loginGroup = appendDivTo(this.div, { class: `vrv-btn-group-right` });
         if (!app.options.enableEditor)
             this.loginGroup.style.display = 'none';
         appendDivTo(this.loginGroup, { class: `vrv-h-separator` });
@@ -158,10 +158,10 @@ export class AppToolbar extends Toolbar {
         this.app.eventManager.bind(this.login, 'click', this.app.login);
         // Bindings for hiding menu once an item has be click - the corresponding class is
         // removed when the toolbar is moused over
-        for (const node of this.element.querySelectorAll('div.vrv-menu')) {
+        for (const node of this.div.querySelectorAll('div.vrv-menu')) {
             this.eventManager.bind(node, 'mouseover', this.onMouseOver);
         }
-        for (const node of this.element.querySelectorAll('div.vrv-menu-text')) {
+        for (const node of this.div.querySelectorAll('div.vrv-menu-text')) {
             this.eventManager.bind(node, 'click', this.onClick);
         }
     }
@@ -206,13 +206,13 @@ export class AppToolbar extends Toolbar {
     // Mouse methods
     ////////////////////////////////////////////////////////////////////////
     onMouseOver(e) {
-        for (const node of this.element.querySelectorAll('div.vrv-menu-content')) {
+        for (const node of this.div.querySelectorAll('div.vrv-menu-content')) {
             // Hide the menu content
             node.classList.remove("clicked");
         }
     }
     onClick(e) {
-        for (const node of this.element.querySelectorAll('div.vrv-menu-content')) {
+        for (const node of this.div.querySelectorAll('div.vrv-menu-content')) {
             // Remove the class so the menu content is shown again with a hover
             node.classList.add("clicked");
         }

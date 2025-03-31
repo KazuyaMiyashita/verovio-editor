@@ -11,14 +11,14 @@ import { appendDivTo } from './utils/functions.js';
 export class AppStatusbar extends GenericView {
     active: boolean;
     statustext: HTMLDivElement;
-    element: HTMLDivElement;
+    div: HTMLDivElement;
 
     constructor(div: HTMLDivElement, app: App) {
         super(div, app);
 
         this.active = true;
 
-        this.statustext = appendDivTo(this.element, { class: `vrv-status-text` });
+        this.statustext = appendDivTo(this.div, { class: `vrv-status-text` });
     }
 
     ////////////////////////////////////////////////////////////////////////

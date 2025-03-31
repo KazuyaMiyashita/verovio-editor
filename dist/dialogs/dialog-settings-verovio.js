@@ -83,10 +83,7 @@ export class DialogSettingsVerovio extends Dialog {
                     continue;
                 const group = availableOptions.groups[groupKey];
                 let tab = this.tabGroup.addTab(tabNames[groupKey]);
-                let fields = appendDivTo(tab.tabContent, { class: `vrv-dialog-form` });
-                // Select the first tab
-                //(this.tabs.length === 0) ? tab.select() : tab.deselect();
-                //this.tabs.push(tab);
+                let fields = appendDivTo(tab.div, { class: `vrv-dialog-form` });
                 for (const optionKey in group.options) {
                     if (this.verovioDisabled.includes(optionKey))
                         continue;

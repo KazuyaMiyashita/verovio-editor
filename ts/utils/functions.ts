@@ -19,8 +19,16 @@ export function insertDivBefore(parent: HTMLElement, options: object, before: HT
     return <HTMLDivElement>insertHTMLElementBefore(parent, options, 'div', before);
 }
 
+export function appendFieldSetTo(parent: HTMLElement, options: object): HTMLFieldSetElement {
+    return <HTMLFieldSetElement>appendHTMLElementTo(parent, options, 'fieldset');
+}
+
 export function appendInputTo(parent: HTMLElement, options: object): HTMLInputElement {
     return <HTMLInputElement>appendHTMLElementTo(parent, options, 'input');
+}
+
+export function appendLegendTo(parent: HTMLElement, options: object): HTMLLegendElement {
+    return <HTMLLegendElement>appendHTMLElementTo(parent, options, 'legend');
 }
 
 export function appendLinkTo(parent: HTMLElement, options: object): HTMLLinkElement {

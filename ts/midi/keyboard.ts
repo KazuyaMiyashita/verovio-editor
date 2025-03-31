@@ -10,7 +10,7 @@ import { midiScale } from './midi-scale.js'
 export class Keyboard {
     app: App;
     eventManager: EventManager;
-    element: HTMLDivElement;
+    div: HTMLDivElement;
     octaves: HTMLDivElement;
     octaveNumbers: number[];
     letters: string[];
@@ -27,21 +27,21 @@ export class Keyboard {
         let iconsLeft = `${app.host}/icons/keyboard/left.png`;
         let iconsRight = `${app.host}/icons/keyboard/right.png`;
 
-        this.element = div;
+        this.div = div;
         // Remove previous content
-        this.element.innerHTML = "";
+        this.div.innerHTML = "";
 
         this.app = app;
-        this.midiPlayerElement = appendMidiPlayerTo(this.element, {});
+        this.midiPlayerElement = appendMidiPlayerTo(this.div, {});
         this.midiPlayerElement.setAttribute('src', midiScale);
 
         this.eventManager = new EventManager(this);
         this.bindListeners(); // Document/Window-scoped events
 
-        let left = appendDivTo(this.element, { class: `vrv-keyboard-navigator`, style: { backgroundImage: `url(${iconsLeft})` } });
+        let left = appendDivTo(this.div, { class: `vrv-keyboard-navigator`, style: { backgroundImage: `url(${iconsLeft})` } });
         this.eventManager.bind(left, 'click', this.activateLower);
-        this.keyboardWrapper = appendDivTo(this.element, { class: `vrv-keyboard-wrapper` });
-        let right = appendDivTo(this.element, { class: `vrv-keyboard-navigator`, style: { backgroundImage: `url(${iconsRight})` } });
+        this.keyboardWrapper = appendDivTo(this.div, { class: `vrv-keyboard-wrapper` });
+        let right = appendDivTo(this.div, { class: `vrv-keyboard-navigator`, style: { backgroundImage: `url(${iconsRight})` } });
         this.eventManager.bind(right, 'click', this.activateHigher);
 
         this.octaves = appendDivTo(this.keyboardWrapper, { class: `vrv-keyboard-octaves` });
@@ -72,8 +72,8 @@ export class Keyboard {
             let b2 = appendDivTo(this.keys, { class: `vrv-keyboard-key white`, 'data-midi': `${midi++}` });
         })
 
-        this.eventManager.bind(this.element, 'mouseleave', this.mouseLeaveListener);
-        this.eventManager.bind(this.element, 'mouseenter', this.mouseEnterListener);
+        this.eventManager.bind(this.div, 'mouseleave', this.mouseLeaveListener);
+        this.eventManager.bind(this.div, 'mouseenter', this.mouseEnterListener);
 
         this.currentOctave = 3;
         this.activate();

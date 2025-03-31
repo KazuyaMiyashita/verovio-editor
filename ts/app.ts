@@ -41,21 +41,21 @@ declare global {
 export class App {
     // private members
     private clientId: string;
-    private element: HTMLDivElement;
+    private div: HTMLDivElement;
     public notificationStack: Array<string>;
 
     private loadingCount: number;
-    public appToolbar: AppToolbar;
-    private appStatusbar: AppStatusbar;
-    private midiToolbar: MidiToolbar;
+    public toolbarObj: AppToolbar;
+    private statusbarObj: AppStatusbar;
+    private midiToolbarObj: MidiToolbar;
     private resizeTimer: number;
     private appIsLoaded: boolean;
     private appReset: boolean;
     private filename: string;
 
-    private viewDocument: DocumentView;
-    private viewEditor: EditorPanel;
-    private viewResponsive: ResponsiveView;
+    private viewDocumentObj: DocumentView;
+    private viewEditorObj: EditorPanel;
+    private viewResponsiveObj: ResponsiveView;
 
     private pdf: PDFWorkerProxy;
     public midiPlayer: MidiPlayer;
@@ -76,7 +76,7 @@ export class App {
     private view3: HTMLDivElement;
 
     // readonly members
-    readonly dialog: HTMLDivElement;
+    readonly dialogDiv: HTMLDivElement;
     readonly host: string;
     readonly customEventManager: CustomEventManager;
     readonly zoomLevels: Array<number>;
@@ -169,13 +169,13 @@ export class App {
         if (options.appReset) this.fileStack.reset();
 
         // Root element in which verovio-ui is created
-        this.element = div;
+        this.div = div;
 
         this.zoomLevels = [5, 10, 20, 35, 75, 100, 150, 200];
 
         // If necessary remove all the children of the div
-        while (this.element.firstChild) {
-            this.element.firstChild.remove();
+        while (this.div.firstChild) {
+            this.div.firstChild.remove();
         }
 
         appendLinkTo(document.head, { href: `${this.host}/css/verovio.css`, rel: `stylesheet` });
@@ -184,29 +184,29 @@ export class App {
         this.eventManager = new EventManager(this);
         this.customEventManager = new CustomEventManager();
 
-        this.appToolbar = null;
+        this.toolbarObj = null;
 
         // Create and load the SVG filter
         this.createFilter();
 
         // Create input for reading files
-        this.input = appendInputTo(this.element, { type: `file`, class: `vrv-file-input` });
+        this.input = appendInputTo(this.div, { type: `file`, class: `vrv-file-input` });
         this.input.onchange = this.fileInput.bind(this);
 
         // Create link for writing files
-        this.output = appendAnchorTo(this.element, { class: `vrv-file-output` });
+        this.output = appendAnchorTo(this.div, { class: `vrv-file-output` });
 
         // Create link for copying files
-        this.fileCopy = appendTextAreaTo(this.element, { class: `vrv-file-copy` });
+        this.fileCopy = appendTextAreaTo(this.div, { class: `vrv-file-copy` });
 
         // Create the HTML content
-        this.wrapper = appendDivTo(this.element, { class: `vrv-wrapper` });
+        this.wrapper = appendDivTo(this.div, { class: `vrv-wrapper` });
 
         // Create notification div
         this.notification = appendDivTo(this.wrapper, { class: `vrv-notification disabled` });
 
         // Create a dialog div
-        this.dialog = appendDivTo(this.wrapper, { class: `vrv-dialog` });
+        this.dialogDiv = appendDivTo(this.wrapper, { class: `vrv-dialog` });
 
         // Create a toolbar div
         this.toolbar = appendDivTo(this.wrapper, { class: `vrv-toolbar` });
@@ -362,31 +362,31 @@ export class App {
         if (this.options.enableDocument) {
             this.currentZoomIndex = this.options.documentZoom;
             this.view1 = appendDivTo(this.views, { class: `vrv-view` });
-            this.viewDocument = new DocumentView(this.view1, this, this.verovio);
-            this.customEventManager.addToPropagationList(this.viewDocument.customEventManager);
+            this.viewDocumentObj = new DocumentView(this.view1, this, this.verovio);
+            this.customEventManager.addToPropagationList(this.viewDocumentObj.customEventManager);
             if (this.options.defaultView === 'document') {
-                this.view = this.viewDocument;
-                this.toolbarView = this.viewDocument;
+                this.view = this.viewDocumentObj;
+                this.toolbarView = this.viewDocumentObj;
             }
         }
         if (this.options.enableEditor) {
             this.currentZoomIndex = this.options.editorZoom;
             this.view2 = appendDivTo(this.views, { class: `vrv-view` });
-            this.viewEditor = new EditorPanel(this.view2, this, this.verovio, this.validator, this.rngLoader);
-            this.customEventManager.addToPropagationList(this.viewEditor.customEventManager);
+            this.viewEditorObj = new EditorPanel(this.view2, this, this.verovio, this.validator, this.rngLoader);
+            this.customEventManager.addToPropagationList(this.viewEditorObj.customEventManager);
             if (this.options.defaultView === 'editor') {
-                this.view = this.viewEditor;
-                this.toolbarView = this.viewEditor.editorView;
+                this.view = this.viewEditorObj;
+                this.toolbarView = this.viewEditorObj.editorViewObj;
             }
         }
         if (this.options.enableResponsive) {
             this.currentZoomIndex = this.options.responsiveZoom;
             this.view3 = appendDivTo(this.views, { class: `vrv-view` });
-            this.viewResponsive = new ResponsiveView(this.view3, this, this.verovio);
-            this.customEventManager.addToPropagationList(this.viewResponsive.customEventManager);
+            this.viewResponsiveObj = new ResponsiveView(this.view3, this, this.verovio);
+            this.customEventManager.addToPropagationList(this.viewResponsiveObj.customEventManager);
             if (this.options.defaultView === 'responsive') {
-                this.view = this.viewResponsive;
-                this.toolbarView = this.viewResponsive;
+                this.view = this.viewResponsiveObj;
+                this.toolbarView = this.viewResponsiveObj;
             }
         }
 
@@ -405,23 +405,23 @@ export class App {
     }
 
     createToolbar(): void {
-        this.appToolbar = new AppToolbar(this.toolbar, this);
-        this.customEventManager.addToPropagationList(this.appToolbar.customEventManager);
+        this.toolbarObj = new AppToolbar(this.toolbar, this);
+        this.customEventManager.addToPropagationList(this.toolbarObj.customEventManager);
 
-        this.midiToolbar = new MidiToolbar(this.toolbar, this);
-        this.midiPlayer = new MidiPlayer(this.midiToolbar);
-        this.customEventManager.addToPropagationList(this.midiToolbar.customEventManager);
+        this.midiToolbarObj = new MidiToolbar(this.toolbar, this);
+        this.midiPlayer = new MidiPlayer(this.midiToolbarObj);
+        this.customEventManager.addToPropagationList(this.midiToolbarObj.customEventManager);
     }
 
     createStatusbar(): void {
         if (!this.options.enableStatusbar) return;
 
-        this.appStatusbar = new AppStatusbar(this.statusbar, this);
-        this.customEventManager.addToPropagationList(this.appStatusbar.customEventManager);
+        this.statusbarObj = new AppStatusbar(this.statusbar, this);
+        this.customEventManager.addToPropagationList(this.statusbarObj.customEventManager);
     }
 
     createFilter(): void {
-        const filterDiv = appendDivTo(this.element, { class: `vrv-filter` });
+        const filterDiv = appendDivTo(this.div, { class: `vrv-filter` });
 
         var xHttp = new XMLHttpRequest();
         xHttp.onreadystatechange = function () {
@@ -439,7 +439,7 @@ export class App {
             if (onlyIfEmpty) return;
 
             this.fileStack.store(this.filename, this.mei);
-            if (this.appToolbar !== null) this.appToolbar.updateRecent();
+            if (this.toolbarObj !== null) this.toolbarObj.updateRecent();
         }
         this.mei = mei;
         this.filename = filename;
@@ -518,9 +518,9 @@ export class App {
             this.mei = await this.verovio.getMEI({});
         }
 
-        if (this.viewEditor) {
-            this.viewEditor.xmlEditorView.setEnabled(false);
-            this.viewEditor.xmlEditorView.setMode(this.mei.length);
+        if (this.viewEditorObj) {
+            this.viewEditorObj.xmlEditorViewObj.setEnabled(false);
+            this.viewEditorObj.xmlEditorViewObj.setMode(this.mei.length);
         }
 
         await this.checkSchema();
@@ -550,7 +550,7 @@ export class App {
         const schemaMatch = schema.exec(this.mei);
         if (schemaMatch && schemaMatch[1] !== this.currentSchema) {
             this.currentSchema = this.options.schemaDefault;
-            const dlg = new Dialog(this.dialog, this, "Different Schema in the file", { icon: "warning", type: Dialog.Type.Msg });
+            const dlg = new Dialog(this.dialogDiv, this, "Different Schema in the file", { icon: "warning", type: Dialog.Type.Msg });
             dlg.setContent(`The Schema '${schemaMatch[1]}' in the file is different from the one in the editor<br><br>The validation in the editor will use the Schema '${this.options.schemaDefault}'`);
             await dlg.show();
         }
@@ -606,14 +606,14 @@ export class App {
         //if (this.element.clientHeight < 400) this.element.style.height = `${400}px`;
         //if (this.element.clientWidth < 200) this.element.style.width = `${200}px`;
 
-        let height = this.element.clientHeight - this.toolbar.clientHeight - this.statusbar.clientHeight;
+        let height = this.div.clientHeight - this.toolbar.clientHeight - this.statusbar.clientHeight;
         if (height < parseInt(this.views.style.minHeight, 10)) {
             height = Number(this.views.style.minHeight);
-            this.element.style.height = `${height + this.toolbar.clientHeight}px`;
+            this.div.style.height = `${height + this.toolbar.clientHeight}px`;
         }
 
         this.views.style.height = `${height}px`
-        this.views.style.width = `${this.element.clientWidth}px`;
+        this.views.style.width = `${this.div.clientWidth}px`;
 
         this.statusbar.style.top = `${height}px`;
 
@@ -628,13 +628,13 @@ export class App {
         if (this.appReset) return;
 
         // Store zoom of each view
-        if (this.viewDocument) this.options.documentZoom = this.viewDocument.currentZoomIndex;
-        if (this.viewResponsive) this.options.responsiveZoom = this.viewResponsive.currentZoomIndex;
-        if (this.viewEditor) this.options.editorZoom = this.viewEditor.editorView.currentZoomIndex;
+        if (this.viewDocumentObj) this.options.documentZoom = this.viewDocumentObj.currentZoomIndex;
+        if (this.viewResponsiveObj) this.options.responsiveZoom = this.viewResponsiveObj.currentZoomIndex;
+        if (this.viewEditorObj) this.options.editorZoom = this.viewEditorObj.editorViewObj.currentZoomIndex;
         // Store current view
-        if (this.view == this.viewDocument) this.options.defaultView = 'document';
-        else if (this.view == this.viewResponsive) this.options.defaultView = 'responsive';
-        else if (this.view == this.viewEditor) this.options.defaultView = 'editor';
+        if (this.view == this.viewDocumentObj) this.options.defaultView = 'document';
+        else if (this.view == this.viewResponsiveObj) this.options.defaultView = 'responsive';
+        else if (this.view == this.viewEditorObj) this.options.defaultView = 'editor';
         // Do not store selection and editorial
         delete this.options['selection'];
         delete this.options['editorial'];
@@ -718,7 +718,7 @@ export class App {
     }
 
     async fileExport(e: Event): Promise<any> {
-        const dlg = new DialogExport(this.dialog, this, "Select MEI export parameters");
+        const dlg = new DialogExport(this.dialogDiv, this, "Select MEI export parameters");
         const dlgRes = await dlg.show();
         if (dlgRes === 0) return;
         this.startLoading("Generating MEI file ...");
@@ -750,7 +750,7 @@ export class App {
     }
 
     async fileSelection(e: Event): Promise<any> {
-        const dlg = new DialogSelection(this.dialog, this, "Apply a selection to the file currently loaded", { okLabel: "Apply", icon: "info", type: Dialog.Type.OKCancel }, this.options.selection);
+        const dlg = new DialogSelection(this.dialogDiv, this, "Apply a selection to the file currently loaded", { okLabel: "Apply", icon: "info", type: Dialog.Type.OKCancel }, this.options.selection);
         const dlgRes = await dlg.show();
         if (dlgRes === 1) {
             this.options.selection = dlg.selection;
@@ -766,7 +766,7 @@ export class App {
     }
 
     async githubImport(e: Event): Promise<any> {
-        const dlg = new DialogGhImport(this.dialog, this, "Import an MEI file from GitHub", {}, this.githubManager);
+        const dlg = new DialogGhImport(this.dialogDiv, this, "Import an MEI file from GitHub", {}, this.githubManager);
         const dlgRes = await dlg.show();
         if (dlgRes === 1) {
             this.loadData(dlg.data as string, dlg.filename);
@@ -774,19 +774,19 @@ export class App {
     }
 
     async githubExport(e: Event): Promise<any> {
-        const dlg = new DialogGhExport(this.dialog, this, "Export an MEI file to GitHub", {}, this.githubManager);
+        const dlg = new DialogGhExport(this.dialogDiv, this, "Export an MEI file to GitHub", {}, this.githubManager);
         const dlgRes = await dlg.show();
         if (dlgRes === 1) {
         }
     }
 
     async settingsEditor(e: Event): Promise<any> {
-        const dlg = new DialogSettingsEditor(this.dialog, this, "Editor options", { okLabel: "Apply", icon: "info", type: Dialog.Type.OKCancel }, this.options);
+        const dlg = new DialogSettingsEditor(this.dialogDiv, this, "Editor options", { okLabel: "Apply", icon: "info", type: Dialog.Type.OKCancel }, this.options);
         const dlgRes = await dlg.show();
         if (dlgRes === 1) {
             this.options.verovioVersion = dlg.appOptions.verovioVersion;
             if (dlg.reload) {
-                const dlg = new Dialog(this.dialog, this, "Reloading the editor", { okLabel: "Yes", icon: "question" });
+                const dlg = new Dialog(this.dialogDiv, this, "Reloading the editor", { okLabel: "Yes", icon: "question" });
                 dlg.setContent(marked.parse(reloadMsg));
                 if (await dlg.show() === 0) return;
                 location.reload();
@@ -795,7 +795,7 @@ export class App {
     }
 
     async settingsVerovio(e: Event): Promise<any> {
-        const dlg = new DialogSettingsVerovio(this.dialog, this, "Verovio options", { okLabel: "Apply", icon: "info", type: Dialog.Type.OKCancel }, this.options.selection, this.verovio);
+        const dlg = new DialogSettingsVerovio(this.dialogDiv, this, "Verovio options", { okLabel: "Apply", icon: "info", type: Dialog.Type.OKCancel }, this.options.selection, this.verovio);
         await dlg.loadOptions();
         const dlgRes = await dlg.show();
         if (dlgRes === 1) {
@@ -811,7 +811,7 @@ export class App {
     }
 
     async helpAbout(e: Event): Promise<any> {
-        const dlg = new DialogAbout(this.dialog, this, "About this application");
+        const dlg = new DialogAbout(this.dialogDiv, this, "About this application");
         const vrvVersion = await this.verovio.getVersion();
         dlg.setContent(marked.parse(aboutMsg + `\n\nVerovio: ${vrvVersion}`));
         await dlg.load();
@@ -819,7 +819,7 @@ export class App {
     }
 
     async helpReset(e: Event): Promise<any> {
-        const dlg = new Dialog(this.dialog, this, "Reset to default", { okLabel: "Yes", icon: "question" });
+        const dlg = new Dialog(this.dialogDiv, this, "Reset to default", { okLabel: "Yes", icon: "question" });
         dlg.setContent(marked.parse(resetMsg));
         if (await dlg.show() === 0) return;
         this.fileStack.reset();
@@ -839,7 +839,7 @@ export class App {
     async setView(e: Event): Promise<any> {
         const element = e.target as HTMLElement;
 
-        if (this.midiToolbar && this.midiToolbar.playing) {
+        if (this.midiToolbarObj && this.midiToolbarObj.playing) {
             this.midiPlayer.stop();
         }
 
@@ -847,16 +847,16 @@ export class App {
         this.view.customEventManager.dispatch(event);
 
         if (element.dataset.view == 'document') {
-            this.view = this.viewDocument;
-            this.toolbarView = this.viewDocument;
+            this.view = this.viewDocumentObj;
+            this.toolbarView = this.viewDocumentObj;
         }
         else if (element.dataset.view == 'editor') {
-            this.view = this.viewEditor;
-            this.toolbarView = this.viewEditor.editorView;
+            this.view = this.viewEditorObj;
+            this.toolbarView = this.viewEditorObj.editorViewObj;
         }
         else if (element.dataset.view == 'responsive') {
-            this.view = this.viewResponsive;
-            this.toolbarView = this.viewResponsive;
+            this.view = this.viewResponsiveObj;
+            this.toolbarView = this.viewResponsiveObj;
         }
 
         this.startLoading("Switching view ...");
@@ -866,7 +866,7 @@ export class App {
             }
         });
         this.view.customEventManager.dispatch(eventActivate);
-        this.appToolbar.customEventManager.dispatch(eventActivate);
+        this.toolbarObj.customEventManager.dispatch(eventActivate);
     }
 }
 

@@ -4,7 +4,6 @@
 
 import { App } from '../app.js';
 import { Dialog } from './dialog.js';
-
 import { appendDivTo } from '../utils/functions.js';
 import { changelogUrl, libraries, licenseUrl  } from '../utils/messages.js';
 

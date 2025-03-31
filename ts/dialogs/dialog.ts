@@ -11,7 +11,7 @@ import { appendDetailsTo, appendDivTo, appendSummaryTo, insertDivBefore } from '
 export class Dialog {
     app: App;
     eventManager: EventManager;
-    element: HTMLDivElement;
+    div: HTMLDivElement;
     options: Dialog.Options;
     deferred: Deferred;
 
@@ -34,9 +34,9 @@ export class Dialog {
             cancelLabel: "Cancel"
         }, options);
 
-        this.element = div;
+        this.div = div;
         // Remove previous content
-        this.element.innerHTML = "";
+        this.div.innerHTML = "";
 
         this.app = app;
 
@@ -44,7 +44,7 @@ export class Dialog {
         this.bindListeners(); // Document/Window-scoped events
 
         // Create the HTML content
-        this.box = appendDivTo(this.element, { class: `vrv-dialog-box` });
+        this.box = appendDivTo(this.div, { class: `vrv-dialog-box` });
 
         // The top of the dialog
         this.top = appendDivTo(this.box, { class: `vrv-dialog-top` });
@@ -102,20 +102,20 @@ export class Dialog {
     }
 
     cancel(): void {
-        this.element.style.display = 'none';
+        this.div.style.display = 'none';
         document.removeEventListener('keydown', this.boundKeyDown);
         this.deferred.resolve(0);
     }
 
     ok(): void {
-        this.element.style.display = 'none';
+        this.div.style.display = 'none';
         document.removeEventListener('keydown', this.boundKeyDown);
         const resolveValue = (this.options.type === Dialog.Type.Msg) ? 0 : 1;
         this.deferred.resolve(resolveValue);
     }
 
     async show(): Promise<any> {
-        this.element.style.display = 'block';
+        this.div.style.display = 'block';
         this.okBtn.focus();
         this.deferred = new Deferred();
         return this.deferred.promise;

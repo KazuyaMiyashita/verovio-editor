@@ -4,14 +4,15 @@
  * It should not be instantiated directly but only through inherited classes.
  */
 import { CustomEventManager } from '../events/custom-event-manager.js';
+import { randomHex } from '../utils/functions.js';
 export class GenericView {
     constructor(div, app) {
         // Root element in which verovio-ui is created
-        this.element = div;
+        this.div = div;
         // App object
         this.app = app;
         // Generate an id for the CustomEventManager
-        this.id = Math.floor((1 + Math.random()) * Math.pow(16, 16)).toString(16).substring(1);
+        this.id = randomHex(16);
         this.active = false;
         this.customEventManager = new CustomEventManager();
         this.customEventManager.bind(this, 'onActivate', this.onActivate);
@@ -35,13 +36,13 @@ export class GenericView {
     ////////////////////////////////////////////////////////////////////////
     onActivate(e) {
         //console.debug("GenericView::onActivate");
-        this.element.style.display = 'block';
+        this.div.style.display = 'block';
         this.active = true;
         return true;
     }
     onDeactivate(e) {
         //console.debug("GenericView::onDeactivate");
-        this.element.style.display = 'none';
+        this.div.style.display = 'none';
         this.active = false;
         return true;
     }

@@ -27,7 +27,7 @@ export class ActionManager {
     constructor(view: EditorView) {
         // EditorView object
         this.view = view;
-        this.cursorPointer = view.cursorPointer;
+        this.cursorPointer = view.cursorPointerObj;
         this.verovio = view.verovio;
 
         this.eventManager = new EventManager(this);
@@ -70,8 +70,7 @@ export class ActionManager {
         }
         await this.view.renderPage(true);
 
-        // WIP disable udpateMEI
-        //this.view.updateMEI();
+        this.view.updateMEI();
         this.inProgress = false;
 
         // Check that nothing was added in-between

@@ -44,43 +44,15 @@ export class GenericTree extends GenericView {
     if (!json || !json.element) throw new Error("Invalid JSON data: Missing 'element' property");
 
     this.root = buildTree(json);
-    this.rootElement = appendDivTo(this.element, { class: `vrv-tree-root` });
+    this.rootElement = appendDivTo(this.div, { class: `vrv-tree-root` });
     this.root.html(this.rootElement);
-  }
-
-  /*
-  traverse(callback: (node: TreeNode) => void) {
-    function visit(node: TreeNode) {
-      callback(node);
-      node.children.forEach(visit);
-    }
-    if (this.root) visit(this.root);
-  }
-  */
-
-  ////////////////////////////////////////////////////////////////////////
-  // Custom event methods
-  ////////////////////////////////////////////////////////////////////////
-
-  override onActivate(e: CustomEvent): boolean {
-    //console.debug("GenericView::onActivate");
-    this.element.style.display = 'block';
-    this.active = true;
-    return true;
-  }
-
-  override onDeactivate(e: CustomEvent): boolean {
-    //console.debug("GenericView::onDeactivate");
-    this.element.style.display = 'none';
-    this.active = false;
-    return true;
   }
 }
 
 export class TreeNode {
-  element: HTMLDivElement;
+  div: HTMLDivElement;
   id: string | null; // Unique node identifier
-  elementName: string; // XML tag name
+  element: string; // XML tag name
   attributes: Record<string, string>; // Key-value attributes
   children: TreeNode[];
   isTextNode: boolean; // Flag for text nodes
@@ -93,7 +65,7 @@ export class TreeNode {
     isTextNode: boolean = false
   ) {
     this.id = id;
-    this.elementName = element;
+    this.element = element;
     this.attributes = attributes;
     this.children = children;
     this.isTextNode = isTextNode;
@@ -101,16 +73,16 @@ export class TreeNode {
 
   reset(): void {
     this.children.forEach(child => child.reset());
-    while (this.element.firstChild) {
-      this.element.firstChild.remove();
+    while (this.div.firstChild) {
+      this.div.firstChild.remove();
     }
   }
 
-  html(element: HTMLDivElement) {
-    this.element = element;
-    let label = appendDivTo(this.element, { class: `vrv-node-label` });
-    label.innerHTML = this.elementName;
-    let children = appendDivTo(this.element, { class: `vrv-node-children` });
+  html(div: HTMLDivElement) {
+    this.div = div;
+    let label = appendDivTo(this.div, { class: `vrv-node-label` });
+    label.innerHTML = this.element;
+    let children = appendDivTo(this.div, { class: `vrv-node-children` });
     this.children.forEach(child => {
       let node = appendDivTo(children, { class: `vrv-tree-node` });
       child.html(node);

@@ -6,23 +6,24 @@
 
 import { App } from '../app.js';
 import { CustomEventManager } from '../events/custom-event-manager.js';
+import { randomHex } from '../utils/functions.js';
 
 export class GenericView {
     app: App;
-    element: HTMLDivElement;
+    div: HTMLDivElement;
     id: string;
     active: boolean;
     customEventManager: CustomEventManager;
 
     constructor(div: HTMLDivElement, app: App) {
         // Root element in which verovio-ui is created
-        this.element = div;
+        this.div = div;
 
         // App object
         this.app = app;
 
         // Generate an id for the CustomEventManager
-        this.id = Math.floor((1 + Math.random()) * Math.pow(16, 16)).toString(16).substring(1);
+        this.id = randomHex(16);
 
         this.active = false;
 
@@ -51,14 +52,14 @@ export class GenericView {
 
     onActivate(e: CustomEvent): boolean {
         //console.debug("GenericView::onActivate");
-        this.element.style.display = 'block';
+        this.div.style.display = 'block';
         this.active = true;
         return true;
     }
 
     onDeactivate(e: CustomEvent): boolean {
         //console.debug("GenericView::onDeactivate");
-        this.element.style.display = 'none';
+        this.div.style.display = 'none';
         this.active = false;
         return true;
     }

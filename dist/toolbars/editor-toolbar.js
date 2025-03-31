@@ -23,7 +23,7 @@ export class EditorToolbar extends Toolbar {
         this.active = true;
         this.selectedElementType = null;
         // sub-toolbar in application 
-        this.layoutControls = appendDivTo(this.element, { class: `vrv-btn-group` });
+        this.layoutControls = appendDivTo(this.div, { class: `vrv-btn-group` });
         appendDivTo(this.layoutControls, { class: `vrv-h-separator` });
         this.xmlEditorEnable = appendDivTo(this.layoutControls, { class: `vrv-btn-icon-large`, style: { backgroundImage: `url(${editorXml})` } });
         appendSpanTo(this.xmlEditorEnable, { class: `vrv-tooltip` }, "Open or close the XML editor");
@@ -33,10 +33,10 @@ export class EditorToolbar extends Toolbar {
         appendSpanTo(this.xmlEditorValidate, { class: `vrv-tooltip` }, "Validate and refresh rendering ('Shift-Ctrl-V')");
         this.xmlEditorForce = appendDivTo(this.layoutControls, { class: `vrv-btn-icon-large`, style: { backgroundImage: `url(${editorXmlForce})` } });
         appendSpanTo(this.xmlEditorForce, { class: `vrv-tooltip` }, "By-pass XML validation and force reload");
-        appendDivTo(this.element, { class: `vrv-h-separator` });
-        this.notes = appendDivTo(this.element, { class: `vrv-btn-text`, 'data-before': `Notes` });
-        appendDivTo(this.element, { class: `vrv-h-separator` });
-        this.controlEvents = appendDivTo(this.element, { class: `vrv-btn-text`, 'data-before': `Control events` });
+        appendDivTo(this.div, { class: `vrv-h-separator` });
+        this.notes = appendDivTo(this.div, { class: `vrv-btn-text`, 'data-before': `Notes` });
+        appendDivTo(this.div, { class: `vrv-h-separator` });
+        this.controlEvents = appendDivTo(this.div, { class: `vrv-btn-text`, 'data-before': `Control events` });
         // binding
         this.panel.eventManager.bind(this.xmlEditorEnable, 'click', this.panel.onToggle);
         this.panel.eventManager.bind(this.xmlEditorOrientation, 'click', this.panel.onToggleOrientation);
@@ -45,18 +45,18 @@ export class EditorToolbar extends Toolbar {
         this.eventManager.bind(this.notes, 'click', this.onNotes);
         this.eventManager.bind(this.controlEvents, 'click', this.onControlEvents);
         // controlEventControls
-        this.controlEventControls = appendDivTo(this.element, { class: `vrv-btn-group` });
+        this.controlEventControls = appendDivTo(this.div, { class: `vrv-btn-group` });
         appendDivTo(this.controlEventControls, { class: `vrv-h-separator` });
         this.placeAbove = appendDivTo(this.controlEventControls, { class: `vrv-btn-icon-large`, style: { backgroundImage: `url(${editorPlaceAbove})` } });
         this.placeBelow = appendDivTo(this.controlEventControls, { class: `vrv-btn-icon-large`, style: { backgroundImage: `url(${editorPlaceBelow})` } });
         this.placeAuto = appendDivTo(this.controlEventControls, { class: `vrv-btn-icon-large`, style: { backgroundImage: `url(${editorPlaceAuto})` } });
         // hairpinFormControls
-        this.hairpinFormControls = appendDivTo(this.element, { class: `vrv-btn-group` });
+        this.hairpinFormControls = appendDivTo(this.div, { class: `vrv-btn-group` });
         appendDivTo(this.hairpinFormControls, { class: `vrv-h-separator` });
         this.formCres = appendDivTo(this.hairpinFormControls, { class: `vrv-btn-icon-large`, style: { backgroundImage: `url(${editorFormCres})` } });
         this.formDim = appendDivTo(this.hairpinFormControls, { class: `vrv-btn-icon-large`, style: { backgroundImage: `url(${editorFormDim})` } });
         // stemControls
-        this.stemControls = appendDivTo(this.element, { class: `vrv-btn-group` });
+        this.stemControls = appendDivTo(this.div, { class: `vrv-btn-group` });
         appendDivTo(this.stemControls, { class: `vrv-h-separator` });
         this.stemDirUp = appendDivTo(this.stemControls, { class: `vrv-btn-icon-large`, style: { backgroundImage: `url(${editorStemDirUp})` } });
         this.stemDirDown = appendDivTo(this.stemControls, { class: `vrv-btn-icon-large`, style: { backgroundImage: `url(${editorStemDirDown})` } });
@@ -69,9 +69,9 @@ export class EditorToolbar extends Toolbar {
         let iconsLayoutH = `${this.app.host}/icons/toolbar/layout-h.png`;
         let iconsLayoutV = `${this.app.host}/icons/toolbar/layout-v.png`;
         const isHorizontal = (this.app.options.editorSplitterHorizontal) ? true : false;
-        const isToggled = this.panel.xmlEditorView.isEnabled() ? true : false;
-        const isAutoMode = this.panel.xmlEditorView.isAutoMode() ? true : false;
-        const isEdited = this.panel.xmlEditorView.isEdited() ? true : false;
+        const isToggled = this.panel.xmlEditorViewObj.isEnabled() ? true : false;
+        const isAutoMode = this.panel.xmlEditorViewObj.isAutoMode() ? true : false;
+        const isEdited = this.panel.xmlEditorViewObj.isEdited() ? true : false;
         if (isHorizontal) {
             this.xmlEditorOrientation.style.backgroundImage = `url(${iconsLayoutV})`;
         }
@@ -170,8 +170,8 @@ export class EditorToolbar extends Toolbar {
         this.updateAll();
     }
     onTriggerValidation(e) {
-        if (this.panel.xmlEditorView && this.panel.xmlEditorView.isEdited()) {
-            this.panel.xmlEditorView.triggerValidation();
+        if (this.panel.xmlEditorViewObj && this.panel.xmlEditorViewObj.isEdited()) {
+            this.panel.xmlEditorViewObj.triggerValidation();
         }
     }
 }

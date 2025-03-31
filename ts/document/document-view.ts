@@ -38,7 +38,7 @@ export class DocumentView extends VerovioView {
     constructor(div: HTMLDivElement, app: App, verovio: VerovioWorkerProxy) {
         super(div, app, verovio);
 
-        this.docWrapper = appendDivTo(this.element, { class: `vrv-doc-wrapper`, style: { position: `absolute` } });
+        this.docWrapper = appendDivTo(this.div, { class: `vrv-doc-wrapper`, style: { position: `absolute` } });
 
         this.observer;
         try {
@@ -145,21 +145,21 @@ export class DocumentView extends VerovioView {
     }
 
     async updateResized(): Promise<any> {
-        this.element.style.height = this.element.parentElement.style.height;
-        this.element.style.width = this.element.parentElement.style.width;
+        this.div.style.height = this.div.parentElement.style.height;
+        this.div.style.width = this.div.parentElement.style.width;
 
         if (this.docWrapper) {
             this.currentDocMargin = this.app.options.documentViewMargin * this.currentScale / 100;
 
             this.currentPageWidth = this.app.verovioOptions.pageWidth * this.currentScale / 100;
             const docWidth = this.currentPageWidth + 2 * this.currentDocMargin + 2 * this.app.options.documentViewPageBorder;
-            const elementWidth = parseInt(this.element.parentElement.style.width, 10);
+            const elementWidth = parseInt(this.div.parentElement.style.width, 10);
             this.currentDocWidth = Math.max(elementWidth, docWidth);
             this.docWrapper.style.width = `${this.currentDocWidth}px`;
 
             this.currentPageHeight = this.app.verovioOptions.pageHeight * this.currentScale / 100;
             const docHeight = (this.currentPageHeight + this.currentDocMargin + 2 * this.app.options.documentViewPageBorder) * this.app.pageCount + this.currentDocMargin;
-            const elementHeight = parseInt(this.element.parentElement.style.height, 10);
+            const elementHeight = parseInt(this.div.parentElement.style.height, 10);
             this.currentDocHeight = Math.max(elementHeight, docHeight);
             this.docWrapper.style.height = `${this.currentDocHeight}px`;
         }

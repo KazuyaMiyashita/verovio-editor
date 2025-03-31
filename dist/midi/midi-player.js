@@ -7,7 +7,7 @@ export class MidiPlayer {
     constructor(midiToolbar) {
         this.midiToolbar = midiToolbar;
         this.midiToolbar.midiPlayer = this;
-        this.midiPlayerElement = appendMidiPlayerTo(this.midiToolbar.element, {});
+        this.midiPlayerElement = appendMidiPlayerTo(this.midiToolbar.div, {});
         this.midiPlayerElement.addEventListener('load', () => this.play());
         this.midiPlayerElement.addEventListener('note', () => this.onUpdateNoteTime(this.midiPlayerElement.currentTime));
         this.midiPlayerElement.addEventListener('stop', (e) => this.onStop(e));

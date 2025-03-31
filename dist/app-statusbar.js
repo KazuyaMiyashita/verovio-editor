@@ -8,7 +8,7 @@ export class AppStatusbar extends GenericView {
     constructor(div, app) {
         super(div, app);
         this.active = true;
-        this.statustext = appendDivTo(this.element, { class: `vrv-status-text` });
+        this.statustext = appendDivTo(this.div, { class: `vrv-status-text` });
     }
     ////////////////////////////////////////////////////////////////////////
     // Class-specific methods

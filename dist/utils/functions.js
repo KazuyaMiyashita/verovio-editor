@@ -13,8 +13,14 @@ export function appendDivTo(parent, options) {
 export function insertDivBefore(parent, options, before) {
     return insertHTMLElementBefore(parent, options, 'div', before);
 }
+export function appendFieldSetTo(parent, options) {
+    return appendHTMLElementTo(parent, options, 'fieldset');
+}
 export function appendInputTo(parent, options) {
     return appendHTMLElementTo(parent, options, 'input');
+}
+export function appendLegendTo(parent, options) {
+    return appendHTMLElementTo(parent, options, 'legend');
 }
 export function appendLinkTo(parent, options) {
     return appendHTMLElementTo(parent, options, 'link');

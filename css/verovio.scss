@@ -46,7 +46,7 @@ $toolbar-height: 36px;
 $menu-height: 18px;
 $statusbar-height: 20px;
 $editor-tool-panel-width: 300px;
-$editor-keyboard-height: 0px; //110px;
+$editor-keyboard-height: 110px;
 $btn-height: 40px;
 $dialog-gh-list-height: 350px;
 
@@ -245,15 +245,15 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
             .vrv-editor-tool-panel {
                 min-width: $editor-tool-panel-width;                
                 max-width: $editor-tool-panel-width;
-                background-color: lighten($doc-background, 15%);
-                border-right: 5px solid $background-border;
-                border-left: 5px solid $background-border;
-                padding: 5px;
-                //border-bottom: 1px solid $background-border;
+                background: $dialog-color;
+                padding: 10px;
+                border-top: 1px solid $background-border;
+                border-bottom: 1px solid $background-border;
+                color: $text-color;
             }
 
             .vrv-keyboard-panel {
-                display: none; //flex;
+                display: flex;
                 min-height: $editor-keyboard-height;
                 background-color: $background;
                 border-top: 1px solid $background-border;

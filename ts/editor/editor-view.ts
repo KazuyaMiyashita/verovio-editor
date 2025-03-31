@@ -3,20 +3,19 @@
  * It uses a responsive layout. 
  */
 
-import { App } from '../app.js';
-import { ResponsiveView } from '../verovio/responsive-view.js';
-import { EditorCursorPointer } from './editor-cursor-pointer.js';
 import { ActionManager } from '../events/action-manager.js';
+import { App } from '../app.js';
+import { EditorCursorPointer } from './editor-cursor-pointer.js';
+import { ResponsiveView } from '../verovio/responsive-view.js';
 import { VerovioWorkerProxy } from '../utils/worker-proxy.js';
-
 import { appendDivTo, appendMidiPlayerTo, MidiPlayerElement } from '../utils/functions.js';
 import { midiScale } from '../midi/midi-scale.js'
 
 export class EditorView extends ResponsiveView {
     midiPlayerElement: MidiPlayerElement;
     svgOverlay: HTMLDivElement;
-    cursor: HTMLDivElement;
-    cursorPointer: EditorCursorPointer;
+    cursorPointer: HTMLDivElement;
+    cursorPointerObj: EditorCursorPointer;
     mouseMoveTimer: boolean;
     draggingActive: boolean;
     highlightedCache: Array<string>;
@@ -26,14 +25,14 @@ export class EditorView extends ResponsiveView {
     constructor(div: HTMLDivElement, app: App, verovio: VerovioWorkerProxy) {
         super(div, app, verovio);
 
-        this.midiPlayerElement = appendMidiPlayerTo(this.element, {});
+        this.midiPlayerElement = appendMidiPlayerTo(this.div, {});
         this.midiPlayerElement.setAttribute('src', midiScale);
 
         // add the svgOverlay for dragging
-        this.svgOverlay = appendDivTo(this.element, { class: `vrv-svg-overlay`, style: { position: `absolute` } });
+        this.svgOverlay = appendDivTo(this.div, { class: `vrv-svg-overlay`, style: { position: `absolute` } });
 
-        this.cursor = appendDivTo(this.element, { class: `vrv-editor-cursor` });
-        this.cursorPointer = new EditorCursorPointer(this.cursor, this);
+        this.cursorPointer = appendDivTo(this.div, { class: `vrv-editor-cursor` });
+        this.cursorPointerObj = new EditorCursorPointer(this.cursorPointer, this);
 
         // synchronized scrolling between svg overlay and wrapper
         this.eventManager.bind(this.svgOverlay, 'scroll', this.scrollListener);
@@ -69,9 +68,9 @@ export class EditorView extends ResponsiveView {
         const svgRoot: SVGElement = this.svgWrapper.querySelector('svg');
         if (!svgRoot) return;
 
-        const top = this.element.getBoundingClientRect().top;
-        const left = this.element.getBoundingClientRect().left;
-        this.cursorPointer.init(svgRoot, top, left);
+        const top = this.div.getBoundingClientRect().top;
+        const left = this.div.getBoundingClientRect().left;
+        this.cursorPointerObj.init(svgRoot, top, left);
     }
 
     ////////////////////////////////////////////////////////////////////////
@@ -301,9 +300,9 @@ export class EditorView extends ResponsiveView {
         e.cancelBubble = true;
 
         // Note input
-        if (this.cursorPointer.inputMode) {
-            this.actionManager.insertNote(this.cursorPointer.elementX, this.cursorPointer.currentY);
-            this.cursorPointer.hide();
+        if (this.cursorPointerObj.inputMode) {
+            this.actionManager.insertNote(this.cursorPointerObj.elementX, this.cursorPointerObj.currentY);
+            this.cursorPointerObj.hide();
             return;
         }
 
@@ -324,13 +323,13 @@ export class EditorView extends ResponsiveView {
         // Multiple selection - add it to the cursor
         if (e.shiftKey) {
             this.activateHighlight(id);
-            this.cursorPointer.add(id, node);
+            this.cursorPointerObj.add(id, node);
             document.addEventListener('mousemove', this.boundMouseMove);
             document.addEventListener('mouseup', this.boundMouseUp);
             return;
         }
 
-        this.cursorPointer.hide();
+        this.cursorPointerObj.hide();
         // More to reset here?
         document.removeEventListener('mousemove', this.boundMouseMove);
         document.removeEventListener('touchmove', this.boundMouseMove);
@@ -346,7 +345,7 @@ export class EditorView extends ResponsiveView {
 
         this.resetHighlights();
         this.activateHighlight(id);
-        this.cursorPointer.initEvent(e, id, node);
+        this.cursorPointerObj.initEvent(e, id, node);
 
         // we haven't started to drag yet, this might be just a selection
         document.addEventListener('mousemove', this.boundMouseMove);
@@ -360,12 +359,12 @@ export class EditorView extends ResponsiveView {
         //console.debug( "Hey!" );
         let node: SVGElement = this.getClosestMEIElement((<SVGElement>e.target));
         if (node && node.classList.contains('staff')) {
-            this.cursorPointer.staffEnter(node);
+            this.cursorPointerObj.staffEnter(node);
         }
     }
 
     mouseLeaveListener(e: MouseEvent): void {
-        this.cursorPointer.hide();
+        this.cursorPointerObj.hide();
         document.removeEventListener('mouseup', this.boundMouseUp);
         document.removeEventListener('touchend', this.boundMouseUp);
         document.removeEventListener('mousemove', this.boundMouseMove);
@@ -377,20 +376,20 @@ export class EditorView extends ResponsiveView {
         // Fire drag event only every 50ms
         if (!this.mouseMoveTimer) {
             const timerThis = this;
-            this.cursorPointer.lastEvent = e;
+            this.cursorPointerObj.lastEvent = e;
             this.mouseMoveTimer = true;
 
             setTimeout(function () {
                 timerThis.mouseMoveTimer = false;
-                if (timerThis.cursorPointer.lastEvent.buttons == 1) {
-                    timerThis.cursorPointer.hide();
-                    timerThis.cursorPointer.moveToLastEvent(false);
+                if (timerThis.cursorPointerObj.lastEvent.buttons == 1) {
+                    timerThis.cursorPointerObj.hide();
+                    timerThis.cursorPointerObj.moveToLastEvent(false);
                     timerThis.draggingActive = true; // we know we're dragging if this listener triggers
-                    let distY = timerThis.cursorPointer.currentY - timerThis.cursorPointer.elementY;
+                    let distY = timerThis.cursorPointerObj.currentY - timerThis.cursorPointerObj.elementY;
                     timerThis.actionManager.drag(0, distY);
                 }
                 else {
-                    timerThis.cursorPointer.moveToLastEvent();
+                    timerThis.cursorPointerObj.moveToLastEvent();
                 }
 
             }, 50);
@@ -427,10 +426,10 @@ export class EditorView extends ResponsiveView {
 
     scrollListener(e: Event): void {
         let element = (e.target as HTMLElement);
-        this.cursorPointer.scrollTop = element.scrollTop;
-        this.cursorPointer.scrollLeft = element.scrollLeft;
-        if (this.cursorPointer.lastEvent) {
-            this.cursorPointer.update();
+        this.cursorPointerObj.scrollTop = element.scrollTop;
+        this.cursorPointerObj.scrollLeft = element.scrollLeft;
+        if (this.cursorPointerObj.lastEvent) {
+            this.cursorPointerObj.update();
         }
         this.svgWrapper.scrollTop = element.scrollTop;
         this.svgWrapper.scrollLeft = element.scrollLeft;

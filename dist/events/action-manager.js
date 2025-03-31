@@ -18,7 +18,7 @@ export class ActionManager {
     constructor(view) {
         // EditorView object
         this.view = view;
-        this.cursorPointer = view.cursorPointer;
+        this.cursorPointer = view.cursorPointerObj;
         this.verovio = view.verovio;
         this.eventManager = new EventManager(this);
         this.inProgress = false;
@@ -55,8 +55,7 @@ export class ActionManager {
                 this.view.currentPage = this.view.app.pageCount;
             }
             yield this.view.renderPage(true);
-            // WIP disable udpateMEI
-            //this.view.updateMEI();
+            this.view.updateMEI();
             this.inProgress = false;
             // Check that nothing was added in-between
             if (this.delayedCalls.length > 0) {

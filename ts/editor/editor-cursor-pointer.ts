@@ -3,7 +3,6 @@
  */
 
 import { EditorView } from './editor-view.js';
-
 import { appendDivTo } from '../utils/functions.js';
 
 interface SelectedItem {
@@ -15,7 +14,7 @@ interface SelectedItem {
 };
 
 export class EditorCursorPointer {
-    element: HTMLDivElement;
+    div: HTMLDivElement;
     editorView: EditorView;
 
     lines: HTMLDivElement;
@@ -70,13 +69,13 @@ export class EditorCursorPointer {
 
     constructor(div: HTMLDivElement, editorView: EditorView) {
         // Root element in which verovio-ui is created
-        this.element = div;
+        this.div = div;
 
         // EditorView object
         this.editorView = editorView;
 
-        this.lines = appendDivTo(this.element, { class: `vrv-cursor-lines` });
-        this.pointer = appendDivTo(this.element, { class: `vrv-cursor-pointer` });
+        this.lines = appendDivTo(this.div, { class: `vrv-cursor-lines` });
+        this.pointer = appendDivTo(this.div, { class: `vrv-cursor-pointer` });
 
         this.activated = false;
         this.inputMode = false;
@@ -389,9 +388,9 @@ export class EditorCursorPointer {
     hide(): void {
         //console.debug( "hide cursor" );
         this.inputMode = false;
-        this.element.style.left = '-1000px';
-        this.element.style.top = '-1000px';
-        this.element.style.display = 'none';
+        this.div.style.left = '-1000px';
+        this.div.style.top = '-1000px';
+        this.div.style.display = 'none';
     }
 
     ////////////////////////////////////////////////////////////////////////

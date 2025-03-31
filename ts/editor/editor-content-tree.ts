@@ -1,19 +1,23 @@
 import { App } from '../app.js';
 import { EventManager } from '../events/event-manager.js';
 import { GenericTree } from '../utils/generic-tree.js';
-
+import { Tab } from '../utils/tab-group.js'
 import { appendDivTo } from '../utils/functions.js';
 
-export class EditorMusicTree extends GenericTree {
+export class EditorContentTree extends GenericTree {
+    tab: Tab;
     breadCrumbs: HTMLDivElement;
     eventManager: EventManager;
 
-    constructor(div: HTMLDivElement, app: App) {
+    constructor(div: HTMLDivElement, app: App, tab: Tab) {
         super(div, app);
+
+        this.tab = tab;
 
         this.eventManager = new EventManager(this);
 
-        this.breadCrumbs = appendDivTo(this.element, { class: `vrv-path-breadcrumbs` });
+        let treeBreadCrumbsWrapper = appendDivTo(this.div, { class: `vrv-tree-breadcrumbs` });
+        this.breadCrumbs = appendDivTo(treeBreadCrumbsWrapper, { class: `vrv-path-breadcrumbs` });
 
         //this.breadCrumbs.style.display = 'flex';
         let crumbs = ["measure", "staff", "layer", "app", "rdg",
@@ -63,9 +67,24 @@ export class EditorMusicTree extends GenericTree {
 
     override onSelect(e: CustomEvent): boolean {
         if (!super.onSelect(e)) return false;
-        console.debug("GenericTree::onSelect");
+        console.debug("EditorContentTree::onSelect");
+        
         this.currentId = e.detail.id;
         this.setCurrent(this.currentId);
+
+        return true;
+    }
+
+    override onLoadData(e: CustomEvent): boolean {
+        if (!super.onLoadData(e)) return false;
+        console.debug("EditorContentTree::onLoadData");
+        
+        return true;
+    }
+
+    override onUpdateData(e: CustomEvent): boolean {
+        if (!super.onUpdateData(e)) return false;
+        console.debug("EditorContentTree::onUpdateData");
 
         return true;
     }

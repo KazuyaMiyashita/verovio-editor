@@ -17,7 +17,7 @@ export class ResponsiveView extends VerovioView {
     constructor(div, app, verovio) {
         super(div, app, verovio);
         // initializes ui underneath the parent element, as well as Verovio communication
-        this.svgWrapper = appendDivTo(this.element, { class: `vrv-svg-wrapper` });
+        this.svgWrapper = appendDivTo(this.div, { class: `vrv-svg-wrapper` });
         this.midiIds = [];
     }
     ////////////////////////////////////////////////////////////////////////
@@ -64,10 +64,10 @@ export class ResponsiveView extends VerovioView {
     updateLoadData() {
         return __awaiter(this, void 0, void 0, function* () {
             if (!(this instanceof EditorView)) {
-                this.element.style.height = this.element.parentElement.style.height;
-                this.element.style.width = this.element.parentElement.style.width;
+                this.div.style.height = this.div.parentElement.style.height;
+                this.div.style.width = this.div.parentElement.style.width;
             }
-            if (this.element && this.svgWrapper) {
+            if (this.div && this.svgWrapper) {
                 this.updateSVGDimensions();
                 // Reset pageHeight and pageWidth to match the effective scaled viewport width
                 this.app.verovioOptions.scale = this.currentScale;
@@ -167,8 +167,8 @@ export class ResponsiveView extends VerovioView {
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
     updateSVGDimensions() {
-        this.svgWrapper.style.height = this.element.style.height;
-        this.svgWrapper.style.width = this.element.style.width;
+        this.svgWrapper.style.height = this.div.style.height;
+        this.svgWrapper.style.width = this.div.style.width;
     }
     ////////////////////////////////////////////////////////////////////////
     // Custom event methods

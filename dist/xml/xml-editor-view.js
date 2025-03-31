@@ -32,8 +32,8 @@ export class XMLEditorView extends GenericView {
         // RNGLoader object
         this.rngLoader = rngLoader;
         this.currentId = null;
-        this.xmlValid = appendDivTo(this.element, { class: `vrv-xml-valid` });
-        this.xmlEditorView = appendTextAreaTo(this.element, {});
+        this.xmlValid = appendDivTo(this.div, { class: `vrv-xml-valid` });
+        this.xmlEditorView = appendTextAreaTo(this.div, {});
         this.updateLinting = null;
         this.currentId = "";
         this.timestamp = Date.now();
@@ -106,7 +106,7 @@ export class XMLEditorView extends GenericView {
         return __awaiter(this, void 0, void 0, function* () {
             this.enabled = enabled;
             if (this.enabled && this.autoModeNotification && !this.autoMode) {
-                const dlg = new Dialog(this.app.dialog, this.app, "Live validation off", { icon: "warning", type: Dialog.Type.Msg });
+                const dlg = new Dialog(this.app.dialogDiv, this.app, "Live validation off", { icon: "warning", type: Dialog.Type.Msg });
                 dlg.setContent(marked.parse(autoModeOff));
                 yield dlg.show();
                 // Do not show it again for that file.
@@ -192,7 +192,7 @@ export class XMLEditorView extends GenericView {
         cursor.findNext();
         if (cursor.atOccurrence) {
             // Move with a margin in order to make the highlighted line more visible
-            this.CMeditor.scrollIntoView({ line: cursor.pos.from.line, char: 0 }, this.element.clientHeight / 2);
+            this.CMeditor.scrollIntoView({ line: cursor.pos.from.line, char: 0 }, this.div.clientHeight / 2);
             this.CMeditor.setCursor(cursor.from());
         }
     }
@@ -316,7 +316,7 @@ export class XMLEditorView extends GenericView {
         //console.debug("XMLEditorView::onActivate");
         this.CMeditor.setValue(this.app.mei);
         this.CMeditor.refresh();
-        this.CMeditor.setSize(this.element.style.width, this.element.style.height);
+        this.CMeditor.setSize(this.div.style.width, this.div.style.height);
         return true;
     }
     onLoadData(e) {
@@ -351,7 +351,7 @@ export class XMLEditorView extends GenericView {
         if (!super.onResized(e))
             return false;
         //console.debug("XMLEditorView::onResized");
-        this.CMeditor.setSize(this.element.style.width, this.element.style.height);
+        this.CMeditor.setSize(this.div.style.width, this.div.style.height);
         return true;
     }
 }
