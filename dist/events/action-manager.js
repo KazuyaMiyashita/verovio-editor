@@ -55,7 +55,7 @@ export class ActionManager {
                 this.view.currentPage = this.view.app.pageCount;
             }
             yield this.view.renderPage(true);
-            this.view.updateMEI();
+            //this.view.updateMEI();
             this.inProgress = false;
             // Check that nothing was added in-between
             if (this.delayedCalls.length > 0) {

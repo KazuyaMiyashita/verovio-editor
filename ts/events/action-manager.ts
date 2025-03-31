@@ -70,7 +70,7 @@ export class ActionManager {
         }
         await this.view.renderPage(true);
 
-        this.view.updateMEI();
+        //this.view.updateMEI();
         this.inProgress = false;
 
         // Check that nothing was added in-between

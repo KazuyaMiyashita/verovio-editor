@@ -383,7 +383,7 @@ export class App {
                 this.mei = yield this.verovio.getMEI({});
             }
             if (this.viewEditorObj) {
-                this.viewEditorObj.xmlEditorViewObj.setEnabled(false);
+                this.viewEditorObj.xmlEditorEnabled = false;
                 this.viewEditorObj.xmlEditorViewObj.setMode(this.mei.length);
             }
             yield this.checkSchema();

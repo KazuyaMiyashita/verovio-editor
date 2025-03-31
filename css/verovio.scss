@@ -243,12 +243,11 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
             ////////////////////////////////////////////////////////////////////////
 
             .vrv-editor-tool-panel {
-                min-width: $editor-tool-panel-width;                
+                min-width: $editor-tool-panel-width;
                 max-width: $editor-tool-panel-width;
-                background: $dialog-color;
-                padding: 10px;
-                border-top: 1px solid $background-border;
-                border-bottom: 1px solid $background-border;
+                background: $background-light;
+                padding: 8px;
+                border-right: 2px solid $background;
                 color: $text-color;
             }
 
@@ -726,8 +725,10 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
                     margin-bottom: 10px;
                 }
                 details > div {
-                    h1 {
-                        font-size: 110%;
+                    // for handling changelog
+                    h1, h2 {
+                        font-size: 100%;
+                        font-weight: bold;
                     }
                     background: $background-toggled;
                     padding: 10px;

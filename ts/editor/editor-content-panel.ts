@@ -10,11 +10,11 @@ import { appendDivTo } from '../utils/functions.js';
 
 function fakeApiCall() {
     return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve("Data received");
-      }, 2000); // Simulate a delay of 2 seconds
+        setTimeout(() => {
+            resolve("Data received");
+        }, 2000); // Simulate a delay of 2 seconds
     });
-  }
+}
 
 export class EditorContentPanel extends GenericView {
     treeView: EditorContentTree;
@@ -22,7 +22,7 @@ export class EditorContentPanel extends GenericView {
 
     constructor(div: HTMLDivElement, app: App, tab: Tab) {
         super(div, app);
-        
+
         this.tab = tab;
         this.treeView = new EditorContentTree(this.div, this.app, this.tab);
         this.customEventManager.addToPropagationList(this.treeView.customEventManager);

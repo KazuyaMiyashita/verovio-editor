@@ -20,7 +20,7 @@ import { Keyboard } from '../midi/keyboard.js';
 import { TabGroup } from '../utils/tab-group.js';
 import { XMLEditorView } from '../xml/xml-editor-view.js';
 import { appendDivTo } from '../utils/functions.js';
-import { editedXML } from '../utils/messages.js';
+import { autoModeOff, editedXML } from '../utils/messages.js';
 export class EditorPanel extends GenericView {
     constructor(div, app, verovio, validator, rngLoader) {
         super(div, app);
@@ -32,10 +32,10 @@ export class EditorPanel extends GenericView {
         this.toolbarObj = new EditorToolbar(this.toolbar, this.app, this);
         this.customEventManager.addToPropagationList(this.toolbarObj.customEventManager);
         this.hSplit = appendDivTo(this.div, { class: `vrv-h-split` });
-        this.toolPanelDiv = appendDivTo(this.hSplit, { class: `vrv-editor-tool-panel` });
-        this.tabGroup = appendDivTo(this.toolPanelDiv, { class: `vrv-tab-group` });
+        this.toolPanel = appendDivTo(this.hSplit, { class: `vrv-editor-tool-panel` });
+        this.tabGroup = appendDivTo(this.toolPanel, { class: `vrv-tab-group` });
         this.tabGroupObj = new TabGroup(this.tabGroup, this.app);
-        this.customEventManager.addToPropagationList(this.tabGroupObj.customEventManager);
+        //this.customEventManager.addToPropagationList(this.tabGroupObj.customEventManager);
         let tabScoreObj = this.tabGroupObj.addTab("Score");
         let tabSectionsObj = this.tabGroupObj.addTab("Sections");
         let tabContentObj = this.tabGroupObj.addTab("Content");
@@ -61,9 +61,10 @@ export class EditorPanel extends GenericView {
         this.draggingY = 0;
         this.splitterX = 0; // Stores top, left values (edge) of the element
         this.splitterY = 0;
+        this.xmlEditorEnabled = false;
         this.xmlEditorView = appendDivTo(this.split, { class: `vrv-xml` });
         this.xmlEditorViewObj = new XMLEditorView(this.xmlEditorView, this.app, this.validator, this.rngLoader);
-        this.customEventManager.addToPropagationList(this.xmlEditorViewObj.customEventManager);
+        //this.customEventManager.addToPropagationList(this.xmlEditorViewObj.customEventManager);
         this.splitterSize = 60;
         this.resizeTimer;
     }
@@ -87,45 +88,52 @@ export class EditorPanel extends GenericView {
         this.div.style.width = this.div.parentElement.style.width;
         //this.toolPanel.style.display = 'none';
         //this.keyboard.style.display = 'none';
-        this.toolPanelDiv.style.display = this.xmlEditorViewObj.isEnabled() ? 'none' : 'block';
-        this.keyboard.style.display = this.xmlEditorViewObj.isEnabled() ? 'none' : 'flex';
+        this.toolPanel.style.display = this.xmlEditorEnabled ? 'none' : 'block';
+        this.keyboard.style.display = this.xmlEditorEnabled ? 'none' : 'flex';
         // Force the toolbar to be displayed when re-activate because the it does not have received the event yet
         this.toolbar.style.display = 'block';
         let height = this.div.clientHeight - this.toolbar.offsetHeight - this.keyboard.offsetHeight;
-        let width = this.div.clientWidth - this.toolPanelDiv.offsetWidth;
+        let width = this.div.clientWidth - this.toolPanel.offsetWidth;
         this.split.style.height = `${height}px`;
         this.split.style.width = `${width}px`;
         this.keyboard.style.width = `${width}px`;
         this.xmlEditorView.style.display = 'block';
         this.splitter.style.display = 'block';
-        if (!this.xmlEditorViewObj.isEnabled()) {
+        if (!this.xmlEditorEnabled) {
             // Ideally we would send a onActive / onDeactivate event
+            let event = new CustomEvent('onDeactivate');
+            this.xmlEditorViewObj.customEventManager.dispatch(event);
+            event = new CustomEvent('onActivate');
+            this.tabGroupObj.customEventManager.dispatch(event);
             this.xmlEditorView.style.display = 'none';
             this.xmlEditorView.style.height = `0px`;
             this.xmlEditorView.style.width = `0px`;
             this.splitter.style.display = 'none';
             this.editorView.style.height = `${height}px`;
             this.editorView.style.width = `${width}px`;
-        }
-        else if (this.app.options.editorSplitterHorizontal) {
-            let editorHeight = Math.floor(height * this.splitterSize / 100);
-            // 10 is the bottom border of the editor view
-            let xmlHeight = Math.ceil((height * (100 - this.splitterSize) / 100) - 10);
-            this.editorView.style.height = `${editorHeight}px`;
-            this.editorView.style.width = `${width}px`;
-            this.xmlEditorView.style.height = `${xmlHeight}px`;
-            this.xmlEditorView.style.width = `${width}px`;
-            this.div.style.height = this.div.parentElement.style.height;
-            this.div.style.width = this.div.parentElement.style.width;
+            let tabHeight = this.div.clientHeight - this.toolbar.offsetHeight;
+            // 78 = toolPanel padding (8 * 2) + selectors height (40) + tab padding (10 * 2)
+            // this.tabGroupObj.setMinHeight(tabHeight - 78);
         }
         else {
-            let editorWidth = Math.floor(width * this.splitterSize / 100);
-            // 10 is the bottom border of the editor view
-            let xmlWidth = Math.ceil((width * (100 - this.splitterSize) / 100) - 10);
-            this.editorView.style.height = `${height}px`;
-            this.editorView.style.width = `${editorWidth}px`;
-            this.xmlEditorView.style.height = `${height}px`;
-            this.xmlEditorView.style.width = `${xmlWidth}px`;
+            if (this.app.options.editorSplitterHorizontal) {
+                let editorHeight = Math.floor(height * this.splitterSize / 100);
+                // 10 is the bottom border of the editor view
+                let xmlHeight = Math.ceil((height * (100 - this.splitterSize) / 100) - 10);
+                this.editorView.style.height = `${editorHeight}px`;
+                this.editorView.style.width = `${width}px`;
+                this.xmlEditorView.style.height = `${xmlHeight}px`;
+                this.xmlEditorView.style.width = `${width}px`;
+            }
+            else {
+                let editorWidth = Math.floor(width * this.splitterSize / 100);
+                // 10 is the bottom border of the editor view
+                let xmlWidth = Math.ceil((width * (100 - this.splitterSize) / 100) - 10);
+                this.editorView.style.height = `${height}px`;
+                this.editorView.style.width = `${editorWidth}px`;
+                this.xmlEditorView.style.height = `${height}px`;
+                this.xmlEditorView.style.width = `${xmlWidth}px`;
+            }
         }
         this.div.style.height = this.div.parentElement.style.height;
         this.div.style.width = this.div.parentElement.style.width;
@@ -137,25 +145,74 @@ export class EditorPanel extends GenericView {
     onActivate(e) {
         if (!super.onActivate(e))
             return false;
-        console.debug("EditorPanel::onActivate");
-        this.updateSize();
+        //console.debug("EditorPanel::onActivate");
+        if (e.detail && e.detail.loadData) {
+            this.updateSize();
+        }
+        if (this.xmlEditorEnabled) {
+            let event = new CustomEvent('onDeactivate');
+            this.tabGroupObj.customEventManager.dispatch(event);
+            event = new CustomEvent('onActivate');
+            this.xmlEditorViewObj.customEventManager.dispatch(event);
+        }
+        else {
+            let event = new CustomEvent('onDeactivate');
+            this.xmlEditorViewObj.customEventManager.dispatch(event);
+            event = new CustomEvent('onActivate');
+            this.tabGroupObj.customEventManager.dispatch(event);
+        }
+    }
+    onDeactivate(e) {
+        if (!super.onDeactivate(e))
+            return false;
+        //console.debug("EditorPanel::onDeactivate");
+        this.propagateEvent(e);
+    }
+    onSelect(e) {
+        if (!super.onSelect(e))
+            return false;
+        //console.debug("EditorPanel::onSelect");
+        this.propagateEvent(e);
     }
     onLoadData(e) {
         if (!super.onLoadData(e))
             return false;
-        console.debug("EditorPanel::onLoadData");
+        //console.debug("EditorPanel::onLoadData");
+        this.propagateEvent(e);
         this.updateSize();
+    }
+    onStartLoading(e) {
+        if (!super.onStartLoading(e))
+            return false;
+        //console.debug("EditorPanel::onStartLoading");
+        this.propagateEvent(e);
+    }
+    onEndLoading(e) {
+        if (!super.onEndLoading(e))
+            return false;
+        //console.debug("EditorPanel::onEndLoading");
+        this.propagateEvent(e);
     }
     onResized(e) {
         if (!super.onResized(e))
             return false;
         //console.debug("EditorPanel::onResized");
         this.updateSize();
+        this.propagateEvent(e);
     }
     onUpdateView(e) {
         if (!super.onUpdateView(e))
             return false;
+        this.propagateEvent(e);
         this.app.endLoading();
+    }
+    propagateEvent(e) {
+        if (this.xmlEditorEnabled) {
+            this.xmlEditorViewObj.customEventManager.dispatch(e);
+        }
+        else {
+            this.tabGroupObj.customEventManager.dispatch(e);
+        }
     }
     //////////////////////////////////////////////////////////////////////////
     // Event methods
@@ -219,10 +276,15 @@ export class EditorPanel extends GenericView {
     }
     onToggle() {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!this.xmlEditorViewObj.isEnabled()) {
-                let event = new CustomEvent('onDeactivate');
-                this.tabGroupObj.customEventManager.dispatch(event);
-                this.xmlEditorViewObj.setEnabled(true);
+            if (!this.xmlEditorEnabled) {
+                this.xmlEditorEnabled = true;
+                if (this.xmlEditorViewObj.isAutoModeNotification() && !this.xmlEditorViewObj.isAutoMode()) {
+                    const dlg = new Dialog(this.app.dialogDiv, this.app, "Live validation off", { icon: "warning", type: Dialog.Type.Msg });
+                    dlg.setContent(marked.parse(autoModeOff));
+                    yield dlg.show();
+                    // Do not show it again for that file.
+                    this.xmlEditorViewObj.setAutoModeNotification(false);
+                }
                 yield this.editorViewObj.updateMEI();
             }
             else {
@@ -233,13 +295,13 @@ export class EditorPanel extends GenericView {
                         return;
                     this.xmlEditorViewObj.setEdited(false);
                 }
-                let event = new CustomEvent('onActivate');
-                this.tabGroupObj.customEventManager.dispatch(event);
-                this.xmlEditorViewObj.setEnabled(false);
+                this.xmlEditorEnabled = false;
             }
-            this.app.startLoading("Adjusting size ...", true);
-            let event = new CustomEvent('onResized');
-            this.app.customEventManager.dispatch(event);
+            this.app.startLoading("Adjusting the interface ...", true);
+            let event = new CustomEvent('onActivate');
+            this.customEventManager.dispatch(event);
+            event = new CustomEvent('onResized');
+            this.customEventManager.dispatch(event);
         });
     }
     onForceReload(e) {

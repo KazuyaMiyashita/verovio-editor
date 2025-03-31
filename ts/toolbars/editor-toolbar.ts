@@ -115,7 +115,7 @@ export class EditorToolbar extends Toolbar {
         let iconsLayoutV = `${this.app.host}/icons/toolbar/layout-v.png`;
 
         const isHorizontal = (this.app.options.editorSplitterHorizontal) ? true : false;
-        const isToggled = this.panel.xmlEditorViewObj.isEnabled() ? true : false;
+        const isToggled = this.panel.xmlEditorEnabled ? true : false;
         const isAutoMode = this.panel.xmlEditorViewObj.isAutoMode() ? true : false;
         const isEdited = this.panel.xmlEditorViewObj.isEdited() ? true : false;
         if (isHorizontal) {

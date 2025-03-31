@@ -11,9 +11,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { Dialog } from '../dialogs/dialog.js';
 import { GenericView } from '../utils/generic-view.js';
-import { autoModeLimit, autoModeOff } from '../utils/messages.js';
+import { autoModeLimit } from '../utils/messages.js';
 import { appendDivTo, appendTextAreaTo } from '../utils/functions.js';
 const theme = "vrv"; // default for light theme
 var Status;
@@ -40,7 +39,6 @@ export class XMLEditorView extends GenericView {
         this.edited = false;
         this.autoMode = false;
         this.autoModeNotification = false;
-        this.enabled = false;
         this.formatting = false;
         const cmThis = this;
         this.lintOptions = {
@@ -93,27 +91,29 @@ export class XMLEditorView extends GenericView {
     ////////////////////////////////////////////////////////////////////////
     isEdited() { return this.edited; }
     setEdited(edited) { this.edited = edited; }
-    isEnabled() { return this.enabled; }
+    //isEnabled(): boolean { return this.enabled; }
     isAutoMode() { return this.autoMode; }
     setMode(fileSize) {
         this.autoMode = (fileSize < (autoModeLimit * 1024 * 1024));
         this.autoModeNotification = !this.autoMode;
     }
+    isAutoModeNotification() { return this.autoModeNotification; }
+    setAutoModeNotification(autoModeNotification) { this.autoModeNotification = autoModeNotification; }
     ////////////////////////////////////////////////////////////////////////
     // Async methods
     ////////////////////////////////////////////////////////////////////////
-    setEnabled(enabled) {
-        return __awaiter(this, void 0, void 0, function* () {
-            this.enabled = enabled;
-            if (this.enabled && this.autoModeNotification && !this.autoMode) {
-                const dlg = new Dialog(this.app.dialogDiv, this.app, "Live validation off", { icon: "warning", type: Dialog.Type.Msg });
-                dlg.setContent(marked.parse(autoModeOff));
-                yield dlg.show();
-                // Do not show it again for that file.
-                this.autoModeNotification = false;
-            }
-        });
+    /*
+    async setEnabled(enabled: boolean): Promise<any> {
+        this.enabled = enabled;
+        if (this.enabled && this.autoModeNotification && !this.autoMode) {
+            const dlg = new Dialog(this.app.dialogDiv, this.app, "Live validation off", { icon: "warning", type: Dialog.Type.Msg });
+            dlg.setContent(marked.parse(autoModeOff));
+            await dlg.show();
+            // Do not show it again for that file.
+            this.autoModeNotification = false;
+        }
     }
+    */
     validate(text, updateLinting, options) {
         return __awaiter(this, void 0, void 0, function* () {
             //console.debug( "XMLEditorView::validate");
@@ -121,7 +121,7 @@ export class XMLEditorView extends GenericView {
                 return;
             const editor = options.caller;
             //console.debug( "XMLEditorView::validate", editor );
-            if (!editor.enabled)
+            if (!editor.active)
                 return;
             if (editor.formatting)
                 return;

@@ -9,7 +9,7 @@ import { GenericView } from '../utils/generic-view.js';
 import { ValidatorWorkerProxy } from '../utils/worker-proxy.js';
 import { RNGLoader } from './rng-loader.js';
 
-import { autoModeLimit, autoModeOff } from '../utils/messages.js';
+import { autoModeLimit } from '../utils/messages.js';
 import { appendDivTo, appendTextAreaTo } from '../utils/functions.js';
 
 const theme = "vrv"; // default for light theme
@@ -36,7 +36,6 @@ export class XMLEditorView extends GenericView {
     private autoMode: boolean; // For indicating if live validation and sync is on
     private autoModeNotification: boolean; // For indicating if the notification should be displayed
     private edited: boolean; // For indicating if the XML content is edited but not synchronized
-    private enabled: boolean; // For indicating the XML editor is open
     private formatting: boolean; // For indicating that XML formatting is under progress
     private CMeditor: any;
     private lintOptions: Object;
@@ -60,7 +59,6 @@ export class XMLEditorView extends GenericView {
         this.edited = false;
         this.autoMode = false;
         this.autoModeNotification = false;
-        this.enabled = false;
         this.formatting = false;
 
         const cmThis = this;
@@ -124,7 +122,7 @@ export class XMLEditorView extends GenericView {
     isEdited(): boolean { return this.edited; }
     setEdited(edited: boolean): void { this.edited = edited; }
 
-    isEnabled(): boolean { return this.enabled; }
+    //isEnabled(): boolean { return this.enabled; }
 
     isAutoMode(): boolean { return this.autoMode; }
     setMode(fileSize: number): void {
@@ -132,10 +130,14 @@ export class XMLEditorView extends GenericView {
         this.autoModeNotification = !this.autoMode;
     }
 
+    isAutoModeNotification(): boolean { return this.autoModeNotification; }
+    setAutoModeNotification(autoModeNotification: boolean): void { this.autoModeNotification = autoModeNotification;  }
+
     ////////////////////////////////////////////////////////////////////////
     // Async methods
     ////////////////////////////////////////////////////////////////////////
 
+    /*
     async setEnabled(enabled: boolean): Promise<any> {
         this.enabled = enabled;
         if (this.enabled && this.autoModeNotification && !this.autoMode) {
@@ -146,6 +148,7 @@ export class XMLEditorView extends GenericView {
             this.autoModeNotification = false;
         }
     }
+    */
 
     async validate(text: string, updateLinting: Function, options: any): Promise<any> {
         //console.debug( "XMLEditorView::validate");
@@ -154,7 +157,7 @@ export class XMLEditorView extends GenericView {
         const editor: XMLEditorView = options.caller;
         //console.debug( "XMLEditorView::validate", editor );
 
-        if (!editor.enabled) return;
+        if (!editor.active) return;
         if (editor.formatting) return;
 
         // keep the callback
