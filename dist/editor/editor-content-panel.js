@@ -12,28 +12,24 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 import { EditorContentTree } from './editor-content-tree.js';
 import { GenericView } from '../utils/generic-view.js';
-function fakeApiCall() {
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            resolve("Data received");
-        }, 2000); // Simulate a delay of 2 seconds
-    });
-}
 export class EditorContentPanel extends GenericView {
     constructor(div, app, tab) {
         super(div, app);
         this.tab = tab;
         this.treeView = new EditorContentTree(this.div, this.app, this.tab);
+        this.treeView.hideRoot = true;
         this.customEventManager.addToPropagationList(this.treeView.customEventManager);
     }
     ////////////////////////////////////////////////////////////////////////
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
-    updateContent() {
+    updateContent(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log("prout1");
-            const data = yield fakeApiCall();
-            console.log("prout2");
+            const contextOk = yield this.app.verovio.edit({ action: 'context', param: { elementId: `${id}` } });
+            if (contextOk) {
+                const jsonContext = yield this.app.verovio.editInfo();
+                this.treeView.loadContext(jsonContext['context'], jsonContext['ancestors']);
+            }
         });
     }
     ////////////////////////////////////////////////////////////////////////
@@ -42,13 +38,19 @@ export class EditorContentPanel extends GenericView {
     onActivate(e) {
         if (!super.onActivate(e))
             return false;
-        console.debug("EditorContentPanel::onActivate");
-        this.updateContent();
+        //console.debug("EditorContentPanel::onActivate");
+        return true;
     }
     onUpdateData(e) {
         if (!super.onUpdateData(e))
             return false;
-        console.debug("EditorContentTree::onUpdateData");
+        //console.debug("EditorContentTree::onUpdateData");
+        return true;
+    }
+    onSelect(e) {
+        if (!super.onSelect(e))
+            return false;
+        this.updateContent(e.detail.id);
         return true;
     }
 }

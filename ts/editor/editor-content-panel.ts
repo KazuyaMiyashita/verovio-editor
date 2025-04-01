@@ -8,14 +8,6 @@ import { GenericView } from '../utils/generic-view.js';
 import { Tab } from '../utils/tab-group.js';
 import { appendDivTo } from '../utils/functions.js';
 
-function fakeApiCall() {
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            resolve("Data received");
-        }, 2000); // Simulate a delay of 2 seconds
-    });
-}
-
 export class EditorContentPanel extends GenericView {
     treeView: EditorContentTree;
     tab: Tab
@@ -25,6 +17,7 @@ export class EditorContentPanel extends GenericView {
 
         this.tab = tab;
         this.treeView = new EditorContentTree(this.div, this.app, this.tab);
+        this.treeView.hideRoot = true;
         this.customEventManager.addToPropagationList(this.treeView.customEventManager);
     }
 
@@ -32,10 +25,12 @@ export class EditorContentPanel extends GenericView {
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
 
-    async updateContent(): Promise<any> {
-        console.log("prout1");
-        const data = await fakeApiCall();
-        console.log("prout2");
+    async updateContent(id: string): Promise<any> {
+        const contextOk = await this.app.verovio.edit({ action: 'context', param: { elementId: `${id}` } });
+        if (contextOk) {
+            const jsonContext = await this.app.verovio.editInfo();
+            this.treeView.loadContext(jsonContext['context'], jsonContext['ancestors']);
+        }
     }
 
     ////////////////////////////////////////////////////////////////////////
@@ -44,15 +39,19 @@ export class EditorContentPanel extends GenericView {
 
     override onActivate(e: CustomEvent): boolean {
         if (!super.onActivate(e)) return false;
-        console.debug("EditorContentPanel::onActivate");
-
-        this.updateContent();
+        //console.debug("EditorContentPanel::onActivate");
+        return true;
     }
 
     override onUpdateData(e: CustomEvent): boolean {
         if (!super.onUpdateData(e)) return false;
-        console.debug("EditorContentTree::onUpdateData");
+        //console.debug("EditorContentTree::onUpdateData");
+        return true;
+    }
 
+    override onSelect(e: CustomEvent): boolean {
+        if (!super.onSelect(e)) return false;
+        this.updateContent(e.detail.id);
         return true;
     }
 

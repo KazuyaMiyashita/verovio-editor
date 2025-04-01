@@ -1,11 +1,12 @@
 import { App } from '../app.js';
 import { EventManager } from '../events/event-manager.js';
-import { GenericTree } from '../utils/generic-tree.js';
+import { GenericTree, TreeNode } from '../utils/generic-tree.js';
 import { Tab } from '../utils/tab-group.js'
 import { appendDivTo } from '../utils/functions.js';
 
 export class EditorContentTree extends GenericTree {
     tab: Tab;
+    breadCrumbsWrapper: HTMLDivElement;
     breadCrumbs: HTMLDivElement;
     eventManager: EventManager;
 
@@ -16,64 +17,43 @@ export class EditorContentTree extends GenericTree {
 
         this.eventManager = new EventManager(this);
 
-        let treeBreadCrumbsWrapper = appendDivTo(this.div, { class: `vrv-tree-breadcrumbs` });
-        this.breadCrumbs = appendDivTo(treeBreadCrumbsWrapper, { class: `vrv-path-breadcrumbs` });
-
-        //this.breadCrumbs.style.display = 'flex';
-        let crumbs = ["measure", "staff", "layer", "app", "rdg",
-            "tuplet", "beam"]
-        for (let i = 0; i < crumbs.length; i++) this.addCrumb(crumbs[i], i + 1);
+        this.breadCrumbsWrapper = appendDivTo(this.div, { class: `vrv-tree-breadcrumbs-wrapper` });
+        this.breadCrumbs = appendDivTo(this.breadCrumbsWrapper, { class: `vrv-tree-breadcrumbs` });
     }
 
-    addCrumb(name: string, value: number): void {
-        const crumb: HTMLDivElement = appendDivTo(this.breadCrumbs, { class: `vrv-path-breadcrumbs` });
-        crumb.innerHTML = name;
-        crumb.dataset.value = value.toString();
-        this.eventManager.bind(crumb, 'click', this.selectCrumb);
+    addCrumb(element: string, id: string): void {
+        const crumb: HTMLDivElement = appendDivTo(this.breadCrumbs, { class: `vrv-tree-breadcrumb` });
+        crumb.innerHTML = element;
+        crumb.dataset.id = id
+        crumb.dataset.element = element;
+        this.eventManager.bind(crumb, 'click', this.onClick);
     }
 
     async setCurrent(id: string): Promise<any> {
         //this.currentId = id;
-        this.fakeLoad();
+        //this.fakeLoad();
     }
 
-    fakeLoad(): void {
-        const jsonData = {
-            id: "1",
-            element: "bookstore",
-            attributes: {},
-            isTextNode: false,
-            children: [
-                {
-                    id: "2",
-                    element: "book",
-                    attributes: { category: "fiction" },
-                    isTextNode: false,
-                    children: [
-                        { id: "3", element: "title", attributes: { lang: "en" }, isTextNode: false, children: [] },
-                        { id: "4", element: "text", attributes: {}, isTextNode: true, children: [] }
-                    ]
-                }
-            ]
-        };
-
+    async loadContext(context: Object, ancestors: Object): Promise<any> {
         this.reset();
-        this.fromJson(jsonData);
-    }    
+        this.fromJson(context);
+
+
+
+        if (Array.isArray(ancestors)) {
+            this.breadCrumbs.innerHTML = "";
+            for (let i = ancestors.length - 1; i >= 0; i--) {
+                let id = (i === 0) ? "" : ancestors[i - 1]['id'];
+                console.log(id, ancestors[i]['element']);
+                this.addCrumb(ancestors[i]['element'], ancestors[i]['id']);
+            };
+        };
+        this.breadCrumbsWrapper.scrollLeft = this.breadCrumbsWrapper.scrollWidth;
+    }   
 
     ////////////////////////////////////////////////////////////////////////
     // Custom event methods
     ////////////////////////////////////////////////////////////////////////
-
-    override onSelect(e: CustomEvent): boolean {
-        if (!super.onSelect(e)) return false;
-        console.debug("EditorContentTree::onSelect");
-        
-        this.currentId = e.detail.id;
-        this.setCurrent(this.currentId);
-
-        return true;
-    }
 
     override onLoadData(e: CustomEvent): boolean {
         if (!super.onLoadData(e)) return false;
@@ -93,9 +73,24 @@ export class EditorContentTree extends GenericTree {
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
 
-    selectCrumb(e: MouseEvent): void {
-        //const element: HTMLElement = e.target as HTMLElement;
-        //this.githubManager.slicePathTo(Number(element.dataset.value));
-        //this.listFiles();
+    select(element: string, id: string)
+    {
+        let event = new CustomEvent('onSelect', {
+            detail: {
+                id: id,
+                caller: this
+            }
+        });
+        this.app.customEventManager.dispatch(event);
+
+    }
+
+    override onClick(e: MouseEvent): void {
+        const element: HTMLElement = e.target as HTMLElement;
+        console.log(element);
+        if (element.dataset.id) {
+            this.select(element.dataset.element, element.dataset.id);
+        }
+       
     }
 }

@@ -15,59 +15,42 @@ export class EditorContentTree extends GenericTree {
         super(div, app);
         this.tab = tab;
         this.eventManager = new EventManager(this);
-        let treeBreadCrumbsWrapper = appendDivTo(this.div, { class: `vrv-tree-breadcrumbs` });
-        this.breadCrumbs = appendDivTo(treeBreadCrumbsWrapper, { class: `vrv-path-breadcrumbs` });
-        //this.breadCrumbs.style.display = 'flex';
-        let crumbs = ["measure", "staff", "layer", "app", "rdg",
-            "tuplet", "beam"];
-        for (let i = 0; i < crumbs.length; i++)
-            this.addCrumb(crumbs[i], i + 1);
+        this.breadCrumbsWrapper = appendDivTo(this.div, { class: `vrv-tree-breadcrumbs-wrapper` });
+        this.breadCrumbs = appendDivTo(this.breadCrumbsWrapper, { class: `vrv-tree-breadcrumbs` });
     }
-    addCrumb(name, value) {
-        const crumb = appendDivTo(this.breadCrumbs, { class: `vrv-path-breadcrumbs` });
-        crumb.innerHTML = name;
-        crumb.dataset.value = value.toString();
-        this.eventManager.bind(crumb, 'click', this.selectCrumb);
+    addCrumb(element, id) {
+        const crumb = appendDivTo(this.breadCrumbs, { class: `vrv-tree-breadcrumb` });
+        crumb.innerHTML = element;
+        crumb.dataset.id = id;
+        crumb.dataset.element = element;
+        this.eventManager.bind(crumb, 'click', this.onClick);
     }
     setCurrent(id) {
         return __awaiter(this, void 0, void 0, function* () {
             //this.currentId = id;
-            this.fakeLoad();
+            //this.fakeLoad();
         });
     }
-    fakeLoad() {
-        const jsonData = {
-            id: "1",
-            element: "bookstore",
-            attributes: {},
-            isTextNode: false,
-            children: [
-                {
-                    id: "2",
-                    element: "book",
-                    attributes: { category: "fiction" },
-                    isTextNode: false,
-                    children: [
-                        { id: "3", element: "title", attributes: { lang: "en" }, isTextNode: false, children: [] },
-                        { id: "4", element: "text", attributes: {}, isTextNode: true, children: [] }
-                    ]
+    loadContext(context, ancestors) {
+        return __awaiter(this, void 0, void 0, function* () {
+            this.reset();
+            this.fromJson(context);
+            if (Array.isArray(ancestors)) {
+                this.breadCrumbs.innerHTML = "";
+                for (let i = ancestors.length - 1; i >= 0; i--) {
+                    let id = (i === 0) ? "" : ancestors[i - 1]['id'];
+                    console.log(id, ancestors[i]['element']);
+                    this.addCrumb(ancestors[i]['element'], ancestors[i]['id']);
                 }
-            ]
-        };
-        this.reset();
-        this.fromJson(jsonData);
+                ;
+            }
+            ;
+            this.breadCrumbsWrapper.scrollLeft = this.breadCrumbsWrapper.scrollWidth;
+        });
     }
     ////////////////////////////////////////////////////////////////////////
     // Custom event methods
     ////////////////////////////////////////////////////////////////////////
-    onSelect(e) {
-        if (!super.onSelect(e))
-            return false;
-        console.debug("EditorContentTree::onSelect");
-        this.currentId = e.detail.id;
-        this.setCurrent(this.currentId);
-        return true;
-    }
     onLoadData(e) {
         if (!super.onLoadData(e))
             return false;
@@ -83,10 +66,21 @@ export class EditorContentTree extends GenericTree {
     ////////////////////////////////////////////////////////////////////////
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
-    selectCrumb(e) {
-        //const element: HTMLElement = e.target as HTMLElement;
-        //this.githubManager.slicePathTo(Number(element.dataset.value));
-        //this.listFiles();
+    select(element, id) {
+        let event = new CustomEvent('onSelect', {
+            detail: {
+                id: id,
+                caller: this
+            }
+        });
+        this.app.customEventManager.dispatch(event);
+    }
+    onClick(e) {
+        const element = e.target;
+        console.log(element);
+        if (element.dataset.id) {
+            this.select(element.dataset.element, element.dataset.id);
+        }
     }
 }
 //# sourceMappingURL=editor-content-tree.js.map

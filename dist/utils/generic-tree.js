@@ -1,7 +1,7 @@
 import { GenericView } from './generic-view.js';
 import { appendDivTo } from './functions.js';
 function buildTree(nodeData) {
-    const { id = null, element, attributes = {}, children = [], isTextNode = false } = nodeData;
+    const { id = null, element, attributes = {}, children = [], isTextNode = false, } = nodeData;
     const node = new TreeNode(id, element, attributes, [], isTextNode);
     if (Array.isArray(children)) {
         node.children = children.map(buildTree);
@@ -12,6 +12,7 @@ export class GenericTree extends GenericView {
     constructor(div, app) {
         super(div, app);
         this.root = null;
+        this.hideRoot = false;
     }
     reset() {
         if (this.root) {
@@ -20,12 +21,15 @@ export class GenericTree extends GenericView {
         }
         this.root = null;
     }
+    onClick(e) {
+        // This need to be overridden
+    }
     fromJson(json) {
         if (!json || !json.element)
             throw new Error("Invalid JSON data: Missing 'element' property");
         this.root = buildTree(json);
         this.rootElement = appendDivTo(this.div, { class: `vrv-tree-root` });
-        this.root.html(this.rootElement);
+        this.root.html(this.rootElement, this, this.hideRoot);
     }
 }
 export class TreeNode {
@@ -42,36 +46,34 @@ export class TreeNode {
             this.div.firstChild.remove();
         }
     }
-    html(div) {
+    html(div, tree, hideLabel = false) {
         this.div = div;
+        // Pass the id and element for the onClick
+        this.div.dataset.id = this.id;
+        this.div.dataset.element = this.element;
         let label = appendDivTo(this.div, { class: `vrv-node-label` });
-        label.innerHTML = this.element;
+        if (hideLabel)
+            label.style.display = 'none';
+        else {
+            // Copy the dataset because both the node and the label fire an event
+            label.dataset.id = this.div.dataset.id;
+            label.dataset.element = this.div.dataset.element;
+            tree.eventManager.bind(this.div, "click", tree.onClick);
+        }
+        let labelStr = this.element;
+        if (this.attributes && this.attributes['n']) {
+            labelStr += ` ${this.attributes['n']}`;
+        }
+        label.innerHTML = labelStr;
+        //let cb = appendInputTo(label, { type: `checkbox` });
         let children = appendDivTo(this.div, { class: `vrv-node-children` });
         this.children.forEach(child => {
             let node = appendDivTo(children, { class: `vrv-tree-node` });
-            child.html(node);
+            child.html(node, tree);
         });
     }
 }
 /*
-const jsonData = {
-  id: "1",
-  element: "bookstore",
-  attributes: {},
-  isTextNode: false,
-  children: [
-    {
-      id: "2",
-      element: "book",
-      attributes: { category: "fiction" },
-      isTextNode: false,
-      children: [
-        { id: "3", element: "title", attributes: { lang: "en" }, isTextNode: false, children: [] },
-        { id: "4", element: "text", attributes: {}, isTextNode: true, children: [] }
-      ]
-    }
-  ]
-};
 
 Get Score
 Mdiv / Score / ScoreDef
@@ -94,52 +96,6 @@ tree.traverse(node => {
     `<${node.element} id="${node.id}" ${JSON.stringify(node.attributes)} isTextNode=${node.isTextNode}>`
   );
 });
-
-<div class="vrv-wrapper">
-  <div class="vrv-tree">
-    <div class="vrv-node-label">root</div>
-    <div class="vrv-node-children">
-      <div class="vrv-tree-node">
-        <div class="vrv-node-label">1</div>
-      </div>
-      <div class="vrv-tree-node">
-        <div class="vrv-node-label">2</div>
-      </div>
-      <div class="vrv-tree-node open">
-        <div class="vrv-node-label">
-          <input type="checkbox">
-          <span>label</span>
-          
-        </div>
-        <div class="vrv-node-children">
-          <div class="vrv-tree-node">
-            <div class="vrv-node-label">3.1</div>
-          </div>
-          <div class="vrv-tree-node">
-            <div class="vrv-node-label">3.2</div>
-          </div>
-          <div class="vrv-tree-node open">
-            <div class="vrv-node-label">3.3</div>
-            <div class="vrv-tree-children">
-              <div class="vrv-tree-node">
-                <div class="vrv-node-label">3.3.1</div>
-              </div>
-              <div class="vrv-tree-node">
-                <div class="vrv-node-label">3.3.2</div>
-              </div>
-              <div class="vrv-tree-node">
-                <div class="vrv-node-label">3.3.3</div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="vrv-tree-node">
-          <div class="vrv-node-label">4</div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
 
 */ 
 //# sourceMappingURL=generic-tree.js.map

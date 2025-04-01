@@ -113,7 +113,7 @@ export class EditorPanel extends GenericView {
             this.editorView.style.width = `${width}px`;
             let tabHeight = this.div.clientHeight - this.toolbar.offsetHeight;
             // 78 = toolPanel padding (8 * 2) + selectors height (40) + tab padding (10 * 2)
-            // this.tabGroupObj.setMinHeight(tabHeight - 78);
+            this.tabGroupObj.setMinHeight(tabHeight - 78);
         }
         else {
             if (this.app.options.editorSplitterHorizontal) {

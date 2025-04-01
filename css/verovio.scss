@@ -580,7 +580,7 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
         z-index: $z-index-tooltip;
     }
 
-    div:hover > span.vrv-tooltip {
+    div:hover>span.vrv-tooltip {
         display: block;
     }
 
@@ -724,12 +724,16 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
                 details {
                     margin-bottom: 10px;
                 }
-                details > div {
+
+                details>div {
+
                     // for handling changelog
-                    h1, h2 {
+                    h1,
+                    h2 {
                         font-size: 100%;
                         font-weight: bold;
                     }
+
                     background: $background-toggled;
                     padding: 10px;
                     margin-top: 5px;
@@ -764,7 +768,7 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
         .vrv-tab-selectors {
             display: flex;
             align-items: center;
-    
+
             .vrv-tab-selector {
                 @extend .vrv-text-no-select;
                 @extend .vrv-clickable;
@@ -779,11 +783,12 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
                 align-items: center;
                 padding: 0px 10px;
             }
-    
+
             .vrv-tab-selector:not(:last-child) {
                 border-right: 1px solid $background-border;
             }
         }
+
         .vrv-tab-content {
             background-color: $background;
             padding: 10px;
@@ -863,9 +868,8 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
         flex-wrap: nowrap;
         flex-shrink: 0;
         align-items: center;
-        //margin-top: 10px;
+        margin-top: 10px;
         background-color: $background;
-        overflow-x: scroll;
 
         .vrv-path-breadcrumbs {
             justify-content: center;
@@ -986,6 +990,7 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
                 padding-top: 1px;
                 color: $background;
             }
+
             .vrv-keyboard-octave.selected {
                 color: $text-color;
                 background-color: $background-light;
@@ -1057,43 +1062,88 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
     ////////////////////////////////////////////////////////////////////////
     // Tree
     ////////////////////////////////////////////////////////////////////////
-    
+
     $node-height: 20;
     $node-indent: 16px;
-    $node-margin: 2px;
+    $node-margin: 4px;
     $node-label-padding: 5px;
-    
+
     .vrv-tree-root {
-      .vrv-node-label {
-        padding: $node-label-padding;
-        border: 1px solid $background;
-        min-height: $node-height;
-        background: $background-light;
-        color: $text-color;
-      }
-      .vrv-tree-node {
-        cursor: pointer;
-        position: relative;
-        margin-left: $node-indent;
-        min-height: $node-height;
-        margin-top: $node-margin;
-      }
-      .vrv-tree-node::before {
-        position: absolute;
-        content: "";
-        width: 15px;
-        height: 10px;
-        background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIiIGhlaWdodD0iNyIgdmlld0JveD0iMCAwIDEyIDciIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cGF0aCBkPSJNNiA3TDAgMEgxMkw2IDdaIiBmaWxsPSIjMDAwIi8+Cjwvc3ZnPg==');
-  background-repeat: no-repeat;
-        left: calc(-#{$node-indent});
-        top: 11px;
-        display: inline-block;
-        transform: rotate(-90deg);
-      }
-      .vrv-tree-node.open::before {
-        transform: rotate(0deg);
-      }
-      
+        .vrv-node-label {
+            padding: $node-label-padding;
+            min-height: $node-height;
+            background: $background-light;
+            color: $text-color;
+            user-select: none;
+        }
+        .vrv-node-label:hover {
+            filter: $hover-filter;
+            background-color: $filtered-primary;
+            cursor: pointer;
+        }
+
+        .vrv-tree-node {
+            position: relative;
+            margin-left: $node-indent;
+            min-height: $node-height;
+            margin-top: $node-margin;
+        }
+
+        .vrv-tree-node::before {
+            cursor: pointer;
+            position: absolute;
+            content: "";
+            width: 15px;
+            height: 10px;
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIiIGhlaWdodD0iNyIgdmlld0JveD0iMCAwIDEyIDciIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cGF0aCBkPSJNNiA3TDAgMEgxMkw2IDdaIiBmaWxsPSIjMDAwIi8+Cjwvc3ZnPg==');
+            background-repeat: no-repeat;
+            left: calc(-#{$node-indent});
+            top: 11px;
+            display: inline-block;
+            transform: rotate(-90deg);
+        }
+
+        .vrv-tree-node.open::before {
+            transform: rotate(0deg);
+        }
+
+    }
+
+    .vrv-tree-breadcrumbs-wrapper {
+        overflow-x: scroll;
+        scrollbar-width: none;
+        .vrv-tree-breadcrumbs {
+            display: flex;
+            flex-wrap: nowrap;
+            flex-shrink: 0;
+            align-items: center;
+            background: $background-light;
+
+            .vrv-tree-breadcrumb {
+                justify-content: center;
+                align-items: center;
+                min-height: $node-height;
+                background: $background-light;
+                padding: $node-label-padding;
+                display: flex;
+            }
+
+            .vrv-tree-breadcrumb:first-child {
+                padding-left: 8px;
+                padding-right: 4px;
+            }
+
+            .vrv-tree-breadcrumb:after {
+                padding-left: 8px;
+                content: "/\00a0";
+            }
+
+            .vrv-tree-breadcrumb:hover {
+                filter: $hover-filter;
+                background-color: $filtered-primary;
+                cursor: pointer;
+            }
+        }
     }
 }
 

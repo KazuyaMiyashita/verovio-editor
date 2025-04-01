@@ -396,7 +396,8 @@
           margin-top: 5px;
           max-height: 300px;
           overflow-y: scroll; }
-          .vrv-wrapper .vrv-dialog .vrv-dialog-box .vrv-dialog-content details > div h1, .vrv-wrapper .vrv-dialog .vrv-dialog-box .vrv-dialog-content details > div h2 {
+          .vrv-wrapper .vrv-dialog .vrv-dialog-box .vrv-dialog-content details > div h1,
+          .vrv-wrapper .vrv-dialog .vrv-dialog-box .vrv-dialog-content details > div h2 {
             font-size: 100%;
             font-weight: bold; }
         .vrv-wrapper .vrv-dialog .vrv-dialog-box .vrv-dialog-content br {
@@ -472,8 +473,8 @@
     flex-wrap: nowrap;
     flex-shrink: 0;
     align-items: center;
-    background-color: #3c3c3c;
-    overflow-x: scroll; }
+    margin-top: 10px;
+    background-color: #3c3c3c; }
     .vrv-wrapper .vrv-path-breadcrumbs .vrv-path-breadcrumbs {
       justify-content: center;
       align-items: center;
@@ -594,17 +595,21 @@
         padding-top: 25px; }
   .vrv-wrapper .vrv-tree-root .vrv-node-label {
     padding: 5px;
-    border: 1px solid #3c3c3c;
     min-height: 20;
     background: #565656;
-    color: white; }
+    color: white;
+    user-select: none; }
+  .vrv-wrapper .vrv-tree-root .vrv-node-label:hover {
+    filter: invert(0%);
+    background-color: #8B0000;
+    cursor: pointer; }
   .vrv-wrapper .vrv-tree-root .vrv-tree-node {
-    cursor: pointer;
     position: relative;
     margin-left: 16px;
     min-height: 20;
-    margin-top: 2px; }
+    margin-top: 4px; }
   .vrv-wrapper .vrv-tree-root .vrv-tree-node::before {
+    cursor: pointer;
     position: absolute;
     content: "";
     width: 15px;
@@ -617,6 +622,32 @@
     transform: rotate(-90deg); }
   .vrv-wrapper .vrv-tree-root .vrv-tree-node.open::before {
     transform: rotate(0deg); }
+  .vrv-wrapper .vrv-tree-breadcrumbs-wrapper {
+    overflow-x: scroll;
+    scrollbar-width: none; }
+    .vrv-wrapper .vrv-tree-breadcrumbs-wrapper .vrv-tree-breadcrumbs {
+      display: flex;
+      flex-wrap: nowrap;
+      flex-shrink: 0;
+      align-items: center;
+      background: #565656; }
+      .vrv-wrapper .vrv-tree-breadcrumbs-wrapper .vrv-tree-breadcrumbs .vrv-tree-breadcrumb {
+        justify-content: center;
+        align-items: center;
+        min-height: 20;
+        background: #565656;
+        padding: 5px;
+        display: flex; }
+      .vrv-wrapper .vrv-tree-breadcrumbs-wrapper .vrv-tree-breadcrumbs .vrv-tree-breadcrumb:first-child {
+        padding-left: 8px;
+        padding-right: 4px; }
+      .vrv-wrapper .vrv-tree-breadcrumbs-wrapper .vrv-tree-breadcrumbs .vrv-tree-breadcrumb:after {
+        padding-left: 8px;
+        content: "/\00a0"; }
+      .vrv-wrapper .vrv-tree-breadcrumbs-wrapper .vrv-tree-breadcrumbs .vrv-tree-breadcrumb:hover {
+        filter: invert(0%);
+        background-color: #8B0000;
+        cursor: pointer; }
 
 @media screen and (max-width: 600px) {
   .vrv-wrapper .vrv-toolbar .vrv-btn, .vrv-wrapper .vrv-editor-toolbar .vrv-btn, .vrv-wrapper .vrv-toolbar .vrv-btn-text, .vrv-wrapper .vrv-toolbar .vrv-btn-icon-left, .vrv-wrapper .vrv-toolbar .vrv-btn-icon, .vrv-wrapper .vrv-toolbar .vrv-btn-icon-large, .vrv-wrapper .vrv-toolbar .vrv-menu-content .vrv-menu-text, .vrv-wrapper .vrv-editor-toolbar .vrv-btn-text, .vrv-wrapper .vrv-editor-toolbar .vrv-btn-icon-large {

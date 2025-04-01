@@ -1,114 +1,119 @@
 
 
 import { App } from '../app.js';
+import { EventManager } from '../events/event-manager.js';
 import { GenericView } from './generic-view.js';
 
-import { appendDivTo } from './functions.js';
+import { appendDivTo, appendInputTo } from './functions.js';
 
 function buildTree(nodeData: any): TreeNode {
-  const {
-    id = null,
-    element,
-    attributes = {},
-    children = [],
-    isTextNode = false
-  } = nodeData;
+    const {
+        id = null,
+        element,
+        attributes = {},
+        children = [],
+        isTextNode = false,
+    } = nodeData;
 
-  const node = new TreeNode(id, element, attributes, [], isTextNode);
-  if (Array.isArray(children)) {
-    node.children = children.map(buildTree);
-  }
-  return node;
+    const node = new TreeNode(id, element, attributes, [], isTextNode);
+    if (Array.isArray(children)) {
+        node.children = children.map(buildTree);
+    }
+    return node;
 }
 
 export class GenericTree extends GenericView {
-  root: TreeNode | null;
-  currentId: string;
-  rootElement: HTMLDivElement;
+    root: TreeNode | null;
+    currentId: string;
+    rootElement: HTMLDivElement;
+    hideRoot: boolean;
+    eventManager: EventManager;
 
-  constructor(div: HTMLDivElement, app: App) {
-    super(div, app);
+    constructor(div: HTMLDivElement, app: App) {
+        super(div, app);
 
-    this.root = null;
-  }
-
-  reset(): void {
-    if (this.root) {
-      this.root.reset();
-      this.rootElement.remove();
+        this.root = null;
+        this.hideRoot = false;
     }
-    this.root = null;
-  }
 
-  fromJson(json: any): void {
-    if (!json || !json.element) throw new Error("Invalid JSON data: Missing 'element' property");
+    reset(): void {
+        if (this.root) {
+            this.root.reset();
+            this.rootElement.remove();
+        }
+        this.root = null;
+    }
 
-    this.root = buildTree(json);
-    this.rootElement = appendDivTo(this.div, { class: `vrv-tree-root` });
-    this.root.html(this.rootElement);
-  }
+    onClick(e: MouseEvent): void {
+        // This need to be overridden
+    }
+
+    fromJson(json: any): void {
+        if (!json || !json.element) throw new Error("Invalid JSON data: Missing 'element' property");
+
+        this.root = buildTree(json);
+        this.rootElement = appendDivTo(this.div, { class: `vrv-tree-root` });
+        this.root.html(this.rootElement, this, this.hideRoot);
+    }
 }
 
 export class TreeNode {
-  div: HTMLDivElement;
-  id: string | null; // Unique node identifier
-  element: string; // XML tag name
-  attributes: Record<string, string>; // Key-value attributes
-  children: TreeNode[];
-  isTextNode: boolean; // Flag for text nodes
+    div: HTMLDivElement;
+    id: string | null; // Unique node identifier
+    element: string; // XML tag name
+    attributes: Record<string, string>; // Key-value attributes
+    children: TreeNode[];
+    isTextNode: boolean; // Flag for text nodes
 
-  constructor(
-    id: string | null,
-    element: string,
-    attributes: Record<string, string> = {},
-    children: TreeNode[] = [],
-    isTextNode: boolean = false
-  ) {
-    this.id = id;
-    this.element = element;
-    this.attributes = attributes;
-    this.children = children;
-    this.isTextNode = isTextNode;
-  }
-
-  reset(): void {
-    this.children.forEach(child => child.reset());
-    while (this.div.firstChild) {
-      this.div.firstChild.remove();
+    constructor(
+        id: string | null,
+        element: string,
+        attributes: Record<string, string> = {},
+        children: TreeNode[] = [],
+        isTextNode: boolean = false
+    ) {
+        this.id = id;
+        this.element = element;
+        this.attributes = attributes;
+        this.children = children;
+        this.isTextNode = isTextNode;
     }
-  }
 
-  html(div: HTMLDivElement) {
-    this.div = div;
-    let label = appendDivTo(this.div, { class: `vrv-node-label` });
-    label.innerHTML = this.element;
-    let children = appendDivTo(this.div, { class: `vrv-node-children` });
-    this.children.forEach(child => {
-      let node = appendDivTo(children, { class: `vrv-tree-node` });
-      child.html(node);
-    });
-  }
+    reset(): void {
+        this.children.forEach(child => child.reset());
+        while (this.div.firstChild) {
+            this.div.firstChild.remove();
+        }
+    }
+
+    html(div: HTMLDivElement, tree: GenericTree, hideLabel: boolean = false) {
+        this.div = div;
+        // Pass the id and element for the onClick
+        this.div.dataset.id = this.id;
+        this.div.dataset.element = this.element;
+        let label = appendDivTo(this.div, { class: `vrv-node-label` });
+        if (hideLabel) label.style.display = 'none';
+        else {
+            // Copy the dataset because both the node and the label fire an event
+            label.dataset.id = this.div.dataset.id;
+            label.dataset.element = this.div.dataset.element;
+            tree.eventManager.bind(this.div, "click", tree.onClick);
+        }
+        let labelStr = this.element;
+        if (this.attributes && this.attributes['n']) {
+            labelStr += ` ${this.attributes['n']}`
+        }
+        label.innerHTML = labelStr;
+        //let cb = appendInputTo(label, { type: `checkbox` });
+        let children = appendDivTo(this.div, { class: `vrv-node-children` });
+        this.children.forEach(child => {
+            let node = appendDivTo(children, { class: `vrv-tree-node` });
+            child.html(node, tree);
+        });
+    }
 }
 
 /*
-const jsonData = {
-  id: "1",
-  element: "bookstore",
-  attributes: {},
-  isTextNode: false,
-  children: [
-    {
-      id: "2",
-      element: "book",
-      attributes: { category: "fiction" },
-      isTextNode: false,
-      children: [
-        { id: "3", element: "title", attributes: { lang: "en" }, isTextNode: false, children: [] },
-        { id: "4", element: "text", attributes: {}, isTextNode: true, children: [] }
-      ]
-    }
-  ]
-};
 
 Get Score
 Mdiv / Score / ScoreDef
@@ -131,51 +136,5 @@ tree.traverse(node => {
     `<${node.element} id="${node.id}" ${JSON.stringify(node.attributes)} isTextNode=${node.isTextNode}>`
   );
 });
-
-<div class="vrv-wrapper">
-  <div class="vrv-tree">
-    <div class="vrv-node-label">root</div>
-    <div class="vrv-node-children">
-      <div class="vrv-tree-node">
-        <div class="vrv-node-label">1</div>
-      </div>
-      <div class="vrv-tree-node">
-        <div class="vrv-node-label">2</div>
-      </div>
-      <div class="vrv-tree-node open">
-        <div class="vrv-node-label">
-          <input type="checkbox">
-          <span>label</span>
-          
-        </div>
-        <div class="vrv-node-children">
-          <div class="vrv-tree-node">
-            <div class="vrv-node-label">3.1</div>
-          </div>
-          <div class="vrv-tree-node">
-            <div class="vrv-node-label">3.2</div>
-          </div>
-          <div class="vrv-tree-node open">
-            <div class="vrv-node-label">3.3</div>
-            <div class="vrv-tree-children">
-              <div class="vrv-tree-node">
-                <div class="vrv-node-label">3.3.1</div>
-              </div>
-              <div class="vrv-tree-node">
-                <div class="vrv-node-label">3.3.2</div>
-              </div>
-              <div class="vrv-tree-node">
-                <div class="vrv-node-label">3.3.3</div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="vrv-tree-node">
-          <div class="vrv-node-label">4</div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
 
 */
