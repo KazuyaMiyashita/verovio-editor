@@ -24,6 +24,12 @@ export class GenericTree extends GenericView {
     onClick(e) {
         // This need to be overridden
     }
+    onMouseover(e) {
+        // This need to be overridden
+    }
+    onMouseout(e) {
+        // This need to be overridden
+    }
     fromJson(json) {
         if (!json || !json.element)
             throw new Error("Invalid JSON data: Missing 'element' property");
@@ -59,6 +65,8 @@ export class TreeNode {
             label.dataset.id = this.div.dataset.id;
             label.dataset.element = this.div.dataset.element;
             tree.eventManager.bind(this.div, "click", tree.onClick);
+            tree.eventManager.bind(this.div, "mouseover", tree.onMouseover);
+            tree.eventManager.bind(this.div, "mouseout", tree.onMouseout);
         }
         let labelStr = this.element;
         if (this.attributes && this.attributes['n']) {

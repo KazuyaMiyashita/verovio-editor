@@ -27,6 +27,8 @@ export class EditorContentTree extends GenericTree {
         crumb.dataset.id = id
         crumb.dataset.element = element;
         this.eventManager.bind(crumb, 'click', this.onClick);
+        this.eventManager.bind(crumb, 'mouseover', this.onMouseover);
+        this.eventManager.bind(crumb, 'mouseout', this.onMouseout);
     }
 
     async setCurrent(id: string): Promise<any> {
@@ -85,12 +87,38 @@ export class EditorContentTree extends GenericTree {
 
     }
 
+    cursorActivity(id: string, activity: string) {
+        let event = new CustomEvent('onCursorActivity', {
+            detail: {
+                id: id,
+                activity: activity,
+                caller: this
+            }
+        });
+        this.app.customEventManager.dispatch(event);
+    }
+
     override onClick(e: MouseEvent): void {
         const element: HTMLElement = e.target as HTMLElement;
         console.log(element);
         if (element.dataset.id) {
             this.select(element.dataset.element, element.dataset.id);
         }
-       
+    }
+
+    override onMouseover(e: MouseEvent): void {
+        const element: HTMLElement = e.target as HTMLElement;
+        if (element.dataset.id) {
+            this.cursorActivity(element.dataset.id, 'mouseover');
+
+        }
+    }
+
+    override onMouseout(e: MouseEvent): void {
+        const element: HTMLElement = e.target as HTMLElement;
+        if (element.dataset.id) {
+            this.cursorActivity(element.dataset.id, 'mouseout');
+
+        }
     }
 }

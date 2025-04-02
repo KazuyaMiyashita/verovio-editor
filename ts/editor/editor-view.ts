@@ -214,7 +214,7 @@ export class EditorView extends ResponsiveView {
         }
         for (const id of this.highlightedCache) {
             // Set the wrapper instance to be red
-            this.highlightWithColor(this.svgWrapper.querySelector('#' + id), '#e60000');
+            this.highlightWithColor(this.svgWrapper.querySelector('#' + id), '#cd0000');
         }
     }
 
@@ -256,9 +256,22 @@ export class EditorView extends ResponsiveView {
     // Custom event methods
     ////////////////////////////////////////////////////////////////////////
 
+    override onCursorActivity(e: CustomEvent): boolean {
+        if (!super.onCursorActivity(e)) return false;
+        //console.debug("EditorView::onMouseover");
+        console.log(e.detail.id);  
+        if (e.detail.activity === 'mouseover') this.activateHighlight(e.detail.id);
+        else if (e.detail.activity === 'mouseout') {
+            this.resetHighlights();
+            this.activateHighlight(this.currentId);
+        }
+
+        return true;
+    }
+    
     override onEndLoading(e: CustomEvent): boolean {
         if (!super.onEndLoading(e)) return false;
-        //console.debug("AppToolbar::onEndLoading");
+        //console.debug("EditorView::onEndLoading");
 
         this.initCursor();
 
@@ -267,7 +280,7 @@ export class EditorView extends ResponsiveView {
 
     override onSelect(e: CustomEvent): boolean {
         if (!super.onSelect(e)) return false;
-        //console.debug("VerovioView::onSelect");
+        //console.debug("EditorView::onSelect");
 
         this.setCurrent(e.detail.id);
 
@@ -334,6 +347,7 @@ export class EditorView extends ResponsiveView {
         document.removeEventListener('mousemove', this.boundMouseMove);
         document.removeEventListener('touchmove', this.boundMouseMove);
 
+        this.currentId = id;
         let event = new CustomEvent('onSelect', {
             detail: {
                 id: id,

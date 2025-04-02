@@ -24,6 +24,8 @@ export class EditorContentTree extends GenericTree {
         crumb.dataset.id = id;
         crumb.dataset.element = element;
         this.eventManager.bind(crumb, 'click', this.onClick);
+        this.eventManager.bind(crumb, 'mouseover', this.onMouseover);
+        this.eventManager.bind(crumb, 'mouseout', this.onMouseout);
     }
     setCurrent(id) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -75,11 +77,33 @@ export class EditorContentTree extends GenericTree {
         });
         this.app.customEventManager.dispatch(event);
     }
+    cursorActivity(id, activity) {
+        let event = new CustomEvent('onCursorActivity', {
+            detail: {
+                id: id,
+                activity: activity,
+                caller: this
+            }
+        });
+        this.app.customEventManager.dispatch(event);
+    }
     onClick(e) {
         const element = e.target;
         console.log(element);
         if (element.dataset.id) {
             this.select(element.dataset.element, element.dataset.id);
+        }
+    }
+    onMouseover(e) {
+        const element = e.target;
+        if (element.dataset.id) {
+            this.cursorActivity(element.dataset.id, 'mouseover');
+        }
+    }
+    onMouseout(e) {
+        const element = e.target;
+        if (element.dataset.id) {
+            this.cursorActivity(element.dataset.id, 'mouseout');
         }
     }
 }

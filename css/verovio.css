@@ -6,7 +6,7 @@
   left: -9999px;
   z-index: -1; }
 
-.vrv-clickable:hover:not(.inactivated), .vrv-wrapper .vrv-dialog-gh-list .vrv-dialog-gh-item:hover:not(.inactivated), .vrv-wrapper .vrv-tab-group .vrv-tab-selectors .vrv-tab-selector:hover:not(.inactivated), .vrv-wrapper .vrv-dialog .vrv-dialog-box .vrv-dialog-btn:hover:not(.inactivated), .vrv-wrapper .vrv-toolbar .vrv-btn:hover:not(.inactivated), .vrv-wrapper .vrv-editor-toolbar .vrv-btn:hover:not(.inactivated), .vrv-wrapper .vrv-toolbar .vrv-btn-icon-large:hover:not(.inactivated), .vrv-wrapper .vrv-editor-toolbar .vrv-btn-icon-large:hover:not(.inactivated), .vrv-wrapper .vrv-toolbar .vrv-btn-text:hover:not(.inactivated), .vrv-wrapper .vrv-editor-toolbar .vrv-btn-text:hover:not(.inactivated), .vrv-wrapper .vrv-toolbar .vrv-menu-content .vrv-menu-text:hover:not(.inactivated), .vrv-wrapper .vrv-editor-toolbar .vrv-menu-content .vrv-menu-text:hover:not(.inactivated), .vrv-wrapper .vrv-toolbar .vrv-menu-content .vrv-submenu-text:hover:not(.inactivated), .vrv-wrapper .vrv-editor-toolbar .vrv-menu-content .vrv-submenu-text:hover:not(.inactivated), .vrv-wrapper .vrv-toolbar .vrv-btn-icon:hover:not(.inactivated), .vrv-wrapper .vrv-editor-toolbar .vrv-btn-icon:hover:not(.inactivated), .vrv-wrapper .vrv-toolbar .vrv-btn-icon-left:hover:not(.inactivated), .vrv-wrapper .vrv-editor-toolbar .vrv-btn-icon-left:hover:not(.inactivated), .vrv-wrapper .vrv-toolbar .vrv-menu-icon-left:hover:not(.inactivated), .vrv-wrapper .vrv-editor-toolbar .vrv-menu-icon-left:hover:not(.inactivated) {
+.vrv-clickable:hover:not(.inactivated), .vrv-wrapper .vrv-tree-breadcrumbs-wrapper .vrv-tree-breadcrumbs .vrv-tree-breadcrumb:hover:not(.inactivated), .vrv-wrapper .vrv-tree-root .vrv-node-label:hover:not(.inactivated), .vrv-wrapper .vrv-dialog-gh-list .vrv-dialog-gh-item:hover:not(.inactivated), .vrv-wrapper .vrv-tab-group .vrv-tab-selectors .vrv-tab-selector:hover:not(.inactivated), .vrv-wrapper .vrv-dialog .vrv-dialog-box .vrv-dialog-btn:hover:not(.inactivated), .vrv-wrapper .vrv-toolbar .vrv-btn:hover:not(.inactivated), .vrv-wrapper .vrv-editor-toolbar .vrv-btn:hover:not(.inactivated), .vrv-wrapper .vrv-toolbar .vrv-btn-icon-large:hover:not(.inactivated), .vrv-wrapper .vrv-editor-toolbar .vrv-btn-icon-large:hover:not(.inactivated), .vrv-wrapper .vrv-toolbar .vrv-btn-text:hover:not(.inactivated), .vrv-wrapper .vrv-editor-toolbar .vrv-btn-text:hover:not(.inactivated), .vrv-wrapper .vrv-toolbar .vrv-menu-content .vrv-menu-text:hover:not(.inactivated), .vrv-wrapper .vrv-editor-toolbar .vrv-menu-content .vrv-menu-text:hover:not(.inactivated), .vrv-wrapper .vrv-toolbar .vrv-menu-content .vrv-submenu-text:hover:not(.inactivated), .vrv-wrapper .vrv-editor-toolbar .vrv-menu-content .vrv-submenu-text:hover:not(.inactivated), .vrv-wrapper .vrv-toolbar .vrv-btn-icon:hover:not(.inactivated), .vrv-wrapper .vrv-editor-toolbar .vrv-btn-icon:hover:not(.inactivated), .vrv-wrapper .vrv-toolbar .vrv-btn-icon-left:hover:not(.inactivated), .vrv-wrapper .vrv-editor-toolbar .vrv-btn-icon-left:hover:not(.inactivated), .vrv-wrapper .vrv-toolbar .vrv-menu-icon-left:hover:not(.inactivated), .vrv-wrapper .vrv-editor-toolbar .vrv-menu-icon-left:hover:not(.inactivated) {
   filter: invert(0%);
   background-color: #8B0000;
   cursor: pointer; }
@@ -25,7 +25,7 @@
 .vrv-inactivable.inactivated, .vrv-wrapper .vrv-toolbar .inactivated.vrv-btn, .vrv-wrapper .vrv-editor-toolbar .inactivated.vrv-btn, .vrv-wrapper .vrv-toolbar .inactivated.vrv-btn-icon-large, .vrv-wrapper .vrv-editor-toolbar .inactivated.vrv-btn-icon-large, .vrv-wrapper .vrv-toolbar .inactivated.vrv-btn-text, .vrv-wrapper .vrv-editor-toolbar .inactivated.vrv-btn-text, .vrv-wrapper .vrv-toolbar .vrv-menu-content .inactivated.vrv-menu-text, .vrv-wrapper .vrv-editor-toolbar .vrv-menu-content .inactivated.vrv-menu-text, .vrv-wrapper .vrv-toolbar .vrv-menu-content .inactivated.vrv-submenu-text, .vrv-wrapper .vrv-editor-toolbar .vrv-menu-content .inactivated.vrv-submenu-text, .vrv-wrapper .vrv-toolbar .inactivated.vrv-btn-icon, .vrv-wrapper .vrv-editor-toolbar .inactivated.vrv-btn-icon, .vrv-wrapper .vrv-toolbar .inactivated.vrv-btn-icon-left, .vrv-wrapper .vrv-editor-toolbar .inactivated.vrv-btn-icon-left, .vrv-wrapper .vrv-toolbar .inactivated.vrv-menu-icon-left, .vrv-wrapper .vrv-editor-toolbar .inactivated.vrv-menu-icon-left {
   pointer-events: none; }
 
-.vrv-selectable.selected, .vrv-wrapper .vrv-tab-group .vrv-tab-selectors .selected.vrv-tab-selector {
+.vrv-selectable.selected, .vrv-wrapper .vrv-tree-root .selected.vrv-node-label, .vrv-wrapper .vrv-tab-group .vrv-tab-selectors .selected.vrv-tab-selector {
   background-color: #3c3c3c; }
 
 .vrv-text-no-select, .vrv-wrapper .vrv-tab-group .vrv-tab-selectors .vrv-tab-selector, .vrv-wrapper .vrv-views .vrv-view .vrv-svg-wrapper text,
@@ -608,10 +608,6 @@
     background: #565656;
     color: white;
     user-select: none; }
-  .vrv-wrapper .vrv-tree-root .vrv-node-label:hover {
-    filter: invert(0%);
-    background-color: #8B0000;
-    cursor: pointer; }
   .vrv-wrapper .vrv-tree-root .vrv-tree-node {
     position: relative;
     margin-left: 16px;
@@ -653,10 +649,6 @@
       .vrv-wrapper .vrv-tree-breadcrumbs-wrapper .vrv-tree-breadcrumbs .vrv-tree-breadcrumb:after {
         padding-left: 8px;
         content: "/\00a0"; }
-      .vrv-wrapper .vrv-tree-breadcrumbs-wrapper .vrv-tree-breadcrumbs .vrv-tree-breadcrumb:hover {
-        filter: invert(0%);
-        background-color: #8B0000;
-        cursor: pointer; }
 
 @media screen and (max-width: 600px) {
   .vrv-wrapper .vrv-toolbar .vrv-btn, .vrv-wrapper .vrv-editor-toolbar .vrv-btn, .vrv-wrapper .vrv-toolbar .vrv-btn-text, .vrv-wrapper .vrv-toolbar .vrv-btn-icon-left, .vrv-wrapper .vrv-toolbar .vrv-btn-icon, .vrv-wrapper .vrv-toolbar .vrv-btn-icon-large, .vrv-wrapper .vrv-toolbar .vrv-menu-content .vrv-menu-text, .vrv-wrapper .vrv-editor-toolbar .vrv-btn-text, .vrv-wrapper .vrv-editor-toolbar .vrv-btn-icon-large {

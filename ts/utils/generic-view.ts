@@ -29,6 +29,7 @@ export class GenericView {
 
         this.customEventManager = new CustomEventManager();
         this.customEventManager.bind(this, 'onActivate', this.onActivate);
+        this.customEventManager.bind(this, 'onCursorActivity', this.onCursorActivity);
         this.customEventManager.bind(this, 'onDeactivate', this.onDeactivate);
         this.customEventManager.bind(this, 'onEndLoading', this.onEndLoading);
         this.customEventManager.bind(this, 'onLoadData', this.onLoadData);
@@ -54,6 +55,12 @@ export class GenericView {
         //console.debug("GenericView::onActivate");
         this.div.style.display = 'block';
         this.active = true;
+        return true;
+    }
+
+    onCursorActivity(e: CustomEvent): boolean {
+        if (!this.active) return false;
+        //console.debug("GenericView::onCursorActivity");
         return true;
     }
 

@@ -1088,16 +1088,13 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
 
     .vrv-tree-root {
         .vrv-node-label {
+            @extend .vrv-clickable;
+            @extend .vrv-selectable;
             padding: $node-label-padding;
             min-height: $node-height;
             background: $background-light;
             color: $text-color;
             user-select: none;
-        }
-        .vrv-node-label:hover {
-            filter: $hover-filter;
-            background-color: $filtered-primary;
-            cursor: pointer;
         }
 
         .vrv-tree-node {
@@ -1138,6 +1135,7 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
             background: $background-light;
 
             .vrv-tree-breadcrumb {
+                @extend .vrv-clickable;
                 justify-content: center;
                 align-items: center;
                 min-height: $node-height;
@@ -1154,12 +1152,6 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
             .vrv-tree-breadcrumb:after {
                 padding-left: 8px;
                 content: "/\00a0";
-            }
-
-            .vrv-tree-breadcrumb:hover {
-                filter: $hover-filter;
-                background-color: $filtered-primary;
-                cursor: pointer;
             }
         }
     }
