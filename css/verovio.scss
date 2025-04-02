@@ -1059,6 +1059,24 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
         }
     }
 
+
+    ////////////////////////////////////////////////////////////////////////
+    // Fieldset
+    ////////////////////////////////////////////////////////////////////////
+    
+    .vrv-field-set {
+        border-top: 1px solid $background-border;
+        padding-top: 14px;
+        margin-top: 8px;
+
+        .vrv-legend {
+            float: left;
+            margin-top: -26px;
+            padding-right: 4px;
+            background: $background;
+        }
+    }
+
     ////////////////////////////////////////////////////////////////////////
     // Tree
     ////////////////////////////////////////////////////////////////////////

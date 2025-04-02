@@ -16,9 +16,17 @@ export class EditorContentPanel extends GenericView {
         super(div, app);
 
         this.tab = tab;
-        this.treeView = new EditorContentTree(this.div, this.app, this.tab);
+
+        let treeFieldSet = this.addFieldSet("Element context");
+        this.treeView = new EditorContentTree(treeFieldSet, this.app, this.tab);
         this.treeView.hideRoot = true;
         this.customEventManager.addToPropagationList(this.treeView.customEventManager);
+
+        let attributeFieldSet = this.addFieldSet("Attributes");
+
+        let referencedFieldSet = this.addFieldSet("Referencing elements");
+
+        let referencingFieldSet = this.addFieldSet("Referenced elements");
     }
 
     ////////////////////////////////////////////////////////////////////////
@@ -31,6 +39,13 @@ export class EditorContentPanel extends GenericView {
             const jsonContext = await this.app.verovio.editInfo();
             this.treeView.loadContext(jsonContext['context'], jsonContext['ancestors']);
         }
+    }
+
+    addFieldSet(label: string): HTMLDivElement {
+        let fieldSet = appendDivTo(this.div, { class: `vrv-field-set` });
+        let legend = appendDivTo(fieldSet, { class: `vrv-legend` });
+        legend.innerHTML = label;
+        return fieldSet;
     }
 
     ////////////////////////////////////////////////////////////////////////
