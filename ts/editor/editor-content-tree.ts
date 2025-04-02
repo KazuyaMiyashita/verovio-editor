@@ -45,8 +45,6 @@ export class EditorContentTree extends GenericTree {
         if (Array.isArray(ancestors)) {
             this.breadCrumbs.innerHTML = "";
             for (let i = ancestors.length - 1; i >= 0; i--) {
-                let id = (i === 0) ? "" : ancestors[i - 1]['id'];
-                console.log(id, ancestors[i]['element']);
                 this.addCrumb(ancestors[i]['element'], ancestors[i]['id']);
             };
         };
@@ -100,7 +98,6 @@ export class EditorContentTree extends GenericTree {
 
     override onClick(e: MouseEvent): void {
         const element: HTMLElement = e.target as HTMLElement;
-        console.log(element);
         if (element.dataset.id) {
             this.select(element.dataset.element, element.dataset.id);
         }

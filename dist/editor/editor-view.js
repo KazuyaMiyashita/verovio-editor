@@ -245,7 +245,6 @@ export class EditorView extends ResponsiveView {
         if (!super.onCursorActivity(e))
             return false;
         //console.debug("EditorView::onMouseover");
-        console.log(e.detail.id);
         if (e.detail.activity === 'mouseover')
             this.activateHighlight(e.detail.id);
         else if (e.detail.activity === 'mouseout') {

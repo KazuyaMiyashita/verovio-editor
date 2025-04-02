@@ -13,6 +13,7 @@ export class GenericTree extends GenericView {
         super(div, app);
         this.root = null;
         this.hideRoot = false;
+        this.setDisplayFlex();
     }
     reset() {
         if (this.root) {

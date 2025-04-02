@@ -70,7 +70,7 @@ export class XMLEditorView extends GenericView {
         };
         this.CMeditor.addKeyMap(map);
         this.CMeditor.on("cursorActivity", function (cm) {
-            cmThis.onCursorActivity(cm);
+            cmThis.onXMLCursorActivity(cm);
         });
         this.CMeditor.on("keyHandled", function (cm, string, event) {
             cmThis.keyHandled(cm, string, event);
@@ -270,7 +270,7 @@ export class XMLEditorView extends GenericView {
     ////////////////////////////////////////////////////////////////////////
     // Codemirror event methods
     ////////////////////////////////////////////////////////////////////////
-    onCursorActivity(cm) {
+    onXMLCursorActivity(cm) {
         if (this.formatting)
             return;
         const cursor = cm.getCursor();

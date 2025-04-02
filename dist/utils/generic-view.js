@@ -14,6 +14,7 @@ export class GenericView {
         // Generate an id for the CustomEventManager
         this.id = randomHex(16);
         this.active = false;
+        this.display = 'block';
         this.customEventManager = new CustomEventManager();
         this.customEventManager.bind(this, 'onActivate', this.onActivate);
         this.customEventManager.bind(this, 'onCursorActivity', this.onCursorActivity);
@@ -32,12 +33,13 @@ export class GenericView {
     destroy() {
         // Nothing at this level
     }
+    setDisplayFlex() { this.display = 'flex'; }
     ////////////////////////////////////////////////////////////////////////
     // Custom event methods
     ////////////////////////////////////////////////////////////////////////
     onActivate(e) {
         //console.debug("GenericView::onActivate");
-        this.div.style.display = 'block';
+        this.div.style.display = this.display;
         this.active = true;
         return true;
     }

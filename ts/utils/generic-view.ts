@@ -14,6 +14,7 @@ export class GenericView {
     id: string;
     active: boolean;
     customEventManager: CustomEventManager;
+    private display: string;
 
     constructor(div: HTMLDivElement, app: App) {
         // Root element in which verovio-ui is created
@@ -26,6 +27,8 @@ export class GenericView {
         this.id = randomHex(16);
 
         this.active = false;
+
+        this.display = 'block';
 
         this.customEventManager = new CustomEventManager();
         this.customEventManager.bind(this, 'onActivate', this.onActivate);
@@ -47,13 +50,15 @@ export class GenericView {
         // Nothing at this level
     }
 
+    setDisplayFlex(): void { this.display = 'flex';  }
+
     ////////////////////////////////////////////////////////////////////////
     // Custom event methods
     ////////////////////////////////////////////////////////////////////////
 
     onActivate(e: CustomEvent): boolean {
         //console.debug("GenericView::onActivate");
-        this.div.style.display = 'block';
+        this.div.style.display = this.display;
         this.active = true;
         return true;
     }

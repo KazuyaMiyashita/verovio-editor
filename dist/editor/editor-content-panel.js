@@ -12,15 +12,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 import { EditorContentTree } from './editor-content-tree.js';
 import { GenericView } from '../utils/generic-view.js';
-import { appendDivTo } from '../utils/functions.js';
+import { appendDivTo, appendSpanTo } from '../utils/functions.js';
 export class EditorContentPanel extends GenericView {
     constructor(div, app, tab) {
         super(div, app);
+        this.setDisplayFlex();
         this.tab = tab;
         let treeFieldSet = this.addFieldSet("Element context");
-        this.treeView = new EditorContentTree(treeFieldSet, this.app, this.tab);
-        this.treeView.hideRoot = true;
-        this.customEventManager.addToPropagationList(this.treeView.customEventManager);
+        this.contentTree = appendDivTo(treeFieldSet, { class: `vrv-field-set-panel` });
+        this.contentTreeObj = new EditorContentTree(this.contentTree, this.app, this.tab);
+        this.contentTreeObj.hideRoot = true;
+        this.customEventManager.addToPropagationList(this.contentTreeObj.customEventManager);
         let attributeFieldSet = this.addFieldSet("Attributes");
         let referencedFieldSet = this.addFieldSet("Referencing elements");
         let referencingFieldSet = this.addFieldSet("Referenced elements");
@@ -33,14 +35,19 @@ export class EditorContentPanel extends GenericView {
             const contextOk = yield this.app.verovio.edit({ action: 'context', param: { elementId: `${id}` } });
             if (contextOk) {
                 const jsonContext = yield this.app.verovio.editInfo();
-                this.treeView.loadContext(jsonContext['context'], jsonContext['ancestors']);
+                this.contentTreeObj.loadContext(jsonContext['context'], jsonContext['ancestors']);
             }
         });
     }
     addFieldSet(label) {
-        let fieldSet = appendDivTo(this.div, { class: `vrv-field-set` });
-        let legend = appendDivTo(fieldSet, { class: `vrv-legend` });
+        let legend = appendDivTo(this.div, { class: `vrv-legend` });
         legend.innerHTML = label;
+        let span = appendSpanTo(legend, { class: `icon` }, '▼');
+        let fieldSet = appendDivTo(this.div, { class: `vrv-field-set` });
+        span.addEventListener("click", () => {
+            legend.classList.toggle("toggled");
+            fieldSet.classList.toggle("toggled");
+        });
         return fieldSet;
     }
     ////////////////////////////////////////////////////////////////////////

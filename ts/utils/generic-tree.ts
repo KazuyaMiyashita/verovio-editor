@@ -34,6 +34,7 @@ export class GenericTree extends GenericView {
 
         this.root = null;
         this.hideRoot = false;
+        this.setDisplayFlex();
     }
 
     reset(): void {
