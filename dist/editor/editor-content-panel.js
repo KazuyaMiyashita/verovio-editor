@@ -11,6 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import { EditorContentTree } from './editor-content-tree.js';
+import { EditorReferenceList, ReferenceDirection } from './editor-references-list.js';
 import { GenericView } from '../utils/generic-view.js';
 import { appendDivTo, appendSpanTo } from '../utils/functions.js';
 export class EditorContentPanel extends GenericView {
@@ -24,8 +25,14 @@ export class EditorContentPanel extends GenericView {
         this.contentTreeObj.hideRoot = true;
         this.customEventManager.addToPropagationList(this.contentTreeObj.customEventManager);
         let attributeFieldSet = this.addFieldSet("Attributes");
-        let referencedFieldSet = this.addFieldSet("Referencing elements");
-        let referencingFieldSet = this.addFieldSet("Referenced elements");
+        let referencesFromFieldSet = this.addFieldSet("Referencing elements");
+        this.referencesFrom = appendDivTo(referencesFromFieldSet, { class: `vrv-field-set-panel` });
+        this.referencesFromObj = new EditorReferenceList(this.referencesFrom, this.app, this.tab);
+        this.customEventManager.addToPropagationList(this.referencesFromObj.customEventManager);
+        let referencesToFieldSet = this.addFieldSet("Referenced elements");
+        this.referencesTo = appendDivTo(referencesToFieldSet, { class: `vrv-field-set-panel` });
+        this.referencesToObj = new EditorReferenceList(this.referencesTo, this.app, this.tab);
+        this.customEventManager.addToPropagationList(this.contentTreeObj.customEventManager);
     }
     ////////////////////////////////////////////////////////////////////////
     // Class-specific methods
@@ -36,6 +43,8 @@ export class EditorContentPanel extends GenericView {
             if (contextOk) {
                 const jsonContext = yield this.app.verovio.editInfo();
                 this.contentTreeObj.loadContext(jsonContext['context'], jsonContext['ancestors'], jsonContext['object']);
+                this.referencesFromObj.loadList(jsonContext['referringElements'], ReferenceDirection.From);
+                this.referencesToObj.loadList(jsonContext['referencedElements'], ReferenceDirection.To);
             }
         });
     }
