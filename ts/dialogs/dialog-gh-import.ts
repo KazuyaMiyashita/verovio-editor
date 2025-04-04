@@ -106,7 +106,7 @@ export class DialogGhImport extends Dialog {
 
     addItemToList(name: string, icon: string, dataset: ItemDataset, checked: boolean, bind: Function): void {
         const item: HTMLDivElement = appendDivTo(this.list, { class: `vrv-dialog-gh-item`, style: { backgroundImage: `url(${icon})` }, 'data-before': `${name}` });
-        const keys = Object.keys(dataset);;
+        const keys = Object.keys(dataset);
         for (let i = 0; i < keys.length; i++) {
             item.dataset[keys[i]] = dataset[keys[i]];
         }

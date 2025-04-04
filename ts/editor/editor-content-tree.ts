@@ -31,16 +31,27 @@ export class EditorContentTree extends GenericTree {
         this.eventManager.bind(crumb, 'mouseout', this.onMouseout);
     }
 
-    async setCurrent(id: string): Promise<any> {
-        //this.currentId = id;
-        //this.fakeLoad();
+    selectNode(node: TreeNode): void {
+        node.label.classList.add("target");
+        const parentRect = this.root.div.getBoundingClientRect();
+        const childRect = node.div.getBoundingClientRect();
+        // Calculate offset of the node relative to root
+        const offsetTop = childRect.top - parentRect.top + this.root.div.scrollTop;
+        // arbitrary margin
+        this.root.div.scrollTo({ top: offsetTop - 50 });
     }
 
-    async loadContext(context: Object, ancestors: Object): Promise<any> {
+    async loadContext(context: Object, ancestors: Object, target: Object): Promise<any> {
+        console.log(context);
         this.reset();
         this.fromJson(context);
 
-
+        this.traverse((node) => {
+            if (node.id === target['id']) {
+                this.selectNode(node);
+                return true;
+            }
+        });
 
         if (Array.isArray(ancestors)) {
             this.breadCrumbs.innerHTML = "";
@@ -49,7 +60,7 @@ export class EditorContentTree extends GenericTree {
             };
         };
         this.breadCrumbsWrapper.scrollLeft = this.breadCrumbsWrapper.scrollWidth;
-    }   
+    }
 
     ////////////////////////////////////////////////////////////////////////
     // Custom event methods
@@ -58,7 +69,7 @@ export class EditorContentTree extends GenericTree {
     override onLoadData(e: CustomEvent): boolean {
         if (!super.onLoadData(e)) return false;
         console.debug("EditorContentTree::onLoadData");
-        
+
         return true;
     }
 
@@ -73,8 +84,7 @@ export class EditorContentTree extends GenericTree {
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
 
-    select(element: string, id: string)
-    {
+    select(element: string, id: string) {
         let event = new CustomEvent('onSelect', {
             detail: {
                 id: id,

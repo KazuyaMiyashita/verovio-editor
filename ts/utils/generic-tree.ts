@@ -13,9 +13,10 @@ function buildTree(nodeData: any): TreeNode {
         attributes = {},
         children = [],
         isTextNode = false,
+        isLeaf = false
     } = nodeData;
 
-    const node = new TreeNode(id, element, attributes, [], isTextNode);
+    const node = new TreeNode(id, element, attributes, [], isTextNode, isLeaf);
     if (Array.isArray(children)) {
         node.children = children.map(buildTree);
     }
@@ -64,28 +65,46 @@ export class GenericTree extends GenericView {
         this.rootElement = appendDivTo(this.div, { class: `vrv-tree-root` });
         this.root.html(this.rootElement, this, this.hideRoot);
     }
+
+    // Generic depth-first traversal method
+    traverse(callback: (node: TreeNode) => boolean | void): void {
+        const visit = (node: TreeNode): boolean => {
+            if (callback(node)) {
+                return true; // Stop if callback says so
+            }
+            for (const child of node.children) {
+                if (visit(child)) return true;
+            }
+            return false;
+        };
+        visit(this.root);
+    }
 }
 
 export class TreeNode {
     div: HTMLDivElement;
+    label: HTMLDivElement;
     id: string | null; // Unique node identifier
     element: string; // XML tag name
     attributes: Record<string, string>; // Key-value attributes
     children: TreeNode[];
     isTextNode: boolean; // Flag for text nodes
+    isLeaf: boolean;
 
     constructor(
         id: string | null,
         element: string,
         attributes: Record<string, string> = {},
         children: TreeNode[] = [],
-        isTextNode: boolean = false
+        isTextNode: boolean = false,
+        isLeaf = false
     ) {
         this.id = id;
         this.element = element;
         this.attributes = attributes;
         this.children = children;
         this.isTextNode = isTextNode;
+        this.isLeaf = isLeaf;
     }
 
     reset(): void {
@@ -97,15 +116,17 @@ export class TreeNode {
 
     html(div: HTMLDivElement, tree: GenericTree, hideLabel: boolean = false) {
         this.div = div;
+        if (this.isLeaf) this.div.classList.add("leaf");
+        if (this.children.length > 0) this.div.classList.add("open");
         // Pass the id and element for the onClick
         this.div.dataset.id = this.id;
         this.div.dataset.element = this.element;
-        let label = appendDivTo(this.div, { class: `vrv-node-label` });
-        if (hideLabel) label.style.display = 'none';
+        this.label = appendDivTo(this.div, { class: `vrv-node-label` });
+        if (hideLabel) this.label.style.display = 'none';
         else {
             // Copy the dataset because both the node and the label fire an event
-            label.dataset.id = this.div.dataset.id;
-            label.dataset.element = this.div.dataset.element;
+            this.label.dataset.id = this.div.dataset.id;
+            this.label.dataset.element = this.div.dataset.element;
             tree.eventManager.bind(this.div, "click", tree.onClick);
             tree.eventManager.bind(this.div, "mouseover", tree.onMouseover);
             tree.eventManager.bind(this.div, "mouseout", tree.onMouseout);
@@ -114,7 +135,7 @@ export class TreeNode {
         if (this.attributes && this.attributes['n']) {
             labelStr += ` ${this.attributes['n']}`
         }
-        label.innerHTML = labelStr;
+        this.label.innerHTML = labelStr;
         //let cb = appendInputTo(label, { type: `checkbox` });
         let children = appendDivTo(this.div, { class: `vrv-node-children` });
         this.children.forEach(child => {
@@ -138,14 +159,5 @@ GetContext
 Find element in page / find element in doc
 	SB, PB, DIV, MEASURE, SCOREDEF
 
-
-const tree = Tree.fromJson(jsonData);
-
-// Traverse and print elements
-tree.traverse(node => {
-  console.log(
-    `<${node.element} id="${node.id}" ${JSON.stringify(node.attributes)} isTextNode=${node.isTextNode}>`
-  );
-});
 
 */

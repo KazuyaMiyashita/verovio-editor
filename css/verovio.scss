@@ -1119,10 +1119,10 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
     // Tree
     ////////////////////////////////////////////////////////////////////////
 
-    $node-height: 20;
+    $node-height: 22px;
     $node-indent: 16px;
     $node-margin: 4px;
-    $node-label-padding: 5px;
+    $node-label-padding: 4px 6px;
 
     .vrv-tree-root {
         overflow-y: auto;
@@ -1136,6 +1136,9 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
             color: $text-color;
             user-select: none;
         }
+        .vrv-node-label.target {
+            background: $primary;
+        }
 
         .vrv-tree-node {
             position: relative;
@@ -1144,7 +1147,7 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
             margin-top: $node-margin;
         }
 
-        .vrv-tree-node::before {
+        .vrv-tree-node:not(.leaf)::before {
             cursor: pointer;
             position: absolute;
             content: "▼";

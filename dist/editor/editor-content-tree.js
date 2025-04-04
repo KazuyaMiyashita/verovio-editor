@@ -27,16 +27,26 @@ export class EditorContentTree extends GenericTree {
         this.eventManager.bind(crumb, 'mouseover', this.onMouseover);
         this.eventManager.bind(crumb, 'mouseout', this.onMouseout);
     }
-    setCurrent(id) {
-        return __awaiter(this, void 0, void 0, function* () {
-            //this.currentId = id;
-            //this.fakeLoad();
-        });
+    selectNode(node) {
+        node.label.classList.add("target");
+        const parentRect = this.root.div.getBoundingClientRect();
+        const childRect = node.div.getBoundingClientRect();
+        // Calculate offset of the node relative to root
+        const offsetTop = childRect.top - parentRect.top + this.root.div.scrollTop;
+        // arbitrary margin
+        this.root.div.scrollTo({ top: offsetTop - 50 });
     }
-    loadContext(context, ancestors) {
+    loadContext(context, ancestors, target) {
         return __awaiter(this, void 0, void 0, function* () {
+            console.log(context);
             this.reset();
             this.fromJson(context);
+            this.traverse((node) => {
+                if (node.id === target['id']) {
+                    this.selectNode(node);
+                    return true;
+                }
+            });
             if (Array.isArray(ancestors)) {
                 this.breadCrumbs.innerHTML = "";
                 for (let i = ancestors.length - 1; i >= 0; i--) {

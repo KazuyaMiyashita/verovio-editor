@@ -39,6 +39,7 @@ export class EditorPanel extends GenericView {
         let tabScoreObj = this.tabGroupObj.addTab("Score");
         let tabSectionsObj = this.tabGroupObj.addTab("Sections");
         let tabContentObj = this.tabGroupObj.addTab("Content");
+        this.tabGroupObj.select(tabContentObj.tabId);
         this.contentPanel = appendDivTo(tabContentObj.div, { class: `vrv-tab-content-panel` });
         this.contentPanelObj = new EditorContentPanel(this.contentPanel, this.app, tabContentObj);
         tabContentObj.customEventManager.addToPropagationList(this.contentPanelObj.customEventManager);
@@ -113,7 +114,7 @@ export class EditorPanel extends GenericView {
             this.editorView.style.width = `${width}px`;
             let tabHeight = this.div.clientHeight - this.toolbar.offsetHeight;
             // 78 = toolPanel padding (8 * 2) + selectors height (40) + tab padding (10 * 2)
-            this.tabGroupObj.setMinHeight(tabHeight - 78);
+            this.tabGroupObj.setHeight(tabHeight - 78);
         }
         else {
             if (this.app.options.editorSplitterHorizontal) {

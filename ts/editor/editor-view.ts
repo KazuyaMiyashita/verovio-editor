@@ -201,11 +201,18 @@ export class EditorView extends ResponsiveView {
         this.reapplyHighlights();
     }
 
-    activateHighlight(id: string): void {
+    activateHighlight(id: string, filter: boolean = false): void {
+        if (filter && id === this.currentId) return;
         if (this.highlightedCache.indexOf(id) === -1) {
             this.highlightedCache.push(id);
         }
-        this.reapplyHighlights();
+        if (filter) {
+            let element = <SVGElement>this.svgWrapper.querySelector('#' + id);
+            if (element) element.style.filter = "url(#highlighting)";
+        }
+        else {
+            this.reapplyHighlights();
+        }
     }
 
     reapplyHighlights(): void {
@@ -218,17 +225,22 @@ export class EditorView extends ResponsiveView {
         }
     }
 
-    resetHighlights(): void {
+    resetHighlights(filter: boolean = false): void {
         for (const id of this.highlightedCache) {
-            // Remove the color
-            this.highlightWithColor(this.svgWrapper.querySelector('#' + id), '');
+            if (filter) {
+                let element = <SVGElement>this.svgWrapper.querySelector('#' + id);
+                if (element) element.style.filter = '';
+            }
+            else {
+                // Remove the color with and empty color string
+                this.highlightWithColor(this.svgWrapper.querySelector('#' + id), '');
+            }
         }
         this.highlightedCache.length = 0;
     }
 
     highlightWithColor(g: SVGElement, color: string) {
         if (!g) return;
-
         for (const node of g.querySelectorAll('*:not(g)')) {
             // Do not highlight bounding boxes elements
             if ((<SVGElement>node.parentNode).classList.contains('bounding-box')) continue;
@@ -259,15 +271,17 @@ export class EditorView extends ResponsiveView {
     override onCursorActivity(e: CustomEvent): boolean {
         if (!super.onCursorActivity(e)) return false;
         //console.debug("EditorView::onMouseover");
-        if (e.detail.activity === 'mouseover') this.activateHighlight(e.detail.id);
+        if (e.detail.activity === 'mouseover') {
+            this.activateHighlight(e.detail.id, true);
+        }
         else if (e.detail.activity === 'mouseout') {
-            this.resetHighlights();
+            this.resetHighlights(true);
             this.activateHighlight(this.currentId);
         }
 
         return true;
     }
-    
+
     override onEndLoading(e: CustomEvent): boolean {
         if (!super.onEndLoading(e)) return false;
         //console.debug("EditorView::onEndLoading");

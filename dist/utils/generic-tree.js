@@ -1,8 +1,8 @@
 import { GenericView } from './generic-view.js';
 import { appendDivTo } from './functions.js';
 function buildTree(nodeData) {
-    const { id = null, element, attributes = {}, children = [], isTextNode = false, } = nodeData;
-    const node = new TreeNode(id, element, attributes, [], isTextNode);
+    const { id = null, element, attributes = {}, children = [], isTextNode = false, isLeaf = false } = nodeData;
+    const node = new TreeNode(id, element, attributes, [], isTextNode, isLeaf);
     if (Array.isArray(children)) {
         node.children = children.map(buildTree);
     }
@@ -38,14 +38,29 @@ export class GenericTree extends GenericView {
         this.rootElement = appendDivTo(this.div, { class: `vrv-tree-root` });
         this.root.html(this.rootElement, this, this.hideRoot);
     }
+    // Generic depth-first traversal method
+    traverse(callback) {
+        const visit = (node) => {
+            if (callback(node)) {
+                return true; // Stop if callback says so
+            }
+            for (const child of node.children) {
+                if (visit(child))
+                    return true;
+            }
+            return false;
+        };
+        visit(this.root);
+    }
 }
 export class TreeNode {
-    constructor(id, element, attributes = {}, children = [], isTextNode = false) {
+    constructor(id, element, attributes = {}, children = [], isTextNode = false, isLeaf = false) {
         this.id = id;
         this.element = element;
         this.attributes = attributes;
         this.children = children;
         this.isTextNode = isTextNode;
+        this.isLeaf = isLeaf;
     }
     reset() {
         this.children.forEach(child => child.reset());
@@ -55,16 +70,20 @@ export class TreeNode {
     }
     html(div, tree, hideLabel = false) {
         this.div = div;
+        if (this.isLeaf)
+            this.div.classList.add("leaf");
+        if (this.children.length > 0)
+            this.div.classList.add("open");
         // Pass the id and element for the onClick
         this.div.dataset.id = this.id;
         this.div.dataset.element = this.element;
-        let label = appendDivTo(this.div, { class: `vrv-node-label` });
+        this.label = appendDivTo(this.div, { class: `vrv-node-label` });
         if (hideLabel)
-            label.style.display = 'none';
+            this.label.style.display = 'none';
         else {
             // Copy the dataset because both the node and the label fire an event
-            label.dataset.id = this.div.dataset.id;
-            label.dataset.element = this.div.dataset.element;
+            this.label.dataset.id = this.div.dataset.id;
+            this.label.dataset.element = this.div.dataset.element;
             tree.eventManager.bind(this.div, "click", tree.onClick);
             tree.eventManager.bind(this.div, "mouseover", tree.onMouseover);
             tree.eventManager.bind(this.div, "mouseout", tree.onMouseout);
@@ -73,7 +92,7 @@ export class TreeNode {
         if (this.attributes && this.attributes['n']) {
             labelStr += ` ${this.attributes['n']}`;
         }
-        label.innerHTML = labelStr;
+        this.label.innerHTML = labelStr;
         //let cb = appendInputTo(label, { type: `checkbox` });
         let children = appendDivTo(this.div, { class: `vrv-node-children` });
         this.children.forEach(child => {
@@ -96,15 +115,6 @@ GetContext
 Find element in page / find element in doc
 	SB, PB, DIV, MEASURE, SCOREDEF
 
-
-const tree = Tree.fromJson(jsonData);
-
-// Traverse and print elements
-tree.traverse(node => {
-  console.log(
-    `<${node.element} id="${node.id}" ${JSON.stringify(node.attributes)} isTextNode=${node.isTextNode}>`
-  );
-});
 
 */ 
 //# sourceMappingURL=generic-tree.js.map

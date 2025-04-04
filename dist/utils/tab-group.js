@@ -30,12 +30,9 @@ export class TabGroup extends GenericView {
         this.tabs.push(tab);
         return tab;
     }
-    setMinHeight(minHeight) {
+    setHeight(minHeight) {
         this.div.style.minHeight = `${minHeight}px`;
         this.div.style.maxHeight = `${minHeight}px`;
-        this.tabs.forEach(tab => {
-            //tab.div.style.minHeight = `${minHeight}px`;
-        });
     }
     ////////////////////////////////////////////////////////////////////////
     // Custom event methods
@@ -76,18 +73,20 @@ export class TabGroup extends GenericView {
             tab.customEventManager.dispatch(e);
         });
     }
-    onSelectTab(e) {
-        const element = e.target;
-        // The tab is already selected
-        if (this.selectedTab && this.selectedTab.tabId === element.dataset.tab)
+    select(tabId) {
+        if (this.selectedTab && this.selectedTab.tabId === tabId)
             return;
         this.tabs.forEach(tab => {
-            if (element.dataset.tab === tab.tabId)
+            if (tabId === tab.tabId)
                 this.selectedTab = tab;
             else
                 tab.deselect();
         });
         this.selectedTab.select();
+    }
+    onSelectTab(e) {
+        const element = e.target;
+        this.select(element.dataset.tab);
     }
 }
 export class Tab extends GenericView {

@@ -66,7 +66,7 @@ export class EditorPanel extends GenericView {
     xmlEditorEnabled: boolean;
     xmlEditorView: HTMLDivElement;
     xmlEditorViewObj: XMLEditorView;
-    
+
     boundMouseMove: { (event: MouseEvent): void };
     boundMouseUp: { (event: MouseEvent): void };
 
@@ -85,16 +85,18 @@ export class EditorPanel extends GenericView {
 
         this.hSplit = appendDivTo(this.div, { class: `vrv-h-split` });
         this.toolPanel = appendDivTo(this.hSplit, { class: `vrv-editor-tool-panel` });
-        
+
         this.tabGroup = appendDivTo(this.toolPanel, { class: `vrv-tab-group` });
         this.tabGroupObj = new TabGroup(this.tabGroup, this.app);
         //this.customEventManager.addToPropagationList(this.tabGroupObj.customEventManager);
 
         let tabScoreObj = this.tabGroupObj.addTab("Score");
-        
+
         let tabSectionsObj = this.tabGroupObj.addTab("Sections");
-        
+
         let tabContentObj = this.tabGroupObj.addTab("Content");
+
+        this.tabGroupObj.select(tabContentObj.tabId);
 
         this.contentPanel = appendDivTo(tabContentObj.div, { class: `vrv-tab-content-panel` });
         this.contentPanelObj = new EditorContentPanel(this.contentPanel, this.app, tabContentObj);
@@ -102,7 +104,7 @@ export class EditorPanel extends GenericView {
 
         this.vSplit = appendDivTo(this.hSplit, { class: `vrv-v-split` });
         this.split = appendDivTo(this.vSplit, { class: `vrv-split` });
-        
+
         this.keyboard = appendDivTo(this.vSplit, { class: `vrv-keyboard-panel` });
         this.keyboardObj = new Keyboard(this.keyboard, this.app);
 
@@ -189,17 +191,17 @@ export class EditorPanel extends GenericView {
 
             let tabHeight = this.div.clientHeight - this.toolbar.offsetHeight
             // 78 = toolPanel padding (8 * 2) + selectors height (40) + tab padding (10 * 2)
-            this.tabGroupObj.setMinHeight(tabHeight - 78);
+            this.tabGroupObj.setHeight(tabHeight - 78);
         }
         else {
             if (this.app.options.editorSplitterHorizontal) {
                 let editorHeight = Math.floor(height * this.splitterSize / 100);
                 // 10 is the bottom border of the editor view
                 let xmlHeight = Math.ceil((height * (100 - this.splitterSize) / 100) - 10);
-    
+
                 this.editorView.style.height = `${editorHeight}px`;
                 this.editorView.style.width = `${width}px`;
-    
+
                 this.xmlEditorView.style.height = `${xmlHeight}px`;
                 this.xmlEditorView.style.width = `${width}px`;
             }
@@ -207,10 +209,10 @@ export class EditorPanel extends GenericView {
                 let editorWidth = Math.floor(width * this.splitterSize / 100);
                 // 10 is the bottom border of the editor view
                 let xmlWidth = Math.ceil((width * (100 - this.splitterSize) / 100) - 10);
-    
+
                 this.editorView.style.height = `${height}px`;
                 this.editorView.style.width = `${editorWidth}px`;
-    
+
                 this.xmlEditorView.style.height = `${height}px`;
                 this.xmlEditorView.style.width = `${xmlWidth}px`;
             }

@@ -191,11 +191,20 @@ export class EditorView extends ResponsiveView {
         this.eventManager.bind(this.svgOverlay, 'mousedown', this.mouseDownListener);
         this.reapplyHighlights();
     }
-    activateHighlight(id) {
+    activateHighlight(id, filter = false) {
+        if (filter && id === this.currentId)
+            return;
         if (this.highlightedCache.indexOf(id) === -1) {
             this.highlightedCache.push(id);
         }
-        this.reapplyHighlights();
+        if (filter) {
+            let element = this.svgWrapper.querySelector('#' + id);
+            if (element)
+                element.style.filter = "url(#highlighting)";
+        }
+        else {
+            this.reapplyHighlights();
+        }
     }
     reapplyHighlights() {
         if (this.highlightedCache.length === 1) {
@@ -206,10 +215,17 @@ export class EditorView extends ResponsiveView {
             this.highlightWithColor(this.svgWrapper.querySelector('#' + id), '#cd0000');
         }
     }
-    resetHighlights() {
+    resetHighlights(filter = false) {
         for (const id of this.highlightedCache) {
-            // Remove the color
-            this.highlightWithColor(this.svgWrapper.querySelector('#' + id), '');
+            if (filter) {
+                let element = this.svgWrapper.querySelector('#' + id);
+                if (element)
+                    element.style.filter = '';
+            }
+            else {
+                // Remove the color with and empty color string
+                this.highlightWithColor(this.svgWrapper.querySelector('#' + id), '');
+            }
         }
         this.highlightedCache.length = 0;
     }
@@ -245,10 +261,11 @@ export class EditorView extends ResponsiveView {
         if (!super.onCursorActivity(e))
             return false;
         //console.debug("EditorView::onMouseover");
-        if (e.detail.activity === 'mouseover')
-            this.activateHighlight(e.detail.id);
+        if (e.detail.activity === 'mouseover') {
+            this.activateHighlight(e.detail.id, true);
+        }
         else if (e.detail.activity === 'mouseout') {
-            this.resetHighlights();
+            this.resetHighlights(true);
             this.activateHighlight(this.currentId);
         }
         return true;

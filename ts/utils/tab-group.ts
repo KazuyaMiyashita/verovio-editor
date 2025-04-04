@@ -43,12 +43,9 @@ export class TabGroup extends GenericView {
         return tab;
     }
 
-    setMinHeight(minHeight: number): void {
+    setHeight(minHeight: number): void {
         this.div.style.minHeight = `${minHeight}px`;
         this.div.style.maxHeight = `${minHeight}px`;
-        this.tabs.forEach(tab => {
-            //tab.div.style.minHeight = `${minHeight}px`;
-        });
     }
 
     ////////////////////////////////////////////////////////////////////////
@@ -94,15 +91,18 @@ export class TabGroup extends GenericView {
         });
     }
 
-    onSelectTab(e: MouseEvent): void {
-        const element: HTMLElement = e.target as HTMLElement;
-        // The tab is already selected
-        if (this.selectedTab && this.selectedTab.tabId === element.dataset.tab) return;
+    select(tabId: string): void {
+        if (this.selectedTab && this.selectedTab.tabId === tabId) return;
         this.tabs.forEach(tab => {
-            if (element.dataset.tab === tab.tabId) this.selectedTab = tab;
+            if (tabId === tab.tabId) this.selectedTab = tab;
             else tab.deselect();
         });
         this.selectedTab.select();
+    }
+
+    onSelectTab(e: MouseEvent): void {
+        const element: HTMLElement = e.target as HTMLElement;
+        this.select(element.dataset.tab);
     }
 
 }
