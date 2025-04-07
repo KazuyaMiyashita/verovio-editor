@@ -10,17 +10,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 import { EventManager } from '../events/event-manager.js';
 import { GenericView } from '../utils/generic-view.js';
 import { appendDivTo } from '../utils/functions.js';
-export var ReferenceDirection;
-(function (ReferenceDirection) {
-    ReferenceDirection[ReferenceDirection["From"] = 0] = "From";
-    ReferenceDirection[ReferenceDirection["To"] = 1] = "To";
-})(ReferenceDirection || (ReferenceDirection = {}));
 export class EditorReferenceList extends GenericView {
     constructor(div, app, tab) {
         super(div, app);
+        this.setDisplayFlex();
         this.tab = tab;
         this.eventManager = new EventManager(this);
-        this.listWrapper = appendDivTo(this.div, { class: `vrv-tree-breadcrumbs-wrapper` });
+        this.listWrapper = appendDivTo(this.div, { class: `vrv-reference-list-wrapper` });
     }
     /*
     addCrumb(element: string, id: string): void {
@@ -36,15 +32,12 @@ export class EditorReferenceList extends GenericView {
     loadList(references, direction) {
         return __awaiter(this, void 0, void 0, function* () {
             console.log(references);
-            /*
-            if (Array.isArray(ancestors)) {
-                this.breadCrumbs.innerHTML = "";
-                for (let i = ancestors.length - 1; i >= 0; i--) {
-                    this.addCrumb(ancestors[i]['element'], ancestors[i]['id']);
-                };
-            };
-            this.listWrapper.scrollLeft = this.listWrapper.scrollWidth;
-            */
+            if (!Array.isArray(references))
+                return;
+            references.forEach(reference => {
+                let item = appendDivTo(this.listWrapper, {});
+                item.innerHTML = `${reference['element']}@${reference['referenceAttribute']}`;
+            });
         });
     }
     ////////////////////////////////////////////////////////////////////////
@@ -85,4 +78,14 @@ export class EditorReferenceList extends GenericView {
         this.app.customEventManager.dispatch(event);
     }
 }
+////////////////////////////////////////////////////////////////////////
+// Merged namespace
+////////////////////////////////////////////////////////////////////////
+(function (EditorReferenceList) {
+    let Direction;
+    (function (Direction) {
+        Direction[Direction["From"] = 0] = "From";
+        Direction[Direction["To"] = 1] = "To";
+    })(Direction = EditorReferenceList.Direction || (EditorReferenceList.Direction = {}));
+})(EditorReferenceList || (EditorReferenceList = {}));
 //# sourceMappingURL=editor-references-list.js.map

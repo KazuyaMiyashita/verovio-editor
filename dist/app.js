@@ -147,7 +147,7 @@ export class App {
         this.customEventManager.bind(this, 'onResized', this.onResized);
         let event = new CustomEvent('onResized');
         this.customEventManager.dispatch(event);
-        const verovioWorkerURL = this.getWorkerURL(`${this.host}/dist/verovio-worker.js`);
+        const verovioWorkerURL = this.getWorkerURL(`${this.host}/dist/verovio/verovio-worker.js`);
         const verovioWorker = new Worker(verovioWorkerURL);
         //const verovioUrl = `https://www.verovio.org/javascript/${this.options.verovioVersion}/verovio-toolkit-wasm.js`;
         const verovioUrl = `http://localhost:8001/build/verovio-toolkit-wasm.js`;
@@ -167,7 +167,7 @@ export class App {
         this.pageCount = 0;
         this.currentZoomIndex = 4;
         if (this.options.enableEditor) {
-            const validatorWorkerURL = this.getWorkerURL(`${this.host}/dist/validator-worker.js`);
+            const validatorWorkerURL = this.getWorkerURL(`${this.host}/dist/xml/validator-worker.js`);
             const validatorWorker = new Worker(validatorWorkerURL);
             this.validator = new ValidatorWorkerProxy(validatorWorker);
             this.rngLoader = new RNGLoader();

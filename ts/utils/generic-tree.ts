@@ -136,7 +136,7 @@ export class TreeNode {
             labelStr += ` ${this.attributes['n']}`
         }
         this.label.innerHTML = labelStr;
-        //let cb = appendInputTo(label, { type: `checkbox` });
+        //let cb = appendInputTo(this.label, { type: `checkbox` });
         let children = appendDivTo(this.div, { class: `vrv-node-children` });
         this.children.forEach(child => {
             let node = appendDivTo(children, { class: `vrv-tree-node` });

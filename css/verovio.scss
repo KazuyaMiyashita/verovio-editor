@@ -1103,7 +1103,7 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
         flex-direction: column;
         overflow: hidden;
         display: flex;
-        transition: display 0.3s ease-in-out;
+        min-height: 80px;
 
         .vrv-field-set-panel {
             flex-direction: column;
@@ -1137,7 +1137,7 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
             user-select: none;
         }
         .vrv-node-label.target {
-            background: $primary;
+            background: $background-extra-light;
         }
 
         .vrv-tree-node {
@@ -1197,6 +1197,19 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
                 content: "/\00a0";
             }
         }
+    }
+
+    ////////////////////////////////////////////////////////////////////////
+    // Tree
+    ////////////////////////////////////////////////////////////////////////
+
+    //$node-height: 22px;
+    //$node-indent: 16px;
+    //$node-margin: 4px;
+    //$node-label-padding: 4px 6px;
+
+    .vrv-reference-list-wrapper {
+        overflow-y: auto;
     }
 }
 

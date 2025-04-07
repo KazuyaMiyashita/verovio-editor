@@ -30,9 +30,9 @@ export class TabGroup extends GenericView {
         this.tabs.push(tab);
         return tab;
     }
-    setHeight(minHeight) {
-        this.div.style.minHeight = `${minHeight}px`;
-        this.div.style.maxHeight = `${minHeight}px`;
+    setHeight(height) {
+        this.div.style.minHeight = `${height}px`;
+        this.div.style.maxHeight = `${height}px`;
     }
     ////////////////////////////////////////////////////////////////////////
     // Custom event methods

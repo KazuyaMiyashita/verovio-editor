@@ -43,9 +43,9 @@ export class TabGroup extends GenericView {
         return tab;
     }
 
-    setHeight(minHeight: number): void {
-        this.div.style.minHeight = `${minHeight}px`;
-        this.div.style.maxHeight = `${minHeight}px`;
+    setHeight(height: number): void {
+        this.div.style.minHeight = `${height}px`;
+        this.div.style.maxHeight = `${height}px`;
     }
 
     ////////////////////////////////////////////////////////////////////////

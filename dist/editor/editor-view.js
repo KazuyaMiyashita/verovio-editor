@@ -192,8 +192,6 @@ export class EditorView extends ResponsiveView {
         this.reapplyHighlights();
     }
     activateHighlight(id, filter = false) {
-        if (filter && id === this.currentId)
-            return;
         if (this.highlightedCache.indexOf(id) === -1) {
             this.highlightedCache.push(id);
         }
@@ -262,6 +260,7 @@ export class EditorView extends ResponsiveView {
             return false;
         //console.debug("EditorView::onMouseover");
         if (e.detail.activity === 'mouseover') {
+            this.resetHighlights();
             this.activateHighlight(e.detail.id, true);
         }
         else if (e.detail.activity === 'mouseout') {

@@ -4,11 +4,6 @@ import { GenericView } from '../utils/generic-view.js';
 import { Tab } from '../utils/tab-group.js'
 import { appendDivTo } from '../utils/functions.js';
 
-export enum ReferenceDirection {
-    From,
-    To
-}
-
 export class EditorReferenceList extends GenericView {
     tab: Tab;
     listWrapper: HTMLDivElement;
@@ -16,12 +11,13 @@ export class EditorReferenceList extends GenericView {
 
     constructor(div: HTMLDivElement, app: App, tab: Tab) {
         super(div, app);
+        this.setDisplayFlex();
 
         this.tab = tab;
 
         this.eventManager = new EventManager(this);
 
-        this.listWrapper = appendDivTo(this.div, { class: `vrv-tree-breadcrumbs-wrapper` });
+        this.listWrapper = appendDivTo(this.div, { class: `vrv-reference-list-wrapper` });
     }
 
     /*
@@ -36,17 +32,13 @@ export class EditorReferenceList extends GenericView {
     }
     */
 
-    async loadList(references: Object, direction: ReferenceDirection): Promise<any> {
+    async loadList(references: Object, direction: EditorReferenceList.Direction): Promise<any> {
         console.log(references);
-        /*
-        if (Array.isArray(ancestors)) {
-            this.breadCrumbs.innerHTML = "";
-            for (let i = ancestors.length - 1; i >= 0; i--) {
-                this.addCrumb(ancestors[i]['element'], ancestors[i]['id']);
-            };
-        };
-        this.listWrapper.scrollLeft = this.listWrapper.scrollWidth;
-        */
+        if (!Array.isArray(references)) return;
+        references.forEach(reference => {
+            let item = appendDivTo(this.listWrapper, {});
+            item.innerHTML = `${reference['element']}@${reference['referenceAttribute']}`
+        });
     }
 
     ////////////////////////////////////////////////////////////////////////
@@ -118,3 +110,15 @@ export class EditorReferenceList extends GenericView {
     }
     */
 }
+
+////////////////////////////////////////////////////////////////////////
+// Merged namespace
+////////////////////////////////////////////////////////////////////////
+
+export namespace EditorReferenceList {
+
+    export enum Direction {
+        From,
+        To
+    }
+}    

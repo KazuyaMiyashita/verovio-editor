@@ -624,7 +624,7 @@
     flex-direction: column;
     overflow: hidden;
     display: flex;
-    transition: display 0.3s ease-in-out; }
+    min-height: 80px; }
     .vrv-wrapper .vrv-field-set .vrv-field-set-panel {
       flex-direction: column;
       overflow: hidden; }
@@ -639,7 +639,7 @@
       color: white;
       user-select: none; }
     .vrv-wrapper .vrv-tree-root .vrv-node-label.target {
-      background: #8B0000; }
+      background: #6f6f6f; }
     .vrv-wrapper .vrv-tree-root .vrv-tree-node {
       position: relative;
       margin-left: 16px;
@@ -680,6 +680,8 @@
       .vrv-wrapper .vrv-tree-breadcrumbs-wrapper .vrv-tree-breadcrumbs .vrv-tree-breadcrumb:after {
         padding-left: 8px;
         content: "/\00a0"; }
+  .vrv-wrapper .vrv-reference-list-wrapper {
+    overflow-y: auto; }
 
 @media screen and (max-width: 600px) {
   .vrv-wrapper .vrv-toolbar .vrv-btn, .vrv-wrapper .vrv-editor-toolbar .vrv-btn, .vrv-wrapper .vrv-toolbar .vrv-btn-text, .vrv-wrapper .vrv-toolbar .vrv-btn-icon-left, .vrv-wrapper .vrv-toolbar .vrv-btn-icon, .vrv-wrapper .vrv-toolbar .vrv-btn-icon-large, .vrv-wrapper .vrv-toolbar .vrv-menu-content .vrv-menu-text, .vrv-wrapper .vrv-editor-toolbar .vrv-btn-text, .vrv-wrapper .vrv-editor-toolbar .vrv-btn-icon-large {

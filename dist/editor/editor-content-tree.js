@@ -80,6 +80,7 @@ export class EditorContentTree extends GenericTree {
         let event = new CustomEvent('onSelect', {
             detail: {
                 id: id,
+                element: element,
                 caller: this
             }
         });
