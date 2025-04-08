@@ -7,6 +7,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+import { App } from '../app.js';
 import { EventManager } from '../events/event-manager.js';
 import { GenericView } from '../utils/generic-view.js';
 import { appendDivTo } from '../utils/functions.js';
@@ -31,12 +32,19 @@ export class EditorReferenceList extends GenericView {
     */
     loadList(references, direction) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log(references);
+            this.listWrapper.innerHTML = "";
+            this.eventManager.unbindAll();
             if (!Array.isArray(references))
                 return;
             references.forEach(reference => {
-                let item = appendDivTo(this.listWrapper, {});
+                let item = appendDivTo(this.listWrapper, { class: `vrv-reference-list-item vrv-mei-element` });
+                item.style.backgroundImage = `url(${App.iconFor(reference['element'])})`;
                 item.innerHTML = `${reference['element']}@${reference['referenceAttribute']}`;
+                item.dataset.id = reference['id'];
+                item.dataset.element = reference['element'];
+                this.eventManager.bind(item, "click", this.onClick);
+                this.eventManager.bind(item, "mouseover", this.onMouseover);
+                this.eventManager.bind(item, "mouseout", this.onMouseout);
             });
         });
     }
@@ -62,6 +70,7 @@ export class EditorReferenceList extends GenericView {
         let event = new CustomEvent('onSelect', {
             detail: {
                 id: id,
+                elementType: element,
                 caller: this
             }
         });
@@ -76,6 +85,24 @@ export class EditorReferenceList extends GenericView {
             }
         });
         this.app.customEventManager.dispatch(event);
+    }
+    onClick(e) {
+        const element = e.target;
+        if (element.dataset.id) {
+            this.select(element.dataset.element, element.dataset.id);
+        }
+    }
+    onMouseover(e) {
+        const element = e.target;
+        if (element.dataset.id) {
+            this.cursorActivity(element.dataset.id, 'mouseover');
+        }
+    }
+    onMouseout(e) {
+        const element = e.target;
+        if (element.dataset.id) {
+            this.cursorActivity(element.dataset.id, 'mouseout');
+        }
     }
 }
 ////////////////////////////////////////////////////////////////////////

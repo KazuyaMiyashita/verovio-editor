@@ -39,9 +39,10 @@ export class GenericTree extends GenericView {
     }
 
     reset(): void {
+        this.eventManager.unbindAll();
         if (this.root) {
             this.root.reset();
-            this.rootElement.remove();
+            this.rootElement.innerHTML = "";
         }
         this.root = null;
     }
@@ -109,9 +110,7 @@ export class TreeNode {
 
     reset(): void {
         this.children.forEach(child => child.reset());
-        while (this.div.firstChild) {
-            this.div.firstChild.remove();
-        }
+        this.div.innerHTML = "";
     }
 
     html(div: HTMLDivElement, tree: GenericTree, hideLabel: boolean = false) {
@@ -121,7 +120,7 @@ export class TreeNode {
         // Pass the id and element for the onClick
         this.div.dataset.id = this.id;
         this.div.dataset.element = this.element;
-        this.label = appendDivTo(this.div, { class: `vrv-node-label` });
+        this.label = appendDivTo(this.div, { class: `vrv-mei-element vrv-node-label` });
         if (hideLabel) this.label.style.display = 'none';
         else {
             // Copy the dataset because both the node and the label fire an event

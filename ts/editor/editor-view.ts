@@ -105,6 +105,8 @@ export class EditorView extends ResponsiveView {
     }
 
     async setCurrent(id: string): Promise<any> {
+        this.resetHighlights();
+        this.resetHighlights(true);
         this.currentId = id;
         const pageWithElement = await this.verovio.getPageWithElement(id);
         if ((pageWithElement > 0) && (pageWithElement != this.currentPage)) {
@@ -112,7 +114,6 @@ export class EditorView extends ResponsiveView {
             let event = new CustomEvent('onPage');
             this.app.customEventManager.dispatch(event);;
         }
-        this.resetHighlights();
         this.activateHighlight(id)
     }
 

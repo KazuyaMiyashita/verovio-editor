@@ -89,6 +89,8 @@ export class EditorView extends ResponsiveView {
     }
     setCurrent(id) {
         return __awaiter(this, void 0, void 0, function* () {
+            this.resetHighlights();
+            this.resetHighlights(true);
             this.currentId = id;
             const pageWithElement = yield this.verovio.getPageWithElement(id);
             if ((pageWithElement > 0) && (pageWithElement != this.currentPage)) {
@@ -97,7 +99,6 @@ export class EditorView extends ResponsiveView {
                 this.app.customEventManager.dispatch(event);
                 ;
             }
-            this.resetHighlights();
             this.activateHighlight(id);
         });
     }

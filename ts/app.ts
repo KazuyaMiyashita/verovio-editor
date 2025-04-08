@@ -32,7 +32,8 @@ import { appendAnchorTo, appendDivTo, appendInputTo, appendLinkTo, appendTextAre
 import { aboutMsg, reloadMsg, resetMsg, version } from './utils/messages.js';
 import { GenericTree } from './utils/generic-tree.js';
 
-let filter = '/svg/filter.xml';
+const filter = '/svg/filter.xml';
+const host = (window.location.hostname == "localhost") ? `http://${window.location.host}` : "https://editor.verovio.org";
 
 declare global {
     const marked;
@@ -103,7 +104,7 @@ export class App {
 
     constructor(div: HTMLDivElement, options?: App.Options) {
         this.clientId = "fd81068a15354a300522";
-        this.host = (window.location.hostname == "localhost") ? `http://${window.location.host}` : "https://editor.verovio.org";
+        this.host = host;
         this.id = this.clientId;
 
         this.notificationStack = [];
@@ -158,7 +159,7 @@ export class App {
             // Do not reload options if we have a new minor release
             if (major1 < major2 || minor1 < minor2) {
                 // We cannot show a notification at this stage
-                console.warn(`Version ${options.version} is new, options not reloaded`); 
+                console.warn(`Version ${options.version} is new, options not reloaded`);
             }
             else {
                 this.options = Object.assign(this.options, jsonStoredOptions);
@@ -246,7 +247,7 @@ export class App {
         this.customEventManager.dispatch(event);
 
         const verovioWorkerURL = this.getWorkerURL(`${this.host}/dist/verovio/verovio-worker.js`);
-        const verovioWorker = new Worker(verovioWorkerURL);     
+        const verovioWorker = new Worker(verovioWorkerURL);
         //const verovioUrl = `https://www.verovio.org/javascript/${this.options.verovioVersion}/verovio-toolkit-wasm.js`;
         const verovioUrl = `http://localhost:8001/build/verovio-toolkit-wasm.js`
         verovioWorker.postMessage({ verovioUrl });
@@ -908,5 +909,14 @@ export namespace App {
         ignoreHeader: boolean;
         firstPage: number;
         lastPage: number;
+    }
+
+    export function iconFor(element: string): string {
+        console.log(element);
+        const elements: string[] = ["accid", "annot", "arpeg", "artic", "beam", "beamSpan", "beatRpt", "bracketSpan", "breath", "bTrem", "caesura", "chord", "clef", "cpMark", "custos", "dir", "dynam", "f", "fb", "fermata", "fing", "fTrem", "gliss", "graceGrp", "hairpin", "halfmRpt", "harm", "keySig", "layer", "measure", "meterSig", "mordent", "mRest", "mRpt", "mRpt2", "mSpace", "multiRest", "multiRpt", "note", "octave", "ornam", "pb", "pedal", "phrase", "reh", "rend", "repeatMark", "rest", "sb", "slur", "staff", "syl", "symbol", "tempo", "text", "tie", "trill", "tuplet", "tupletSpan", "turn", "verse"]
+        if (elements.includes(element)) {
+            return `${host}/icons/mei/${element}.png`;
+        }
+        return "missing";
     }
 }

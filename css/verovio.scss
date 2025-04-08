@@ -1103,11 +1103,11 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
         flex-direction: column;
         overflow: hidden;
         display: flex;
-        min-height: 80px;
+        min-height: 50px;
 
         .vrv-field-set-panel {
             flex-direction: column;
-            overflow: hidden;
+            overflow: scroll;
         }
     }
 
@@ -1122,7 +1122,8 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
     $node-height: 22px;
     $node-indent: 16px;
     $node-margin: 4px;
-    $node-label-padding: 4px 6px;
+    $node-label-padding: 4px 6px 4px 40px;
+    $tree-breadcrumb-padding: 4px 6px;
 
     .vrv-tree-root {
         overflow-y: auto;
@@ -1132,12 +1133,16 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
             @extend .vrv-selectable;
             padding: $node-label-padding;
             min-height: $node-height;
-            background: $background-light;
+            background-color: $background-light;
             color: $text-color;
             user-select: none;
         }
         .vrv-node-label.target {
-            background: $background-extra-light;
+            background-color: $background-extra-light;
+        }
+        .vrv-node-label.checked::after {
+            content: url(../icons/toolbar/checked.png);
+            margin-left: 10px;
         }
 
         .vrv-tree-node {
@@ -1183,7 +1188,7 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
                 align-items: center;
                 min-height: $node-height;
                 background: $background-light;
-                padding: $node-label-padding;
+                padding: $tree-breadcrumb-padding;
                 display: flex;
             }
 
@@ -1200,7 +1205,7 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
     }
 
     ////////////////////////////////////////////////////////////////////////
-    // Tree
+    // Reference List
     ////////////////////////////////////////////////////////////////////////
 
     //$node-height: 22px;
@@ -1210,6 +1215,29 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
 
     .vrv-reference-list-wrapper {
         overflow-y: auto;
+        height: 100%;
+        .vrv-reference-list-item {
+            @extend .vrv-clickable;
+            padding: $node-label-padding;
+            min-height: $node-height;
+            background-color: $background-light;
+            color: $text-color;
+            user-select: none;
+            margin-bottom: 1px;
+        }
+    }
+
+    ////////////////////////////////////////////////////////////////////////
+    // MEI Element
+    ///////////////////////////////////////////////////////////////////////
+    
+    .vrv-mei-element {
+        background-repeat: no-repeat;
+        background-position: 6px center;
+    }
+    
+    .vrv-mei-element:before {
+        content: attr(data-before);
     }
 }
 

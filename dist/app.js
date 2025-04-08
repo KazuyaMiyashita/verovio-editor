@@ -35,11 +35,12 @@ import { RNGLoader } from './xml/rng-loader.js';
 import { PDFWorkerProxy, VerovioWorkerProxy, ValidatorWorkerProxy } from './utils/worker-proxy.js';
 import { appendAnchorTo, appendDivTo, appendInputTo, appendLinkTo, appendTextAreaTo } from './utils/functions.js';
 import { aboutMsg, reloadMsg, resetMsg, version } from './utils/messages.js';
-let filter = '/svg/filter.xml';
+const filter = '/svg/filter.xml';
+const host = (window.location.hostname == "localhost") ? `http://${window.location.host}` : "https://editor.verovio.org";
 export class App {
     constructor(div, options) {
         this.clientId = "fd81068a15354a300522";
-        this.host = (window.location.hostname == "localhost") ? `http://${window.location.host}` : "https://editor.verovio.org";
+        this.host = host;
         this.id = this.clientId;
         this.notificationStack = [];
         this.githubManager = new GitHubManager(this);
@@ -742,4 +743,18 @@ export class App {
         });
     }
 }
+////////////////////////////////////////////////////////////////////////
+// Merged namespace
+////////////////////////////////////////////////////////////////////////
+(function (App) {
+    function iconFor(element) {
+        console.log(element);
+        const elements = ["accid", "annot", "arpeg", "artic", "beam", "beamSpan", "beatRpt", "bracketSpan", "breath", "bTrem", "caesura", "chord", "clef", "cpMark", "custos", "dir", "dynam", "f", "fb", "fermata", "fing", "fTrem", "gliss", "graceGrp", "hairpin", "halfmRpt", "harm", "keySig", "layer", "measure", "meterSig", "mordent", "mRest", "mRpt", "mRpt2", "mSpace", "multiRest", "multiRpt", "note", "octave", "ornam", "pb", "pedal", "phrase", "reh", "rend", "repeatMark", "rest", "sb", "slur", "staff", "syl", "symbol", "tempo", "text", "tie", "trill", "tuplet", "tupletSpan", "turn", "verse"];
+        if (elements.includes(element)) {
+            return `${host}/icons/mei/${element}.png`;
+        }
+        return "missing";
+    }
+    App.iconFor = iconFor;
+})(App || (App = {}));
 //# sourceMappingURL=app.js.map

@@ -33,6 +33,7 @@ export class EditorContentTree extends GenericTree {
 
     selectNode(node: TreeNode): void {
         node.label.classList.add("target");
+        node.label.classList.add("checked");
         const parentRect = this.root.div.getBoundingClientRect();
         const childRect = node.div.getBoundingClientRect();
         // Calculate offset of the node relative to root
@@ -42,15 +43,15 @@ export class EditorContentTree extends GenericTree {
     }
 
     async loadContext(context: Object, ancestors: Object, target: Object): Promise<any> {
-        console.log(context);
         this.reset();
         this.fromJson(context);
 
         this.traverse((node) => {
+            node.label.style.backgroundImage = `url(${App.iconFor(node.element)})`;
             if (node.id === target['id']) {
                 this.selectNode(node);
-                return true;
             }
+            return false;
         });
 
         if (Array.isArray(ancestors)) {

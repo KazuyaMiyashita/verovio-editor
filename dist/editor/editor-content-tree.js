@@ -7,6 +7,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+import { App } from '../app.js';
 import { EventManager } from '../events/event-manager.js';
 import { GenericTree } from '../utils/generic-tree.js';
 import { appendDivTo } from '../utils/functions.js';
@@ -29,6 +30,7 @@ export class EditorContentTree extends GenericTree {
     }
     selectNode(node) {
         node.label.classList.add("target");
+        node.label.classList.add("checked");
         const parentRect = this.root.div.getBoundingClientRect();
         const childRect = node.div.getBoundingClientRect();
         // Calculate offset of the node relative to root
@@ -38,14 +40,14 @@ export class EditorContentTree extends GenericTree {
     }
     loadContext(context, ancestors, target) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log(context);
             this.reset();
             this.fromJson(context);
             this.traverse((node) => {
+                node.label.style.backgroundImage = `url(${App.iconFor(node.element)})`;
                 if (node.id === target['id']) {
                     this.selectNode(node);
-                    return true;
                 }
+                return false;
             });
             if (Array.isArray(ancestors)) {
                 this.breadCrumbs.innerHTML = "";

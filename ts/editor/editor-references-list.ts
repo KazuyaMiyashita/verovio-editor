@@ -33,11 +33,18 @@ export class EditorReferenceList extends GenericView {
     */
 
     async loadList(references: Object, direction: EditorReferenceList.Direction): Promise<any> {
-        console.log(references);
+        this.listWrapper.innerHTML = "";
+        this.eventManager.unbindAll();
         if (!Array.isArray(references)) return;
         references.forEach(reference => {
-            let item = appendDivTo(this.listWrapper, {});
-            item.innerHTML = `${reference['element']}@${reference['referenceAttribute']}`
+            let item = appendDivTo(this.listWrapper, { class: `vrv-reference-list-item vrv-mei-element` });
+            item.style.backgroundImage = `url(${App.iconFor(reference['element'])})`;
+            item.innerHTML = `${reference['element']}@${reference['referenceAttribute']}`;
+            item.dataset.id = reference['id'];
+            item.dataset.element = reference['element'];
+            this.eventManager.bind(item, "click", this.onClick);
+            this.eventManager.bind(item, "mouseover", this.onMouseover);
+            this.eventManager.bind(item, "mouseout", this.onMouseout);
         });
     }
 
@@ -67,6 +74,7 @@ export class EditorReferenceList extends GenericView {
         let event = new CustomEvent('onSelect', {
             detail: {
                 id: id,
+                elementType: element,
                 caller: this
             }
         });
@@ -85,30 +93,26 @@ export class EditorReferenceList extends GenericView {
         this.app.customEventManager.dispatch(event);
     }
 
-    /*
-    override onClick(e: MouseEvent): void {
+    onClick(e: MouseEvent): void {
         const element: HTMLElement = e.target as HTMLElement;
         if (element.dataset.id) {
             this.select(element.dataset.element, element.dataset.id);
         }
     }
 
-    override onMouseover(e: MouseEvent): void {
+    onMouseover(e: MouseEvent): void {
         const element: HTMLElement = e.target as HTMLElement;
         if (element.dataset.id) {
             this.cursorActivity(element.dataset.id, 'mouseover');
-
         }
     }
 
-    override onMouseout(e: MouseEvent): void {
+    onMouseout(e: MouseEvent): void {
         const element: HTMLElement = e.target as HTMLElement;
         if (element.dataset.id) {
             this.cursorActivity(element.dataset.id, 'mouseout');
-
         }
     }
-    */
 }
 
 ////////////////////////////////////////////////////////////////////////
