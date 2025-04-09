@@ -101,7 +101,12 @@ export class EditorContentTree extends GenericTree {
     onClick(e) {
         const element = e.target;
         if (element.dataset.id) {
-            this.select(element.dataset.element, element.dataset.id);
+            if (element.classList.contains("open")) {
+                this.collapseNode(element.dataset.id);
+            }
+            else if (element.dataset.id) {
+                this.select(element.dataset.element, element.dataset.id);
+            }
         }
     }
     onMouseover(e) {

@@ -111,7 +111,12 @@ export class EditorContentTree extends GenericTree {
     override onClick(e: MouseEvent): void {
         const element: HTMLElement = e.target as HTMLElement;
         if (element.dataset.id) {
-            this.select(element.dataset.element, element.dataset.id);
+            if (element.classList.contains("open")) {
+                this.collapseNode(element.dataset.id);
+            }
+            else if (element.dataset.id) {
+                this.select(element.dataset.element, element.dataset.id);
+            }
         }
     }
 

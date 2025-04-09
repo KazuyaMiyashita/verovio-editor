@@ -42,7 +42,7 @@ export class GenericTree extends GenericView {
         this.eventManager.unbindAll();
         if (this.root) {
             this.root.reset();
-            this.rootElement.innerHTML = "";
+            this.rootElement.remove();
         }
         this.root = null;
     }
@@ -57,6 +57,19 @@ export class GenericTree extends GenericView {
 
     onMouseout(e: MouseEvent): void {
         // This need to be overridden
+    }
+
+    collapseNode(id: string) {
+        this.traverse((node) => {
+            if (node.id === id) {
+                if (!node.div.classList.contains("open")) return true;
+                node.div.classList.toggle("open");
+                const children = node.div.querySelector('.vrv-node-children');
+                if (children) children.remove();
+                return true;
+            }
+            return false;
+        });
     }
 
     fromJson(json: any): void {
