@@ -912,11 +912,10 @@ export namespace App {
     }
 
     export function iconFor(element: string): string {
-        console.log(element);
         const elements: string[] = ["accid", "annot", "arpeg", "artic", "beam", "beamSpan", "beatRpt", "bracketSpan", "breath", "bTrem", "caesura", "chord", "clef", "cpMark", "custos", "dir", "dynam", "f", "fb", "fermata", "fing", "fTrem", "gliss", "graceGrp", "hairpin", "halfmRpt", "harm", "keySig", "layer", "measure", "meterSig", "mordent", "mRest", "mRpt", "mRpt2", "mSpace", "multiRest", "multiRpt", "note", "octave", "ornam", "pb", "pedal", "phrase", "reh", "rend", "repeatMark", "rest", "sb", "slur", "staff", "syl", "symbol", "tempo", "text", "tie", "trill", "tuplet", "tupletSpan", "turn", "verse"]
-        if (elements.includes(element)) {
-            return `${host}/icons/mei/${element}.png`;
+        if (!elements.includes(element)) {
+            element = "missing";
         }
-        return "missing";
+        return `${host}/icons/mei/${element}.png`;
     }
 }
