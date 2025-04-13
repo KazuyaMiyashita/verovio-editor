@@ -159,38 +159,43 @@ export class ActionManager {
     ////////////////////////////////////////////////////////////////////////
     // Element specific methods
     ////////////////////////////////////////////////////////////////////////
-    insertNote(x, y) {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (!this.cursorPointer.inputMode)
-                return;
-            let chain = new Array();
-            chain.push({
-                action: 'insert',
-                param: {
-                    elementType: "note",
-                    startid: this.cursorPointer.elementId
-                }
-            });
-            chain.push({
-                action: 'drag',
-                param: {
-                    elementId: "[chained-id]",
-                    x: x,
-                    y: y
-                }
-            });
-            chain.push({ action: 'commit' });
-            //console.debug( chain );
-            const editorAction = {
-                action: 'chain',
-                param: chain
-            };
-            yield this.view.verovio.edit(editorAction);
-            yield this.view.verovio.redoLayout();
-            yield this.view.renderPage(true);
-            this.view.updateMEI();
+    /*
+    async insertNote(x: number, y: number): Promise<any> {
+        if (!this.cursorPointer.inputMode) return;
+
+        let chain = new Array();
+
+        chain.push({
+            action: 'insert',
+            param: {
+                elementType: "note",
+                startid: this.cursorPointer.elementId
+            }
         });
+
+        chain.push({
+            action: 'drag',
+            param: {
+                elementId: "[chained-id]",
+                x: x,
+                y: y
+            }
+        });
+
+        chain.push({ action: 'commit' });
+
+        //console.debug( chain );
+
+        const editorAction = {
+            action: 'chain',
+            param: chain
+        }
+        await this.view.verovio.edit(editorAction);
+        await this.view.verovio.redoLayout();
+        await this.view.renderPage(true);
+        this.view.updateMEI();
     }
+    */
     formCres() {
         return __awaiter(this, void 0, void 0, function* () {
             yield this.setAttrValue("form", "cres", ["hairpin"]);

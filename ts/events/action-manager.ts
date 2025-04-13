@@ -180,6 +180,7 @@ export class ActionManager {
     // Element specific methods
     ////////////////////////////////////////////////////////////////////////
 
+    /*
     async insertNote(x: number, y: number): Promise<any> {
         if (!this.cursorPointer.inputMode) return;
 
@@ -215,6 +216,7 @@ export class ActionManager {
         await this.view.renderPage(true);
         this.view.updateMEI();
     }
+    */
 
     async formCres(): Promise<any> {
         await this.setAttrValue("form", "cres", ["hairpin"]);
