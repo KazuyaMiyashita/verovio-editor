@@ -406,7 +406,7 @@ export class EditorView extends ResponsiveView {
             setTimeout(function () {
                 timerThis.mouseMoveTimer = false;
                 if (timerThis.cursorPointerObj.lastEvent.buttons == 1) {
-                    timerThis.cursorPointerObj.moveToLastEvent(false);
+                    timerThis.cursorPointerObj.moveToLastEvent();
                     timerThis.draggingActive = true; // we know we're dragging if this listener triggers
                     let distY = timerThis.cursorPointerObj.currentY - timerThis.cursorPointerObj.elementY;
                     timerThis.actionManager.drag(0, distY);

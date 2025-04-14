@@ -20,8 +20,6 @@ export class EditorCursorPointer {
         this.elementX = 0;
         this.elementY = 0;
         this.selectedItems = [];
-        this.initX = 0;
-        this.initY = 0;
         this.currentX = 0;
         this.currentY = 0;
         this.fixedX = true;
@@ -29,7 +27,7 @@ export class EditorCursorPointer {
         this.forceOnPitch = true;
         this.marginLeft = 0;
         this.marginTop = 0;
-        this.MEIunit = 90;
+        this.MEIUnit = 90;
         this.lastPitchLine = null;
         this.topLine = null;
         this.bottomLine = null;
@@ -76,8 +74,6 @@ export class EditorCursorPointer {
             return;
         }
         this.activated = true;
-        this.initX = this.xToMEI(event.pageX);
-        this.initY = this.yToMEI(event.pageY);
         this.lastPitchLine = null;
         this.initStaff(node);
     }
@@ -100,7 +96,7 @@ export class EditorCursorPointer {
             const match2 = regexp2.exec(d2);
             this.bottomLine = Number(match2[1]);
             if (staffLines.length > 1) {
-                this.MEIunit = (this.bottomLine - this.topLine) / (staffLines.length - 1) / 2;
+                this.MEIUnit = (this.bottomLine - this.topLine) / (staffLines.length - 1) / 2;
             }
         }
         catch (err) {
@@ -129,8 +125,6 @@ export class EditorCursorPointer {
         this.elementType = item.elementType;
         this.elementX = item.elementX;
         this.elementY = item.elementY;
-        //this.initX = this.xToMEI( event.pageX );
-        //this.initY = this.yToMEI( event.pageY );
         let children = node.querySelectorAll('g:not(.bounding-box):not(.ledgerLines):not(.articPart):not(.notehead):not(.dots):not(.flag):not(.stem)');
         for (let child of children) {
             const element = child;
@@ -146,7 +140,7 @@ export class EditorCursorPointer {
         this.currentX = this.xToMEI(this.lastEvent.pageX);
         this.currentY = this.yToMEI(this.lastEvent.pageY);
         if (this.forceOnPitch && this.topLine) {
-            this.currentY = this.currentY - ((this.currentY - this.topLine) % this.MEIunit);
+            this.currentY = this.currentY - ((this.currentY - this.topLine) % this.MEIUnit);
             this.lastPitchLine = this.currentY;
         }
     }

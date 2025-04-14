@@ -12,44 +12,43 @@ interface SelectedItem {
 };
 
 export class EditorCursorPointer {
-    editorViewObj: EditorView;
+    private editorViewObj: EditorView;
 
     activated: boolean;
 
-    pixPerPix: number;
-    viewTop: number;
-    viewLeft: number;
+    private pixPerPix: number;
+    private viewTop: number;
+    private viewLeft: number;
+    
     lastEvent: any;
     scrollTop: number;
     scrollLeft: number;
 
-    elementClass: string;
-    elementId: string;
-    elementType: string;
-    staffNode: SVGElement;
+    private elementClass: string;
+    private elementId: string;
+    private elementType: string;
+    private staffNode: SVGElement;
 
     elementX: number;
     elementY: number;
 
     selectedItems: Array<SelectedItem>;
 
-    initX: number;
-    initY: number;
     currentX: number;
     currentY: number;
 
-    fixedX: boolean;
-    fixedY: boolean;
-    forceOnPitch: boolean;
+    private fixedX: boolean;
+    private fixedY: boolean;
+    private forceOnPitch: boolean;
 
-    marginLeft: number;
-    marginTop: number;
+    private marginLeft: number;
+    private marginTop: number;
 
-    MEIunit: number;
-    lastPitchLine: any;
+    private MEIUnit: number;
+    private lastPitchLine: any;
 
-    topLine: number;
-    bottomLine: number;
+    private topLine: number;
+    private bottomLine: number;
 
     constructor(editorView: EditorView) {
         // EditorView object
@@ -74,8 +73,6 @@ export class EditorCursorPointer {
 
         this.selectedItems = [];
 
-        this.initX = 0;
-        this.initY = 0;
         this.currentX = 0;
         this.currentY = 0;
 
@@ -86,7 +83,7 @@ export class EditorCursorPointer {
         this.marginLeft = 0;
         this.marginTop = 0;
 
-        this.MEIunit = 90;
+        this.MEIUnit = 90;
         this.lastPitchLine = null;
 
         this.topLine = null;
@@ -144,8 +141,6 @@ export class EditorCursorPointer {
 
         this.activated = true;
 
-        this.initX = this.xToMEI(event.pageX);
-        this.initY = this.yToMEI(event.pageY);
         this.lastPitchLine = null;
 
         this.initStaff(node);
@@ -174,7 +169,7 @@ export class EditorCursorPointer {
             this.bottomLine = Number(match2[1]);
 
             if (staffLines.length > 1) {
-                this.MEIunit = (this.bottomLine - this.topLine) / (staffLines.length - 1) / 2;
+                this.MEIUnit = (this.bottomLine - this.topLine) / (staffLines.length - 1) / 2;
             }
         }
         catch (err) {
@@ -209,9 +204,6 @@ export class EditorCursorPointer {
         this.elementX = item.elementX;
         this.elementY = item.elementY;
 
-        //this.initX = this.xToMEI( event.pageX );
-        //this.initY = this.yToMEI( event.pageY );
-
         let children = node.querySelectorAll('g:not(.bounding-box):not(.ledgerLines):not(.articPart):not(.notehead):not(.dots):not(.flag):not(.stem)');
         for (let child of children) {
             const element = child as SVGElement;
@@ -231,7 +223,7 @@ export class EditorCursorPointer {
         this.currentY = this.yToMEI(this.lastEvent.pageY);
 
         if (this.forceOnPitch && this.topLine) {
-            this.currentY = this.currentY - ((this.currentY - this.topLine) % this.MEIunit);
+            this.currentY = this.currentY - ((this.currentY - this.topLine) % this.MEIUnit);
             this.lastPitchLine = this.currentY;
         }
     }
