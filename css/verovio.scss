@@ -193,37 +193,6 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
             }
 
             ////////////////////////////////////////////////////////////////////////
-            // Editor view cursor
-            ////////////////////////////////////////////////////////////////////////        
-
-            .vrv-editor-cursor {
-                display: none;
-                top: -1000px;
-                position: relative;
-                pointer-events: none;
-
-                .vrv-cursor-lines {
-                    position: absolute;
-                }
-
-                .vrv-cursor-lines.top {
-                    background-position: center bottom;
-                    background-image: url(../icons/ledgerline.png);
-                }
-
-                .vrv-cursor-lines.bottom {
-                    background-position: center top;
-                    background-image: url(../icons/ledgerline.png);
-                }
-
-                .vrv-cursor-pointer {
-                    position: absolute;
-                    background-image: url(../icons/cursor.png);
-                }
-
-            }
-
-            ////////////////////////////////////////////////////////////////////////
             // Document view wrapper
             ////////////////////////////////////////////////////////////////////////
 

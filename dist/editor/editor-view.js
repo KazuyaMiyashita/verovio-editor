@@ -351,10 +351,6 @@ export class EditorView extends ResponsiveView {
     mouseEnterListener(e) {
         document.addEventListener('keydown', this.boundKeyDown);
         //console.debug( "Hey!" );
-        let node = this.getClosestMEIElement(e.target);
-        if (node && node.classList.contains('staff')) {
-            this.cursorPointerObj.staffEnter(node);
-        }
     }
     mouseLeaveListener(e) {
         document.removeEventListener('mouseup', this.boundMouseUp);
@@ -372,17 +368,13 @@ export class EditorView extends ResponsiveView {
             setTimeout(function () {
                 timerThis.mouseMoveTimer = false;
                 if (timerThis.cursorPointerObj.lastEvent.buttons == 1) {
-                    timerThis.cursorPointerObj.moveToLastEvent();
+                    let dist = timerThis.cursorPointerObj.distFromLastEvent();
                     timerThis.draggingActive = true; // we know we're dragging if this listener triggers
-                    let distY = timerThis.cursorPointerObj.currentY - timerThis.cursorPointerObj.elementY;
-                    timerThis.actionManager.drag(0, distY);
-                }
-                else {
-                    timerThis.cursorPointerObj.moveToLastEvent();
+                    timerThis.actionManager.drag(0, dist[1]);
                 }
             }, 50);
         }
-        e.cancelBubble = true;
+        e.stopPropagation();
     }
     ;
     mouseUpListener(e) {

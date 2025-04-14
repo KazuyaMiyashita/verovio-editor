@@ -87,22 +87,6 @@
         .vrv-wrapper .vrv-views .vrv-view .vrv-svg-wrapper svg,
         .vrv-wrapper .vrv-views .vrv-view .vrv-svg-overlay svg {
           float: left; }
-      .vrv-wrapper .vrv-views .vrv-view .vrv-editor-cursor {
-        display: none;
-        top: -1000px;
-        position: relative;
-        pointer-events: none; }
-        .vrv-wrapper .vrv-views .vrv-view .vrv-editor-cursor .vrv-cursor-lines {
-          position: absolute; }
-        .vrv-wrapper .vrv-views .vrv-view .vrv-editor-cursor .vrv-cursor-lines.top {
-          background-position: center bottom;
-          background-image: url(../icons/ledgerline.png); }
-        .vrv-wrapper .vrv-views .vrv-view .vrv-editor-cursor .vrv-cursor-lines.bottom {
-          background-position: center top;
-          background-image: url(../icons/ledgerline.png); }
-        .vrv-wrapper .vrv-views .vrv-view .vrv-editor-cursor .vrv-cursor-pointer {
-          position: absolute;
-          background-image: url(../icons/cursor.png); }
       .vrv-wrapper .vrv-views .vrv-view .vrv-doc-wrapper {
         background: grey;
         margin: 0; }

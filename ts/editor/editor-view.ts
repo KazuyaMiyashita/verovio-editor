@@ -14,7 +14,6 @@ import { midiScale } from '../midi/midi-scale.js'
 export class EditorView extends ResponsiveView {
     midiPlayerElement: MidiPlayerElement;
     svgOverlay: HTMLDivElement;
-    cursorPointer: HTMLDivElement;
     cursorPointerObj: EditorCursorPointer;
     mouseMoveTimer: boolean;
     draggingActive: boolean;
@@ -243,7 +242,7 @@ export class EditorView extends ResponsiveView {
             this.highlightWithColor(this.svgWrapper.querySelector('#' + id), '');
         }
         this.highlightIdsCache.length = 0;
-    } 
+    }
 
     highlightWithColor(g: SVGElement, color: string) {
         if (!g) return;
@@ -382,10 +381,6 @@ export class EditorView extends ResponsiveView {
     mouseEnterListener(e: MouseEvent): void {
         document.addEventListener('keydown', this.boundKeyDown);
         //console.debug( "Hey!" );
-        let node: SVGElement = this.getClosestMEIElement((<SVGElement>e.target));
-        if (node && node.classList.contains('staff')) {
-            this.cursorPointerObj.staffEnter(node);
-        }
     }
 
     mouseLeaveListener(e: MouseEvent): void {
@@ -406,18 +401,14 @@ export class EditorView extends ResponsiveView {
             setTimeout(function () {
                 timerThis.mouseMoveTimer = false;
                 if (timerThis.cursorPointerObj.lastEvent.buttons == 1) {
-                    timerThis.cursorPointerObj.moveToLastEvent();
+                    let dist = timerThis.cursorPointerObj.distFromLastEvent();
                     timerThis.draggingActive = true; // we know we're dragging if this listener triggers
-                    let distY = timerThis.cursorPointerObj.currentY - timerThis.cursorPointerObj.elementY;
-                    timerThis.actionManager.drag(0, distY);
-                }
-                else {
-                    timerThis.cursorPointerObj.moveToLastEvent();
+                    timerThis.actionManager.drag(0, dist[1]);
                 }
             }, 50);
         }
 
-        e.cancelBubble = true;
+        e.stopPropagation();
     };
 
     mouseUpListener(e: MouseEvent): void {

@@ -20,7 +20,7 @@ export class EditorCursorPointer {
     private viewTop: number;
     private viewLeft: number;
     
-    lastEvent: any;
+    lastEvent: MouseEvent;
     scrollTop: number;
     scrollLeft: number;
 
@@ -34,21 +34,13 @@ export class EditorCursorPointer {
 
     selectedItems: Array<SelectedItem>;
 
-    currentX: number;
-    currentY: number;
-
-    private fixedX: boolean;
-    private fixedY: boolean;
-    private forceOnPitch: boolean;
+    initX: number;
+    initY: number;
 
     private marginLeft: number;
     private marginTop: number;
 
     private MEIUnit: number;
-    private lastPitchLine: any;
-
-    private topLine: number;
-    private bottomLine: number;
 
     constructor(editorView: EditorView) {
         // EditorView object
@@ -73,21 +65,13 @@ export class EditorCursorPointer {
 
         this.selectedItems = [];
 
-        this.currentX = 0;
-        this.currentY = 0;
-
-        this.fixedX = true;
-        this.fixedY = false;
-        this.forceOnPitch = true;
+        this.initX = 0;
+        this.initY = 0;
 
         this.marginLeft = 0;
         this.marginTop = 0;
 
         this.MEIUnit = 90;
-        this.lastPitchLine = null;
-
-        this.topLine = null;
-        this.bottomLine = null;
     }
 
     xToMEI(x: number): number {
@@ -141,9 +125,10 @@ export class EditorCursorPointer {
 
         this.activated = true;
 
-        this.lastPitchLine = null;
-
         this.initStaff(node);
+
+        this.initX = this.xToMEI(event.pageX);
+        this.initY = this.yToMEI(event.pageY);
     }
 
     initStaff(node: SVGElement): void {
@@ -155,21 +140,19 @@ export class EditorCursorPointer {
 
         if (staffLines.length === 0) return;
 
-        this.topLine = null;
-        this.bottomLine = null;
         try {
             const d1 = staffLines[0].getAttribute('d');
             const regexp1 = /M\d*\ (\d*)/g;
             const match1 = regexp1.exec(d1);
-            this.topLine = Number(match1[1]);
+            let topLine = Number(match1[1]);
 
             const d2 = staffLines[staffLines.length - 1].getAttribute('d');
             const regexp2 = /M\d*\ (\d*)/g;
             const match2 = regexp2.exec(d2);
-            this.bottomLine = Number(match2[1]);
+            let bottomLine = Number(match2[1]);
 
             if (staffLines.length > 1) {
-                this.MEIUnit = (this.bottomLine - this.topLine) / (staffLines.length - 1) / 2;
+                this.MEIUnit = (bottomLine - topLine) / (staffLines.length - 1) / 2;
             }
         }
         catch (err) {
@@ -218,27 +201,10 @@ export class EditorCursorPointer {
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
 
-    moveToLastEvent(): void {
-        this.currentX = this.xToMEI(this.lastEvent.pageX);
-        this.currentY = this.yToMEI(this.lastEvent.pageY);
-
-        if (this.forceOnPitch && this.topLine) {
-            this.currentY = this.currentY - ((this.currentY - this.topLine) % this.MEIUnit);
-            this.lastPitchLine = this.currentY;
-        }
-    }
-
-    staffEnter(staffNode: SVGElement): void {
-        if (!this.staffNode) {
-            return;
-        }
-        else if (this.staffNode !== staffNode) {
-            this.activated = false;
-        }
-        else if (!this.activated) {
-            this.activated = true;
-            this.moveToLastEvent();
-        }
+    distFromLastEvent(): [number, number] {
+        let x = this.xToMEI(this.lastEvent.pageX);
+        let y = this.yToMEI(this.lastEvent.pageY);
+        return [x - this.initX, y - this.initY];
     }
 
     ////////////////////////////////////////////////////////////////////////
