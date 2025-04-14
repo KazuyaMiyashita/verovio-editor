@@ -18,7 +18,8 @@ export class EditorView extends ResponsiveView {
     cursorPointerObj: EditorCursorPointer;
     mouseMoveTimer: boolean;
     draggingActive: boolean;
-    highlightedCache: Array<string>;
+    highlightIdsCache: Array<string>;
+    mouseOverId: string;
     actionManager: ActionManager;
     lastNote: { midiPitch: number, oct: string, pname: string };
 
@@ -41,7 +42,8 @@ export class EditorView extends ResponsiveView {
         // For dragging
         this.mouseMoveTimer = false;
         this.draggingActive = false;
-        this.highlightedCache = [];
+        this.highlightIdsCache = [];
+        this.mouseOverId = "";
 
         // For note playback
         this.lastNote = { midiPitch: 0, oct: "", pname: "" };
@@ -105,7 +107,7 @@ export class EditorView extends ResponsiveView {
 
     async setCurrent(id: string): Promise<any> {
         this.resetHighlights();
-        this.resetHighlights(true);
+        this.resetMouseOverHighlight();
         this.currentId = id;
         const pageWithElement = await this.verovio.getPageWithElement(id);
         if ((pageWithElement > 0) && (pageWithElement != this.currentPage)) {
@@ -117,7 +119,7 @@ export class EditorView extends ResponsiveView {
     }
 
     async playNoteSound(): Promise<any> {
-        const attr = await this.app.verovio.getElementAttr(this.highlightedCache[0]);
+        const attr = await this.app.verovio.getElementAttr(this.highlightIdsCache[0]);
         if (!attr.pname || !attr.oct) return;
         if ((this.lastNote.pname === attr.pname) && (this.lastNote.oct === attr.oct)) return;
 
@@ -201,42 +203,47 @@ export class EditorView extends ResponsiveView {
         this.reapplyHighlights();
     }
 
-    activateHighlight(id: string, filter: boolean = false): void {
-        if (this.highlightedCache.indexOf(id) === -1) {
-            this.highlightedCache.push(id);
-        }
-        if (filter) {
-            let element = <SVGElement>this.svgWrapper.querySelector('#' + id);
-            if (element) element.style.filter = "url(#highlighting)";
-        }
-        else {
-            this.reapplyHighlights();
+    mouseOverHighlight(id: string) {
+        this.resetMouseOverHighlight();
+        let element = <SVGElement>this.svgWrapper.querySelector('#' + id);
+        if (element) {
+            element.style.filter = "url(#highlighting)";
+            this.mouseOverId = id;
         }
     }
 
+    resetMouseOverHighlight(): void {
+        if (this.mouseOverId !== "") {
+            let element = <SVGElement>this.svgWrapper.querySelector('#' + this.mouseOverId);
+            if (element) element.style.filter = '';
+        }
+        this.mouseOverId = "";
+    }
+
+    activateHighlight(id: string): void {
+        if (this.highlightIdsCache.indexOf(id) === -1) {
+            this.highlightIdsCache.push(id);
+        }
+        this.reapplyHighlights();
+    }
+
     reapplyHighlights(): void {
-        if (this.highlightedCache.length === 1) {
+        if (this.highlightIdsCache.length === 1) {
             this.playNoteSound();
         }
-        for (const id of this.highlightedCache) {
+        for (const id of this.highlightIdsCache) {
             // Set the wrapper instance to be red
             this.highlightWithColor(this.svgWrapper.querySelector('#' + id), '#cd0000');
         }
     }
 
-    resetHighlights(filter: boolean = false): void {
-        for (const id of this.highlightedCache) {
-            if (filter) {
-                let element = <SVGElement>this.svgWrapper.querySelector('#' + id);
-                if (element) element.style.filter = '';
-            }
-            else {
-                // Remove the color with and empty color string
-                this.highlightWithColor(this.svgWrapper.querySelector('#' + id), '');
-            }
+    resetHighlights(): void {
+        for (const id of this.highlightIdsCache) {
+            // Remove the color with and empty color string
+            this.highlightWithColor(this.svgWrapper.querySelector('#' + id), '');
         }
-        this.highlightedCache.length = 0;
-    }
+        this.highlightIdsCache.length = 0;
+    } 
 
     highlightWithColor(g: SVGElement, color: string) {
         if (!g) return;
@@ -272,13 +279,12 @@ export class EditorView extends ResponsiveView {
         //console.debug("EditorView::onMouseover");
         if (e.detail.activity === 'mouseover') {
             this.resetHighlights();
-            this.activateHighlight(e.detail.id, true);
+            this.mouseOverHighlight(e.detail.id);
         }
         else if (e.detail.activity === 'mouseout') {
-            this.resetHighlights(true);
+            this.resetMouseOverHighlight();
             this.activateHighlight(this.currentId);
         }
-
         return true;
     }
 

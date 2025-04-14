@@ -31,7 +31,8 @@ export class EditorView extends ResponsiveView {
         // For dragging
         this.mouseMoveTimer = false;
         this.draggingActive = false;
-        this.highlightedCache = [];
+        this.highlightIdsCache = [];
+        this.mouseOverId = "";
         // For note playback
         this.lastNote = { midiPitch: 0, oct: "", pname: "" };
         // EditorAction
@@ -89,7 +90,7 @@ export class EditorView extends ResponsiveView {
     setCurrent(id) {
         return __awaiter(this, void 0, void 0, function* () {
             this.resetHighlights();
-            this.resetHighlights(true);
+            this.resetMouseOverHighlight();
             this.currentId = id;
             const pageWithElement = yield this.verovio.getPageWithElement(id);
             if ((pageWithElement > 0) && (pageWithElement != this.currentPage)) {
@@ -103,7 +104,7 @@ export class EditorView extends ResponsiveView {
     }
     playNoteSound() {
         return __awaiter(this, void 0, void 0, function* () {
-            const attr = yield this.app.verovio.getElementAttr(this.highlightedCache[0]);
+            const attr = yield this.app.verovio.getElementAttr(this.highlightIdsCache[0]);
             if (!attr.pname || !attr.oct)
                 return;
             if ((this.lastNote.pname === attr.pname) && (this.lastNote.oct === attr.oct))
@@ -191,41 +192,43 @@ export class EditorView extends ResponsiveView {
         this.eventManager.bind(this.svgOverlay, 'mousedown', this.mouseDownListener);
         this.reapplyHighlights();
     }
-    activateHighlight(id, filter = false) {
-        if (this.highlightedCache.indexOf(id) === -1) {
-            this.highlightedCache.push(id);
-        }
-        if (filter) {
-            let element = this.svgWrapper.querySelector('#' + id);
-            if (element)
-                element.style.filter = "url(#highlighting)";
-        }
-        else {
-            this.reapplyHighlights();
+    mouseOverHighlight(id) {
+        this.resetMouseOverHighlight();
+        let element = this.svgWrapper.querySelector('#' + id);
+        if (element) {
+            element.style.filter = "url(#highlighting)";
+            this.mouseOverId = id;
         }
     }
+    resetMouseOverHighlight() {
+        if (this.mouseOverId !== "") {
+            let element = this.svgWrapper.querySelector('#' + this.mouseOverId);
+            if (element)
+                element.style.filter = '';
+        }
+        this.mouseOverId = "";
+    }
+    activateHighlight(id) {
+        if (this.highlightIdsCache.indexOf(id) === -1) {
+            this.highlightIdsCache.push(id);
+        }
+        this.reapplyHighlights();
+    }
     reapplyHighlights() {
-        if (this.highlightedCache.length === 1) {
+        if (this.highlightIdsCache.length === 1) {
             this.playNoteSound();
         }
-        for (const id of this.highlightedCache) {
+        for (const id of this.highlightIdsCache) {
             // Set the wrapper instance to be red
             this.highlightWithColor(this.svgWrapper.querySelector('#' + id), '#cd0000');
         }
     }
-    resetHighlights(filter = false) {
-        for (const id of this.highlightedCache) {
-            if (filter) {
-                let element = this.svgWrapper.querySelector('#' + id);
-                if (element)
-                    element.style.filter = '';
-            }
-            else {
-                // Remove the color with and empty color string
-                this.highlightWithColor(this.svgWrapper.querySelector('#' + id), '');
-            }
+    resetHighlights() {
+        for (const id of this.highlightIdsCache) {
+            // Remove the color with and empty color string
+            this.highlightWithColor(this.svgWrapper.querySelector('#' + id), '');
         }
-        this.highlightedCache.length = 0;
+        this.highlightIdsCache.length = 0;
     }
     highlightWithColor(g, color) {
         if (!g)
@@ -261,10 +264,10 @@ export class EditorView extends ResponsiveView {
         //console.debug("EditorView::onMouseover");
         if (e.detail.activity === 'mouseover') {
             this.resetHighlights();
-            this.activateHighlight(e.detail.id, true);
+            this.mouseOverHighlight(e.detail.id);
         }
         else if (e.detail.activity === 'mouseout') {
-            this.resetHighlights(true);
+            this.resetMouseOverHighlight();
             this.activateHighlight(this.currentId);
         }
         return true;

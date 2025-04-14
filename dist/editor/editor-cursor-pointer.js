@@ -142,7 +142,7 @@ export class EditorCursorPointer {
     ////////////////////////////////////////////////////////////////////////
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
-    moveToLastEvent(display = true) {
+    moveToLastEvent() {
         this.currentX = this.xToMEI(this.lastEvent.pageX);
         this.currentY = this.yToMEI(this.lastEvent.pageY);
         if (this.forceOnPitch && this.topLine) {

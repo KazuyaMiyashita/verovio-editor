@@ -98,6 +98,7 @@ export class EditorContentTree extends GenericTree {
     }
 
     cursorActivity(id: string, activity: string) {
+        if (id === "[unspecified]") return;
         let event = new CustomEvent('onCursorActivity', {
             detail: {
                 id: id,

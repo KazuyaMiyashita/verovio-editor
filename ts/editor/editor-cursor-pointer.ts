@@ -3,7 +3,6 @@
  */
 
 import { EditorView } from './editor-view.js';
-import { appendDivTo } from '../utils/functions.js';
 
 interface SelectedItem {
     elementType: string,
@@ -227,7 +226,7 @@ export class EditorCursorPointer {
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
 
-    moveToLastEvent(display: boolean = true): void {
+    moveToLastEvent(): void {
         this.currentX = this.xToMEI(this.lastEvent.pageX);
         this.currentY = this.yToMEI(this.lastEvent.pageY);
 
@@ -253,6 +252,4 @@ export class EditorCursorPointer {
     ////////////////////////////////////////////////////////////////////////
     // Event methods
     ////////////////////////////////////////////////////////////////////////
-
-
 }
