@@ -748,7 +748,7 @@ export class App {
 ////////////////////////////////////////////////////////////////////////
 (function (App) {
     function iconFor(element) {
-        const elements = ["accid", "annot", "arpeg", "artic", "beam", "beamSpan", "beatRpt", "bracketSpan", "breath", "bTrem", "caesura", "chord", "clef", "cpMark", "custos", "dir", "dynam", "f", "fb", "fermata", "fing", "fTrem", "gliss", "graceGrp", "hairpin", "halfmRpt", "harm", "keySig", "layer", "measure", "meterSig", "mordent", "mRest", "mRpt", "mRpt2", "mSpace", "multiRest", "multiRpt", "note", "octave", "ornam", "pb", "pedal", "phrase", "reh", "rend", "repeatMark", "rest", "sb", "scoreDef", "slur", "staff", "syl", "symbol", "tempo", "text", "tie", "trill", "tuplet", "tupletSpan", "turn", "verse"];
+        const elements = ["accid", "annot", "arpeg", "artic", "beam", "beamSpan", "beatRpt", "bracketSpan", "breath", "bTrem", "caesura", "chord", "clef", "cpMark", "custos", "dir", "dynam", "f", "fb", "fermata", "fing", "fTrem", "gliss", "graceGrp", "hairpin", "halfmRpt", "harm", "keySig", "layer", "lb", "lv", "measure", "meterSig", "mordent", "mRest", "mRpt", "mRpt2", "mSpace", "multiRest", "multiRpt", "note", "octave", "ornam", "pb", "pedal", "phrase", "reh", "rend", "repeatMark", "rest", "sb", "scoreDef", "slur", "staff", "syl", "symbol", "tempo", "text", "tie", "trill", "tuplet", "tupletSpan", "turn", "verse"];
         if (!elements.includes(element)) {
             element = "missing";
         }

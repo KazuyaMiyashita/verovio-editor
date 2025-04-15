@@ -26,6 +26,16 @@ export class EditorCursorPointer {
         this.marginTop = 0;
         this.MEIUnit = 90;
     }
+    ////////////////////////////////////////////////////////////////////////
+    // Getters and setters
+    ////////////////////////////////////////////////////////////////////////
+    setLastEvent(lastEvent) { this.lastEvent = lastEvent; }
+    getLastEvent() { return this.lastEvent; }
+    setScrollTop(scrollTop) { this.scrollTop = scrollTop; }
+    setScrollLeft(scrollLeft) { this.scrollLeft = scrollLeft; }
+    ////////////////////////////////////////////////////////////////////////
+    // Class-specific methods
+    ////////////////////////////////////////////////////////////////////////
     xToMEI(x) {
         return Math.round(x - this.viewLeft + this.scrollLeft) * this.pixPerPix - this.marginLeft;
     }
@@ -126,9 +136,6 @@ export class EditorCursorPointer {
         }
         //console.debug( this.selectedItems );
     }
-    ////////////////////////////////////////////////////////////////////////
-    // Class-specific methods
-    ////////////////////////////////////////////////////////////////////////
     distFromLastEvent() {
         let x = this.xToMEI(this.lastEvent.pageX);
         let y = this.yToMEI(this.lastEvent.pageY);

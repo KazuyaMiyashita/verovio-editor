@@ -363,11 +363,11 @@ export class EditorView extends ResponsiveView {
         // Fire drag event only every 50ms
         if (!this.mouseMoveTimer) {
             const timerThis = this;
-            this.cursorPointerObj.lastEvent = e;
+            this.cursorPointerObj.setLastEvent(e);
             this.mouseMoveTimer = true;
             setTimeout(function () {
                 timerThis.mouseMoveTimer = false;
-                if (timerThis.cursorPointerObj.lastEvent.buttons == 1) {
+                if (timerThis.cursorPointerObj.getLastEvent().buttons == 1) {
                     let dist = timerThis.cursorPointerObj.distFromLastEvent();
                     timerThis.draggingActive = true; // we know we're dragging if this listener triggers
                     timerThis.actionManager.drag(0, dist[1]);
@@ -397,8 +397,8 @@ export class EditorView extends ResponsiveView {
     }
     scrollListener(e) {
         let element = e.target;
-        this.cursorPointerObj.scrollTop = element.scrollTop;
-        this.cursorPointerObj.scrollLeft = element.scrollLeft;
+        this.cursorPointerObj.setScrollTop(element.scrollTop);
+        this.cursorPointerObj.setScrollLeft(element.scrollLeft);
         this.svgWrapper.scrollTop = element.scrollTop;
         this.svgWrapper.scrollLeft = element.scrollLeft;
     }

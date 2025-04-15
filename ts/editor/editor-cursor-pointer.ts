@@ -14,28 +14,28 @@ interface SelectedItem {
 export class EditorCursorPointer {
     private editorViewObj: EditorView;
 
-    activated: boolean;
+    private activated: boolean;
 
     private pixPerPix: number;
     private viewTop: number;
     private viewLeft: number;
     
-    lastEvent: MouseEvent;
-    scrollTop: number;
-    scrollLeft: number;
+    private lastEvent: MouseEvent;
+    private scrollTop: number;
+    private scrollLeft: number;
 
     private elementClass: string;
     private elementId: string;
     private elementType: string;
     private staffNode: SVGElement;
 
-    elementX: number;
-    elementY: number;
+    private elementX: number;
+    private elementY: number;
 
     selectedItems: Array<SelectedItem>;
 
-    initX: number;
-    initY: number;
+    private initX: number;
+    private initY: number;
 
     private marginLeft: number;
     private marginTop: number;
@@ -73,6 +73,22 @@ export class EditorCursorPointer {
 
         this.MEIUnit = 90;
     }
+
+    ////////////////////////////////////////////////////////////////////////
+    // Getters and setters
+    ////////////////////////////////////////////////////////////////////////
+
+    setLastEvent(lastEvent: MouseEvent): void { this.lastEvent = lastEvent; }
+    
+    getLastEvent(): MouseEvent { return this.lastEvent; }
+    
+    setScrollTop(scrollTop: number): void { this.scrollTop = scrollTop; }
+    
+    setScrollLeft(scrollLeft: number): void { this.scrollLeft = scrollLeft; }
+
+    ////////////////////////////////////////////////////////////////////////
+    // Class-specific methods
+    ////////////////////////////////////////////////////////////////////////
 
     xToMEI(x: number): number {
         return Math.round(x - this.viewLeft + this.scrollLeft) * this.pixPerPix - this.marginLeft;
@@ -197,17 +213,9 @@ export class EditorCursorPointer {
         //console.debug( this.selectedItems );
     }
 
-    ////////////////////////////////////////////////////////////////////////
-    // Class-specific methods
-    ////////////////////////////////////////////////////////////////////////
-
     distFromLastEvent(): [number, number] {
         let x = this.xToMEI(this.lastEvent.pageX);
         let y = this.yToMEI(this.lastEvent.pageY);
         return [x - this.initX, y - this.initY];
     }
-
-    ////////////////////////////////////////////////////////////////////////
-    // Event methods
-    ////////////////////////////////////////////////////////////////////////
 }
