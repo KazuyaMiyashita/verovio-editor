@@ -25,7 +25,6 @@ function buildTree(nodeData: any): TreeNode {
 
 export class GenericTree extends GenericView {
     root: TreeNode | null;
-    currentId: string;
     rootElement: HTMLDivElement;
     hideRoot: boolean;
     eventManager: EventManager;

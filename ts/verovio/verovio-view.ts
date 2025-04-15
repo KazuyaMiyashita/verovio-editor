@@ -13,7 +13,6 @@ export class VerovioView extends GenericView {
     app: App;
     verovio: VerovioWorkerProxy;
     eventManager: EventManager;
-    currentId: string;
     currentPage: number;
     currentZoomIndex: number;
     currentScale: number;
@@ -34,7 +33,6 @@ export class VerovioView extends GenericView {
         this.bindListeners(); // Document/Window-scoped events
 
         // Common members
-        this.currentId = null;
         this.currentPage = 1;
         this.currentZoomIndex = this.app.currentZoomIndex;
         this.currentScale = this.app.zoomLevels[this.currentZoomIndex];
