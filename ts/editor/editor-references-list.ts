@@ -20,18 +20,6 @@ export class EditorReferenceList extends GenericView {
         this.listWrapper = appendDivTo(this.div, { class: `vrv-reference-list-wrapper` });
     }
 
-    /*
-    addCrumb(element: string, id: string): void {
-        const crumb: HTMLDivElement = appendDivTo(this.breadCrumbs, { class: `vrv-tree-breadcrumb` });
-        crumb.innerHTML = element;
-        crumb.dataset.id = id
-        crumb.dataset.element = element;
-        this.eventManager.bind(crumb, 'click', this.onClick);
-        this.eventManager.bind(crumb, 'mouseover', this.onMouseover);
-        this.eventManager.bind(crumb, 'mouseout', this.onMouseout);
-    }
-    */
-
     async loadList(references: Object, direction: EditorReferenceList.Direction): Promise<any> {
         this.listWrapper.innerHTML = "";
         this.eventManager.unbindAll();
@@ -74,7 +62,7 @@ export class EditorReferenceList extends GenericView {
         let event = new CustomEvent('onSelect', {
             detail: {
                 id: id,
-                elementType: element,
+                element: element,
                 caller: this
             }
         });

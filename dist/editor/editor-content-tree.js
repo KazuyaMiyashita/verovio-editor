@@ -66,13 +66,13 @@ export class EditorContentTree extends GenericTree {
     onLoadData(e) {
         if (!super.onLoadData(e))
             return false;
-        console.debug("EditorContentTree::onLoadData");
+        //console.debug("EditorContentTree::onLoadData");
         return true;
     }
     onUpdateData(e) {
         if (!super.onUpdateData(e))
             return false;
-        console.debug("EditorContentTree::onUpdateData");
+        //console.debug("EditorContentTree::onUpdateData");
         return true;
     }
     ////////////////////////////////////////////////////////////////////////
@@ -89,8 +89,6 @@ export class EditorContentTree extends GenericTree {
         this.app.customEventManager.dispatch(event);
     }
     cursorActivity(id, activity) {
-        if (id === "[unspecified]")
-            return;
         let event = new CustomEvent('onCursorActivity', {
             detail: {
                 id: id,
@@ -110,6 +108,7 @@ export class EditorContentTree extends GenericTree {
                 this.select(element.dataset.element, element.dataset.id);
             }
         }
+        e.stopPropagation();
     }
     onMouseover(e) {
         const element = e.target;

@@ -22,11 +22,11 @@ export class ActionManager {
     eventManager: EventManager;
     inProgress: boolean;
     verovio: WorkerProxy;
-    view: EditorView;
+    editorViewObj: EditorView;
 
     constructor(view: EditorView) {
         // EditorView object
-        this.view = view;
+        this.editorViewObj = view;
         this.cursorPointer = view.cursorPointerObj;
         this.verovio = view.verovio;
 
@@ -60,15 +60,15 @@ export class ActionManager {
     async commit(): Promise<any> {
         this.inProgress = true;
         const editorAction = { action: 'commit' };
-        await this.view.verovio.edit(editorAction);
+        await this.editorViewObj.verovio.edit(editorAction);
 
         // WIP disable redo layout
         //await this.view.verovio.redoLayout();
-        this.view.app.pageCount = await this.view.verovio.getPageCount();
-        if (this.view.currentPage > this.view.app.pageCount) {
-            this.view.currentPage = this.view.app.pageCount
+        this.editorViewObj.app.pageCount = await this.editorViewObj.verovio.getPageCount();
+        if (this.editorViewObj.currentPage > this.editorViewObj.app.pageCount) {
+            this.editorViewObj.currentPage = this.editorViewObj.app.pageCount
         }
-        await this.view.renderPage(true);
+        await this.editorViewObj.renderPage(true);
 
         //this.view.updateMEI();
         this.inProgress = false;
@@ -81,12 +81,12 @@ export class ActionManager {
 
     async delete(): Promise<any> {
         let chain = new Array();
-        for (const item of this.cursorPointer.selectedItems) {
-            if (!["note"].includes(item.elementType)) continue;
+        for (const item of this.editorViewObj.getSelection()) {
+            if (!["note"].includes(item.element)) continue;
             chain.push({
                 action: 'delete',
                 param: {
-                    elementId: item.elementId
+                    elementId: item.id
                 }
             });
         }
@@ -100,22 +100,22 @@ export class ActionManager {
             param: chain
         }
 
-        await this.view.verovio.edit(editorAction);
-        await this.view.verovio.redoLayout();
-        await this.view.renderPage(true);
-        this.view.updateMEI();
+        await this.editorViewObj.verovio.edit(editorAction);
+        await this.editorViewObj.verovio.redoLayout();
+        await this.editorViewObj.renderPage(true);
+        this.editorViewObj.updateMEI();
     }
 
     async drag(x: number, y: number): Promise<any> {
         let chain = new Array();
-        for (const item of this.cursorPointer.selectedItems) {
-            if (!["note"].includes(item.elementType)) continue
+        for (const item of this.editorViewObj.getSelection()) {
+            if (!["note"].includes(item.element)) continue
             const editorAction = {
                 action: 'drag',
                 param: {
-                    elementId: item.elementId,
-                    x: item.elementX + x,
-                    y: item.elementY + y
+                    elementId: item.id,
+                    x: item.x + x,
+                    y: item.y + y
                 }
             };
             chain.push(editorAction);
@@ -128,9 +128,9 @@ export class ActionManager {
             param: chain
         }
 
-        await this.view.verovio.edit(editorAction);
-        await this.view.verovio.redoPagePitchPosLayout();
-        await this.view.renderPage(true, false);
+        await this.editorViewObj.verovio.edit(editorAction);
+        await this.editorViewObj.verovio.redoPagePitchPosLayout();
+        await this.editorViewObj.renderPage(true, false);
     }
 
     async keyDown(key: number, shiftKey: boolean, ctrlKey: boolean): Promise<any> {
@@ -142,12 +142,12 @@ export class ActionManager {
         this.inProgress = true;
 
         let chain = new Array();
-        for (const item of this.cursorPointer.selectedItems) {
-            if (!["note"].includes(item.elementType)) continue;
+        for (const item of this.editorViewObj.getSelection()) {
+            if (!["note"].includes(item.element)) continue;
             const editorAction = {
                 action: 'keyDown',
                 param: {
-                    elementId: item.elementId,
+                    elementId: item.id,
                     key: key,
                     shiftKey: shiftKey,
                     ctrlKey: ctrlKey
@@ -166,7 +166,7 @@ export class ActionManager {
             param: chain
         }
 
-        await this.view.verovio.edit(editorAction);
+        await this.editorViewObj.verovio.edit(editorAction);
         
         // WIP disable redo layout
         //await this.view.verovio.redoPagePitchPosLayout();
@@ -255,21 +255,21 @@ export class ActionManager {
             action: 'commit'
         }
 
-        await this.view.verovio.edit(editorAction);
-        await this.view.updateLoadData();
-        this.view.updateMEI();
+        await this.editorViewObj.verovio.edit(editorAction);
+        await this.editorViewObj.updateLoadData();
+        this.editorViewObj.updateMEI();
     }
 
     // helper
 
     async setAttrValue(attribute: string, value: string, elementTypes: Array<string> = []): Promise<any> {
         let chain = new Array();
-        for (const item of this.cursorPointer.selectedItems) {
-            if (elementTypes.length > 0 && !elementTypes.includes(item.elementType)) continue;
+        for (const item of this.editorViewObj.getSelection()) {
+            if (elementTypes.length > 0 && !elementTypes.includes(item.element)) continue;
             const editorAction = {
                 action: 'set',
                 param: {
-                    elementId: item.elementId,
+                    elementId: item.id,
                     attribute: attribute,
                     value: value
                 }
@@ -285,11 +285,11 @@ export class ActionManager {
             action: 'chain',
             param: chain
         }
-        await this.view.verovio.edit(editorAction);
+        await this.editorViewObj.verovio.edit(editorAction);
 
         // WIP disable redo layout
         //await this.view.verovio.redoLayout();
-        await this.view.renderPage(true);
-        this.view.updateMEI();
+        await this.editorViewObj.renderPage(true);
+        this.editorViewObj.updateMEI();
     }
 }

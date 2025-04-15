@@ -4,13 +4,6 @@
 
 import { EditorView } from './editor-view.js';
 
-interface SelectedItem {
-    elementType: string,
-    elementId: string,
-    elementX: number,
-    elementY: number,
-};
-
 export class EditorCursorPointer {
     private editorViewObj: EditorView;
 
@@ -24,15 +17,7 @@ export class EditorCursorPointer {
     private scrollTop: number;
     private scrollLeft: number;
 
-    private elementClass: string;
-    private elementId: string;
-    private elementType: string;
     private staffNode: SVGElement;
-
-    private elementX: number;
-    private elementY: number;
-
-    selectedItems: Array<SelectedItem>;
 
     private initX: number;
     private initY: number;
@@ -55,15 +40,7 @@ export class EditorCursorPointer {
         this.scrollTop = 0;
         this.scrollLeft = 0;
 
-        this.elementClass = '';
-        this.elementId = '';
-        this.elementType = '';
         this.staffNode = null;
-
-        this.elementX = 0;
-        this.elementY = 0;
-
-        this.selectedItems = [];
 
         this.initX = 0;
         this.initY = 0;
@@ -130,14 +107,12 @@ export class EditorCursorPointer {
         this.viewLeft = left;
     }
 
-    initEvent(event: MouseEvent, id: string, node: SVGElement): void {
-        this.selectedItems = [];
+    initEvent(event: MouseEvent, node: SVGElement): void {
+        this.editorViewObj.clearSelection();
 
-        this.add(id, node);
+        this.editorViewObj.addNodeToSelection(node);
 
-        if (this.selectedItems.length === 0) {
-            return;
-        }
+        if (!this.editorViewObj.hasSelection()) return;
 
         this.activated = true;
 
@@ -174,43 +149,6 @@ export class EditorCursorPointer {
         catch (err) {
             console.debug("Loading staff line position failed");
         }
-    }
-
-    add(id: string, node: SVGElement, clicked: boolean = true): void {
-        let positionNode: SVGElement = node;
-        if (node.classList.contains('note') || node.classList.contains('rest')) {
-            positionNode = node.querySelector('use');
-        }
-
-        if (!positionNode) {
-            console.debug("Cannot find node with dragging position")
-            return;
-        }
-
-        let item: SelectedItem = {
-            elementType: node.classList[0],
-            elementId: id,
-            elementX: parseInt(positionNode.getAttribute('x')),
-            elementY: parseInt(positionNode.getAttribute('y'))
-        }
-
-        this.selectedItems.push(item);
-
-        if (!clicked) return;
-
-        this.elementId = item.elementId;
-        this.elementType = item.elementType;
-        this.elementX = item.elementX;
-        this.elementY = item.elementY;
-
-        let children = node.querySelectorAll('g:not(.bounding-box):not(.ledgerLines):not(.articPart):not(.notehead):not(.dots):not(.flag):not(.stem)');
-        for (let child of children) {
-            const element = child as SVGElement;
-            const childId: string = element.getAttribute(id);
-            this.add(childId, element, false);
-        }
-
-        //console.debug( this.selectedItems );
     }
 
     distFromLastEvent(): [number, number] {

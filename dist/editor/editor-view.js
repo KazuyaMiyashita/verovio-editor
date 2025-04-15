@@ -16,6 +16,7 @@ import { EditorCursorPointer } from './editor-cursor-pointer.js';
 import { ResponsiveView } from '../verovio/responsive-view.js';
 import { appendDivTo, appendMidiPlayerTo } from '../utils/functions.js';
 import { midiScale } from '../midi/midi-scale.js';
+;
 export class EditorView extends ResponsiveView {
     constructor(div, app, verovio) {
         super(div, app, verovio);
@@ -31,12 +32,12 @@ export class EditorView extends ResponsiveView {
         // For dragging
         this.mouseMoveTimer = false;
         this.draggingActive = false;
-        this.highlightIdsCache = [];
         this.mouseOverId = "";
         // For note playback
         this.lastNote = { midiPitch: 0, oct: "", pname: "" };
         // EditorAction
         this.actionManager = new ActionManager(this);
+        this.selectedItems = [];
     }
     ////////////////////////////////////////////////////////////////////////
     // Overwriting methods
@@ -69,7 +70,7 @@ export class EditorView extends ResponsiveView {
                 this.createOverlay();
             }
             //  make sure highlights are up to date
-            this.reapplyHighlights();
+            this.highlightSelected();
             if (lightEndLoading)
                 this.app.endLoading(true);
         });
@@ -80,18 +81,15 @@ export class EditorView extends ResponsiveView {
             this.app.mei = mei;
             let event = new CustomEvent('onUpdateData', {
                 detail: {
-                    currentId: this.currentId,
                     caller: this
                 }
             });
             this.app.customEventManager.dispatch(event);
         });
     }
-    setCurrent(id) {
+    select(element, id) {
         return __awaiter(this, void 0, void 0, function* () {
-            this.resetHighlights();
-            this.resetMouseOverHighlight();
-            this.currentId = id;
+            this.highlightMouseOverReset();
             const pageWithElement = yield this.verovio.getPageWithElement(id);
             if ((pageWithElement > 0) && (pageWithElement != this.currentPage)) {
                 this.currentPage = pageWithElement;
@@ -99,12 +97,12 @@ export class EditorView extends ResponsiveView {
                 this.app.customEventManager.dispatch(event);
                 ;
             }
-            this.activateHighlight(id);
+            this.addToSelection(element, id);
         });
     }
     playNoteSound() {
         return __awaiter(this, void 0, void 0, function* () {
-            const attr = yield this.app.verovio.getElementAttr(this.highlightIdsCache[0]);
+            const attr = yield this.app.verovio.getElementAttr(this.selectedItems[0].id);
             if (!attr.pname || !attr.oct)
                 return;
             if ((this.lastNote.pname === attr.pname) && (this.lastNote.oct === attr.oct))
@@ -160,6 +158,39 @@ export class EditorView extends ResponsiveView {
     ////////////////////////////////////////////////////////////////////////
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
+    clearSelection() {
+        this.highlightSelectedReset();
+        this.selectedItems = [];
+    }
+    hasSelection() {
+        return (this.scrollListener.length > 0);
+    }
+    getSelection() {
+        return this.selectedItems;
+    }
+    addNodeToSelection(node) {
+        let positionNode = node;
+        if (node.classList.contains('note') || node.classList.contains('rest')) {
+            positionNode = node.querySelector('use');
+        }
+        if (!positionNode) {
+            console.debug("Cannot find node with dragging position");
+            return;
+        }
+        let x = parseInt(positionNode.getAttribute('x'));
+        let y = parseInt(positionNode.getAttribute('y'));
+        this.addToSelection(node.classList[0], node.id, x, y);
+    }
+    addToSelection(element, id, x = null, y = null) {
+        let item = {
+            element: element,
+            id: id,
+            x: x,
+            y: y
+        };
+        this.selectedItems.push(item);
+        this.highlightSelected();
+    }
     createOverlay() {
         // Copy wrapper HTML to overlay
         this.svgOverlay.innerHTML = this.svgWrapper.innerHTML;
@@ -190,17 +221,17 @@ export class EditorView extends ResponsiveView {
         }
         // Add an event listener to the overlay of note input
         this.eventManager.bind(this.svgOverlay, 'mousedown', this.mouseDownListener);
-        this.reapplyHighlights();
+        this.highlightSelected();
     }
-    mouseOverHighlight(id) {
-        this.resetMouseOverHighlight();
+    highlightMouseOver(id) {
+        this.highlightMouseOverReset();
         let element = this.svgWrapper.querySelector('#' + id);
         if (element) {
             element.style.filter = "url(#highlighting)";
             this.mouseOverId = id;
         }
     }
-    resetMouseOverHighlight() {
+    highlightMouseOverReset() {
         if (this.mouseOverId !== "") {
             let element = this.svgWrapper.querySelector('#' + this.mouseOverId);
             if (element)
@@ -208,27 +239,20 @@ export class EditorView extends ResponsiveView {
         }
         this.mouseOverId = "";
     }
-    activateHighlight(id) {
-        if (this.highlightIdsCache.indexOf(id) === -1) {
-            this.highlightIdsCache.push(id);
-        }
-        this.reapplyHighlights();
-    }
-    reapplyHighlights() {
-        if (this.highlightIdsCache.length === 1) {
+    highlightSelected() {
+        if (this.selectedItems.length === 1) {
             this.playNoteSound();
         }
-        for (const id of this.highlightIdsCache) {
+        for (const item of this.selectedItems) {
             // Set the wrapper instance to be red
-            this.highlightWithColor(this.svgWrapper.querySelector('#' + id), '#cd0000');
+            this.highlightWithColor(this.svgWrapper.querySelector('#' + item.id), '#cd0000');
         }
     }
-    resetHighlights() {
-        for (const id of this.highlightIdsCache) {
+    highlightSelectedReset() {
+        for (const item of this.selectedItems) {
             // Remove the color with and empty color string
-            this.highlightWithColor(this.svgWrapper.querySelector('#' + id), '');
+            this.highlightWithColor(this.svgWrapper.querySelector('#' + item.id), '');
         }
-        this.highlightIdsCache.length = 0;
     }
     highlightWithColor(g, color) {
         if (!g)
@@ -262,13 +286,15 @@ export class EditorView extends ResponsiveView {
         if (!super.onCursorActivity(e))
             return false;
         //console.debug("EditorView::onMouseover");
+        if (e.detail.id === "[unspecified]")
+            return false;
         if (e.detail.activity === 'mouseover') {
-            this.resetHighlights();
-            this.mouseOverHighlight(e.detail.id);
+            this.highlightSelectedReset();
+            this.highlightMouseOver(e.detail.id);
         }
         else if (e.detail.activity === 'mouseout') {
-            this.resetMouseOverHighlight();
-            this.activateHighlight(this.currentId);
+            this.highlightMouseOverReset();
+            this.highlightSelected();
         }
         return true;
     }
@@ -283,15 +309,16 @@ export class EditorView extends ResponsiveView {
         if (!super.onSelect(e))
             return false;
         //console.debug("EditorView::onSelect");
-        this.setCurrent(e.detail.id);
+        this.clearSelection();
+        if (e.detail.id === "[unspecified]")
+            return false;
+        this.select(e.detail.element, e.detail.id);
         return true;
     }
     ////////////////////////////////////////////////////////////////////////
     // Event listeners
     ////////////////////////////////////////////////////////////////////////
     keyDownListener(e) {
-        //this.app.startLoading( "Editing...", true );
-        //document.removeEventListener( 'keydown', this.boundKeyDown );
         // For now only up and down arrows
         if (e.keyCode === 38 || e.keyCode === 40) {
             this.actionManager.keyDown(e.keyCode, e.shiftKey, e.ctrlKey);
@@ -299,14 +326,12 @@ export class EditorView extends ResponsiveView {
         else if (e.keyCode === 8 || e.keyCode === 46) {
             this.actionManager.delete();
         }
-        //document.addEventListener( 'keydown', this.boundKeyDown );
-        //this.app.endLoading( true );
         e.preventDefault();
     }
     mouseDownListener(e) {
         this.draggingActive = false;
         this.lastNote = { midiPitch: 0, oct: "", pname: "" };
-        e.cancelBubble = true;
+        e.stopPropagation();
         // Clicking on the overlay - nothing to do
         if (e.target.parentNode === this.svgOverlay) {
             return;
@@ -317,11 +342,9 @@ export class EditorView extends ResponsiveView {
             console.log(node, "MEI element not found or with no id");
             return; // this should never happen, but as a safety 
         }
-        const id = node.id;
         // Multiple selection - add it to the cursor
-        if (e.shiftKey) {
-            this.activateHighlight(id);
-            this.cursorPointerObj.add(id, node);
+        if (this.hasSelection() && e.shiftKey) {
+            this.addNodeToSelection(node);
             document.addEventListener('mousemove', this.boundMouseMove);
             document.addEventListener('mouseup', this.boundMouseUp);
             return;
@@ -329,18 +352,15 @@ export class EditorView extends ResponsiveView {
         // More to reset here?
         document.removeEventListener('mousemove', this.boundMouseMove);
         document.removeEventListener('touchmove', this.boundMouseMove);
-        this.currentId = id;
         let event = new CustomEvent('onSelect', {
             detail: {
-                id: id,
+                id: node.id,
                 elementType: node.classList[0],
                 caller: this
             }
         });
         this.app.customEventManager.dispatch(event);
-        this.resetHighlights();
-        this.activateHighlight(id);
-        this.cursorPointerObj.initEvent(e, id, node);
+        this.cursorPointerObj.initEvent(e, node);
         // we haven't started to drag yet, this might be just a selection
         document.addEventListener('mousemove', this.boundMouseMove);
         document.addEventListener('mouseup', this.boundMouseUp);
@@ -382,15 +402,13 @@ export class EditorView extends ResponsiveView {
         document.removeEventListener('mouseup', this.boundMouseUp);
         document.removeEventListener('touchend', this.boundMouseUp);
         if (this.draggingActive === true) {
-            //console.debug( "up - dragging" );
-            //this.app.startLoading( "Updating content ...", true );
             this.draggingActive = false;
             document.removeEventListener('mousemove', this.boundMouseMove);
             document.removeEventListener('touchmove', this.boundMouseMove);
             const timerThis = this;
             // Since we are waiting to trigger the mousemove events, we also need to delay the mouseup
             setTimeout(function () {
-                timerThis.resetHighlights();
+                timerThis.clearSelection();
                 timerThis.actionManager.update();
             }, 80);
         }

@@ -17,7 +17,7 @@ class Call {
 export class ActionManager {
     constructor(view) {
         // EditorView object
-        this.view = view;
+        this.editorViewObj = view;
         this.cursorPointer = view.cursorPointerObj;
         this.verovio = view.verovio;
         this.eventManager = new EventManager(this);
@@ -47,14 +47,14 @@ export class ActionManager {
         return __awaiter(this, void 0, void 0, function* () {
             this.inProgress = true;
             const editorAction = { action: 'commit' };
-            yield this.view.verovio.edit(editorAction);
+            yield this.editorViewObj.verovio.edit(editorAction);
             // WIP disable redo layout
             //await this.view.verovio.redoLayout();
-            this.view.app.pageCount = yield this.view.verovio.getPageCount();
-            if (this.view.currentPage > this.view.app.pageCount) {
-                this.view.currentPage = this.view.app.pageCount;
+            this.editorViewObj.app.pageCount = yield this.editorViewObj.verovio.getPageCount();
+            if (this.editorViewObj.currentPage > this.editorViewObj.app.pageCount) {
+                this.editorViewObj.currentPage = this.editorViewObj.app.pageCount;
             }
-            yield this.view.renderPage(true);
+            yield this.editorViewObj.renderPage(true);
             //this.view.updateMEI();
             this.inProgress = false;
             // Check that nothing was added in-between
@@ -66,13 +66,13 @@ export class ActionManager {
     delete() {
         return __awaiter(this, void 0, void 0, function* () {
             let chain = new Array();
-            for (const item of this.cursorPointer.selectedItems) {
-                if (!["note"].includes(item.elementType))
+            for (const item of this.editorViewObj.getSelection()) {
+                if (!["note"].includes(item.element))
                     continue;
                 chain.push({
                     action: 'delete',
                     param: {
-                        elementId: item.elementId
+                        elementId: item.id
                     }
                 });
             }
@@ -83,24 +83,24 @@ export class ActionManager {
                 action: 'chain',
                 param: chain
             };
-            yield this.view.verovio.edit(editorAction);
-            yield this.view.verovio.redoLayout();
-            yield this.view.renderPage(true);
-            this.view.updateMEI();
+            yield this.editorViewObj.verovio.edit(editorAction);
+            yield this.editorViewObj.verovio.redoLayout();
+            yield this.editorViewObj.renderPage(true);
+            this.editorViewObj.updateMEI();
         });
     }
     drag(x, y) {
         return __awaiter(this, void 0, void 0, function* () {
             let chain = new Array();
-            for (const item of this.cursorPointer.selectedItems) {
-                if (!["note"].includes(item.elementType))
+            for (const item of this.editorViewObj.getSelection()) {
+                if (!["note"].includes(item.element))
                     continue;
                 const editorAction = {
                     action: 'drag',
                     param: {
-                        elementId: item.elementId,
-                        x: item.elementX + x,
-                        y: item.elementY + y
+                        elementId: item.id,
+                        x: item.x + x,
+                        y: item.y + y
                     }
                 };
                 chain.push(editorAction);
@@ -111,9 +111,9 @@ export class ActionManager {
                 action: 'chain',
                 param: chain
             };
-            yield this.view.verovio.edit(editorAction);
-            yield this.view.verovio.redoPagePitchPosLayout();
-            yield this.view.renderPage(true, false);
+            yield this.editorViewObj.verovio.edit(editorAction);
+            yield this.editorViewObj.verovio.redoPagePitchPosLayout();
+            yield this.editorViewObj.renderPage(true, false);
         });
     }
     keyDown(key, shiftKey, ctrlKey) {
@@ -126,13 +126,13 @@ export class ActionManager {
             }
             this.inProgress = true;
             let chain = new Array();
-            for (const item of this.cursorPointer.selectedItems) {
-                if (!["note"].includes(item.elementType))
+            for (const item of this.editorViewObj.getSelection()) {
+                if (!["note"].includes(item.element))
                     continue;
                 const editorAction = {
                     action: 'keyDown',
                     param: {
-                        elementId: item.elementId,
+                        elementId: item.id,
                         key: key,
                         shiftKey: shiftKey,
                         ctrlKey: ctrlKey
@@ -148,7 +148,7 @@ export class ActionManager {
                 action: 'chain',
                 param: chain
             };
-            yield this.view.verovio.edit(editorAction);
+            yield this.editorViewObj.verovio.edit(editorAction);
             // WIP disable redo layout
             //await this.view.verovio.redoPagePitchPosLayout();
             //await this.view.renderPage(true, false);
@@ -241,22 +241,22 @@ export class ActionManager {
             const editorAction = {
                 action: 'commit'
             };
-            yield this.view.verovio.edit(editorAction);
-            yield this.view.updateLoadData();
-            this.view.updateMEI();
+            yield this.editorViewObj.verovio.edit(editorAction);
+            yield this.editorViewObj.updateLoadData();
+            this.editorViewObj.updateMEI();
         });
     }
     // helper
     setAttrValue(attribute_1, value_1) {
         return __awaiter(this, arguments, void 0, function* (attribute, value, elementTypes = []) {
             let chain = new Array();
-            for (const item of this.cursorPointer.selectedItems) {
-                if (elementTypes.length > 0 && !elementTypes.includes(item.elementType))
+            for (const item of this.editorViewObj.getSelection()) {
+                if (elementTypes.length > 0 && !elementTypes.includes(item.element))
                     continue;
                 const editorAction = {
                     action: 'set',
                     param: {
-                        elementId: item.elementId,
+                        elementId: item.id,
                         attribute: attribute,
                         value: value
                     }
@@ -270,11 +270,11 @@ export class ActionManager {
                 action: 'chain',
                 param: chain
             };
-            yield this.view.verovio.edit(editorAction);
+            yield this.editorViewObj.verovio.edit(editorAction);
             // WIP disable redo layout
             //await this.view.verovio.redoLayout();
-            yield this.view.renderPage(true);
-            this.view.updateMEI();
+            yield this.editorViewObj.renderPage(true);
+            this.editorViewObj.updateMEI();
         });
     }
 }

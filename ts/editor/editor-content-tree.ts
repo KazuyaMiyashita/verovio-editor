@@ -69,14 +69,14 @@ export class EditorContentTree extends GenericTree {
 
     override onLoadData(e: CustomEvent): boolean {
         if (!super.onLoadData(e)) return false;
-        console.debug("EditorContentTree::onLoadData");
+        //console.debug("EditorContentTree::onLoadData");
 
         return true;
     }
 
     override onUpdateData(e: CustomEvent): boolean {
         if (!super.onUpdateData(e)) return false;
-        console.debug("EditorContentTree::onUpdateData");
+        //console.debug("EditorContentTree::onUpdateData");
 
         return true;
     }
@@ -98,7 +98,6 @@ export class EditorContentTree extends GenericTree {
     }
 
     cursorActivity(id: string, activity: string) {
-        if (id === "[unspecified]") return;
         let event = new CustomEvent('onCursorActivity', {
             detail: {
                 id: id,
@@ -119,6 +118,7 @@ export class EditorContentTree extends GenericTree {
                 this.select(element.dataset.element, element.dataset.id);
             }
         }
+        e.stopPropagation();
     }
 
     override onMouseover(e: MouseEvent): void {

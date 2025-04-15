@@ -11,16 +11,24 @@ import { VerovioWorkerProxy } from '../utils/worker-proxy.js';
 import { appendDivTo, appendMidiPlayerTo, MidiPlayerElement } from '../utils/functions.js';
 import { midiScale } from '../midi/midi-scale.js'
 
+interface SelectedItem {
+    element: string,
+    id: string,
+    x: number,
+    y: number,
+};
+
 export class EditorView extends ResponsiveView {
     midiPlayerElement: MidiPlayerElement;
     svgOverlay: HTMLDivElement;
     cursorPointerObj: EditorCursorPointer;
     mouseMoveTimer: boolean;
     draggingActive: boolean;
-    highlightIdsCache: Array<string>;
     mouseOverId: string;
     actionManager: ActionManager;
     lastNote: { midiPitch: number, oct: string, pname: string };
+
+    private selectedItems: Array<SelectedItem>;
 
     constructor(div: HTMLDivElement, app: App, verovio: VerovioWorkerProxy) {
         super(div, app, verovio);
@@ -41,7 +49,6 @@ export class EditorView extends ResponsiveView {
         // For dragging
         this.mouseMoveTimer = false;
         this.draggingActive = false;
-        this.highlightIdsCache = [];
         this.mouseOverId = "";
 
         // For note playback
@@ -49,6 +56,8 @@ export class EditorView extends ResponsiveView {
 
         // EditorAction
         this.actionManager = new ActionManager(this);
+
+        this.selectedItems = [];
     }
 
     ////////////////////////////////////////////////////////////////////////
@@ -87,7 +96,7 @@ export class EditorView extends ResponsiveView {
             this.createOverlay();
         }
         //  make sure highlights are up to date
-        this.reapplyHighlights();
+        this.highlightSelected();
 
         if (lightEndLoading) this.app.endLoading(true);
     }
@@ -97,28 +106,25 @@ export class EditorView extends ResponsiveView {
         this.app.mei = mei;
         let event = new CustomEvent('onUpdateData', {
             detail: {
-                currentId: this.currentId,
                 caller: this
             }
         });
         this.app.customEventManager.dispatch(event);
     }
 
-    async setCurrent(id: string): Promise<any> {
-        this.resetHighlights();
-        this.resetMouseOverHighlight();
-        this.currentId = id;
+    async select(element: string, id: string): Promise<any> {
+        this.highlightMouseOverReset();
         const pageWithElement = await this.verovio.getPageWithElement(id);
         if ((pageWithElement > 0) && (pageWithElement != this.currentPage)) {
             this.currentPage = pageWithElement;
             let event = new CustomEvent('onPage');
             this.app.customEventManager.dispatch(event);;
         }
-        this.activateHighlight(id)
+        this.addToSelection(element, id);
     }
 
     async playNoteSound(): Promise<any> {
-        const attr = await this.app.verovio.getElementAttr(this.highlightIdsCache[0]);
+        const attr = await this.app.verovio.getElementAttr(this.selectedItems[0].id);
         if (!attr.pname || !attr.oct) return;
         if ((this.lastNote.pname === attr.pname) && (this.lastNote.oct === attr.oct)) return;
 
@@ -161,6 +167,46 @@ export class EditorView extends ResponsiveView {
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
 
+    clearSelection(): void {
+        this.highlightSelectedReset();
+        this.selectedItems = [];
+    }
+
+    hasSelection(): boolean {
+        return (this.scrollListener.length > 0);
+    }
+
+    getSelection(): Array<SelectedItem> {
+        return this.selectedItems;
+    }
+
+    addNodeToSelection(node: SVGElement): void {
+        let positionNode: SVGElement = node;
+        if (node.classList.contains('note') || node.classList.contains('rest')) {
+            positionNode = node.querySelector('use');
+        }
+
+        if (!positionNode) {
+            console.debug("Cannot find node with dragging position")
+            return;
+        }
+        let x = parseInt(positionNode.getAttribute('x'));
+        let y = parseInt(positionNode.getAttribute('y'));
+        this.addToSelection(node.classList[0], node.id, x, y);
+    }
+
+    addToSelection(element: string, id: string, x: number = null, y: number = null): void {
+        let item: SelectedItem = {
+            element: element,
+            id: id,
+            x: x,
+            y: y
+        }
+
+        this.selectedItems.push(item);
+        this.highlightSelected();
+    }
+    
     createOverlay(): void {
         // Copy wrapper HTML to overlay
         this.svgOverlay.innerHTML = this.svgWrapper.innerHTML;
@@ -199,11 +245,11 @@ export class EditorView extends ResponsiveView {
         // Add an event listener to the overlay of note input
         this.eventManager.bind(this.svgOverlay, 'mousedown', this.mouseDownListener);
 
-        this.reapplyHighlights();
+        this.highlightSelected();
     }
 
-    mouseOverHighlight(id: string) {
-        this.resetMouseOverHighlight();
+    highlightMouseOver(id: string) {
+        this.highlightMouseOverReset();
         let element = <SVGElement>this.svgWrapper.querySelector('#' + id);
         if (element) {
             element.style.filter = "url(#highlighting)";
@@ -211,7 +257,7 @@ export class EditorView extends ResponsiveView {
         }
     }
 
-    resetMouseOverHighlight(): void {
+    highlightMouseOverReset(): void {
         if (this.mouseOverId !== "") {
             let element = <SVGElement>this.svgWrapper.querySelector('#' + this.mouseOverId);
             if (element) element.style.filter = '';
@@ -219,29 +265,21 @@ export class EditorView extends ResponsiveView {
         this.mouseOverId = "";
     }
 
-    activateHighlight(id: string): void {
-        if (this.highlightIdsCache.indexOf(id) === -1) {
-            this.highlightIdsCache.push(id);
-        }
-        this.reapplyHighlights();
-    }
-
-    reapplyHighlights(): void {
-        if (this.highlightIdsCache.length === 1) {
+    highlightSelected(): void {
+        if (this.selectedItems.length === 1) {
             this.playNoteSound();
         }
-        for (const id of this.highlightIdsCache) {
+        for (const item of this.selectedItems) {
             // Set the wrapper instance to be red
-            this.highlightWithColor(this.svgWrapper.querySelector('#' + id), '#cd0000');
+            this.highlightWithColor(this.svgWrapper.querySelector('#' + item.id), '#cd0000');
         }
     }
 
-    resetHighlights(): void {
-        for (const id of this.highlightIdsCache) {
+    highlightSelectedReset(): void {
+        for (const item of this.selectedItems) {
             // Remove the color with and empty color string
-            this.highlightWithColor(this.svgWrapper.querySelector('#' + id), '');
+            this.highlightWithColor(this.svgWrapper.querySelector('#' + item.id), '');
         }
-        this.highlightIdsCache.length = 0;
     }
 
     highlightWithColor(g: SVGElement, color: string) {
@@ -276,13 +314,15 @@ export class EditorView extends ResponsiveView {
     override onCursorActivity(e: CustomEvent): boolean {
         if (!super.onCursorActivity(e)) return false;
         //console.debug("EditorView::onMouseover");
+        if (e.detail.id === "[unspecified]") return false;
+
         if (e.detail.activity === 'mouseover') {
-            this.resetHighlights();
-            this.mouseOverHighlight(e.detail.id);
+            this.highlightSelectedReset();
+            this.highlightMouseOver(e.detail.id);
         }
         else if (e.detail.activity === 'mouseout') {
-            this.resetMouseOverHighlight();
-            this.activateHighlight(this.currentId);
+            this.highlightMouseOverReset();
+            this.highlightSelected();
         }
         return true;
     }
@@ -292,7 +332,6 @@ export class EditorView extends ResponsiveView {
         //console.debug("EditorView::onEndLoading");
 
         this.initCursor();
-
         return true;
     }
 
@@ -300,8 +339,10 @@ export class EditorView extends ResponsiveView {
         if (!super.onSelect(e)) return false;
         //console.debug("EditorView::onSelect");
 
-        this.setCurrent(e.detail.id);
-
+        this.clearSelection();
+        if (e.detail.id === "[unspecified]") return false;
+        
+        this.select(e.detail.element, e.detail.id);
         return true;
     }
 
@@ -310,8 +351,6 @@ export class EditorView extends ResponsiveView {
     ////////////////////////////////////////////////////////////////////////
 
     keyDownListener(e: KeyboardEvent): void {
-        //this.app.startLoading( "Editing...", true );
-        //document.removeEventListener( 'keydown', this.boundKeyDown );
         // For now only up and down arrows
         if (e.keyCode === 38 || e.keyCode === 40) {
             this.actionManager.keyDown(e.keyCode, e.shiftKey, e.ctrlKey);
@@ -319,16 +358,13 @@ export class EditorView extends ResponsiveView {
         else if (e.keyCode === 8 || e.keyCode === 46) {
             this.actionManager.delete();
         }
-
-        //document.addEventListener( 'keydown', this.boundKeyDown );
-        //this.app.endLoading( true );
         e.preventDefault();
     }
 
     mouseDownListener(e: MouseEvent): void {
         this.draggingActive = false;
         this.lastNote = { midiPitch: 0, oct: "", pname: "" };
-        e.cancelBubble = true;
+        e.stopPropagation();
 
         // Clicking on the overlay - nothing to do
         if ((<HTMLDivElement>(<HTMLElement>e.target).parentNode) === this.svgOverlay) {
@@ -342,12 +378,9 @@ export class EditorView extends ResponsiveView {
             return; // this should never happen, but as a safety 
         }
 
-        const id = node.id;
-
         // Multiple selection - add it to the cursor
-        if (e.shiftKey) {
-            this.activateHighlight(id);
-            this.cursorPointerObj.add(id, node);
+        if (this.hasSelection() && e.shiftKey) {
+            this.addNodeToSelection(node);
             document.addEventListener('mousemove', this.boundMouseMove);
             document.addEventListener('mouseup', this.boundMouseUp);
             return;
@@ -357,19 +390,16 @@ export class EditorView extends ResponsiveView {
         document.removeEventListener('mousemove', this.boundMouseMove);
         document.removeEventListener('touchmove', this.boundMouseMove);
 
-        this.currentId = id;
         let event = new CustomEvent('onSelect', {
             detail: {
-                id: id,
+                id: node.id,
                 elementType: node.classList[0],
                 caller: this
             }
         });
         this.app.customEventManager.dispatch(event);
 
-        this.resetHighlights();
-        this.activateHighlight(id);
-        this.cursorPointerObj.initEvent(e, id, node);
+        this.cursorPointerObj.initEvent(e, node);
 
         // we haven't started to drag yet, this might be just a selection
         document.addEventListener('mousemove', this.boundMouseMove);
@@ -418,9 +448,6 @@ export class EditorView extends ResponsiveView {
         document.removeEventListener('touchend', this.boundMouseUp);
 
         if (this.draggingActive === true) {
-            //console.debug( "up - dragging" );
-            //this.app.startLoading( "Updating content ...", true );
-
             this.draggingActive = false;
             document.removeEventListener('mousemove', this.boundMouseMove);
             document.removeEventListener('touchmove', this.boundMouseMove);
@@ -429,7 +456,7 @@ export class EditorView extends ResponsiveView {
 
             // Since we are waiting to trigger the mousemove events, we also need to delay the mouseup
             setTimeout(function () {
-                timerThis.resetHighlights();
+                timerThis.clearSelection();
                 timerThis.actionManager.update();
 
             }, 80);
