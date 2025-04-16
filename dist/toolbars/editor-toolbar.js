@@ -151,13 +151,6 @@ export class EditorToolbar extends Toolbar {
         this.updateToolbarBtnEnabled(this.xmlEditorForce, false);
         return true;
     }
-    onUpdateView(e) {
-        if (!super.onActivate(e))
-            return false;
-        //console.debug("EditorToolbar::onUpdate");
-        this.updateAll();
-        return true;
-    }
     ////////////////////////////////////////////////////////////////////////
     // Event methods
     ////////////////////////////////////////////////////////////////////////

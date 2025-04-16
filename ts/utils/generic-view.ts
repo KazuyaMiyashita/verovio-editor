@@ -40,7 +40,6 @@ export class GenericView {
         this.customEventManager.bind(this, 'onSelect', this.onSelect);
         this.customEventManager.bind(this, 'onStartLoading', this.onStartLoading);
         this.customEventManager.bind(this, 'onLoadData', this.onLoadData);
-        this.customEventManager.bind(this, 'onUpdateView', this.onUpdateView);
         this.customEventManager.bind(this, 'onEditData', this.onEditData);
         this.customEventManager.bind(this, 'onZoom', this.onZoom);
     }
@@ -109,12 +108,6 @@ export class GenericView {
     onLoadData(e: CustomEvent): boolean {
         if (!this.active) return false;
         //console.debug("GenericView::onLoadData");
-        return true;
-    }
-
-    onUpdateView(e: CustomEvent): boolean {
-        if (!this.active) return false;
-        //console.debug("GenericView::onUpdateView");
         return true;
     }
 

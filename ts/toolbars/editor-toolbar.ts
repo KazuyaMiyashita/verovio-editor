@@ -210,16 +210,7 @@ export class EditorToolbar extends Toolbar {
 
         return true;
     }
-
-    override onUpdateView(e: CustomEvent): boolean {
-        if (!super.onActivate(e)) return false;
-        //console.debug("EditorToolbar::onUpdate");
-
-        this.updateAll();
-
-        return true;
-    }
-
+    
     ////////////////////////////////////////////////////////////////////////
     // Event methods
     ////////////////////////////////////////////////////////////////////////

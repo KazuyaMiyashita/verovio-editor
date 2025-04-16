@@ -244,12 +244,5 @@ export class AppToolbar extends Toolbar {
         this.updateToolbarBtnEnabled(this.zoomIn, false);
         return true;
     }
-    onUpdateView(e) {
-        if (!super.onUpdateView(e))
-            return false;
-        //console.debug("AppToolbar::onUpdate");
-        this.updateAll();
-        return true;
-    }
 }
 //# sourceMappingURL=app-toolbar.js.map

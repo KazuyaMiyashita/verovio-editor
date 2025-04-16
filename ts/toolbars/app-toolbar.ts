@@ -355,13 +355,4 @@ export class AppToolbar extends Toolbar {
 
         return true;
     }
-
-    override onUpdateView(e: CustomEvent): boolean {
-        if (!super.onUpdateView(e)) return false;
-        //console.debug("AppToolbar::onUpdate");
-
-        this.updateAll();
-
-        return true;
-    }
 }
