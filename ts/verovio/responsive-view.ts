@@ -26,18 +26,18 @@ export class ResponsiveView extends VerovioView {
     // VerovioView update methods
     ////////////////////////////////////////////////////////////////////////
 
-    override async updateView(update: VerovioView.Update, lightEndLoading: boolean = true, mei: string = "", reload: boolean = false): Promise<any> {
+    override async refreshView(update: VerovioView.Refresh, lightEndLoading: boolean = true, mei: string = "", reload: boolean = false): Promise<any> {
         switch (update) {
-            case (VerovioView.Update.Activate):
+            case (VerovioView.Refresh.Activate):
                 await this.updateActivate();
                 break;
-            case (VerovioView.Update.Resized):
-                await this.updateResized();
+            case (VerovioView.Refresh.Resized):
+                await this.updateResize();
                 break;
-            case (VerovioView.Update.LoadData):
+            case (VerovioView.Refresh.LoadData):
                 await this.updateLoadData(mei, reload);
                 break;
-            case (VerovioView.Update.Zoom):
+            case (VerovioView.Refresh.Zoom):
                 await this.updateZoom();
                 break;
         }
@@ -67,10 +67,10 @@ export class ResponsiveView extends VerovioView {
         }
         await this.verovio.loadData(mei);
         this.app.pageCount = await this.verovio.getPageCount();
-        await this.updateResized();
+        await this.updateResize();
     }
 
-    async updateResized(): Promise<any> {
+    async updateResize(): Promise<any> {
         if (!(this instanceof EditorView)) {
             this.div.style.height = this.div.parentElement.style.height;
             this.div.style.width = this.div.parentElement.style.width;
@@ -101,7 +101,7 @@ export class ResponsiveView extends VerovioView {
     }
 
     async updateZoom(): Promise<any> {
-        await this.updateResized();
+        await this.updateResize();
     }
 
     async renderPage(lightEndLoading: boolean = false): Promise<any> {

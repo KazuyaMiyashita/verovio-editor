@@ -54,18 +54,18 @@ export class DocumentView extends VerovioView {
     // VerovioView update methods
     ////////////////////////////////////////////////////////////////////////
 
-    override async updateView(update: VerovioView.Update, lightEndLoading: boolean = true, mei: string = "", reload: boolean = false): Promise<any> {
+    override async refreshView(update: VerovioView.Refresh, lightEndLoading: boolean = true, mei: string = "", reload: boolean = false): Promise<any> {
         switch (update) {
-            case (VerovioView.Update.Activate):
+            case (VerovioView.Refresh.Activate):
                 await this.updateActivate();
                 break;
-            case (VerovioView.Update.Resized):
-                await this.updateResized();
+            case (VerovioView.Refresh.Resized):
+                await this.updateResize();
                 break;
-            case (VerovioView.Update.LoadData):
+            case (VerovioView.Refresh.LoadData):
                 await this.updateLoadData(true, mei, reload);
                 break;
-            case (VerovioView.Update.Zoom):
+            case (VerovioView.Refresh.Zoom):
                 await this.updateZoom();
                 break;
         }
@@ -105,7 +105,7 @@ export class DocumentView extends VerovioView {
             this.docWrapper.firstChild.remove();
         }
 
-        await this.updateResized();
+        await this.updateResize();
 
         if (this.observer) {
             this.observer.lastPageIn = 0;
@@ -146,7 +146,7 @@ export class DocumentView extends VerovioView {
 
     }
 
-    async updateResized(): Promise<any> {
+    async updateResize(): Promise<any> {
         this.div.style.height = this.div.parentElement.style.height;
         this.div.style.width = this.div.parentElement.style.width;
 
@@ -169,7 +169,7 @@ export class DocumentView extends VerovioView {
 
     async updateZoom(): Promise<any> {
         if (this.app.options.documentViewSVG) {
-            await this.updateResized();
+            await this.updateResize();
             for (let idx = 0; idx < this.app.pageCount; idx++) {
                 let page = <HTMLElement>this.docWrapper.children[idx];
                 page.style.height = `${this.currentPageHeight}px`;

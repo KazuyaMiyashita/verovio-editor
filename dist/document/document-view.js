@@ -39,19 +39,19 @@ export class DocumentView extends VerovioView {
     ////////////////////////////////////////////////////////////////////////
     // VerovioView update methods
     ////////////////////////////////////////////////////////////////////////
-    updateView(update_1) {
+    refreshView(update_1) {
         return __awaiter(this, arguments, void 0, function* (update, lightEndLoading = true, mei = "", reload = false) {
             switch (update) {
-                case (VerovioView.Update.Activate):
+                case (VerovioView.Refresh.Activate):
                     yield this.updateActivate();
                     break;
-                case (VerovioView.Update.Resized):
-                    yield this.updateResized();
+                case (VerovioView.Refresh.Resized):
+                    yield this.updateResize();
                     break;
-                case (VerovioView.Update.LoadData):
+                case (VerovioView.Refresh.LoadData):
                     yield this.updateLoadData(true, mei, reload);
                     break;
-                case (VerovioView.Update.Zoom):
+                case (VerovioView.Refresh.Zoom):
                     yield this.updateZoom();
                     break;
             }
@@ -89,7 +89,7 @@ export class DocumentView extends VerovioView {
             while (this.docWrapper.firstChild) {
                 this.docWrapper.firstChild.remove();
             }
-            yield this.updateResized();
+            yield this.updateResize();
             if (this.observer) {
                 this.observer.lastPageIn = 0;
             }
@@ -124,7 +124,7 @@ export class DocumentView extends VerovioView {
             }
         });
     }
-    updateResized() {
+    updateResize() {
         return __awaiter(this, void 0, void 0, function* () {
             this.div.style.height = this.div.parentElement.style.height;
             this.div.style.width = this.div.parentElement.style.width;
@@ -146,7 +146,7 @@ export class DocumentView extends VerovioView {
     updateZoom() {
         return __awaiter(this, void 0, void 0, function* () {
             if (this.app.options.documentViewSVG) {
-                yield this.updateResized();
+                yield this.updateResize();
                 for (let idx = 0; idx < this.app.pageCount; idx++) {
                     let page = this.docWrapper.children[idx];
                     page.style.height = `${this.currentPageHeight}px`;

@@ -66,7 +66,7 @@ export class VerovioView extends GenericView {
         this.boundResize = (e: Event) => this.resizeComponents(e);
     }
 
-    async updateView(update: VerovioView.Update, lightEndLoading: boolean = false, mei: string = "", reload: boolean = false): Promise<any> {
+    async refreshView(update: VerovioView.Refresh, lightEndLoading: boolean = false, mei: string = "", reload: boolean = false): Promise<any> {
         console.debug("View::updateView should be overwritten");
         console.debug(update);
     }
@@ -79,7 +79,7 @@ export class VerovioView extends GenericView {
         if (!super.onActivate(e)) return false;
         //console.debug("VerovioView::onActivate");
 
-        this.updateView(VerovioView.Update.Activate);
+        this.refreshView(VerovioView.Refresh.Activate);
         return true;
     }
 
@@ -87,7 +87,7 @@ export class VerovioView extends GenericView {
         if (!super.onResized(e)) return false;
         //console.debug("VerovioView::onResized");
 
-        this.updateView(VerovioView.Update.Resized);
+        this.refreshView(VerovioView.Refresh.Resized);
         return true;
     }
 
@@ -98,7 +98,7 @@ export class VerovioView extends GenericView {
         const mei = e.detail?.mei ?? '';
         const lightEndLoading = e.detail?.lightEndLoading ?? true;
         const reload = e.detail?.reload ?? false;
-        this.updateView(VerovioView.Update.LoadData, lightEndLoading, mei, reload);
+        this.refreshView(VerovioView.Refresh.LoadData, lightEndLoading, mei, reload);
         return true;
     }
 
@@ -107,7 +107,7 @@ export class VerovioView extends GenericView {
         //console.debug("VerovioView::onZoom");
 
         this.currentScale = this.app.zoomLevels[this.currentZoomIndex];
-        this.updateView(VerovioView.Update.Zoom);
+        this.refreshView(VerovioView.Refresh.Zoom);
         return true;
     }
 
@@ -130,7 +130,7 @@ export class VerovioView extends GenericView {
 
 export namespace VerovioView {
 
-    export enum Update {
+    export enum Refresh {
         Activate,
         Resized,
         LoadData,

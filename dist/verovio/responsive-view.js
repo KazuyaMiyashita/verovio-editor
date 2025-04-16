@@ -23,19 +23,19 @@ export class ResponsiveView extends VerovioView {
     ////////////////////////////////////////////////////////////////////////
     // VerovioView update methods
     ////////////////////////////////////////////////////////////////////////
-    updateView(update_1) {
+    refreshView(update_1) {
         return __awaiter(this, arguments, void 0, function* (update, lightEndLoading = true, mei = "", reload = false) {
             switch (update) {
-                case (VerovioView.Update.Activate):
+                case (VerovioView.Refresh.Activate):
                     yield this.updateActivate();
                     break;
-                case (VerovioView.Update.Resized):
-                    yield this.updateResized();
+                case (VerovioView.Refresh.Resized):
+                    yield this.updateResize();
                     break;
-                case (VerovioView.Update.LoadData):
+                case (VerovioView.Refresh.LoadData):
                     yield this.updateLoadData(mei, reload);
                     break;
-                case (VerovioView.Update.Zoom):
+                case (VerovioView.Refresh.Zoom):
                     yield this.updateZoom();
                     break;
             }
@@ -65,10 +65,10 @@ export class ResponsiveView extends VerovioView {
             }
             yield this.verovio.loadData(mei);
             this.app.pageCount = yield this.verovio.getPageCount();
-            yield this.updateResized();
+            yield this.updateResize();
         });
     }
-    updateResized() {
+    updateResize() {
         return __awaiter(this, void 0, void 0, function* () {
             if (!(this instanceof EditorView)) {
                 this.div.style.height = this.div.parentElement.style.height;
@@ -99,7 +99,7 @@ export class ResponsiveView extends VerovioView {
     }
     updateZoom() {
         return __awaiter(this, void 0, void 0, function* () {
-            yield this.updateResized();
+            yield this.updateResize();
         });
     }
     renderPage() {
