@@ -103,7 +103,7 @@ export class ActionManager {
         await this.editorViewObj.verovio.edit(editorAction);
         await this.editorViewObj.verovio.redoLayout();
         await this.editorViewObj.renderPage(true);
-        this.editorViewObj.updateMEI();
+        //this.editorViewObj.updateMEI();
     }
 
     async drag(x: number, y: number): Promise<any> {
@@ -256,8 +256,8 @@ export class ActionManager {
         }
 
         await this.editorViewObj.verovio.edit(editorAction);
-        await this.editorViewObj.updateLoadData();
-        this.editorViewObj.updateMEI();
+        //await this.editorViewObj.updateLoadData();
+        //this.editorViewObj.updateMEI();
     }
 
     // helper
@@ -290,6 +290,6 @@ export class ActionManager {
         // WIP disable redo layout
         //await this.view.verovio.redoLayout();
         await this.editorViewObj.renderPage(true);
-        this.editorViewObj.updateMEI();
+        //this.editorViewObj.updateMEI();
     }
 }

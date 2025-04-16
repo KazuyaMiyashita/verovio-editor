@@ -66,7 +66,7 @@ export class VerovioView extends GenericView {
         this.boundResize = (e: Event) => this.resizeComponents(e);
     }
 
-    async updateView(update: VerovioView.Update, lightEndLoading: boolean = true): Promise<any> {
+    async updateView(update: VerovioView.Update, lightEndLoading: boolean = false, mei: string = "", reload: boolean = false): Promise<any> {
         console.debug("View::updateView should be overwritten");
         console.debug(update);
     }
@@ -80,21 +80,6 @@ export class VerovioView extends GenericView {
         //console.debug("VerovioView::onActivate");
 
         this.updateView(VerovioView.Update.Activate);
-
-        // This occurs when switching views
-        if (e.detail && e.detail.loadData) {
-            this.updateView(VerovioView.Update.LoadData, false);
-        }
-
-        return true;
-    }
-
-    override onLoadData(e: CustomEvent): boolean {
-        if (!super.onLoadData(e)) return false;
-        //console.debug("VerovioView::onLoadData");
-
-        this.updateView(VerovioView.Update.LoadData, false);
-
         return true;
     }
 
@@ -103,16 +88,17 @@ export class VerovioView extends GenericView {
         //console.debug("VerovioView::onResized");
 
         this.updateView(VerovioView.Update.Resized);
-
         return true;
     }
 
-    override onUpdateData(e: CustomEvent): boolean {
-        if (!super.onUpdateData(e)) return false;
-        //console.debug("VerovioView::onUpdateData");
+    override onLoadData(e: CustomEvent): boolean {
+        if (!super.onLoadData(e)) return false;
+        //console.debug("VerovioView::onLoadData");
 
-        this.updateView(VerovioView.Update.Update);
-
+        const mei = e.detail?.mei ?? '';
+        const lightEndLoading = e.detail?.lightEndLoading ?? true;
+        const reload = e.detail?.reload ?? false;
+        this.updateView(VerovioView.Update.LoadData, lightEndLoading, mei, reload);
         return true;
     }
 
@@ -121,9 +107,7 @@ export class VerovioView extends GenericView {
         //console.debug("VerovioView::onZoom");
 
         this.currentScale = this.app.zoomLevels[this.currentZoomIndex];
-
         this.updateView(VerovioView.Update.Zoom);
-
         return true;
     }
 
@@ -148,9 +132,8 @@ export namespace VerovioView {
 
     export enum Update {
         Activate,
-        LoadData,
         Resized,
-        Update,
+        LoadData,
         Zoom
     };
 

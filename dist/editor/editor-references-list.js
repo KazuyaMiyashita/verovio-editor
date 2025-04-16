@@ -46,12 +46,6 @@ export class EditorReferenceList extends GenericView {
         console.debug("EditorReferenceList::onLoadData");
         return true;
     }
-    onUpdateData(e) {
-        if (!super.onUpdateData(e))
-            return false;
-        console.debug("EditorReferenceList::onUpdateData");
-        return true;
-    }
     ////////////////////////////////////////////////////////////////////////
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////

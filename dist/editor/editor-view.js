@@ -75,18 +75,6 @@ export class EditorView extends ResponsiveView {
                 this.app.endLoading(true);
         });
     }
-    updateMEI() {
-        return __awaiter(this, void 0, void 0, function* () {
-            const mei = yield this.verovio.getMEI({});
-            this.app.mei = mei;
-            let event = new CustomEvent('onUpdateData', {
-                detail: {
-                    caller: this
-                }
-            });
-            this.app.customEventManager.dispatch(event);
-        });
-    }
     select(element, id) {
         return __awaiter(this, void 0, void 0, function* () {
             this.highlightMouseOverReset();

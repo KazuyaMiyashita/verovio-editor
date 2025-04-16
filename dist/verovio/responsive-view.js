@@ -24,19 +24,16 @@ export class ResponsiveView extends VerovioView {
     // VerovioView update methods
     ////////////////////////////////////////////////////////////////////////
     updateView(update_1) {
-        return __awaiter(this, arguments, void 0, function* (update, lightEndLoading = true) {
+        return __awaiter(this, arguments, void 0, function* (update, lightEndLoading = true, mei = "", reload = false) {
             switch (update) {
                 case (VerovioView.Update.Activate):
                     yield this.updateActivate();
                     break;
-                case (VerovioView.Update.LoadData):
-                    yield this.updateLoadData();
-                    break;
                 case (VerovioView.Update.Resized):
                     yield this.updateResized();
                     break;
-                case (VerovioView.Update.Update):
-                    yield this.updateUpdateData();
+                case (VerovioView.Update.LoadData):
+                    yield this.updateLoadData(mei, reload);
                     break;
                 case (VerovioView.Update.Zoom):
                     yield this.updateZoom();
@@ -61,7 +58,17 @@ export class ResponsiveView extends VerovioView {
             }
         });
     }
-    updateLoadData() {
+    updateLoadData(mei, reload) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (reload) {
+                mei = yield this.verovio.getMEI({});
+            }
+            yield this.verovio.loadData(mei);
+            this.app.pageCount = yield this.verovio.getPageCount();
+            yield this.updateResized();
+        });
+    }
+    updateResized() {
         return __awaiter(this, void 0, void 0, function* () {
             if (!(this instanceof EditorView)) {
                 this.div.style.height = this.div.parentElement.style.height;
@@ -90,21 +97,9 @@ export class ResponsiveView extends VerovioView {
             }
         });
     }
-    updateResized() {
-        return __awaiter(this, void 0, void 0, function* () {
-            yield this.updateLoadData();
-        });
-    }
-    updateUpdateData() {
-        return __awaiter(this, void 0, void 0, function* () {
-            yield this.verovio.loadData(this.app.mei);
-            this.app.pageCount = yield this.verovio.getPageCount();
-            yield this.updateLoadData();
-        });
-    }
     updateZoom() {
         return __awaiter(this, void 0, void 0, function* () {
-            yield this.updateLoadData();
+            yield this.updateResized();
         });
     }
     renderPage() {

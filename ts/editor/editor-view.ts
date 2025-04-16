@@ -101,17 +101,6 @@ export class EditorView extends ResponsiveView {
         if (lightEndLoading) this.app.endLoading(true);
     }
 
-    async updateMEI(): Promise<any> {
-        const mei = await this.verovio.getMEI({});
-        this.app.mei = mei;
-        let event = new CustomEvent('onUpdateData', {
-            detail: {
-                caller: this
-            }
-        });
-        this.app.customEventManager.dispatch(event);
-    }
-
     async select(element: string, id: string): Promise<any> {
         this.highlightMouseOverReset();
         const pageWithElement = await this.verovio.getPageWithElement(id);

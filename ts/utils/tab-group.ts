@@ -69,8 +69,8 @@ export class TabGroup extends GenericView {
         return true;
     }
 
-    override onUpdateData(e: CustomEvent): boolean {
-        if (!super.onUpdateData(e)) return false;
+    override onLoadData(e: CustomEvent): boolean {
+        if (!super.onLoadData(e)) return false;
         this.selectedTab.customEventManager.dispatch(e);
         return true;
     }

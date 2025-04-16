@@ -74,13 +74,6 @@ export class EditorContentTree extends GenericTree {
         return true;
     }
 
-    override onUpdateData(e: CustomEvent): boolean {
-        if (!super.onUpdateData(e)) return false;
-        //console.debug("EditorContentTree::onUpdateData");
-
-        return true;
-    }
-
     ////////////////////////////////////////////////////////////////////////
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////

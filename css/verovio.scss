@@ -1110,8 +1110,12 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
             background-color: $background-extra-light;
         }
         .vrv-node-label.checked::after {
-            content: url(../icons/toolbar/checked.png);
+            content: url(../icons/editor/star-red.png);
+            vertical-align: middle;
             margin-left: 10px;
+        }
+        .vrv-node-label.checked:hover::after {
+            content: url(../icons/editor/star.png);
         }
 
         .vrv-tree-node {

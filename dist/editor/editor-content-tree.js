@@ -69,12 +69,6 @@ export class EditorContentTree extends GenericTree {
         //console.debug("EditorContentTree::onLoadData");
         return true;
     }
-    onUpdateData(e) {
-        if (!super.onUpdateData(e))
-            return false;
-        //console.debug("EditorContentTree::onUpdateData");
-        return true;
-    }
     ////////////////////////////////////////////////////////////////////////
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////

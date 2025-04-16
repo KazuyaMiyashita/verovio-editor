@@ -175,13 +175,6 @@ export class EditorPanel extends GenericView {
         //console.debug("EditorPanel::onSelect");
         this.propagateEvent(e);
     }
-    onLoadData(e) {
-        if (!super.onLoadData(e))
-            return false;
-        //console.debug("EditorPanel::onLoadData");
-        this.propagateEvent(e);
-        this.updateSize();
-    }
     onStartLoading(e) {
         if (!super.onStartLoading(e))
             return false;
@@ -201,11 +194,12 @@ export class EditorPanel extends GenericView {
         this.updateSize();
         this.propagateEvent(e);
     }
-    onUpdateView(e) {
-        if (!super.onUpdateView(e))
+    onLoadData(e) {
+        if (!super.onLoadData(e))
             return false;
+        //console.debug("EditorPanel::onLoadData");
         this.propagateEvent(e);
-        this.app.endLoading();
+        this.updateSize();
     }
     propagateEvent(e) {
         if (this.xmlEditorEnabled) {
@@ -286,7 +280,6 @@ export class EditorPanel extends GenericView {
                     // Do not show it again for that file.
                     this.xmlEditorViewObj.setAutoModeNotification(false);
                 }
-                yield this.editorViewObj.updateMEI();
             }
             else {
                 if (this.xmlEditorViewObj.isEdited()) {
@@ -301,16 +294,27 @@ export class EditorPanel extends GenericView {
             this.app.startLoading("Adjusting the interface ...", true);
             let event = new CustomEvent('onActivate');
             this.customEventManager.dispatch(event);
+            // We enabled the XML editor, update its data
+            if (this.xmlEditorEnabled) {
+                const mei = yield this.verovio.getMEI({});
+                event = new CustomEvent('onLoadData', {
+                    detail: {
+                        caller: this.editorView,
+                        mei: mei
+                    }
+                });
+                this.app.customEventManager.dispatch(event);
+            }
             event = new CustomEvent('onResized');
             this.customEventManager.dispatch(event);
         });
     }
     onForceReload(e) {
         if (this.xmlEditorViewObj && this.xmlEditorViewObj.isEdited()) {
-            this.app.mei = this.xmlEditorViewObj.getValue();
-            let event = new CustomEvent('onUpdateData', {
+            let event = new CustomEvent('onLoadData', {
                 detail: {
-                    caller: this.xmlEditorViewObj
+                    caller: this.xmlEditorViewObj,
+                    mei: this.xmlEditorViewObj.getValue()
                 }
             });
             this.customEventManager.dispatch(event);

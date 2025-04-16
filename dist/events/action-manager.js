@@ -86,7 +86,7 @@ export class ActionManager {
             yield this.editorViewObj.verovio.edit(editorAction);
             yield this.editorViewObj.verovio.redoLayout();
             yield this.editorViewObj.renderPage(true);
-            this.editorViewObj.updateMEI();
+            //this.editorViewObj.updateMEI();
         });
     }
     drag(x, y) {
@@ -242,8 +242,8 @@ export class ActionManager {
                 action: 'commit'
             };
             yield this.editorViewObj.verovio.edit(editorAction);
-            yield this.editorViewObj.updateLoadData();
-            this.editorViewObj.updateMEI();
+            //await this.editorViewObj.updateLoadData();
+            //this.editorViewObj.updateMEI();
         });
     }
     // helper
@@ -274,7 +274,7 @@ export class ActionManager {
             // WIP disable redo layout
             //await this.view.verovio.redoLayout();
             yield this.editorViewObj.renderPage(true);
-            this.editorViewObj.updateMEI();
+            //this.editorViewObj.updateMEI();
         });
     }
 }

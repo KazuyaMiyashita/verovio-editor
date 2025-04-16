@@ -4,7 +4,6 @@
  */
 
 import { App } from '../app.js';
-import { Dialog } from '../dialogs/dialog.js'
 import { GenericView } from '../utils/generic-view.js';
 import { ValidatorWorkerProxy } from '../utils/worker-proxy.js';
 import { RNGLoader } from './rng-loader.js';
@@ -39,6 +38,7 @@ export class XMLEditorView extends GenericView {
     private formatting: boolean; // For indicating that XML formatting is under progress
     private CMeditor: any;
     private lintOptions: Object;
+    private originalText: string;
 
     constructor(div: HTMLDivElement, app: App, validator: ValidatorWorkerProxy, rngLoader: RNGLoader) {
         super(div, app);
@@ -60,6 +60,7 @@ export class XMLEditorView extends GenericView {
         this.autoMode = false;
         this.autoModeNotification = false;
         this.formatting = false;
+        this.originalText = '';
 
         const cmThis = this;
 
@@ -255,15 +256,16 @@ export class XMLEditorView extends GenericView {
             if (timestamp === this.timestamp) {
                 this.setStatus(Status.Valid);
                 this.edited = false;
-                if (this.app.mei == text) return;
-                this.app.mei = text;
-                this.app.startLoading("Updating data ...", true);
-                let event = new CustomEvent('onUpdateData', {
+                if (this.originalText === text) return;
+                this.originalText = text;
+                this.app.startLoading("Updating data ...", this.autoMode);
+                let event = new CustomEvent('onLoadData', {
                     detail: {
-                        caller: this
+                        caller: this,
+                        lightEndLoading: this.autoMode,
+                        mei: text
                     }
                 });
-
                 this.app.customEventManager.dispatch(event);
             }
             else {
@@ -353,19 +355,8 @@ export class XMLEditorView extends GenericView {
     override onActivate(e: CustomEvent): boolean {
         if (!super.onActivate(e)) return false;
         //console.debug("XMLEditorView::onActivate");
-        this.CMeditor.setValue(this.app.mei);
         this.CMeditor.refresh();
         this.CMeditor.setSize(this.div.style.width, this.div.style.height);
-
-        return true;
-    }
-
-    override onLoadData(e: CustomEvent): boolean {
-        if (!super.onLoadData(e)) return false;
-        //console.debug("XMLEditorView::onLoadData");
-        this.timestamp = Date.now();
-        this.CMeditor.setValue(e.detail.mei);
-        this.setCurrent(this.currentId);
 
         return true;
     }
@@ -379,12 +370,13 @@ export class XMLEditorView extends GenericView {
         return true;
     }
 
-    override onUpdateData(e: CustomEvent): boolean {
-        if (!super.onUpdateData(e)) return false;
+    override onLoadData(e: CustomEvent): boolean {
+        if (!super.onLoadData(e)) return false;
         if (this === e.detail.caller) return false;
-        //console.debug("XMLEditorView::onUpdateData");
+        //console.debug("XMLEditorView::onLoadData");
         this.timestamp = Date.now();
-        this.CMeditor.setValue(this.app.mei);
+        this.originalText = e.detail.mei;
+        this.CMeditor.setValue(this.originalText);
         this.setCurrent(this.currentId);
 
         return true;

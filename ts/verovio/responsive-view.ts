@@ -26,19 +26,16 @@ export class ResponsiveView extends VerovioView {
     // VerovioView update methods
     ////////////////////////////////////////////////////////////////////////
 
-    override async updateView(update: VerovioView.Update, lightEndLoading = true): Promise<any> {
+    override async updateView(update: VerovioView.Update, lightEndLoading: boolean = true, mei: string = "", reload: boolean = false): Promise<any> {
         switch (update) {
             case (VerovioView.Update.Activate):
                 await this.updateActivate();
                 break;
-            case (VerovioView.Update.LoadData):
-                await this.updateLoadData();
-                break;
             case (VerovioView.Update.Resized):
                 await this.updateResized();
                 break;
-            case (VerovioView.Update.Update):
-                await this.updateUpdateData();
+            case (VerovioView.Update.LoadData):
+                await this.updateLoadData(mei, reload);
                 break;
             case (VerovioView.Update.Zoom):
                 await this.updateZoom();
@@ -64,7 +61,16 @@ export class ResponsiveView extends VerovioView {
         }
     }
 
-    async updateLoadData(): Promise<any> {
+    async updateLoadData(mei: string, reload: boolean): Promise<any> {
+        if (reload) {
+            mei = await this.verovio.getMEI({});
+        }
+        await this.verovio.loadData(mei);
+        this.app.pageCount = await this.verovio.getPageCount();
+        await this.updateResized();
+    }
+
+    async updateResized(): Promise<any> {
         if (!(this instanceof EditorView)) {
             this.div.style.height = this.div.parentElement.style.height;
             this.div.style.width = this.div.parentElement.style.width;
@@ -94,18 +100,8 @@ export class ResponsiveView extends VerovioView {
         }
     }
 
-    async updateResized(): Promise<any> {
-        await this.updateLoadData();
-    }
-
-    async updateUpdateData(): Promise<any> {
-        await this.verovio.loadData(this.app.mei);
-        this.app.pageCount = await this.verovio.getPageCount();
-        await this.updateLoadData();
-    }
-
     async updateZoom(): Promise<any> {
-        await this.updateLoadData();
+        await this.updateResized();
     }
 
     async renderPage(lightEndLoading: boolean = false): Promise<any> {

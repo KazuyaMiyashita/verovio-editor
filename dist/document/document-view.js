@@ -40,19 +40,16 @@ export class DocumentView extends VerovioView {
     // VerovioView update methods
     ////////////////////////////////////////////////////////////////////////
     updateView(update_1) {
-        return __awaiter(this, arguments, void 0, function* (update, lightEndLoading = true) {
+        return __awaiter(this, arguments, void 0, function* (update, lightEndLoading = true, mei = "", reload = false) {
             switch (update) {
                 case (VerovioView.Update.Activate):
                     yield this.updateActivate();
                     break;
-                case (VerovioView.Update.LoadData):
-                    yield this.updateLoadData();
-                    break;
                 case (VerovioView.Update.Resized):
                     yield this.updateResized();
                     break;
-                case (VerovioView.Update.Update):
-                    yield this.updateLoadData();
+                case (VerovioView.Update.LoadData):
+                    yield this.updateLoadData(true, mei, reload);
                     break;
                 case (VerovioView.Update.Zoom):
                     yield this.updateZoom();
@@ -75,10 +72,15 @@ export class DocumentView extends VerovioView {
             this.app.verovioOptions.justifyVertically = true;
         });
     }
-    updateLoadData() {
-        return __awaiter(this, arguments, void 0, function* (redoLayout = true) {
-            // We do not need to redo the layout when changing zoom with canvas
+    updateLoadData(redoLayout, mei, reload) {
+        return __awaiter(this, void 0, void 0, function* () {
             if (redoLayout) {
+                if (reload) {
+                    mei = yield this.verovio.getMEI({});
+                }
+                yield this.verovio.loadData(mei);
+                this.app.pageCount = yield this.verovio.getPageCount();
+                // We do not need to redo the layout when changing zoom with canvas
                 yield this.verovio.setOptions(this.app.verovioOptions);
                 yield this.verovio.redoLayout();
                 const pageCount = yield this.verovio.getPageCount();
@@ -160,7 +162,7 @@ export class DocumentView extends VerovioView {
             }
             else {
                 // With canvas have to just reload everything but without redoing the layout
-                yield this.updateLoadData(false);
+                yield this.updateLoadData(false, "", false);
             }
         });
     }

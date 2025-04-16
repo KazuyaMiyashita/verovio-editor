@@ -54,19 +54,16 @@ export class DocumentView extends VerovioView {
     // VerovioView update methods
     ////////////////////////////////////////////////////////////////////////
 
-    override async updateView(update: VerovioView.Update, lightEndLoading: boolean = true): Promise<any> {
+    override async updateView(update: VerovioView.Update, lightEndLoading: boolean = true, mei: string = "", reload: boolean = false): Promise<any> {
         switch (update) {
             case (VerovioView.Update.Activate):
                 await this.updateActivate();
                 break;
-            case (VerovioView.Update.LoadData):
-                await this.updateLoadData();
-                break;
             case (VerovioView.Update.Resized):
                 await this.updateResized();
                 break;
-            case (VerovioView.Update.Update):
-                await this.updateLoadData();
+            case (VerovioView.Update.LoadData):
+                await this.updateLoadData(true, mei, reload);
                 break;
             case (VerovioView.Update.Zoom):
                 await this.updateZoom();
@@ -90,14 +87,19 @@ export class DocumentView extends VerovioView {
         this.app.verovioOptions.justifyVertically = true;
     }
 
-    async updateLoadData(redoLayout = true): Promise<any> {
-        // We do not need to redo the layout when changing zoom with canvas
+    async updateLoadData(redoLayout: boolean, mei: string, reload: boolean): Promise<any> {
         if (redoLayout) {
+            if (reload) {
+                mei = await this.verovio.getMEI({});
+            }
+            await this.verovio.loadData(mei);
+            this.app.pageCount = await this.verovio.getPageCount();
+            // We do not need to redo the layout when changing zoom with canvas
             await this.verovio.setOptions(this.app.verovioOptions);
             await this.verovio.redoLayout();
             const pageCount = await this.verovio.getPageCount();
             this.app.pageCount = pageCount;
-        }
+        }        
 
         while (this.docWrapper.firstChild) {
             this.docWrapper.firstChild.remove();
@@ -183,7 +185,7 @@ export class DocumentView extends VerovioView {
         }
         else {
             // With canvas have to just reload everything but without redoing the layout
-            await this.updateLoadData(false);
+            await this.updateLoadData(false, "", false);
         }
     }
 

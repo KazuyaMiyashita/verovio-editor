@@ -377,10 +377,12 @@ export class App {
     loadMEI(convert) {
         return __awaiter(this, void 0, void 0, function* () {
             this.startLoading("Loading the MEI data ...");
-            yield this.verovio.loadData(this.mei);
-            yield this.applySelection();
-            this.pageCount = yield this.verovio.getPageCount();
+            //await this.verovio.loadData(this.mei);
+            //await this.applySelection();
+            //this.pageCount = await this.verovio.getPageCount();
             if (convert) {
+                console.log("Converting to MEI");
+                yield this.verovio.loadData(this.mei);
                 this.mei = yield this.verovio.getMEI({});
             }
             if (this.viewEditorObj) {
@@ -390,7 +392,9 @@ export class App {
             yield this.checkSchema();
             let event = new CustomEvent('onLoadData', {
                 detail: {
-                    pageCount: this.pageCount,
+                    currentId: this.clientId,
+                    caller: this.view,
+                    lightEndLoading: false,
                     mei: this.mei
                 }
             });
@@ -625,10 +629,11 @@ export class App {
             if (dlgRes === 1) {
                 this.options.selection = dlg.selection;
                 yield this.applySelection();
-                let event = new CustomEvent('onUpdateData', {
+                let event = new CustomEvent('onLoadData', {
                     detail: {
                         currentId: this.clientId,
-                        caller: this.view
+                        caller: this.view,
+                        reload: true
                     }
                 });
                 this.customEventManager.dispatch(event);
@@ -675,10 +680,11 @@ export class App {
             const dlgRes = yield dlg.show();
             if (dlgRes === 1) {
                 yield this.verovio.setOptions(dlg.changedOptions);
-                let event = new CustomEvent('onUpdateData', {
+                let event = new CustomEvent('onLoadData', {
                     detail: {
                         currentId: this.clientId,
-                        caller: this.view
+                        caller: this.view,
+                        reload: true
                     }
                 });
                 this.customEventManager.dispatch(event);
@@ -733,12 +739,17 @@ export class App {
                 this.toolbarView = this.viewResponsiveObj;
             }
             this.startLoading("Switching view ...");
-            let eventActivate = new CustomEvent('onActivate', {
+            let eventActivate = new CustomEvent('onActivate');
+            this.view.customEventManager.dispatch(eventActivate);
+            let eventLoadData = new CustomEvent('onLoadData', {
                 detail: {
-                    loadData: true
+                    currentId: this.clientId,
+                    caller: this.view,
+                    reload: true,
+                    lightEndLoading: false
                 }
             });
-            this.view.customEventManager.dispatch(eventActivate);
+            this.customEventManager.dispatch(eventLoadData);
             this.toolbarObj.customEventManager.dispatch(eventActivate);
         });
     }

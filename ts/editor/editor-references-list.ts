@@ -47,13 +47,6 @@ export class EditorReferenceList extends GenericView {
         return true;
     }
 
-    override onUpdateData(e: CustomEvent): boolean {
-        if (!super.onUpdateData(e)) return false;
-        console.debug("EditorReferenceList::onUpdateData");
-
-        return true;
-    }
-
     ////////////////////////////////////////////////////////////////////////
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////

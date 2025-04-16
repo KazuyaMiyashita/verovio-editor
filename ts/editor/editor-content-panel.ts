@@ -52,6 +52,7 @@ export class EditorContentPanel extends GenericView {
         const contextOk = await this.app.verovio.edit({ action: 'context', param: { elementId: `${id}` } });
         if (contextOk) {
             const jsonContext = await this.app.verovio.editInfo();
+            console.log(jsonContext);
             this.contentTreeObj.loadContext(jsonContext['context'], jsonContext['ancestors'], jsonContext['object']);
             this.referencesFromObj.loadList(jsonContext['referringElements'], EditorReferenceList.Direction.From);
             this.referencesToObj.loadList(jsonContext['referencedElements'], EditorReferenceList.Direction.To);
@@ -81,9 +82,9 @@ export class EditorContentPanel extends GenericView {
         return true;
     }
 
-    override onUpdateData(e: CustomEvent): boolean {
-        if (!super.onUpdateData(e)) return false;
-        //console.debug("EditorContentTree::onUpdateData");
+    override onLoadData(e: CustomEvent): boolean {
+        if (!super.onLoadData(e)) return false;
+        //console.debug("EditorContentTree::onLoadData");
         return true;
     }
 

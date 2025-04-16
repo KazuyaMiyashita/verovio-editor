@@ -35,12 +35,11 @@ export class GenericView {
         this.customEventManager.bind(this, 'onCursorActivity', this.onCursorActivity);
         this.customEventManager.bind(this, 'onDeactivate', this.onDeactivate);
         this.customEventManager.bind(this, 'onEndLoading', this.onEndLoading);
-        this.customEventManager.bind(this, 'onLoadData', this.onLoadData);
         this.customEventManager.bind(this, 'onPage', this.onPage);
         this.customEventManager.bind(this, 'onResized', this.onResized);
         this.customEventManager.bind(this, 'onSelect', this.onSelect);
         this.customEventManager.bind(this, 'onStartLoading', this.onStartLoading);
-        this.customEventManager.bind(this, 'onUpdateData', this.onUpdateData);
+        this.customEventManager.bind(this, 'onLoadData', this.onLoadData);
         this.customEventManager.bind(this, 'onUpdateView', this.onUpdateView);
         this.customEventManager.bind(this, 'onEditData', this.onEditData);
         this.customEventManager.bind(this, 'onZoom', this.onZoom);
@@ -82,12 +81,6 @@ export class GenericView {
         return true;
     }
 
-    onLoadData(e: CustomEvent): boolean {
-        if (!this.active) return false;
-        //console.debug("GenericView::onLoadData");
-        return true;
-    }
-
     onPage(e: CustomEvent): boolean {
         if (!this.active) return false;
         //console.debug("GenericView::onPage");
@@ -113,9 +106,9 @@ export class GenericView {
         return true;
     }
 
-    onUpdateData(e: CustomEvent): boolean {
+    onLoadData(e: CustomEvent): boolean {
         if (!this.active) return false;
-        //console.debug("GenericView::onUpdateData");
+        //console.debug("GenericView::onLoadData");
         return true;
     }
 
