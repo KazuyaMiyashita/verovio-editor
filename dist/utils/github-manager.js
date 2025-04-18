@@ -50,12 +50,23 @@ export class GitHubManager {
     ////////////////////////////////////////////////////////////////////////
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
-    getSessionCookie(name) {
-        let v = document.cookie.match('(^|;) ?' + name + '=([^;]*)(;|$)');
-        return v ? v[2] : null;
+    getPathString() {
+        return this.selectedPath.join('/');
+    }
+    appendToPath(dir) {
+        this.selectedPath.push(dir);
+        this.storeSelection();
+    }
+    slicePathTo(value) {
+        this.selectedPath = this.selectedPath.slice(0, value);
+        this.storeSelection();
     }
     isLoggedIn() {
         return (this.gh !== null);
+    }
+    getSessionCookie(name) {
+        let v = document.cookie.match('(^|;) ?' + name + '=([^;]*)(;|$)');
+        return v ? v[2] : null;
     }
     storeSelection() {
         this.app.options.github =
@@ -70,35 +81,18 @@ export class GitHubManager {
     resetSelectedPath() {
         this.selectedPath = ["."];
     }
-    getPathString() {
-        return this.selectedPath.join('/');
-    }
-    appendToPath(dir) {
-        this.selectedPath.push(dir);
-        this.storeSelection();
-    }
-    slicePathTo(value) {
-        this.selectedPath = this.selectedPath.slice(0, value);
-        this.storeSelection();
-    }
     ////////////////////////////////////////////////////////////////////////
     // Async network methods
     ////////////////////////////////////////////////////////////////////////
-    initUser() {
+    writeFile(filename, commitMsg) {
         return __awaiter(this, void 0, void 0, function* () {
-            this.user = this.gh.getUser();
-            const profile = yield this.user.getProfile();
-            this.login = profile.data.login;
-            this.name = (profile.data.name !== null) ? profile.data.name : profile.data.login;
-            // also use it as default account
-            this.selectedUser = this.user;
-            this.selectedAccountName = this.login;
-            let options = this.app.options.github;
-            if (options && options.login === this.login) {
-                yield this.selectAccount(options.account);
-                yield this.selectRepo(options.repo);
-                yield this.selectBranch(options.branch);
-                this.selectedPath = options.path;
+            try {
+                yield this.selectedRepo.writeFile(this.selectedBranchName, filename, this.app.mei, commitMsg, {});
+                this.app.showNotification("File was successfully pushed to GitHub");
+            }
+            catch (err) {
+                console.error(err);
+                this.app.showNotification("Something went wrong when pushing to GitHub");
             }
         });
     }
@@ -147,15 +141,21 @@ export class GitHubManager {
             }
         });
     }
-    writeFile(filename, commitMsg) {
+    initUser() {
         return __awaiter(this, void 0, void 0, function* () {
-            try {
-                yield this.selectedRepo.writeFile(this.selectedBranchName, filename, this.app.mei, commitMsg, {});
-                this.app.showNotification("File was successfully pushed to GitHub");
-            }
-            catch (err) {
-                console.error(err);
-                this.app.showNotification("Something went wrong when pushing to GitHub");
+            this.user = this.gh.getUser();
+            const profile = yield this.user.getProfile();
+            this.login = profile.data.login;
+            this.name = (profile.data.name !== null) ? profile.data.name : profile.data.login;
+            // also use it as default account
+            this.selectedUser = this.user;
+            this.selectedAccountName = this.login;
+            let options = this.app.options.github;
+            if (options && options.login === this.login) {
+                yield this.selectAccount(options.account);
+                yield this.selectRepo(options.repo);
+                yield this.selectBranch(options.branch);
+                this.selectedPath = options.path;
             }
         });
     }

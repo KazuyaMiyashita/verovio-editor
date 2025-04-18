@@ -76,16 +76,30 @@ export class GitHubManager {
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
 
-    getSessionCookie(name: string): string {
+    public getPathString(): string {
+        return this.selectedPath.join('/');
+    }
+
+    public appendToPath(dir: string): void {
+        this.selectedPath.push(dir);
+        this.storeSelection();
+    }
+
+    public slicePathTo(value: number) {
+        this.selectedPath = this.selectedPath.slice(0, value);
+        this.storeSelection();
+    }
+
+    public isLoggedIn(): boolean {
+        return (this.gh !== null)
+    }
+    
+    private getSessionCookie(name: string): string {
         let v: Array<string> = document.cookie.match('(^|;) ?' + name + '=([^;]*)(;|$)');
         return v ? v[2] : null;
     }
 
-    isLoggedIn(): boolean {
-        return (this.gh !== null)
-    }
-
-    storeSelection(): void {
+    private storeSelection(): void {
         this.app.options.github =
         {
             login: this.login,
@@ -96,47 +110,26 @@ export class GitHubManager {
         }
     }
 
-    resetSelectedPath(): void {
+    private resetSelectedPath(): void {
         this.selectedPath = ["."];
-    }
-
-    getPathString(): string {
-        return this.selectedPath.join('/');
-    }
-
-    appendToPath(dir: string): void {
-        this.selectedPath.push(dir);
-        this.storeSelection();
-    }
-
-    slicePathTo(value: number) {
-        this.selectedPath = this.selectedPath.slice(0, value);
-        this.storeSelection();
     }
 
     ////////////////////////////////////////////////////////////////////////
     // Async network methods
     ////////////////////////////////////////////////////////////////////////
 
-    async initUser(): Promise<any> {
-        this.user = this.gh.getUser();
-        const profile = await this.user.getProfile();
-        this.login = profile.data.login;
-        this.name = (profile.data.name !== null) ? profile.data.name : profile.data.login;
-        // also use it as default account
-        this.selectedUser = this.user;
-        this.selectedAccountName = this.login;
-
-        let options = this.app.options.github;
-        if (options && options.login === this.login) {
-            await this.selectAccount(options.account);
-            await this.selectRepo(options.repo);
-            await this.selectBranch(options.branch);
-            this.selectedPath = options.path;
+    public async writeFile(filename: string, commitMsg: string): Promise<any> {
+        try {
+            await this.selectedRepo.writeFile(this.selectedBranchName, filename, this.app.mei, commitMsg, {});
+            this.app.showNotification("File was successfully pushed to GitHub");
+        }
+        catch (err) {
+            console.error(err);
+            this.app.showNotification("Something went wrong when pushing to GitHub");
         }
     }
 
-    async selectAccount(login: string): Promise<any> {
+    public async selectAccount(login: string): Promise<any> {
         if (login === this.login) {
             this.selectedOrganization = null;
             this.selectedUser = this.gh.getUser();
@@ -153,7 +146,7 @@ export class GitHubManager {
         this.storeSelection();
     }
 
-    async selectBranch(name: string): Promise<any> {
+    public async selectBranch(name: string): Promise<any> {
         if (name === '') return;
 
         // Only need to check the name, but make sure it exists?
@@ -162,7 +155,7 @@ export class GitHubManager {
         this.storeSelection();
     }
 
-    async selectRepo(name: string): Promise<any> {
+    public async selectRepo(name: string): Promise<any> {
         if (name === '') return;
 
         try {
@@ -178,14 +171,21 @@ export class GitHubManager {
         }
     }
 
-    async writeFile(filename: string, commitMsg: string): Promise<any> {
-        try {
-            await this.selectedRepo.writeFile(this.selectedBranchName, filename, this.app.mei, commitMsg, {});
-            this.app.showNotification("File was successfully pushed to GitHub");
-        }
-        catch (err) {
-            console.error(err);
-            this.app.showNotification("Something went wrong when pushing to GitHub");
+    private async initUser(): Promise<any> {
+        this.user = this.gh.getUser();
+        const profile = await this.user.getProfile();
+        this.login = profile.data.login;
+        this.name = (profile.data.name !== null) ? profile.data.name : profile.data.login;
+        // also use it as default account
+        this.selectedUser = this.user;
+        this.selectedAccountName = this.login;
+
+        let options = this.app.options.github;
+        if (options && options.login === this.login) {
+            await this.selectAccount(options.account);
+            await this.selectRepo(options.repo);
+            await this.selectBranch(options.branch);
+            this.selectedPath = options.path;
         }
     }
 }
