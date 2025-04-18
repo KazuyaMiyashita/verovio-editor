@@ -12,6 +12,8 @@ import { Toolbar } from './toolbar.js';
 import { appendDivTo, appendSpanTo } from '../utils/functions.js';
 
 export class EditorToolbar extends Toolbar {
+    private selectedElementType: string;
+    
     private readonly panel: EditorPanel;
 
     private readonly layoutControls: HTMLDivElement;
@@ -36,7 +38,7 @@ export class EditorToolbar extends Toolbar {
     private readonly stemDirDown: HTMLDivElement;
     private readonly stemDirAuto: HTMLDivElement;
 
-    private selectedElementType: string;
+
 
     constructor(div: HTMLDivElement, app: App, panel: EditorPanel) {
         let editorXml = `${app.host}/icons/toolbar/editor-xml.png`;

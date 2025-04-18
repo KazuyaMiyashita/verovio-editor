@@ -9,6 +9,12 @@ import { Toolbar } from './toolbar.js';
 import { appendDivTo } from '../utils/functions.js';
 
 export class MidiToolbar extends Toolbar {
+    private midiPlayer: MidiPlayer;
+
+    private pageDragStart: number;
+    private barDragStart: number;
+    private barWidth: number;
+    
     private readonly midiControls: HTMLDivElement;
     private readonly play: HTMLDivElement;
     private readonly pause: HTMLDivElement;
@@ -18,12 +24,6 @@ export class MidiToolbar extends Toolbar {
     private readonly midiBar: HTMLDivElement;
     private readonly midiBarPercent: HTMLDivElement;
     private readonly midiTotalTime: HTMLDivElement;
-
-    private midiPlayer: MidiPlayer;
-
-    private pageDragStart: number;
-    private barDragStart: number;
-    private barWidth: number;
 
     constructor(div: HTMLDivElement, app: App) {
         let iconsPlay = `${app.host}/icons/toolbar/play.png`;

@@ -47,14 +47,16 @@ const VEROVIO_DISABLED_OPTIONS = [
 ];
 
 export class DialogSettingsVerovio extends Dialog {
-    private verovio: VerovioWorkerProxy;
-    private currentOptions: Options;
-    private defaultOptions: Options;
-    private verovioDisabled: Array<string>;
     protected changedOptions: Options;
 
-    private tabGroup: HTMLDivElement;
-    private tabGroupObj: TabGroup;
+    private currentOptions: Options;
+    private defaultOptions: Options;
+
+    private readonly verovio: VerovioWorkerProxy;
+    private readonly verovioDisabled: Array<string>;
+
+    private readonly tabGroup: HTMLDivElement;
+    private readonly tabGroupObj: TabGroup;
 
     constructor(div: HTMLDivElement, app: App, title: string, options: Dialog.Options, selection: Object, verovioProxy: VerovioWorkerProxy) {
         super(div, app, title, options);

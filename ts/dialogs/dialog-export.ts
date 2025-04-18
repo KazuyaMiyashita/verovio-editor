@@ -7,12 +7,12 @@ import { Dialog } from './dialog.js';
 import { appendDivTo, appendInputTo } from '../utils/functions.js';
 
 export class DialogExport extends Dialog {
-    protected fields: HTMLDivElement;
-    protected exportOptions: App.MEIExportOptions;
+    protected readonly fields: HTMLDivElement;
+    protected readonly exportOptions: App.MEIExportOptions;
 
-    private basicInput: HTMLInputElement;
-    private removeIdsInput: HTMLInputElement;
-    private ignoreHeaderInput: HTMLInputElement;
+    private readonly basicInput: HTMLInputElement;
+    private readonly removeIdsInput: HTMLInputElement;
+    private readonly ignoreHeaderInput: HTMLInputElement;
 
     constructor(div: HTMLDivElement, app: App, title: string) {
         super(div, app, title, { icon: "info", type: Dialog.Type.OKCancel });

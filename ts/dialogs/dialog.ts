@@ -9,19 +9,19 @@ import { EventManager } from '../events/event-manager.js';
 import { appendDetailsTo, appendDivTo, appendSummaryTo, insertDivBefore } from '../utils/functions.js';
 
 export class Dialog {
-    protected app: App;
-    protected eventManager: EventManager;
-    protected div: HTMLDivElement;
-    protected options: Dialog.Options;
+    protected readonly app: App;
+    protected readonly eventManager: EventManager;
+    protected readonly  div: HTMLDivElement;
+    protected readonly options: Dialog.Options;
 
-    protected box: HTMLDivElement;
-    protected top: HTMLDivElement;
-    protected icon: HTMLDivElement;
-    protected close: HTMLDivElement;
-    protected content: HTMLDivElement;
-    protected bottom: HTMLDivElement;
-    protected cancelBtn: HTMLDivElement;
-    protected okBtn: HTMLDivElement;
+    protected readonly box: HTMLDivElement;
+    protected readonly top: HTMLDivElement;
+    protected readonly icon: HTMLDivElement;
+    protected readonly close: HTMLDivElement;
+    protected readonly content: HTMLDivElement;
+    protected readonly bottom: HTMLDivElement;
+    protected readonly cancelBtn: HTMLDivElement;
+    protected readonly okBtn: HTMLDivElement;
 
     private boundKeyDown: { (event: KeyboardEvent): void };
     private deferred: Deferred;

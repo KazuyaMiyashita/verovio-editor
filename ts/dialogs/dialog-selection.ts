@@ -7,11 +7,12 @@ import { Dialog } from './dialog.js';
 import { appendDivTo, appendInputTo } from '../utils/functions.js';
 
 export class DialogSelection extends Dialog {
-    protected fields: HTMLDivElement;
-    protected selectMeasureRange: HTMLInputElement;
-    protected selectStart: HTMLInputElement;
-    protected selectEnd: HTMLInputElement;
     protected selection: Object;
+    
+    protected readonly fields: HTMLDivElement;
+    protected readonly selectMeasureRange: HTMLInputElement;
+    protected readonly selectStart: HTMLInputElement;
+    protected readonly selectEnd: HTMLInputElement;
 
     constructor(div: HTMLDivElement, app: App, title: string, options: Dialog.Options, selection: Object) {
         super(div, app, title, options);

@@ -11,15 +11,16 @@ import { VerovioWorkerProxy } from '../utils/worker-proxy.js';
 
 export class VerovioView extends GenericView {
     public readonly verovio: VerovioWorkerProxy;
-    protected readonly eventManager: EventManager;
+    
     protected currentPage: number;
     protected currentZoomIndex: number;
     protected currentScale: number;
-
     protected boundMouseMove: { (event: MouseEvent): void };
     protected boundMouseUp: { (event: MouseEvent): void };
     protected boundKeyDown: { (event: KeyboardEvent): void };
     protected boundResize: { (event: Event): void };
+
+    protected readonly eventManager: EventManager;
 
     constructor(div: HTMLDivElement, app: App, verovio: VerovioWorkerProxy) {
         super(div, app);

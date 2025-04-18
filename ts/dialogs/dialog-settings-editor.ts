@@ -7,10 +7,11 @@ import { Dialog } from './dialog.js';
 import { appendDivTo, appendOptionTo, appendSelectTo } from '../utils/functions.js';
 
 export class DialogSettingsEditor extends Dialog {
-    protected fields: HTMLDivElement;
-    protected appOptions: App.Options;
-    protected verovioVersion: HTMLSelectElement;
     protected reload: boolean;
+    
+    protected readonly fields: HTMLDivElement;
+    protected readonly appOptions: App.Options;
+    protected readonly verovioVersion: HTMLSelectElement;
 
     constructor(div: HTMLDivElement, app: App, title: string, options: Dialog.Options, appOptions: App.Options) {
         super(div, app, title, options);

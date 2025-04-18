@@ -21,6 +21,7 @@ export class GitHubManager {
     private selectedPath: Array<string>;
 
     private gh: any; // GitHub object
+    
     private readonly app: App;
 
     constructor(app: App) {

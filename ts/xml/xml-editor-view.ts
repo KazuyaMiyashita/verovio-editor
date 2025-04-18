@@ -25,11 +25,7 @@ enum Status {
 };
 
 export class XMLEditorView extends GenericView {
-    private validator: ValidatorWorkerProxy;
-    private rngLoader: RNGLoader;
     private currentId: string;
-    private xmlValid: HTMLDivElement;
-    private xmlEditorView: HTMLTextAreaElement;
     private updateLinting: Function;
     private timestamp: number; // For checking if the data validated is still the data loaded 
     private autoMode: boolean; // For indicating if live validation and sync is on
@@ -39,6 +35,11 @@ export class XMLEditorView extends GenericView {
     private CMeditor: any;
     private lintOptions: Object;
     private originalText: string;
+
+    private readonly validator: ValidatorWorkerProxy;
+    private readonly rngLoader: RNGLoader;
+    private readonly xmlValid: HTMLDivElement;
+    private readonly xmlEditorView: HTMLTextAreaElement;
 
     constructor(div: HTMLDivElement, app: App, validator: ValidatorWorkerProxy, rngLoader: RNGLoader) {
         super(div, app);

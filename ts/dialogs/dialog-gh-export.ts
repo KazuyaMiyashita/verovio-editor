@@ -10,9 +10,9 @@ import { GitHubManager } from '../utils/github-manager.js';
 import { appendDivTo, appendInputTo, appendTextAreaTo } from '../utils/functions.js';
 
 export class DialogGhExport extends DialogGhImport {
-    protected fields: HTMLDivElement;
-    protected inputFile: HTMLInputElement;
-    protected inputMessage: HTMLTextAreaElement;
+    protected readonly fields: HTMLDivElement;
+    protected readonly inputFile: HTMLInputElement;
+    protected readonly inputMessage: HTMLTextAreaElement;
 
     constructor(div: HTMLDivElement, app: App, title: string, options: Dialog.Options, githubManager: GitHubManager) {
         options.okLabel = 'Commit and push';

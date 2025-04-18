@@ -62,6 +62,7 @@ export class App {
     // private members
     private view: GenericView;
     private toolbarView: VerovioView;
+    private midiPlayer: MidiPlayer;
 
     private pageCount: number;
     private currentZoomIndex: number;
@@ -80,7 +81,6 @@ export class App {
     private viewResponsiveObj: ResponsiveView;
 
     private pdf: PDFWorkerProxy;
-    public midiPlayer: MidiPlayer;
     private currentSchema: string;
 
     private input: HTMLInputElement;
@@ -325,6 +325,8 @@ export class App {
     public getView(): GenericView { return this.view; }
     
     public getToolbarView(): VerovioView { return this.toolbarView; }
+
+    public getMidiPlayer(): MidiPlayer { return this.midiPlayer; }
     
     public getPageCount(): number { return this.pageCount; }
     public setPageCount(pageCount: number): void { this.pageCount = pageCount; }

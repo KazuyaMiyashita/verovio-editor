@@ -11,11 +11,12 @@ import { randomHex } from '../utils/functions.js';
 export class GenericView {
     public readonly customEventManager: CustomEventManager;
     public readonly id: string;
-
-    protected readonly app: App;
-    protected readonly div: HTMLDivElement;
+    
     protected active: boolean;
     
+    protected readonly app: App;
+    protected readonly div: HTMLDivElement;
+
     private display: string;
 
     constructor(div: HTMLDivElement, app: App) {

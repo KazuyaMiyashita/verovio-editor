@@ -16,24 +16,24 @@ interface ItemDataset {
 export class DialogGhImport extends Dialog {
     protected data: string | ArrayBuffer | Blob;
     protected filename: string;
-    protected githubManager: GitHubManager;
+    protected readonly githubManager: GitHubManager;
 
-    private iconsBranch: string;
-    private iconsInstitution: string;
-    private iconsFile: string;
-    private iconsFolder: string;
-    private iconsRepo: string;
-    private iconsUser: string;
+    private readonly iconsBranch: string;
+    private readonly iconsInstitution: string;
+    private readonly iconsFile: string;
+    private readonly iconsFolder: string;
+    private readonly iconsRepo: string;
+    private readonly iconsUser: string;
 
-    private tabs: HTMLDivElement;
-    private tabUser: HTMLDivElement;
-    private tabRepo: HTMLDivElement;
-    private tabBranch: HTMLDivElement;
-    private tabFile: HTMLDivElement;
-    private loading: HTMLDivElement;
-    private list: HTMLDivElement;
-    private selection: HTMLDivElement;
-    private breadCrumbs: HTMLDivElement;
+    private readonly tabs: HTMLDivElement;
+    private readonly tabUser: HTMLDivElement;
+    private readonly tabRepo: HTMLDivElement;
+    private readonly tabBranch: HTMLDivElement;
+    private readonly tabFile: HTMLDivElement;
+    private readonly loading: HTMLDivElement;
+    private readonly list: HTMLDivElement;
+    private readonly selection: HTMLDivElement;
+    private readonly breadCrumbs: HTMLDivElement;
 
     constructor(div: HTMLDivElement, app: App, title: string, options: Dialog.Options, githubManager: GitHubManager) {
         super(div, app, title, options);

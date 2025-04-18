@@ -207,6 +207,7 @@ export class App {
     ////////////////////////////////////////////////////////////////////////
     getView() { return this.view; }
     getToolbarView() { return this.toolbarView; }
+    getMidiPlayer() { return this.midiPlayer; }
     getPageCount() { return this.pageCount; }
     setPageCount(pageCount) { this.pageCount = pageCount; }
     getCurrentZoomIndex() { return this.currentZoomIndex; }

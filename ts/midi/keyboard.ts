@@ -8,20 +8,21 @@ import { appendDivTo, appendMidiPlayerTo, MidiPlayerElement } from '../utils/fun
 import { midiScale } from './midi-scale.js'
 
 export class Keyboard {
-    protected app: App;
-    protected eventManager: EventManager;
-    protected div: HTMLDivElement;
-    protected octaves: HTMLDivElement;
-    protected octaveNumbers: number[];
-    protected letters: string[];
-    protected keyboardWrapper: HTMLDivElement;
-    protected keys: HTMLDivElement;
-    protected currentOctave: number;
-    protected note: HTMLAudioElement;
-    protected midiPlayerElement: MidiPlayerElement;
+    private currentOctave: number;
 
     private boundKeyUp: { (event: KeyboardEvent): void };
     private boundKeyDown: { (event: KeyboardEvent): void };
+
+    private readonly app: App;
+    private readonly eventManager: EventManager;
+    private readonly div: HTMLDivElement;
+    private readonly octaves: HTMLDivElement;
+    private readonly octaveNumbers: number[];
+    private readonly letters: string[];
+    private readonly keyboardWrapper: HTMLDivElement;
+    private readonly keys: HTMLDivElement;
+    private readonly note: HTMLAudioElement;
+    private readonly midiPlayerElement: MidiPlayerElement;
 
     constructor(div: HTMLDivElement, app: App) {
         let iconsLeft = `${app.host}/icons/keyboard/left.png`;
