@@ -32,5 +32,7 @@
         "tuplet",
         "verovio",
         "Xlink"
-    ]
+    ],
+
+    "typescript.tsserver.experimental.enableProjectDiagnostics": true
 }
