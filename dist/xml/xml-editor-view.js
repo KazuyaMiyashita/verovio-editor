@@ -56,7 +56,7 @@ export class XMLEditorView extends GenericView {
             theme: theme,
             foldGutter: true,
             styleActiveLine: true,
-            hintOptions: { schemaInfo: this.rngLoader.tags },
+            hintOptions: { schemaInfo: this.rngLoader.getTags() },
             extraKeys: {
                 "'<'": completeAfter,
                 "'/'": completeIfAfterLt,
@@ -85,7 +85,7 @@ export class XMLEditorView extends GenericView {
                 cmThis.setStatus(Status.Unknown);
             }
         });
-        this.CMeditor.options.hintOptions.schemaInfo = this.rngLoader.tags;
+        this.CMeditor.options.hintOptions.schemaInfo = this.rngLoader.getTags();
     }
     ////////////////////////////////////////////////////////////////////////
     // Getters and Setters
@@ -138,7 +138,7 @@ export class XMLEditorView extends GenericView {
                     console.log("New schema loaded", res);
                 }
                 this.rngLoader.setRelaxNGSchema(data);
-                this.CMeditor.options.hintOptions.schemaInfo = this.rngLoader.tags;
+                this.CMeditor.options.hintOptions.schemaInfo = this.rngLoader.getTags();
                 return true;
             }
             catch (error) {

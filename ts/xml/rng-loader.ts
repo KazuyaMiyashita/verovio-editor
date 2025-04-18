@@ -2,8 +2,9 @@
  * The RNGLoader class for parsing and storing an RNG Schema.
  */
 export class RNGLoader {
-    rngNs: string;
-    tags: Object;
+    private tags: Object;
+
+    private readonly rngNs: string;
 
     constructor() {
         this.rngNs = "http://relaxng.org/ns/structure/1.0";
@@ -33,13 +34,19 @@ export class RNGLoader {
     }
 
     //////////////////////////////////////////////////////////////////////////////
+    // Getters and setters
+    //////////////////////////////////////////////////////////////////////////////
+
+    public getTags(): Object { return this.tags;  }
+
+    //////////////////////////////////////////////////////////////////////////////
     // schemaInfoCreator
     //////////////////////////////////////////////////////////////////////////////
 
     /**
      * Collect all <define/> elements.
      */
-    collectDefinitions(doc: Document): Map<string, Element> {
+    private collectDefinitions(doc: Document): Map<string, Element> {
         "use strict";
         let /**@type{!Object<!string,!Array.<!Element>>}*/
             definitions = new Map<string, Element>,
@@ -60,7 +67,7 @@ export class RNGLoader {
     /**
      * Continue recursion in the definition elements for the given reference.
      */
-    followReference(defs: Map<string, Element>, stack: Array<string>, ref: Element, handler: Function): void {
+    private followReference(defs: Map<string, Element>, stack: Array<string>, ref: Element, handler: Function): void {
         "use strict";
         let name = ref.getAttribute("name").trim();
         if (stack.indexOf(name) === -1) { // avoid infinite loop
@@ -73,7 +80,7 @@ export class RNGLoader {
     /**
      * Recurse into the child elements. Follow references.
      */
-    recurseRng(defs: Map<string, Element>, stack: Array<string>, rng, handler: Function): void {
+    private recurseRng(defs: Map<string, Element>, stack: Array<string>, rng, handler: Function): void {
         "use strict";
         let child;
         if (this.isRng(rng, "ref")) {
@@ -92,7 +99,7 @@ export class RNGLoader {
     /**
      * Collect the text from all the <value/> elements.
      */
-    getAttributeValues(defs: Map<string, Element>, stack: Array<string>, rng: Element, values): void {
+    private getAttributeValues(defs: Map<string, Element>, stack: Array<string>, rng: Element, values): void {
         "use strict";
         let text;
         if (this.isRng(rng, "value")) {
@@ -111,7 +118,7 @@ export class RNGLoader {
     /**
      * Get the possible names for an element or attribute.
      */
-    getNamesRecurse(e: Element, names: Array<string>): void {
+    private getNamesRecurse(e: Element, names: Array<string>): void {
         "use strict";
         let child;
         if (this.isRng(e, "name")) {
@@ -128,7 +135,7 @@ export class RNGLoader {
     /**
      * Get the possible names for an element or attribute.
      */
-    getNames(e: Element): Array<string> {
+    private getNames(e: Element): Array<string> {
         "use strict";
         if (e.hasAttribute("name")) {
             return [e.getAttribute("name")];
@@ -145,7 +152,7 @@ export class RNGLoader {
     /**
      * Find the allowed child elements and attributes for an element.
      */
-    defineElement(defs: Map<string, Element>, stack: Array<string>, rng: Element, def): void {
+    private defineElement(defs: Map<string, Element>, stack: Array<string>, rng: Element, def): void {
         "use strict";
         let names: Array<string> = new Array<string>;
         let values: Array<string> = new Array<string>;
@@ -179,7 +186,7 @@ export class RNGLoader {
         }
     }
 
-    sortObject(unordered) {
+    private sortObject(unordered) {
         "use strict";
         let ordered = {},
             keys = Object.keys(unordered);
@@ -190,7 +197,7 @@ export class RNGLoader {
         return ordered;
     }
 
-    sortAttributeValues(attrs: Map<string, Array<string>>): void {
+    private sortAttributeValues(attrs: Map<string, Array<string>>): void {
         "use strict";
         let keys = Object.keys(attrs);
         keys.map(function (key) {
@@ -201,7 +208,7 @@ export class RNGLoader {
         });
     }
 
-    findElements(defs: Map<string, Element>, rng: Element, elements: Map<string, Element>): void {
+    private findElements(defs: Map<string, Element>, rng: Element, elements: Map<string, Element>): void {
         "use strict";
         let child,
             names,
@@ -230,7 +237,7 @@ export class RNGLoader {
     }
 
 
-    findTopLevelElements(defs: Map<string, Element>, stack: Array<any>, rng: Element, top: Array<any>): void {
+    private findTopLevelElements(defs: Map<string, Element>, stack: Array<any>, rng: Element, top: Array<any>): void {
         "use strict";
         if (rng.localName === "element") {
             if (rng.hasAttribute("name")) {
@@ -245,7 +252,7 @@ export class RNGLoader {
     }
 
 
-    findAllTopLevelElements(defs: Map<string, Element>, stack: Array<any>, doc: Document): Array<string> {
+    private findAllTopLevelElements(defs: Map<string, Element>, stack: Array<any>, doc: Document): Array<string> {
         "use strict";
         let top: Array<string> = [];
         let starts = doc.getElementsByTagNameNS(this.rngNs, "start");
@@ -258,7 +265,7 @@ export class RNGLoader {
         return top;
     }
 
-    isRng(e: Element, name: string): boolean {
+    private isRng(e: Element, name: string): boolean {
         "use strict";
         return e.namespaceURI === this.rngNs && e.localName === name;
     }
