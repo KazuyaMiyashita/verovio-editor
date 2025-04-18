@@ -57,8 +57,7 @@
   outline: 0;
   overflow: initial;
   padding: 0;
-  text-align: initial;
-  vertical-align: baseline; }
+  text-align: initial; }
   .vrv-wrapper *,
   .vrv-wrapper ::before,
   .vrv-wrapper ::after {
@@ -627,7 +626,7 @@
     .vrv-wrapper .vrv-tree-root .vrv-node-label.checked::after {
       content: url(../icons/editor/star-red.png);
       vertical-align: middle;
-      margin-left: 10px; }
+      margin-left: 6px; }
     .vrv-wrapper .vrv-tree-root .vrv-node-label.checked:hover::after {
       content: url(../icons/editor/star.png); }
     .vrv-wrapper .vrv-tree-root .vrv-tree-node {
