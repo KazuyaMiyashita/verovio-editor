@@ -487,11 +487,11 @@ export class App {
             return;
         // Store zoom of each view
         if (this.viewDocumentObj)
-            this.options.documentZoom = this.viewDocumentObj.currentZoomIndex;
+            this.options.documentZoom = this.viewDocumentObj.getCurrentZoomIndex();
         if (this.viewResponsiveObj)
-            this.options.responsiveZoom = this.viewResponsiveObj.currentZoomIndex;
+            this.options.responsiveZoom = this.viewResponsiveObj.getCurrentZoomIndex();
         if (this.viewEditorObj)
-            this.options.editorZoom = this.viewEditorObj.editorViewObj.currentZoomIndex;
+            this.options.editorZoom = this.viewEditorObj.editorViewObj.getCurrentZoomIndex();
         // Store current view
         if (this.view == this.viewDocumentObj)
             this.options.defaultView = 'document';
@@ -518,32 +518,32 @@ export class App {
     // Event methods
     ////////////////////////////////////////////////////////////////////////
     prevPage(e) {
-        if (this.toolbarView.currentPage > 1) {
-            this.toolbarView.currentPage -= 1;
+        if (this.toolbarView.getCurrentPage() > 1) {
+            this.toolbarView.setCurrentPage(this.toolbarView.getCurrentPage() - 1);
             this.startLoading("Loading content ...", true);
             let event = new CustomEvent('onPage');
             this.customEventManager.dispatch(event);
         }
     }
     nextPage(e) {
-        if (this.toolbarView.currentPage < this.pageCount) {
-            this.toolbarView.currentPage += 1;
+        if (this.toolbarView.getCurrentPage() < this.pageCount) {
+            this.toolbarView.setCurrentPage(this.toolbarView.getCurrentPage() + 1);
             this.startLoading("Loading content ...", true);
             let event = new CustomEvent('onPage');
             this.customEventManager.dispatch(event);
         }
     }
     zoomOut(e) {
-        if (this.toolbarView.currentZoomIndex > 0) {
-            this.toolbarView.currentZoomIndex -= 1;
+        if (this.toolbarView.getCurrentZoomIndex() > 0) {
+            this.toolbarView.setCurrentZoomIndex(this.toolbarView.getCurrentZoomIndex() - 1);
             this.startLoading("Adjusting size ...", true);
             let event = new CustomEvent('onZoom');
             this.customEventManager.dispatch(event);
         }
     }
     zoomIn(e) {
-        if (this.toolbarView.currentZoomIndex < this.zoomLevels.length - 1) {
-            this.toolbarView.currentZoomIndex += 1;
+        if (this.toolbarView.getCurrentZoomIndex() < this.zoomLevels.length - 1) {
+            this.toolbarView.setCurrentZoomIndex(this.toolbarView.getCurrentZoomIndex() + 1);
             this.startLoading("Adjusting size ...", true);
             let event = new CustomEvent('onZoom');
             this.customEventManager.dispatch(event);

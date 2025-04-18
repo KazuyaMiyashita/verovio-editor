@@ -623,9 +623,9 @@ export class App {
         if (this.appReset) return;
 
         // Store zoom of each view
-        if (this.viewDocumentObj) this.options.documentZoom = this.viewDocumentObj.currentZoomIndex;
-        if (this.viewResponsiveObj) this.options.responsiveZoom = this.viewResponsiveObj.currentZoomIndex;
-        if (this.viewEditorObj) this.options.editorZoom = this.viewEditorObj.editorViewObj.currentZoomIndex;
+        if (this.viewDocumentObj) this.options.documentZoom = this.viewDocumentObj.getCurrentZoomIndex();
+        if (this.viewResponsiveObj) this.options.responsiveZoom = this.viewResponsiveObj.getCurrentZoomIndex();
+        if (this.viewEditorObj) this.options.editorZoom = this.viewEditorObj.editorViewObj.getCurrentZoomIndex();
         // Store current view
         if (this.view == this.viewDocumentObj) this.options.defaultView = 'document';
         else if (this.view == this.viewResponsiveObj) this.options.defaultView = 'responsive';
@@ -653,8 +653,8 @@ export class App {
     ////////////////////////////////////////////////////////////////////////
 
     prevPage(e: MouseEvent): void {
-        if (this.toolbarView.currentPage > 1) {
-            this.toolbarView.currentPage -= 1;
+        if (this.toolbarView.getCurrentPage() > 1) {
+            this.toolbarView.setCurrentPage(this.toolbarView.getCurrentPage() -  1);
             this.startLoading("Loading content ...", true);
             let event = new CustomEvent('onPage');
             this.customEventManager.dispatch(event);
@@ -662,8 +662,8 @@ export class App {
     }
 
     nextPage(e: MouseEvent): void {
-        if (this.toolbarView.currentPage < this.pageCount) {
-            this.toolbarView.currentPage += 1;
+        if (this.toolbarView.getCurrentPage() < this.pageCount) {
+            this.toolbarView.setCurrentPage(this.toolbarView.getCurrentPage() +  1);
             this.startLoading("Loading content ...", true);
             let event = new CustomEvent('onPage');
             this.customEventManager.dispatch(event);
@@ -671,8 +671,8 @@ export class App {
     }
 
     zoomOut(e: MouseEvent): void {
-        if (this.toolbarView.currentZoomIndex > 0) {
-            this.toolbarView.currentZoomIndex -= 1;
+        if (this.toolbarView.getCurrentZoomIndex() > 0) {
+            this.toolbarView.setCurrentZoomIndex(this.toolbarView.getCurrentZoomIndex() -  1);
             this.startLoading("Adjusting size ...", true);
             let event = new CustomEvent('onZoom');
             this.customEventManager.dispatch(event);
@@ -680,8 +680,8 @@ export class App {
     }
 
     zoomIn(e: MouseEvent): void {
-        if (this.toolbarView.currentZoomIndex < this.zoomLevels.length - 1) {
-            this.toolbarView.currentZoomIndex += 1;
+        if (this.toolbarView.getCurrentZoomIndex() < this.zoomLevels.length - 1) {
+            this.toolbarView.setCurrentZoomIndex(this.toolbarView.getCurrentZoomIndex() +  1);
             this.startLoading("Adjusting size ...", true);
             let event = new CustomEvent('onZoom');
             this.customEventManager.dispatch(event);

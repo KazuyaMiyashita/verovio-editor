@@ -10,8 +10,8 @@ import { VerovioWorkerProxy } from '../utils/worker-proxy.js';
 import { appendDivTo } from '../utils/functions.js';
 
 export class ResponsiveView extends VerovioView {
-    svgWrapper: HTMLDivElement;
-    midiIds: Array<number>;
+    protected svgWrapper: HTMLDivElement;
+    protected midiIds: Array<number>;
 
     constructor(div: HTMLDivElement, app: App, verovio: VerovioWorkerProxy) {
         super(div, app, verovio)
@@ -44,7 +44,7 @@ export class ResponsiveView extends VerovioView {
         this.app.endLoading(lightEndLoading);
     }
 
-    async updateActivate(): Promise<any> {
+    private async updateActivate(): Promise<any> {
         this.app.verovioOptions.adjustPageHeight = true;
         this.app.verovioOptions.breaks = 'auto';
         this.app.verovioOptions.footer = 'none';
@@ -61,7 +61,7 @@ export class ResponsiveView extends VerovioView {
         }
     }
 
-    async updateLoadData(mei: string, reload: boolean): Promise<any> {
+    private async updateLoadData(mei: string, reload: boolean): Promise<any> {
         if (reload) {
             mei = await this.verovio.getMEI({});
         }
@@ -70,7 +70,7 @@ export class ResponsiveView extends VerovioView {
         await this.updateResized();
     }
 
-    async updateResized(): Promise<any> {
+    private async updateResized(): Promise<any> {
         if (!(this instanceof EditorView)) {
             this.div.style.height = this.div.parentElement.style.height;
             this.div.style.width = this.div.parentElement.style.width;
@@ -100,7 +100,7 @@ export class ResponsiveView extends VerovioView {
         }
     }
 
-    async updateZoom(): Promise<any> {
+    private async updateZoom(): Promise<any> {
         await this.updateResized();
     }
 
@@ -108,14 +108,14 @@ export class ResponsiveView extends VerovioView {
     // Async worker methods
     ////////////////////////////////////////////////////////////////////////
 
-    async renderPage(lightEndLoading: boolean = false): Promise<any> {
+    public async renderPage(lightEndLoading: boolean = false): Promise<any> {
         const svg = await this.verovio.renderToSVG(this.currentPage);
         this.svgWrapper.innerHTML = svg;
 
         if (lightEndLoading) this.app.endLoading(true);
     }
 
-    async midiUpdate(time: number): Promise<any> {
+    public async midiUpdate(time: number): Promise<any> {
         //const animateStart = document.getElementById( "highlighting-start" );
 
         let vrvTime = time;
@@ -152,7 +152,7 @@ export class ResponsiveView extends VerovioView {
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
 
-    midiStop(): void {
+    public midiStop(): void {
         for (let i = 0, len = this.midiIds.length; i < len; i++) {
             let note = <SVGElement>this.svgWrapper.querySelector('#' + this.midiIds[i]);
             if (note) note.style.filter = "";
@@ -160,7 +160,7 @@ export class ResponsiveView extends VerovioView {
         this.midiIds = [];
     }
     
-    updateSVGDimensions(): void {
+    protected updateSVGDimensions(): void {
         this.svgWrapper.style.height = this.div.style.height;
         this.svgWrapper.style.width = this.div.style.width;
     }

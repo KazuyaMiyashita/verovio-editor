@@ -15,8 +15,9 @@ class Call {
     }
 }
 export class ActionManager {
-    constructor(view) {
+    constructor(view, app) {
         // EditorView object
+        this.app = app;
         this.editorViewObj = view;
         this.cursorPointer = view.cursorPointerObj;
         this.verovio = view.verovio;
@@ -50,9 +51,9 @@ export class ActionManager {
             yield this.editorViewObj.verovio.edit(editorAction);
             // WIP disable redo layout
             //await this.view.verovio.redoLayout();
-            this.editorViewObj.app.pageCount = yield this.editorViewObj.verovio.getPageCount();
-            if (this.editorViewObj.currentPage > this.editorViewObj.app.pageCount) {
-                this.editorViewObj.currentPage = this.editorViewObj.app.pageCount;
+            this.app.pageCount = yield this.verovio.getPageCount();
+            if (this.editorViewObj.getCurrentPage() > this.app.pageCount) {
+                this.editorViewObj.setCurrentPage(this.app.pageCount);
             }
             yield this.editorViewObj.renderPage(true);
             //this.view.updateMEI();

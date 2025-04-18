@@ -10,17 +10,16 @@ import { EventManager } from '../events/event-manager.js';
 import { VerovioWorkerProxy } from '../utils/worker-proxy.js';
 
 export class VerovioView extends GenericView {
-    app: App;
-    verovio: VerovioWorkerProxy;
-    eventManager: EventManager;
-    currentPage: number;
-    currentZoomIndex: number;
-    currentScale: number;
+    public readonly verovio: VerovioWorkerProxy;
+    protected readonly eventManager: EventManager;
+    protected currentPage: number;
+    protected currentZoomIndex: number;
+    protected currentScale: number;
 
-    boundMouseMove: { (event: MouseEvent): void };
-    boundMouseUp: { (event: MouseEvent): void };
-    boundKeyDown: { (event: KeyboardEvent): void };
-    boundResize: { (event: Event): void };
+    protected boundMouseMove: { (event: MouseEvent): void };
+    protected boundMouseUp: { (event: MouseEvent): void };
+    protected boundKeyDown: { (event: KeyboardEvent): void };
+    protected boundResize: { (event: Event): void };
 
     constructor(div: HTMLDivElement, app: App, verovio: VerovioWorkerProxy) {
         super(div, app);
@@ -38,11 +37,24 @@ export class VerovioView extends GenericView {
         this.currentScale = this.app.zoomLevels[this.currentZoomIndex];
     }
 
+    ///////////////////////////////////////////////////////////////////////
+    // Getters and setters
+    ////////////////////////////////////////////////////////////////////////
+
+    public getCurrentPage(): number { return this.currentPage; }
+    public setCurrentPage(value: number): void { this.currentPage = value; }
+
+    public getCurrentZoomIndex(): number { return this.currentZoomIndex; }
+    public setCurrentZoomIndex(value: number): void { this.currentZoomIndex = value; }
+
+    public getCurrentScale(): number { return this.currentScale; }
+    public setCurrentScale(value: number): void { this.currentScale = value; }
+
     ////////////////////////////////////////////////////////////////////////
     // Class-specific method
     ////////////////////////////////////////////////////////////////////////
 
-    parseAndScaleSVG(svgString: string, height: number, width: number): Node {
+    protected parseAndScaleSVG(svgString: string, height: number, width: number): Node {
         const parser = new DOMParser();
         const svg: XMLDocument = parser.parseFromString(svgString, "text/xml");
         svg.firstElementChild.setAttribute(`height`, `${height}px`);
@@ -51,7 +63,7 @@ export class VerovioView extends GenericView {
     }
 
     // Necessary for how ES6 "this" works inside events
-    bindListeners(): void {
+    private bindListeners(): void {
         this.boundKeyDown = (e: KeyboardEvent) => this.keyDownListener(e);
         this.boundMouseMove = (e: MouseEvent) => this.mouseMoveListener(e);
         this.boundMouseUp = (e: MouseEvent) => this.mouseUpListener(e);
@@ -118,7 +130,7 @@ export class VerovioView extends GenericView {
     // Async worker method
     ////////////////////////////////////////////////////////////////////////
 
-    async refreshView(update: VerovioView.Refresh, lightEndLoading: boolean = false, mei: string = "", reload: boolean = false): Promise<any> {
+    protected async refreshView(update: VerovioView.Refresh, lightEndLoading: boolean = false, mei: string = "", reload: boolean = false): Promise<any> {
         console.debug("View::updateView should be overwritten");
     }
 

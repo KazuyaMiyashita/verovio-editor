@@ -1,10 +1,11 @@
 /**
  * The ActionManager action class
  */
+import { App } from '../app.js';
 import { EditorCursorPointer } from '../editor/editor-cursor-pointer.js';
 import { EditorView } from '../editor/editor-view.js';
 import { EventManager } from './event-manager.js';
-import { WorkerProxy } from '../utils/worker-proxy.js'
+import { VerovioWorkerProxy } from '../utils/worker-proxy.js';
 
 class Call {
     method: Function;
@@ -17,15 +18,17 @@ class Call {
 }
 
 export class ActionManager {
+    protected readonly app: App;
     cursorPointer: EditorCursorPointer;
     delayedCalls: Call[];
     eventManager: EventManager;
     inProgress: boolean;
-    verovio: WorkerProxy;
+    verovio: VerovioWorkerProxy;
     editorViewObj: EditorView;
 
-    constructor(view: EditorView) {
+    constructor(view: EditorView, app: App) {
         // EditorView object
+        this.app = app;
         this.editorViewObj = view;
         this.cursorPointer = view.cursorPointerObj;
         this.verovio = view.verovio;
@@ -64,9 +67,9 @@ export class ActionManager {
 
         // WIP disable redo layout
         //await this.view.verovio.redoLayout();
-        this.editorViewObj.app.pageCount = await this.editorViewObj.verovio.getPageCount();
-        if (this.editorViewObj.currentPage > this.editorViewObj.app.pageCount) {
-            this.editorViewObj.currentPage = this.editorViewObj.app.pageCount
+        this.app.pageCount = await this.verovio.getPageCount();
+        if (this.editorViewObj.getCurrentPage() > this.app.pageCount) {
+            this.editorViewObj.setCurrentPage(this.app.pageCount);
         }
         await this.editorViewObj.renderPage(true);
 

@@ -183,10 +183,10 @@ export class AppToolbar extends Toolbar {
         }
     }
     updateAll() {
-        this.updateToolbarBtnEnabled(this.prevPage, (this.app.toolbarView.currentPage > 1));
-        this.updateToolbarBtnEnabled(this.nextPage, (this.app.toolbarView.currentPage < this.app.pageCount));
-        this.updateToolbarBtnEnabled(this.zoomOut, ((this.app.pageCount > 0) && (this.app.toolbarView.currentZoomIndex > 0)));
-        this.updateToolbarBtnEnabled(this.zoomIn, ((this.app.pageCount > 0) && (this.app.toolbarView.currentZoomIndex < this.app.zoomLevels.length - 1)));
+        this.updateToolbarBtnEnabled(this.prevPage, (this.app.toolbarView.getCurrentPage() > 1));
+        this.updateToolbarBtnEnabled(this.nextPage, (this.app.toolbarView.getCurrentPage() < this.app.pageCount));
+        this.updateToolbarBtnEnabled(this.zoomOut, ((this.app.pageCount > 0) && (this.app.toolbarView.getCurrentZoomIndex() > 0)));
+        this.updateToolbarBtnEnabled(this.zoomIn, ((this.app.pageCount > 0) && (this.app.toolbarView.getCurrentZoomIndex() < this.app.zoomLevels.length - 1)));
         let isResponsive = ((this.app.view instanceof ResponsiveView) && !(this.app.view instanceof EditorPanel));
         let isEditor = (this.app.view instanceof EditorPanel);
         let isDocument = (this.app.view instanceof DocumentView);

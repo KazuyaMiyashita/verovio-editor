@@ -36,8 +36,19 @@ export class EditorView extends ResponsiveView {
         // For note playback
         this.lastNote = { midiPitch: 0, oct: "", pname: "" };
         // EditorAction
-        this.actionManager = new ActionManager(this);
+        this.actionManager = new ActionManager(this, app);
         this.selectedItems = [];
+    }
+    ////////////////////////////////////////////////////////////////////////
+    // Class-specific methods
+    ////////////////////////////////////////////////////////////////////////
+    initCursor() {
+        const svgRoot = this.svgWrapper.querySelector('svg');
+        if (!svgRoot)
+            return;
+        const top = this.div.getBoundingClientRect().top;
+        const left = this.div.getBoundingClientRect().left;
+        this.cursorPointerObj.init(svgRoot, top, left);
     }
     ////////////////////////////////////////////////////////////////////////
     // Overriding methods
@@ -48,14 +59,6 @@ export class EditorView extends ResponsiveView {
             this.svgOverlay.style.height = this.svgWrapper.style.height;
             this.svgOverlay.style.width = this.svgWrapper.style.width;
         }
-    }
-    initCursor() {
-        const svgRoot = this.svgWrapper.querySelector('svg');
-        if (!svgRoot)
-            return;
-        const top = this.div.getBoundingClientRect().top;
-        const left = this.div.getBoundingClientRect().left;
-        this.cursorPointerObj.init(svgRoot, top, left);
     }
     ////////////////////////////////////////////////////////////////////////
     // Async worker methods
