@@ -43,12 +43,12 @@ export class MidiPlayer {
     // Public method to be called by the user
     ////////////////////////////////////////////////////////////////////////
 
-    playFile(midiFile: string): void {
+    public playFile(midiFile: string): void {
         this.midiPlayerElement.setAttribute('src', midiFile);
         // play called by html-midi-player callback
     }
 
-    play(): void {
+    public play(): void {
         this.midiPlayerElement.start();
 
         // html-midi-player time is in seconds
@@ -64,7 +64,7 @@ export class MidiPlayer {
         this.midiToolbar.updateAll();
     }
 
-    stop(): void {
+    public stop(): void {
         this.currentTime = 0;
         this.currentTimeStr = "0.00";
         this.totalTime = 0;
@@ -80,7 +80,7 @@ export class MidiPlayer {
         if (this.view) this.view.midiStop();
     }
 
-    pause(): void {
+    public pause(): void {
         this.midiPlayerElement.stop();
         this.stopTimer();
 
@@ -91,7 +91,7 @@ export class MidiPlayer {
         if (this.view) this.view.midiStop();
     }
 
-    seekToPercent(percent: number): void {
+    public seekToPercent(percent: number): void {
         if (!this.midiPlayerElement.playing) return;
 
         let seekTime = this.totalTime * percent;

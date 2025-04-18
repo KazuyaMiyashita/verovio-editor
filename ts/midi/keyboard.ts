@@ -8,20 +8,20 @@ import { appendDivTo, appendMidiPlayerTo, MidiPlayerElement } from '../utils/fun
 import { midiScale } from './midi-scale.js'
 
 export class Keyboard {
-    app: App;
-    eventManager: EventManager;
-    div: HTMLDivElement;
-    octaves: HTMLDivElement;
-    octaveNumbers: number[];
-    letters: string[];
-    keyboardWrapper: HTMLDivElement;
-    keys: HTMLDivElement;
-    currentOctave: number;
-    note: HTMLAudioElement;
-    midiPlayerElement: MidiPlayerElement;
+    protected app: App;
+    protected eventManager: EventManager;
+    protected div: HTMLDivElement;
+    protected octaves: HTMLDivElement;
+    protected octaveNumbers: number[];
+    protected letters: string[];
+    protected keyboardWrapper: HTMLDivElement;
+    protected keys: HTMLDivElement;
+    protected currentOctave: number;
+    protected note: HTMLAudioElement;
+    protected midiPlayerElement: MidiPlayerElement;
 
-    boundKeyUp: { (event: KeyboardEvent): void };
-    boundKeyDown: { (event: KeyboardEvent): void };
+    private boundKeyUp: { (event: KeyboardEvent): void };
+    private boundKeyDown: { (event: KeyboardEvent): void };
 
     constructor(div: HTMLDivElement, app: App) {
         let iconsLeft = `${app.host}/icons/keyboard/left.png`;
@@ -104,24 +104,24 @@ export class Keyboard {
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
 
-    bindListeners(): void {
+    private bindListeners(): void {
         this.boundKeyDown = (e: KeyboardEvent) => this.keyDownListener(e);
         this.boundKeyUp = (e: KeyboardEvent) => this.keyUpListener(e);
     }
     
-    activateLower() {
+    private activateLower() {
         if (this.currentOctave <= 1) return;
         this.currentOctave--;
         this.activate();
     }
 
-    activateHigher() {
+    private activateHigher() {
         if (this.currentOctave >= this.octaveNumbers.length) return;
         this.currentOctave++;
         this.activate();
     }
 
-    activate() {
+    private activate() {
         this.keys.querySelectorAll('.vrv-keyboard-key').forEach(element => element.classList.remove('selected'));
         this.octaves.querySelectorAll('.vrv-keyboard-octave').forEach(element => element.classList.remove('selected'));
 
@@ -200,8 +200,4 @@ export class Keyboard {
         document.removeEventListener('keydown', this.boundKeyDown);
         document.removeEventListener('keyup', this.boundKeyUp);
     }
-}
-
-class Octave {
-
 }

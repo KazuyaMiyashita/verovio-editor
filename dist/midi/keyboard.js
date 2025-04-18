@@ -167,6 +167,4 @@ export class Keyboard {
         document.removeEventListener('keyup', this.boundKeyUp);
     }
 }
-class Octave {
-}
 //# sourceMappingURL=keyboard.js.map
