@@ -98,7 +98,7 @@ export class EditorPanel extends GenericView {
 
         this.tabGroupObj.select(tabContentObj.tabId);
 
-        this.contentPanel = appendDivTo(tabContentObj.div, { class: `vrv-tab-content-panel` });
+        this.contentPanel = appendDivTo(tabContentObj.getDiv(), { class: `vrv-tab-content-panel` });
         this.contentPanelObj = new EditorContentPanel(this.contentPanel, this.app, tabContentObj);
         tabContentObj.customEventManager.addToPropagationList(this.contentPanelObj.customEventManager);
 

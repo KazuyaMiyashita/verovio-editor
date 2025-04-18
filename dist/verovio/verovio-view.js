@@ -30,15 +30,6 @@ export class VerovioView extends GenericView {
     ////////////////////////////////////////////////////////////////////////
     // Class-specific method
     ////////////////////////////////////////////////////////////////////////
-    // Called to unsubscribe from all events. Probably a good idea to call this if the object is deleted.
-    destroy() {
-        this.eventManager.unbindAll();
-        document.removeEventListener('mousemove', this.boundMouseMove);
-        document.removeEventListener('mouseup', this.boundMouseUp);
-        document.removeEventListener('touchmove', this.boundMouseMove);
-        document.removeEventListener('touchend', this.boundMouseUp);
-        super.destroy();
-    }
     parseAndScaleSVG(svgString, height, width) {
         const parser = new DOMParser();
         const svg = parser.parseFromString(svgString, "text/xml");
@@ -52,6 +43,18 @@ export class VerovioView extends GenericView {
         this.boundMouseMove = (e) => this.mouseMoveListener(e);
         this.boundMouseUp = (e) => this.mouseUpListener(e);
         this.boundResize = (e) => this.resizeComponents(e);
+    }
+    ////////////////////////////////////////////////////////////////////////
+    // Overriding methods
+    ////////////////////////////////////////////////////////////////////////
+    destroy() {
+        // Called to unsubscribe from all events. Probably a good idea to call this if the object is deleted.
+        this.eventManager.unbindAll();
+        document.removeEventListener('mousemove', this.boundMouseMove);
+        document.removeEventListener('mouseup', this.boundMouseUp);
+        document.removeEventListener('touchmove', this.boundMouseMove);
+        document.removeEventListener('touchend', this.boundMouseUp);
+        super.destroy();
     }
     ////////////////////////////////////////////////////////////////////////
     // Custom event methods

@@ -9,11 +9,13 @@ import { CustomEventManager } from '../events/custom-event-manager.js';
 import { randomHex } from '../utils/functions.js';
 
 export class GenericView {
-    app: App;
-    div: HTMLDivElement;
-    id: string;
-    active: boolean;
-    customEventManager: CustomEventManager;
+    public readonly customEventManager: CustomEventManager;
+
+    protected readonly app: App;
+    protected readonly div: HTMLDivElement;
+    protected readonly id: string;
+
+    protected active: boolean;
     private display: string;
 
     constructor(div: HTMLDivElement, app: App) {
@@ -34,25 +36,31 @@ export class GenericView {
         this.customEventManager.bind(this, 'onActivate', this.onActivate);
         this.customEventManager.bind(this, 'onCursorActivity', this.onCursorActivity);
         this.customEventManager.bind(this, 'onDeactivate', this.onDeactivate);
+        this.customEventManager.bind(this, 'onEditData', this.onEditData);
         this.customEventManager.bind(this, 'onEndLoading', this.onEndLoading);
+        this.customEventManager.bind(this, 'onLoadData', this.onLoadData);
         this.customEventManager.bind(this, 'onPage', this.onPage);
         this.customEventManager.bind(this, 'onResized', this.onResized);
         this.customEventManager.bind(this, 'onSelect', this.onSelect);
         this.customEventManager.bind(this, 'onStartLoading', this.onStartLoading);
-        this.customEventManager.bind(this, 'onLoadData', this.onLoadData);
-        this.customEventManager.bind(this, 'onEditData', this.onEditData);
         this.customEventManager.bind(this, 'onZoom', this.onZoom);
     }
+
+    ////////////////////////////////////////////////////////////////////////
+    // Getters and setters
+    ////////////////////////////////////////////////////////////////////////
+
+    public getDiv(): HTMLDivElement { return this.div; }
 
     ////////////////////////////////////////////////////////////////////////
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
 
-    destroy(): void {
+    protected destroy(): void {
         // Nothing at this level
     }
 
-    setDisplayFlex(): void { this.display = 'flex';  }
+    protected setDisplayFlex(): void { this.display = 'flex';  }
 
     ////////////////////////////////////////////////////////////////////////
     // Custom event methods

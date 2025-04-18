@@ -7,7 +7,7 @@ function buildTree(nodeData) {
     const { id = null, element, attributes = {}, children = [], isTextNode = false, isLeaf = false } = nodeData;
     const node = new TreeNode(id, element, attributes, [], isTextNode, isLeaf);
     if (Array.isArray(children)) {
-        node.children = children.map(buildTree);
+        node.setChildren(children.map(buildTree));
     }
     return node;
 }
@@ -18,6 +18,11 @@ export class GenericTree extends GenericView {
         this.hideRoot = false;
         this.setDisplayFlex();
     }
+    ////////////////////////////////////////////////////////////////////////
+    // Getters and setters
+    ////////////////////////////////////////////////////////////////////////
+    getHideRoot() { return this.hideRoot; }
+    setHideRoot(hideRoot) { this.hideRoot = hideRoot; }
     ////////////////////////////////////////////////////////////////////////
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
@@ -32,10 +37,10 @@ export class GenericTree extends GenericView {
     collapseNode(id) {
         this.traverse((node) => {
             if (node.id === id) {
-                if (!node.div.classList.contains("open"))
+                if (!node.getDiv().classList.contains("open"))
                     return true;
-                node.div.classList.toggle("open");
-                const children = node.div.querySelector('.vrv-node-children');
+                node.getDiv().classList.toggle("open");
+                const children = node.getDiv().querySelector('.vrv-node-children');
                 if (children)
                     children.remove();
                 return true;
@@ -56,7 +61,7 @@ export class GenericTree extends GenericView {
             if (callback(node)) {
                 return true; // Stop if callback says so
             }
-            for (const child of node.children) {
+            for (const child of node.getChildren()) {
                 if (visit(child))
                     return true;
             }
@@ -86,6 +91,13 @@ export class TreeNode {
         this.isTextNode = isTextNode;
         this.isLeaf = isLeaf;
     }
+    ////////////////////////////////////////////////////////////////////////
+    // Getters and setters
+    ////////////////////////////////////////////////////////////////////////
+    getDiv() { return this.div; }
+    getLabel() { return this.label; }
+    getChildren() { return this.children; }
+    setChildren(children) { this.children = children; }
     ////////////////////////////////////////////////////////////////////////
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////

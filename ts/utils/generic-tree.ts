@@ -22,16 +22,18 @@ function buildTree(nodeData: any): TreeNode {
 
     const node = new TreeNode(id, element, attributes, [], isTextNode, isLeaf);
     if (Array.isArray(children)) {
-        node.children = children.map(buildTree);
+        node.setChildren(children.map(buildTree));
     }
     return node;
 }
 
 export class GenericTree extends GenericView {
-    root: TreeNode | null;
-    rootElement: HTMLDivElement;
-    hideRoot: boolean;
-    eventManager: EventManager;
+    public readonly eventManager: EventManager;
+
+    protected root: TreeNode | null;
+    protected hideRoot: boolean;
+
+    private rootElement: HTMLDivElement;
 
     constructor(div: HTMLDivElement, app: App) {
         super(div, app);
@@ -40,6 +42,13 @@ export class GenericTree extends GenericView {
         this.hideRoot = false;
         this.setDisplayFlex();
     }
+
+    ////////////////////////////////////////////////////////////////////////
+    // Getters and setters
+    ////////////////////////////////////////////////////////////////////////
+
+    public getHideRoot(): boolean { return this.hideRoot; }
+    public setHideRoot(hideRoot: boolean): void { this.hideRoot = hideRoot; }
 
     ////////////////////////////////////////////////////////////////////////
     // Class-specific methods
@@ -57,9 +66,9 @@ export class GenericTree extends GenericView {
     protected collapseNode(id: string) {
         this.traverse((node) => {
             if (node.id === id) {
-                if (!node.div.classList.contains("open")) return true;
-                node.div.classList.toggle("open");
-                const children = node.div.querySelector('.vrv-node-children');
+                if (!node.getDiv().classList.contains("open")) return true;
+                node.getDiv().classList.toggle("open");
+                const children = node.getDiv().querySelector('.vrv-node-children');
                 if (children) children.remove();
                 return true;
             }
@@ -81,7 +90,7 @@ export class GenericTree extends GenericView {
             if (callback(node)) {
                 return true; // Stop if callback says so
             }
-            for (const child of node.children) {
+            for (const child of node.getChildren()) {
                 if (visit(child)) return true;
             }
             return false;
@@ -107,14 +116,16 @@ export class GenericTree extends GenericView {
 }
 
 export class TreeNode {
-    div: HTMLDivElement;
-    label: HTMLDivElement;
-    id: string | null; // xml:id
-    element: string; // tag name
-    attributes: Record<string, string>;
-    children: TreeNode[];
-    isTextNode: boolean; // flag for text nodes
-    isLeaf: boolean;
+    public readonly id: string | null; // xml:id
+    public readonly element: string; // tag name
+    public readonly attributes: Record<string, string>;
+
+    public readonly isTextNode: boolean; // flag for text nodes
+    public readonly isLeaf: boolean;
+
+    private div: HTMLDivElement;
+    private label: HTMLDivElement;
+    private children: TreeNode[];
 
     constructor(
         id: string | null,
@@ -133,15 +144,26 @@ export class TreeNode {
     }
 
     ////////////////////////////////////////////////////////////////////////
+    // Getters and setters
+    ////////////////////////////////////////////////////////////////////////
+
+    public getDiv(): HTMLDivElement { return this.div; }
+    
+    public getLabel(): HTMLDivElement { return this.label; }
+    
+    public getChildren(): TreeNode[] { return this.children; }
+    public setChildren(children: TreeNode[]) { this.children = children;  }
+
+    ////////////////////////////////////////////////////////////////////////
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
 
-    reset(): void {
+    public reset(): void {
         this.children.forEach(child => child.reset());
         this.div.innerHTML = "";
     }
 
-    html(div: HTMLDivElement, tree: GenericTree, hideLabel: boolean = false) {
+    public html(div: HTMLDivElement, tree: GenericTree, hideLabel: boolean = false) {
         this.div = div;
         if (this.isLeaf) this.div.classList.add("leaf");
         if (this.children.length > 0) this.div.classList.add("open");

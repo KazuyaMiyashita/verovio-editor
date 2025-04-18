@@ -40,7 +40,7 @@ export class EditorPanel extends GenericView {
         let tabSectionsObj = this.tabGroupObj.addTab("Sections");
         let tabContentObj = this.tabGroupObj.addTab("Content");
         this.tabGroupObj.select(tabContentObj.tabId);
-        this.contentPanel = appendDivTo(tabContentObj.div, { class: `vrv-tab-content-panel` });
+        this.contentPanel = appendDivTo(tabContentObj.getDiv(), { class: `vrv-tab-content-panel` });
         this.contentPanelObj = new EditorContentPanel(this.contentPanel, this.app, tabContentObj);
         tabContentObj.customEventManager.addToPropagationList(this.contentPanelObj.customEventManager);
         this.vSplit = appendDivTo(this.hSplit, { class: `vrv-v-split` });

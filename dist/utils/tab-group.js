@@ -21,7 +21,7 @@ export class TabGroup extends GenericView {
     ////////////////////////////////////////////////////////////////////////
     addTab(label) {
         let content = appendDivTo(this.div, { class: `vrv-tab-content` });
-        let tab = new Tab(content, this, label);
+        let tab = new Tab(content, this.app, this, label);
         // Select the first one by default
         if (this.tabs.length === 0) {
             this.selectedTab = tab;
@@ -93,8 +93,8 @@ export class TabGroup extends GenericView {
     }
 }
 export class Tab extends GenericView {
-    constructor(div, tabGroup, label) {
-        super(div, tabGroup.app);
+    constructor(div, app, tabGroup, label) {
+        super(div, app);
         this.tabGroupObj = tabGroup;
         this.tabId = randomHex(16);
         this.tabSelector = appendDivTo(tabGroup.tabSelectors, { class: `vrv-tab-selector`, dataset: { tab: `${this.tabId}` } });

@@ -46,20 +46,20 @@ export class EditorContentTree extends GenericTree {
         this.eventManager.bind(crumb, 'mouseout', this.onMouseout);
     }
     selectNode(node) {
-        node.label.classList.add("target");
-        node.label.classList.add("checked");
-        const parentRect = this.root.div.getBoundingClientRect();
-        const childRect = node.div.getBoundingClientRect();
+        node.getLabel().classList.add("target");
+        node.getLabel().classList.add("checked");
+        const parentRect = this.root.getDiv().getBoundingClientRect();
+        const childRect = node.getDiv().getBoundingClientRect();
         // Calculate offset of the node relative to root
-        const offsetTop = childRect.top - parentRect.top + this.root.div.scrollTop;
+        const offsetTop = childRect.top - parentRect.top + this.root.getDiv().scrollTop;
         // arbitrary margin
-        this.root.div.scrollTo({ top: offsetTop - 50 });
+        this.root.getDiv().scrollTo({ top: offsetTop - 50 });
     }
     loadContext(context, ancestors, target) {
         this.reset();
         this.fromJson(context);
         this.traverse((node) => {
-            node.label.style.backgroundImage = `url(${App.iconFor(node.element)})`;
+            node.getLabel().style.backgroundImage = `url(${App.iconFor(node.element)})`;
             if (node.id === target['id']) {
                 this.selectNode(node);
             }
