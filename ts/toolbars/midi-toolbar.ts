@@ -9,22 +9,21 @@ import { Toolbar } from './toolbar.js';
 import { appendDivTo } from '../utils/functions.js';
 
 export class MidiToolbar extends Toolbar {
-    midiPlayer: MidiPlayer;
-    playing: boolean;
-    pausing: boolean;
-    pageDragStart: number;
-    barDragStart: number;
-    barWidth: number;
+    private readonly midiControls: HTMLDivElement;
+    private readonly play: HTMLDivElement;
+    private readonly pause: HTMLDivElement;
+    private readonly stop: HTMLDivElement;
+    private readonly progressControl: HTMLDivElement;
+    private readonly midiCurrentTime: HTMLDivElement;
+    private readonly midiBar: HTMLDivElement;
+    private readonly midiBarPercent: HTMLDivElement;
+    private readonly midiTotalTime: HTMLDivElement;
 
-    midiControls: HTMLDivElement;
-    play: HTMLDivElement;
-    pause: HTMLDivElement;
-    stop: HTMLDivElement;
-    progressControl: HTMLDivElement;
-    midiCurrentTime: HTMLDivElement;
-    midiBar: HTMLDivElement;
-    midiBarPercent: HTMLDivElement;
-    midiTotalTime: HTMLDivElement;
+    private midiPlayer: MidiPlayer;
+
+    private pageDragStart: number;
+    private barDragStart: number;
+    private barWidth: number;
 
     constructor(div: HTMLDivElement, app: App) {
         let iconsPlay = `${app.host}/icons/toolbar/play.png`;
@@ -37,16 +36,13 @@ export class MidiToolbar extends Toolbar {
 
         this.active = true;
 
-        this.pausing = false;
-        this.playing = false;
-
         this.pageDragStart = 0;
         this.barDragStart = 0;
         // set in the css in .vrv-midi-bar via $midi-bar-width
         this.barWidth = 200;
 
         // sub-toolbar in application 
-        this.midiControls = appendDivTo(this.app.toolbarObj.midiPlayerSubToolbar, { class: `vrv-btn-group` });
+        this.midiControls = appendDivTo(this.app.toolbarObj.getMidiPlayerSubToolbar(), { class: `vrv-btn-group` });
         appendDivTo(this.midiControls, { class: `vrv-h-separator` });
 
         this.play = appendDivTo(this.midiControls, { class: `vrv-btn-icon-large`, style: { backgroundImage: `url(${iconsPlay})` } });
@@ -77,28 +73,25 @@ export class MidiToolbar extends Toolbar {
         this.updateToolbarGrp(this.progressControl, false);
     }
 
+
+    ////////////////////////////////////////////////////////////////////////
+    // Getter and setters
+    ////////////////////////////////////////////////////////////////////////
+
+    public setMidiPlayer(midiPlayer: MidiPlayer): void { this.midiPlayer = midiPlayer; }
+
     ////////////////////////////////////////////////////////////////////////
     // Class specific methods
     ////////////////////////////////////////////////////////////////////////
 
-    updateAll(): void {
-        this.updateProgressBar();
-
-        this.updateToolbarGrp(this.midiControls, (this.app.pageCount > 0));
-        this.updateToolbarBtnDisplay(this.play, !this.playing || this.pausing);
-        this.updateToolbarBtnDisplay(this.pause, !this.pausing && this.playing);
-        this.updateToolbarBtnDisplay(this.stop, this.playing || this.pausing);
-        this.updateToolbarGrp(this.progressControl, this.playing || this.pausing);
-    }
-
-    updateProgressBar(): void {
-        this.midiTotalTime.innerHTML = this.midiPlayer.totalTimeStr;
-        this.midiCurrentTime.innerHTML = this.midiPlayer.currentTimeStr;
-        let percent = (this.midiPlayer.totalTime) ? (this.midiPlayer.currentTime / this.midiPlayer.totalTime * 100) : 0;
+    public updateProgressBar(): void {
+        this.midiTotalTime.innerHTML = this.midiPlayer.getTotalTimeStr();
+        this.midiCurrentTime.innerHTML = this.midiPlayer.getCurrentTimeStr();
+        let percent = (this.midiPlayer.getTotalTime()) ? (this.midiPlayer.getCurrentTime() / this.midiPlayer.getTotalTime() * 100) : 0;
         this.midiBarPercent.style.width = `${percent}%`;
     }
 
-    updateDragging(pageX: number): void {
+    private updateDragging(pageX: number): void {
         let posX = this.barDragStart + (pageX - this.pageDragStart);
         if (posX >= 0 && posX <= this.barWidth) {
             let percent = posX / this.barWidth;
@@ -106,12 +99,22 @@ export class MidiToolbar extends Toolbar {
         }
     }
 
+    private updateAll(): void {
+        this.updateProgressBar();
+
+        this.updateToolbarGrp(this.midiControls, (this.app.pageCount > 0));
+        this.updateToolbarBtnDisplay(this.play, !this.midiPlayer.isPlaying() || this.midiPlayer.isPausing());
+        this.updateToolbarBtnDisplay(this.pause, !this.midiPlayer.isPausing() && this.midiPlayer.isPlaying());
+        this.updateToolbarBtnDisplay(this.stop, this.midiPlayer.isPlaying() || this.midiPlayer.isPausing());
+        this.updateToolbarGrp(this.progressControl, this.midiPlayer.isPlaying() || this.midiPlayer.isPausing());
+    }
+
     ////////////////////////////////////////////////////////////////////////
     // Public method to be called by the user
     ////////////////////////////////////////////////////////////////////////
 
     onPlay(e: MouseEvent): void {
-        if (this.pausing) {
+        if (this.midiPlayer.isPausing()) {
             this.midiPlayer.play();
         }
         else {
@@ -128,7 +131,7 @@ export class MidiToolbar extends Toolbar {
     }
 
     onProgressBarDown(e: MouseEvent): void {
-        if (this.midiPlayer.totalTime === 0) return;
+        if (this.midiPlayer.getTotalTime() === 0) return;
 
         this.pageDragStart = e.pageX;
         this.barDragStart = e.offsetX;
@@ -144,7 +147,7 @@ export class MidiToolbar extends Toolbar {
 
     onProgressBarUp(e: MouseEvent): void {
         if (this.pageDragStart === 0) return;
-        if (this.midiPlayer.totalTime === 0) return;
+        if (this.midiPlayer.getTotalTime() === 0) return;
         this.pageDragStart = 0;
         this.midiPlayer.play();
     }
@@ -156,6 +159,15 @@ export class MidiToolbar extends Toolbar {
     override onActivate(e: CustomEvent): boolean {
         if (!super.onActivate(e)) return false;
         //console.debug("MidiToolbar::onActivate");
+
+        this.updateAll();
+
+        return true;
+    }
+
+    override onEditData(e: CustomEvent): boolean {
+        if (!super.onEditData(e)) return false;
+        //console.debug("MidiToolbar::onEditData");
 
         this.updateAll();
 

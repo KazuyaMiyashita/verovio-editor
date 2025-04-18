@@ -166,8 +166,22 @@ export class AppToolbar extends Toolbar {
         }
     }
     ////////////////////////////////////////////////////////////////////////
+    // Getters and setters
+    ////////////////////////////////////////////////////////////////////////
+    getMidiPlayerSubToolbar() { return this.midiPlayerSubToolbar; }
+    ////////////////////////////////////////////////////////////////////////
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
+    updateRecent() {
+        this.subSubMenu.innerHTML = "";
+        let fileList = this.app.fileStack.fileList();
+        for (let i = 0; i < fileList.length; i++) {
+            const entry = appendDivTo(this.subSubMenu, { class: `vrv-menu-text`, 'data-before': fileList[i].filename });
+            entry.dataset.idx = fileList[i].idx.toString();
+            this.app.eventManager.bind(entry, 'click', this.app.fileLoadRecent);
+            this.eventManager.bind(entry, 'click', this.onClick);
+        }
+    }
     updateAll() {
         this.updateToolbarBtnEnabled(this.prevPage, (this.app.toolbarView.currentPage > 1));
         this.updateToolbarBtnEnabled(this.nextPage, (this.app.toolbarView.currentPage < this.app.pageCount));
@@ -191,16 +205,6 @@ export class AppToolbar extends Toolbar {
             this.login.classList.add("inactivated");
         }
         this.updateRecent();
-    }
-    updateRecent() {
-        this.subSubMenu.innerHTML = "";
-        let fileList = this.app.fileStack.fileList();
-        for (let i = 0; i < fileList.length; i++) {
-            const entry = appendDivTo(this.subSubMenu, { class: `vrv-menu-text`, 'data-before': fileList[i].filename });
-            entry.dataset.idx = fileList[i].idx.toString();
-            this.app.eventManager.bind(entry, 'click', this.app.fileLoadRecent);
-            this.eventManager.bind(entry, 'click', this.onClick);
-        }
     }
     ////////////////////////////////////////////////////////////////////////
     // Mouse methods

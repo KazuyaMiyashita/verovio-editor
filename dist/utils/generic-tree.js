@@ -15,14 +15,14 @@ export class GenericTree extends GenericView {
     constructor(div, app) {
         super(div, app);
         this.root = null;
-        this.hideRoot = false;
+        this.hiddenRoot = false;
         this.setDisplayFlex();
     }
     ////////////////////////////////////////////////////////////////////////
     // Getters and setters
     ////////////////////////////////////////////////////////////////////////
-    getHideRoot() { return this.hideRoot; }
-    setHideRoot(hideRoot) { this.hideRoot = hideRoot; }
+    hasHiddenRoot() { return this.hiddenRoot; }
+    setHiddenRoot(hiddenRoot) { this.hiddenRoot = hiddenRoot; }
     ////////////////////////////////////////////////////////////////////////
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
@@ -53,7 +53,7 @@ export class GenericTree extends GenericView {
             throw new Error("Invalid JSON data: Missing 'element' property");
         this.root = buildTree(json);
         this.rootElement = appendDivTo(this.div, { class: `vrv-tree-root` });
-        this.root.html(this.rootElement, this, this.hideRoot);
+        this.root.html(this.rootElement, this, this.hiddenRoot);
     }
     // Generic depth-first traversal method
     traverse(callback) {

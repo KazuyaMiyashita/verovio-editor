@@ -83,7 +83,7 @@ export class Keyboard {
     // Async worker methods
     ////////////////////////////////////////////////////////////////////////
 
-    async playNoteSound(midi: string): Promise<any> {
+    private async playNoteSound(midi: string): Promise<any> {
 
         let midiNum: number = Number(midi);
 

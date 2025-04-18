@@ -13,42 +13,41 @@ import { Toolbar } from './toolbar.js';
 import { appendDivTo } from '../utils/functions.js';
 
 export class AppToolbar extends Toolbar {
-    viewDocument: HTMLDivElement;
-    viewResponsive: HTMLDivElement;
-    viewSelector: HTMLDivElement;
-    viewEditor: HTMLDivElement;
-    div: HTMLDivElement;
+    private readonly viewDocument: HTMLDivElement;
+    private readonly viewResponsive: HTMLDivElement;
+    private readonly viewSelector: HTMLDivElement;
+    private readonly viewEditor: HTMLDivElement;
 
-    subSubMenu: HTMLDivElement;
+    private readonly subSubMenu: HTMLDivElement;
 
-    editorSubToolbar: HTMLDivElement;
-    midiPlayerSubToolbar: HTMLDivElement;
-    pageControls: HTMLDivElement;
-    nextPage: HTMLDivElement;
-    prevPage: HTMLDivElement;
+    private readonly editorSubToolbar: HTMLDivElement;
+    private readonly midiPlayerSubToolbar: HTMLDivElement;
+    private readonly pageControls: HTMLDivElement;
+    private readonly nextPage: HTMLDivElement;
+    private readonly prevPage: HTMLDivElement;
 
-    fileImportMusicXML: HTMLDivElement;
-    fileImport: HTMLDivElement;
-    fileMenuBtn: HTMLDivElement;
-    fileRecent: HTMLDivElement;
-    fileSelection: HTMLDivElement;
+    private readonly fileImportMusicXML: HTMLDivElement;
+    private readonly fileImport: HTMLDivElement;
+    private readonly fileMenuBtn: HTMLDivElement;
+    private readonly fileRecent: HTMLDivElement;
+    private readonly fileSelection: HTMLDivElement;
 
-    zoomControls: HTMLDivElement;
-    zoomIn: HTMLDivElement;
-    zoomOut: HTMLDivElement;
+    private readonly zoomControls: HTMLDivElement;
+    private readonly zoomIn: HTMLDivElement;
+    private readonly zoomOut: HTMLDivElement;
 
-    settingsEditor: HTMLDivElement;
-    settingsVerovio: HTMLDivElement;
+    private readonly settingsEditor: HTMLDivElement;
+    private readonly settingsVerovio: HTMLDivElement;
 
-    helpReset: HTMLDivElement;
-    helpAbout: HTMLDivElement;
+    private readonly helpReset: HTMLDivElement;
+    private readonly helpAbout: HTMLDivElement;
 
-    loginGroup: HTMLDivElement;
-    login: HTMLDivElement;
-    logout: HTMLDivElement;
-    githubMenu: HTMLDivElement;
-    githubImport: HTMLDivElement;
-    githubExport: HTMLDivElement;
+    private readonly loginGroup: HTMLDivElement;
+    private readonly login: HTMLDivElement;
+    private readonly logout: HTMLDivElement;
+    private readonly githubMenu: HTMLDivElement;
+    private readonly githubImport: HTMLDivElement;
+    private readonly githubExport: HTMLDivElement;
 
     constructor(div: HTMLDivElement, app: App) {
         super(div, app);
@@ -256,10 +255,28 @@ export class AppToolbar extends Toolbar {
     }
 
     ////////////////////////////////////////////////////////////////////////
+    // Getters and setters
+    ////////////////////////////////////////////////////////////////////////
+
+    public getMidiPlayerSubToolbar(): HTMLDivElement { return this.midiPlayerSubToolbar;  }
+
+    ////////////////////////////////////////////////////////////////////////
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
 
-    updateAll(): void {
+    public updateRecent(): void {
+        this.subSubMenu.innerHTML = "";
+
+        let fileList: Array<{ idx: number, filename: string }> = this.app.fileStack.fileList();
+        for (let i = 0; i < fileList.length; i++) {
+            const entry = appendDivTo(this.subSubMenu, { class: `vrv-menu-text`, 'data-before': fileList[i].filename });
+            entry.dataset.idx = fileList[i].idx.toString();
+            this.app.eventManager.bind(entry, 'click', this.app.fileLoadRecent);
+            this.eventManager.bind(entry, 'click', this.onClick);
+        }
+    }
+
+    private updateAll(): void {
         this.updateToolbarBtnEnabled(this.prevPage, (this.app.toolbarView.currentPage > 1));
         this.updateToolbarBtnEnabled(this.nextPage, (this.app.toolbarView.currentPage < this.app.pageCount));
         this.updateToolbarBtnEnabled(this.zoomOut, ((this.app.pageCount > 0) && (this.app.toolbarView.currentZoomIndex > 0)));
@@ -290,18 +307,6 @@ export class AppToolbar extends Toolbar {
         }
 
         this.updateRecent();
-    }
-
-    updateRecent(): void {
-        this.subSubMenu.innerHTML = "";
-
-        let fileList: Array<{ idx: number, filename: string }> = this.app.fileStack.fileList();
-        for (let i = 0; i < fileList.length; i++) {
-            const entry = appendDivTo(this.subSubMenu, { class: `vrv-menu-text`, 'data-before': fileList[i].filename });
-            entry.dataset.idx = fileList[i].idx.toString();
-            this.app.eventManager.bind(entry, 'click', this.app.fileLoadRecent);
-            this.eventManager.bind(entry, 'click', this.onClick);
-        }
     }
 
     ////////////////////////////////////////////////////////////////////////

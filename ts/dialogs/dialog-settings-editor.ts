@@ -1,5 +1,5 @@
 /**
- * The DialogSettinsEditor class for the editor settings.
+ * The DialogSettingsEditor class for the editor settings.
  */
 
 import { App } from '../app.js';
@@ -39,7 +39,7 @@ export class DialogSettingsEditor extends Dialog {
 
     public getAppOptions(): App.Options { return this.appOptions; }
 
-    public getReload(): boolean { return this.reload; }
+    public isReload(): boolean { return this.reload; }
 
     ////////////////////////////////////////////////////////////////////////
     // Overriding methods

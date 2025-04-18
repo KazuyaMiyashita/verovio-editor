@@ -8,7 +8,7 @@ import { GenericView } from '../utils/generic-view.js';
 import { EventManager } from '../events/event-manager.js';
 
 export class Toolbar extends GenericView {
-    eventManager: EventManager;
+    public readonly eventManager: EventManager;
 
     constructor(div: HTMLDivElement, app: App) {
         super(div, app);
@@ -21,7 +21,7 @@ export class Toolbar extends GenericView {
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
 
-    updateToolbarGrp(grp: HTMLElement, condition: boolean): void {
+    protected updateToolbarGrp(grp: HTMLElement, condition: boolean): void {
         if (grp === undefined) {
             return;
         }
@@ -29,7 +29,7 @@ export class Toolbar extends GenericView {
         else grp.style.display = 'none';
     }
 
-    updateToolbarBtnEnabled(btn: HTMLElement, condition: boolean): void {
+    protected updateToolbarBtnEnabled(btn: HTMLElement, condition: boolean): void {
         if (btn === undefined) {
             return;
         }
@@ -37,7 +37,7 @@ export class Toolbar extends GenericView {
         else btn.classList.add("disabled");
     }
 
-    updateToolbarBtnDisplay(btn: HTMLElement, condition: boolean): void {
+    protected updateToolbarBtnDisplay(btn: HTMLElement, condition: boolean): void {
         if (btn === undefined) {
             return;
         }
@@ -45,7 +45,7 @@ export class Toolbar extends GenericView {
         else btn.style.display = 'none';
     }
 
-    updateToolbarBtnToggled(btn: HTMLElement, condition: boolean): void {
+    protected updateToolbarBtnToggled(btn: HTMLElement, condition: boolean): void {
         if (btn === undefined) {
             return;
         }
@@ -53,7 +53,7 @@ export class Toolbar extends GenericView {
         else btn.classList.remove("toggled");
     }
 
-    updateToolbarSubmenuBtn(btn: HTMLElement, condition: boolean): void {
+    protected updateToolbarSubmenuBtn(btn: HTMLElement, condition: boolean): void {
         if (btn === undefined) {
             return;
         }

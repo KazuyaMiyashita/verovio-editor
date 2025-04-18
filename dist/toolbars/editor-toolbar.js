@@ -65,6 +65,16 @@ export class EditorToolbar extends Toolbar {
     ////////////////////////////////////////////////////////////////////////
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
+    bindEvents(actionManager) {
+        actionManager.eventManager.bind(this.formCres, 'click', actionManager.formCres);
+        actionManager.eventManager.bind(this.formDim, 'click', actionManager.formDim);
+        actionManager.eventManager.bind(this.placeAbove, 'click', actionManager.placeAbove);
+        actionManager.eventManager.bind(this.placeBelow, 'click', actionManager.placeBelow);
+        actionManager.eventManager.bind(this.placeAuto, 'click', actionManager.placeAuto);
+        actionManager.eventManager.bind(this.stemDirUp, 'click', actionManager.stemDirUp);
+        actionManager.eventManager.bind(this.stemDirDown, 'click', actionManager.stemDirDown);
+        actionManager.eventManager.bind(this.stemDirAuto, 'click', actionManager.stemDirAuto);
+    }
     updateAll() {
         let iconsLayoutH = `${this.app.host}/icons/toolbar/layout-h.png`;
         let iconsLayoutV = `${this.app.host}/icons/toolbar/layout-v.png`;
@@ -105,16 +115,6 @@ export class EditorToolbar extends Toolbar {
         this.controlEventControls.style.display = 'none';
         this.stemControls.style.display = 'none';
         this.hairpinFormControls.style.display = 'none';
-    }
-    bindEvents(actionManager) {
-        actionManager.eventManager.bind(this.formCres, 'click', actionManager.formCres);
-        actionManager.eventManager.bind(this.formDim, 'click', actionManager.formDim);
-        actionManager.eventManager.bind(this.placeAbove, 'click', actionManager.placeAbove);
-        actionManager.eventManager.bind(this.placeBelow, 'click', actionManager.placeBelow);
-        actionManager.eventManager.bind(this.placeAuto, 'click', actionManager.placeAuto);
-        actionManager.eventManager.bind(this.stemDirUp, 'click', actionManager.stemDirUp);
-        actionManager.eventManager.bind(this.stemDirDown, 'click', actionManager.stemDirDown);
-        actionManager.eventManager.bind(this.stemDirAuto, 'click', actionManager.stemDirAuto);
     }
     ////////////////////////////////////////////////////////////////////////
     // Custom event methods

@@ -11,14 +11,12 @@ export class MidiToolbar extends Toolbar {
         super(div, app);
         this.midiPlayer = null;
         this.active = true;
-        this.pausing = false;
-        this.playing = false;
         this.pageDragStart = 0;
         this.barDragStart = 0;
         // set in the css in .vrv-midi-bar via $midi-bar-width
         this.barWidth = 200;
         // sub-toolbar in application 
-        this.midiControls = appendDivTo(this.app.toolbarObj.midiPlayerSubToolbar, { class: `vrv-btn-group` });
+        this.midiControls = appendDivTo(this.app.toolbarObj.getMidiPlayerSubToolbar(), { class: `vrv-btn-group` });
         appendDivTo(this.midiControls, { class: `vrv-h-separator` });
         this.play = appendDivTo(this.midiControls, { class: `vrv-btn-icon-large`, style: { backgroundImage: `url(${iconsPlay})` } });
         this.pause = appendDivTo(this.midiControls, { class: `vrv-btn-icon-large`, style: { backgroundImage: `url(${iconsPause})` } });
@@ -42,20 +40,16 @@ export class MidiToolbar extends Toolbar {
         this.updateToolbarGrp(this.progressControl, false);
     }
     ////////////////////////////////////////////////////////////////////////
+    // Getter and setters
+    ////////////////////////////////////////////////////////////////////////
+    setMidiPlayer(midiPlayer) { this.midiPlayer = midiPlayer; }
+    ////////////////////////////////////////////////////////////////////////
     // Class specific methods
     ////////////////////////////////////////////////////////////////////////
-    updateAll() {
-        this.updateProgressBar();
-        this.updateToolbarGrp(this.midiControls, (this.app.pageCount > 0));
-        this.updateToolbarBtnDisplay(this.play, !this.playing || this.pausing);
-        this.updateToolbarBtnDisplay(this.pause, !this.pausing && this.playing);
-        this.updateToolbarBtnDisplay(this.stop, this.playing || this.pausing);
-        this.updateToolbarGrp(this.progressControl, this.playing || this.pausing);
-    }
     updateProgressBar() {
-        this.midiTotalTime.innerHTML = this.midiPlayer.totalTimeStr;
-        this.midiCurrentTime.innerHTML = this.midiPlayer.currentTimeStr;
-        let percent = (this.midiPlayer.totalTime) ? (this.midiPlayer.currentTime / this.midiPlayer.totalTime * 100) : 0;
+        this.midiTotalTime.innerHTML = this.midiPlayer.getTotalTimeStr();
+        this.midiCurrentTime.innerHTML = this.midiPlayer.getCurrentTimeStr();
+        let percent = (this.midiPlayer.getTotalTime()) ? (this.midiPlayer.getCurrentTime() / this.midiPlayer.getTotalTime() * 100) : 0;
         this.midiBarPercent.style.width = `${percent}%`;
     }
     updateDragging(pageX) {
@@ -65,11 +59,19 @@ export class MidiToolbar extends Toolbar {
             this.midiPlayer.seekToPercent(percent);
         }
     }
+    updateAll() {
+        this.updateProgressBar();
+        this.updateToolbarGrp(this.midiControls, (this.app.pageCount > 0));
+        this.updateToolbarBtnDisplay(this.play, !this.midiPlayer.isPlaying() || this.midiPlayer.isPausing());
+        this.updateToolbarBtnDisplay(this.pause, !this.midiPlayer.isPausing() && this.midiPlayer.isPlaying());
+        this.updateToolbarBtnDisplay(this.stop, this.midiPlayer.isPlaying() || this.midiPlayer.isPausing());
+        this.updateToolbarGrp(this.progressControl, this.midiPlayer.isPlaying() || this.midiPlayer.isPausing());
+    }
     ////////////////////////////////////////////////////////////////////////
     // Public method to be called by the user
     ////////////////////////////////////////////////////////////////////////
     onPlay(e) {
-        if (this.pausing) {
+        if (this.midiPlayer.isPausing()) {
             this.midiPlayer.play();
         }
         else {
@@ -83,7 +85,7 @@ export class MidiToolbar extends Toolbar {
         this.midiPlayer.stop();
     }
     onProgressBarDown(e) {
-        if (this.midiPlayer.totalTime === 0)
+        if (this.midiPlayer.getTotalTime() === 0)
             return;
         this.pageDragStart = e.pageX;
         this.barDragStart = e.offsetX;
@@ -98,7 +100,7 @@ export class MidiToolbar extends Toolbar {
     onProgressBarUp(e) {
         if (this.pageDragStart === 0)
             return;
-        if (this.midiPlayer.totalTime === 0)
+        if (this.midiPlayer.getTotalTime() === 0)
             return;
         this.pageDragStart = 0;
         this.midiPlayer.play();
@@ -110,6 +112,13 @@ export class MidiToolbar extends Toolbar {
         if (!super.onActivate(e))
             return false;
         //console.debug("MidiToolbar::onActivate");
+        this.updateAll();
+        return true;
+    }
+    onEditData(e) {
+        if (!super.onEditData(e))
+            return false;
+        //console.debug("MidiToolbar::onEditData");
         this.updateAll();
         return true;
     }

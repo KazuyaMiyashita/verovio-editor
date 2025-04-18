@@ -31,7 +31,7 @@ export class GenericTree extends GenericView {
     public readonly eventManager: EventManager;
 
     protected root: TreeNode | null;
-    protected hideRoot: boolean;
+    protected hiddenRoot: boolean;
 
     private rootElement: HTMLDivElement;
 
@@ -39,7 +39,7 @@ export class GenericTree extends GenericView {
         super(div, app);
 
         this.root = null;
-        this.hideRoot = false;
+        this.hiddenRoot = false;
         this.setDisplayFlex();
     }
 
@@ -47,8 +47,8 @@ export class GenericTree extends GenericView {
     // Getters and setters
     ////////////////////////////////////////////////////////////////////////
 
-    public getHideRoot(): boolean { return this.hideRoot; }
-    public setHideRoot(hideRoot: boolean): void { this.hideRoot = hideRoot; }
+    public hasHiddenRoot(): boolean { return this.hiddenRoot; }
+    public setHiddenRoot(hiddenRoot: boolean): void { this.hiddenRoot = hiddenRoot; }
 
     ////////////////////////////////////////////////////////////////////////
     // Class-specific methods
@@ -81,7 +81,7 @@ export class GenericTree extends GenericView {
 
         this.root = buildTree(json);
         this.rootElement = appendDivTo(this.div, { class: `vrv-tree-root` });
-        this.root.html(this.rootElement, this, this.hideRoot);
+        this.root.html(this.rootElement, this, this.hiddenRoot);
     }
 
     // Generic depth-first traversal method

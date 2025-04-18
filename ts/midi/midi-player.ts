@@ -10,18 +10,23 @@ import { appendMidiPlayerTo, MidiPlayerElement } from '../utils/functions.js';
 
 export class MidiPlayer {
     private midiPlayerElement: MidiPlayerElement;
-    currentTime: number;
-    currentTimeStr: string;
-    totalTime: number;
-    totalTimeStr: string;
-    midiToolbar: MidiToolbar;
-    view: ResponsiveView;
-    progressBarTimer: number | null;
+    private playing: boolean;
+    private pausing: boolean;
+    private currentTime: number;
+    private currentTimeStr: string;
+    private totalTime: number;
+    private totalTimeStr: string;
+    private midiToolbar: MidiToolbar;
+    private view: ResponsiveView;
+    private progressBarTimer: number | null;
 
     constructor(midiToolbar: MidiToolbar) {
-        
+
+        this.pausing = false;
+        this.playing = false;
+
         this.midiToolbar = midiToolbar;
-        this.midiToolbar.midiPlayer = this;
+        this.midiToolbar.setMidiPlayer(this);
 
         this.midiPlayerElement = appendMidiPlayerTo(this.midiToolbar.getDiv(), {});
         this.midiPlayerElement.addEventListener('load', () => this.play());
@@ -38,6 +43,24 @@ export class MidiPlayer {
         // A view responding to midiUpdate and midiStop
         this.view = null;
     }
+
+    ////////////////////////////////////////////////////////////////////////
+    // Getters and setters
+    ////////////////////////////////////////////////////////////////////////
+
+    public isPlaying(): boolean { return this.playing; }
+    
+    public isPausing(): boolean { return this.pausing; }
+    
+    public getCurrentTime(): number { return this.currentTime; }
+    
+    public getCurrentTimeStr(): string { return this.currentTimeStr; }
+    
+    public getTotalTime(): number { return this.totalTime; }
+    
+    public getTotalTimeStr(): string { return this.totalTimeStr; }
+
+    public setView(view: ResponsiveView): void {  this.view = view; }
 
     ////////////////////////////////////////////////////////////////////////
     // Public method to be called by the user
@@ -59,9 +82,10 @@ export class MidiPlayer {
 
         this.startTimer();
 
-        this.midiToolbar.pausing = false;
-        this.midiToolbar.playing = true;
-        this.midiToolbar.updateAll();
+        this.pausing = false;
+        this.playing = true;
+        let event = new CustomEvent('onEditData');
+        this.midiToolbar.customEventManager.dispatch(event);
     }
 
     public stop(): void {
@@ -73,9 +97,10 @@ export class MidiPlayer {
         this.midiPlayerElement.stop();
         this.stopTimer();
 
-        this.midiToolbar.pausing = false;
-        this.midiToolbar.playing = false;
-        this.midiToolbar.updateAll();
+        this.pausing = false;
+        this.playing = false;
+        let event = new CustomEvent('onEditData');
+        this.midiToolbar.customEventManager.dispatch(event);
 
         if (this.view) this.view.midiStop();
     }
@@ -84,9 +109,10 @@ export class MidiPlayer {
         this.midiPlayerElement.stop();
         this.stopTimer();
 
-        this.midiToolbar.pausing = true;
-        this.midiToolbar.playing = false;
-        this.midiToolbar.updateAll();
+        this.pausing = true;
+        this.playing = false;
+        let event = new CustomEvent('onEditData');
+        this.midiToolbar.customEventManager.dispatch(event);
 
         if (this.view) this.view.midiStop();
     }
@@ -104,7 +130,7 @@ export class MidiPlayer {
     // Internal methods for updating the UI
     ////////////////////////////////////////////////////////////////////////
 
-    private onUpdateNoteTime(time: number): void {        
+    private onUpdateNoteTime(time: number): void {
         const midiTime = time * 1000;
         // If the progress bar timer is behind, use the note time
         if (this.currentTime < midiTime) {
@@ -123,26 +149,26 @@ export class MidiPlayer {
     }
 
     private startTimer(): void {
-      if (this.progressBarTimer === null) {
-        this.progressBarTimer = setInterval(() => {
-            this.onUpdate(this.currentTime);
-            this.currentTime += 50;
-        }, 50);
-      }
+        if (this.progressBarTimer === null) {
+            this.progressBarTimer = setInterval(() => {
+                this.onUpdate(this.currentTime);
+                this.currentTime += 50;
+            }, 50);
+        }
     }
 
     private stopTimer(): void {
-      if (this.progressBarTimer !== null) {
-        clearInterval(this.progressBarTimer);
-          this.progressBarTimer = null;
-      }
+        if (this.progressBarTimer !== null) {
+            clearInterval(this.progressBarTimer);
+            this.progressBarTimer = null;
+        }
     }
 
     private samplesToTime(time: number): string {
-        let timeInSec = Math.floor( time / 1000 );
+        let timeInSec = Math.floor(time / 1000);
         let sec = timeInSec % 60;
         let min = timeInSec / 60 | 0;
-        return min + ':' + ( sec === 0 ? '00' : sec < 10 ? '0' + sec : sec );        
+        return min + ':' + (sec === 0 ? '00' : sec < 10 ? '0' + sec : sec);
     }
 
     ////////////////////////////////////////////////////////////////////////
@@ -152,9 +178,10 @@ export class MidiPlayer {
     onStop(e: CustomEvent): void {
         // Custom event from the html-midi-player
         if (e.detail.finished) {
-            this.midiToolbar.pausing = false;
-            this.midiToolbar.playing = false;
-            this.midiToolbar.updateAll();
+            this.pausing = false;
+            this.playing = false;
+            let event = new CustomEvent('onEditData');
+            this.midiToolbar.customEventManager.dispatch(event);
 
             if (this.view) this.view.midiStop();
         }

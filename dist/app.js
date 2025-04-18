@@ -667,7 +667,7 @@ export class App {
             const dlgRes = yield dlg.show();
             if (dlgRes === 1) {
                 this.options.verovioVersion = dlg.getAppOptions().verovioVersion;
-                if (dlg.getReload()) {
+                if (dlg.isReload()) {
                     const dlg = new Dialog(this.dialogDiv, this, "Reloading the editor", { okLabel: "Yes", icon: "question" });
                     dlg.setContent(marked.parse(reloadMsg));
                     if ((yield dlg.show()) === 0)
@@ -719,7 +719,7 @@ export class App {
     setView(e) {
         return __awaiter(this, void 0, void 0, function* () {
             const element = e.target;
-            if (this.midiToolbarObj && this.midiToolbarObj.playing) {
+            if (this.midiPlayer && this.midiPlayer.isPlaying()) {
                 this.midiPlayer.stop();
             }
             let event = new CustomEvent('onDeactivate');

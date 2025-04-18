@@ -1,5 +1,5 @@
 /**
- * The DialogSettinsEditor class for the editor settings.
+ * The DialogSettingsEditor class for the editor settings.
  */
 import { Dialog } from './dialog.js';
 import { appendDivTo, appendOptionTo, appendSelectTo } from '../utils/functions.js';
@@ -25,7 +25,7 @@ export class DialogSettingsEditor extends Dialog {
     // Getters and setters
     ////////////////////////////////////////////////////////////////////////
     getAppOptions() { return this.appOptions; }
-    getReload() { return this.reload; }
+    isReload() { return this.reload; }
     ////////////////////////////////////////////////////////////////////////
     // Overriding methods
     ////////////////////////////////////////////////////////////////////////
