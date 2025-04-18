@@ -7,8 +7,8 @@ import { Dialog } from './dialog.js';
 import { appendDivTo, appendInputTo } from '../utils/functions.js';
 
 export class DialogExport extends Dialog {
-    fields: HTMLDivElement;
-    exportOptions: App.MEIExportOptions;
+    protected fields: HTMLDivElement;
+    protected exportOptions: App.MEIExportOptions;
 
     private basicInput: HTMLInputElement;
     private removeIdsInput: HTMLInputElement;
@@ -43,17 +43,23 @@ export class DialogExport extends Dialog {
     }
 
     ////////////////////////////////////////////////////////////////////////
-    // Class-specific methods
+    // Getters and setters
     ////////////////////////////////////////////////////////////////////////
 
-    ok(): void {
+    public getExportOptions(): App.MEIExportOptions { return this.exportOptions; }
+
+    ////////////////////////////////////////////////////////////////////////
+    // Overriding methods
+    ////////////////////////////////////////////////////////////////////////
+
+    override ok(): void {
         this.exportOptions.basic = this.basicInput.checked;
         this.exportOptions.removeIds = this.removeIdsInput.checked;
         this.exportOptions.ignoreHeader = this.ignoreHeaderInput.checked;
         super.ok();
     }
 
-    reset(): void { 
+    override reset(): void { 
         super.ok();
     }
 }

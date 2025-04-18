@@ -17,7 +17,7 @@ export class DialogAbout extends Dialog {
     // Async network methods
     ////////////////////////////////////////////////////////////////////////
 
-    async load() {
+    public async load() {
 
         let lib = appendDivTo(this.content, {});
         lib.innerHTML = marked.parse(libraries);

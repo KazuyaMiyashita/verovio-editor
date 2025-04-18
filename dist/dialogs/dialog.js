@@ -82,6 +82,7 @@ export class Dialog {
         const resolveValue = (this.options.type === Dialog.Type.Msg) ? 0 : 1;
         this.deferred.resolve(resolveValue);
     }
+    reset() { }
     ////////////////////////////////////////////////////////////////////////
     // Async methods
     ////////////////////////////////////////////////////////////////////////

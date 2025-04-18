@@ -14,27 +14,26 @@ interface ItemDataset {
 }
 
 export class DialogGhImport extends Dialog {
-    data: string | ArrayBuffer | Blob;
-    filename: string;
-    githubManager: GitHubManager;
+    protected data: string | ArrayBuffer | Blob;
+    protected filename: string;
+    protected githubManager: GitHubManager;
 
-    iconsBranch: string;
-    iconsInstitution: string;
-    iconsFile: string;
-    iconsFolder: string;
-    iconsRepo: string;
-    iconsUser: string;
+    private iconsBranch: string;
+    private iconsInstitution: string;
+    private iconsFile: string;
+    private iconsFolder: string;
+    private iconsRepo: string;
+    private iconsUser: string;
 
-    tabs: HTMLDivElement;
-    tabUser: HTMLDivElement;
-    tabRepo: HTMLDivElement;
-    tabBranch: HTMLDivElement;
-    tabFile: HTMLDivElement;
-    loading: HTMLDivElement;
-    list: HTMLDivElement;
-    selection: HTMLDivElement;
-    breadCrumbs: HTMLDivElement;
-
+    private tabs: HTMLDivElement;
+    private tabUser: HTMLDivElement;
+    private tabRepo: HTMLDivElement;
+    private tabBranch: HTMLDivElement;
+    private tabFile: HTMLDivElement;
+    private loading: HTMLDivElement;
+    private list: HTMLDivElement;
+    private selection: HTMLDivElement;
+    private breadCrumbs: HTMLDivElement;
 
     constructor(div: HTMLDivElement, app: App, title: string, options: Dialog.Options, githubManager: GitHubManager) {
         super(div, app, title, options);
@@ -87,38 +86,20 @@ export class DialogGhImport extends Dialog {
         }
     }
 
+
+    ////////////////////////////////////////////////////////////////////////
+    // Getters and setters
+    ////////////////////////////////////////////////////////////////////////
+
+    public getData(): string | ArrayBuffer | Blob { return this.data; }
+
+    public getFilename(): string { return this.filename; }
+
     ////////////////////////////////////////////////////////////////////////
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
 
-    loadingStart(tab: HTMLDivElement): void {
-        for (const node of this.tabs.querySelectorAll('.vrv-tab-selector')) {
-            node.classList.remove("selected");
-        }
-        tab.classList.add("selected");
-
-        this.list.innerHTML = "";
-        this.list.style.display = 'none';
-        this.loading.style.display = 'block';
-    }
-
-    loadingEnd(): void {
-        this.list.innerHTML = "";
-        this.list.style.display = 'flex';
-        this.loading.style.display = 'none';
-    }
-
-    addItemToList(name: string, icon: string, dataset: ItemDataset, checked: boolean, bind: Function): void {
-        const item: HTMLDivElement = appendDivTo(this.list, { class: `vrv-dialog-gh-item`, style: { backgroundImage: `url(${icon})` }, 'data-before': `${name}` });
-        const keys = Object.keys(dataset);
-        for (let i = 0; i < keys.length; i++) {
-            item.dataset[keys[i]] = dataset[keys[i]];
-        }
-        if (checked) item.classList.add("checked");
-        this.eventManager.bind(item, 'click', bind);
-    }
-
-    updateSelectionAndBreadcrumbs(): void {
+    protected updateSelectionAndBreadcrumbs(): void {
         this.selection.style.display = 'none';
         this.selection.innerHTML = '';
         this.selection.style.display = 'none';
@@ -132,8 +113,35 @@ export class DialogGhImport extends Dialog {
         this.breadCrumbs.style.display = 'flex';
         for (let i = 0; i < path.length; i++) this.addCrumb(path[i], i + 1);
     }
+    
+    private loadingStart(tab: HTMLDivElement): void {
+        for (const node of this.tabs.querySelectorAll('.vrv-tab-selector')) {
+            node.classList.remove("selected");
+        }
+        tab.classList.add("selected");
 
-    addSelection(name: string, icon: string): boolean {
+        this.list.innerHTML = "";
+        this.list.style.display = 'none';
+        this.loading.style.display = 'block';
+    }
+
+    private loadingEnd(): void {
+        this.list.innerHTML = "";
+        this.list.style.display = 'flex';
+        this.loading.style.display = 'none';
+    }
+
+    private addItemToList(name: string, icon: string, dataset: ItemDataset, checked: boolean, bind: Function): void {
+        const item: HTMLDivElement = appendDivTo(this.list, { class: `vrv-dialog-gh-item`, style: { backgroundImage: `url(${icon})` }, 'data-before': `${name}` });
+        const keys = Object.keys(dataset);
+        for (let i = 0; i < keys.length; i++) {
+            item.dataset[keys[i]] = dataset[keys[i]];
+        }
+        if (checked) item.classList.add("checked");
+        this.eventManager.bind(item, 'click', bind);
+    }
+
+    private addSelection(name: string, icon: string): boolean {
         if (name === '') return false;
         this.selection.style.display = 'flex';
         const selection: HTMLDivElement = appendDivTo(this.selection, { class: `vrv-dialog-gh-selection-item`, style: { backgroundImage: `url(${icon})` } });
@@ -141,7 +149,7 @@ export class DialogGhImport extends Dialog {
         return true;
     }
 
-    addCrumb(name: string, value: number): void {
+    private addCrumb(name: string, value: number): void {
         const crumb: HTMLDivElement = appendDivTo(this.breadCrumbs, { class: `vrv-path-breadcrumbs` });
         crumb.innerHTML = name;
         crumb.dataset.value = value.toString();
@@ -152,62 +160,28 @@ export class DialogGhImport extends Dialog {
     // Async network methods
     ////////////////////////////////////////////////////////////////////////
 
-    async listUsers(): Promise<any> {
-        this.loadingStart(this.tabUser);
-        const orgs = await this.githubManager.user.listOrgs();
-        this.loadingEnd();
-
-        const userChecked = (this.githubManager.selectedAccountName === this.githubManager.login);
-        this.addItemToList(this.githubManager.login, this.iconsUser, { login: this.githubManager.login }, userChecked, this.selectUser);
-        for (let i = 0; i < orgs.data.length; i++) {
-            const login = orgs.data[i].login;
-            const checked = (this.githubManager.selectedAccountName === login)
-            this.addItemToList(login, this.iconsInstitution, { login: login }, checked, this.selectUser);
-        }
-
-        this.updateSelectionAndBreadcrumbs();
-    }
-
-    async listRepos(): Promise<any> {
-        this.loadingStart(this.tabRepo);
-        let repos: any;
-        if (this.githubManager.selectedOrganization !== null) {
-            repos = await this.githubManager.selectedOrganization.getRepos();
+    protected async selectFile(e: MouseEvent): Promise<any> {
+        const element: HTMLElement = e.target as HTMLElement;
+        if (element.dataset.type === 'dir') {
+            if (element.dataset.name === '..') {
+                this.githubManager.selectedPath.pop();
+            }
+            else {
+                this.githubManager.appendToPath(element.dataset.name);
+            }
+            await this.listFiles();
         }
         else {
-            repos = await this.githubManager.selectedUser.listRepos({ type: 'owner' });
+            const branch = this.githubManager.selectedBranchName;
+            const filename = this.githubManager.getPathString() + '/' + element.dataset.name;
+            const contents = await this.githubManager.selectedRepo.getContents(branch, filename, true);
+            this.data = contents.data;
+            this.filename = element.dataset.name;
+            this.ok();
         }
-        repos.data.sort((a, b) => (a.name > b.name) ? 1 : -1)
-        this.loadingEnd();
-        for (let i = 0; i < repos.data.length; i++) {
-            const name = repos.data[i].name;
-            const checked = (this.githubManager.selectedRepoName === name);
-            this.addItemToList(name, this.iconsRepo, { name: name }, checked, this.selectRepo);
-        }
-
-        this.updateSelectionAndBreadcrumbs();
     }
 
-    async listBranches(): Promise<any> {
-        if (this.githubManager.selectedRepo === null) {
-            this.app.showNotification("Select a repository first");
-            return;
-        }
-
-        this.loadingStart(this.tabBranch);
-        const branches = await this.githubManager.selectedRepo.listBranches();
-        branches.data.sort((a, b) => (a.name > b.name) ? 1 : -1)
-        this.loadingEnd();
-        for (let i = 0; i < branches.data.length; i++) {
-            const name = branches.data[i].name;
-            const checked = (this.githubManager.selectedBranchName === name);
-            this.addItemToList(name, this.iconsBranch, { name: name }, checked, this.selectBranch);
-        }
-
-        this.updateSelectionAndBreadcrumbs();
-    }
-
-    async listFiles(): Promise<any> {
+    protected async listFiles(): Promise<any> {
         if (this.githubManager.selectedRepo === null) {
             this.app.showNotification("Select a repository first");
             return;
@@ -233,44 +207,78 @@ export class DialogGhImport extends Dialog {
 
         this.updateSelectionAndBreadcrumbs();
     }
+    
+    private async listUsers(): Promise<any> {
+        this.loadingStart(this.tabUser);
+        const orgs = await this.githubManager.user.listOrgs();
+        this.loadingEnd();
 
-    async selectUser(e: MouseEvent): Promise<any> {
+        const userChecked = (this.githubManager.selectedAccountName === this.githubManager.login);
+        this.addItemToList(this.githubManager.login, this.iconsUser, { login: this.githubManager.login }, userChecked, this.selectUser);
+        for (let i = 0; i < orgs.data.length; i++) {
+            const login = orgs.data[i].login;
+            const checked = (this.githubManager.selectedAccountName === login)
+            this.addItemToList(login, this.iconsInstitution, { login: login }, checked, this.selectUser);
+        }
+
+        this.updateSelectionAndBreadcrumbs();
+    }
+
+    private async listRepos(): Promise<any> {
+        this.loadingStart(this.tabRepo);
+        let repos: any;
+        if (this.githubManager.selectedOrganization !== null) {
+            repos = await this.githubManager.selectedOrganization.getRepos();
+        }
+        else {
+            repos = await this.githubManager.selectedUser.listRepos({ type: 'owner' });
+        }
+        repos.data.sort((a, b) => (a.name > b.name) ? 1 : -1)
+        this.loadingEnd();
+        for (let i = 0; i < repos.data.length; i++) {
+            const name = repos.data[i].name;
+            const checked = (this.githubManager.selectedRepoName === name);
+            this.addItemToList(name, this.iconsRepo, { name: name }, checked, this.selectRepo);
+        }
+
+        this.updateSelectionAndBreadcrumbs();
+    }
+
+    private async listBranches(): Promise<any> {
+        if (this.githubManager.selectedRepo === null) {
+            this.app.showNotification("Select a repository first");
+            return;
+        }
+
+        this.loadingStart(this.tabBranch);
+        const branches = await this.githubManager.selectedRepo.listBranches();
+        branches.data.sort((a, b) => (a.name > b.name) ? 1 : -1)
+        this.loadingEnd();
+        for (let i = 0; i < branches.data.length; i++) {
+            const name = branches.data[i].name;
+            const checked = (this.githubManager.selectedBranchName === name);
+            this.addItemToList(name, this.iconsBranch, { name: name }, checked, this.selectBranch);
+        }
+
+        this.updateSelectionAndBreadcrumbs();
+    }
+
+    private async selectUser(e: MouseEvent): Promise<any> {
         const element: HTMLElement = e.target as HTMLElement;
         await this.githubManager.selectAccount(element.dataset.login);
         this.listRepos();
     }
 
-    async selectRepo(e: MouseEvent): Promise<any> {
+    private async selectRepo(e: MouseEvent): Promise<any> {
         const element: HTMLElement = e.target as HTMLElement;
         await this.githubManager.selectRepo(element.dataset.name);
         this.listBranches();
     }
 
-    async selectBranch(e: MouseEvent): Promise<any> {
+    private async selectBranch(e: MouseEvent): Promise<any> {
         const element: HTMLElement = e.target as HTMLElement;
         await this.githubManager.selectBranch(element.dataset.name);
         this.listFiles();
-    }
-
-    async selectFile(e: MouseEvent): Promise<any> {
-        const element: HTMLElement = e.target as HTMLElement;
-        if (element.dataset.type === 'dir') {
-            if (element.dataset.name === '..') {
-                this.githubManager.selectedPath.pop();
-            }
-            else {
-                this.githubManager.appendToPath(element.dataset.name);
-            }
-            this.listFiles();
-        }
-        else {
-            const branch = this.githubManager.selectedBranchName;
-            const filename = this.githubManager.getPathString() + '/' + element.dataset.name;
-            const contents = await this.githubManager.selectedRepo.getContents(branch, filename, true);
-            this.data = contents.data;
-            this.filename = element.dataset.name;
-            this.ok();
-        }
     }
 
     ////////////////////////////////////////////////////////////////////////

@@ -53,6 +53,12 @@ export class DialogGhExport extends DialogGhImport {
     ////////////////////////////////////////////////////////////////////////
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
+    isValid() {
+        return (this.inputFile.value !== '' && this.inputMessage.value !== '');
+    }
+    ////////////////////////////////////////////////////////////////////////
+    // Overriding methods
+    ////////////////////////////////////////////////////////////////////////
     updateSelectionAndBreadcrumbs() {
         super.updateSelectionAndBreadcrumbs();
         if (this.githubManager.selectedBranchName === '') {
@@ -61,9 +67,6 @@ export class DialogGhExport extends DialogGhImport {
         else {
             this.fields.style.display = 'grid';
         }
-    }
-    isValid() {
-        return (this.inputFile.value !== '' && this.inputMessage.value !== '');
     }
     ok() {
         if (!this.isValid())

@@ -61,10 +61,10 @@ export class EditorView extends ResponsiveView {
     }
 
     ////////////////////////////////////////////////////////////////////////
-    // Overwriting methods
+    // Overriding methods
     ////////////////////////////////////////////////////////////////////////
 
-    updateSVGDimensions(): void {
+    override updateSVGDimensions(): void {
         super.updateSVGDimensions();
 
         if (this.svgOverlay) {

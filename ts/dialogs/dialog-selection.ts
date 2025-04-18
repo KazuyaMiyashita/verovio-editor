@@ -7,11 +7,11 @@ import { Dialog } from './dialog.js';
 import { appendDivTo, appendInputTo } from '../utils/functions.js';
 
 export class DialogSelection extends Dialog {
-    fields: HTMLDivElement;
-    selectMeasureRange: HTMLInputElement;
-    selectStart: HTMLInputElement;
-    selectEnd: HTMLInputElement;
-    selection: Object;
+    protected fields: HTMLDivElement;
+    protected selectMeasureRange: HTMLInputElement;
+    protected selectStart: HTMLInputElement;
+    protected selectEnd: HTMLInputElement;
+    protected selection: Object;
 
 
     constructor(div: HTMLDivElement, app: App, title: string, options: Dialog.Options, selection: Object) {
@@ -45,10 +45,16 @@ export class DialogSelection extends Dialog {
     }
 
     ////////////////////////////////////////////////////////////////////////
-    // Class-specific methods
+    // Getters and setters
     ////////////////////////////////////////////////////////////////////////
 
-    ok(): void {
+    public getSelection(): Object { return this.selection;  }
+
+    ////////////////////////////////////////////////////////////////////////
+    // Overriding methods
+    ////////////////////////////////////////////////////////////////////////
+
+    override ok(): void {
         if (this.selectMeasureRange.value !== '') {
             this.selection["measureRange"] = this.selectMeasureRange.value;
         }
@@ -59,7 +65,7 @@ export class DialogSelection extends Dialog {
         super.ok();
     }
 
-    reset(): void { 
+    override reset(): void { 
         this.selection = {};
         super.ok();
     }

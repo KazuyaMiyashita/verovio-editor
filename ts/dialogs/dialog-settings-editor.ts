@@ -7,10 +7,10 @@ import { Dialog } from './dialog.js';
 import { appendDivTo, appendOptionTo, appendSelectTo } from '../utils/functions.js';
 
 export class DialogSettingsEditor extends Dialog {
-    fields: HTMLDivElement;
-    appOptions: App.Options;
-    verovioVersion: HTMLSelectElement;
-    reload: boolean;
+    protected fields: HTMLDivElement;
+    protected appOptions: App.Options;
+    protected verovioVersion: HTMLSelectElement;
+    protected reload: boolean;
 
     constructor(div: HTMLDivElement, app: App, title: string, options: Dialog.Options, appOptions: App.Options) {
         super(div, app, title, options);
@@ -34,10 +34,18 @@ export class DialogSettingsEditor extends Dialog {
     }
 
     ////////////////////////////////////////////////////////////////////////
-    // Class-specific methods
+    // Getters and setters
     ////////////////////////////////////////////////////////////////////////
 
-    ok(): void {
+    public getAppOptions(): App.Options { return this.appOptions; }
+
+    public getReload(): boolean { return this.reload; }
+
+    ////////////////////////////////////////////////////////////////////////
+    // Overriding methods
+    ////////////////////////////////////////////////////////////////////////
+
+    override ok(): void {
         if (this.verovioVersion.value !== this.appOptions.verovioVersion) {
             this.reload = true;
         }
@@ -45,7 +53,7 @@ export class DialogSettingsEditor extends Dialog {
         super.ok();
     }
 
-    reset(): void { 
+    override reset(): void { 
         super.ok();
     }
 }

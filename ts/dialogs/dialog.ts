@@ -9,22 +9,22 @@ import { EventManager } from '../events/event-manager.js';
 import { appendDetailsTo, appendDivTo, appendSummaryTo, insertDivBefore } from '../utils/functions.js';
 
 export class Dialog {
-    app: App;
-    eventManager: EventManager;
-    div: HTMLDivElement;
-    options: Dialog.Options;
-    deferred: Deferred;
+    protected app: App;
+    protected eventManager: EventManager;
+    protected div: HTMLDivElement;
+    protected options: Dialog.Options;
 
-    box: HTMLDivElement;
-    top: HTMLDivElement;
-    icon: HTMLDivElement;
-    close: HTMLDivElement;
-    content: HTMLDivElement;
-    bottom: HTMLDivElement;
-    cancelBtn: HTMLDivElement;
-    okBtn: HTMLDivElement;
+    protected box: HTMLDivElement;
+    protected top: HTMLDivElement;
+    protected icon: HTMLDivElement;
+    protected close: HTMLDivElement;
+    protected content: HTMLDivElement;
+    protected bottom: HTMLDivElement;
+    protected cancelBtn: HTMLDivElement;
+    protected okBtn: HTMLDivElement;
 
-    boundKeyDown: { (event: KeyboardEvent): void };
+    private boundKeyDown: { (event: KeyboardEvent): void };
+    private deferred: Deferred;
 
     constructor(div: HTMLDivElement, app: App, title: string, options: Dialog.Options) {
         this.options = Object.assign({
@@ -79,16 +79,16 @@ export class Dialog {
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
 
-    addButton(label: string, event: Function) {
+    public addButton(label: string, event: Function) {
         const btn = insertDivBefore(this.bottom, { class: `vrv-dialog-btn`, 'data-before': label }, this.cancelBtn);
         this.eventManager.bind(btn, 'click', event);
     }
 
-    setContent(content: string): void {
+    public setContent(content: string): void {
         this.content.innerHTML = content;
     }
 
-    addDetails(label: string, content: string) {
+    protected addDetails(label: string, content: string) {
         let details = appendDetailsTo(this.content, {});
         let summary = appendSummaryTo(details, {});
         let div = appendDivTo(details, {});
@@ -96,22 +96,24 @@ export class Dialog {
         div.innerHTML = content;
     }
 
-    bindListeners(): void {
+    protected bindListeners(): void {
         this.boundKeyDown = (e: KeyboardEvent) => this.keyDownListener(e);
     }
 
-    cancel(): void {
+    protected cancel(): void {
         this.div.style.display = 'none';
         document.removeEventListener('keydown', this.boundKeyDown);
         this.deferred.resolve(0);
     }
 
-    ok(): void {
+    protected ok(): void {
         this.div.style.display = 'none';
         document.removeEventListener('keydown', this.boundKeyDown);
         const resolveValue = (this.options.type === Dialog.Type.Msg) ? 0 : 1;
         this.deferred.resolve(resolveValue);
     }
+
+    protected reset(): void { }
 
     ////////////////////////////////////////////////////////////////////////
     // Async methods

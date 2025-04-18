@@ -51,10 +51,10 @@ export class DialogSettingsVerovio extends Dialog {
     private currentOptions: Options;
     private defaultOptions: Options;
     private verovioDisabled: Array<string>;
-    changedOptions: Options;
+    protected changedOptions: Options;
 
-    tabGroup: HTMLDivElement;
-    tabGroupObj: TabGroup;
+    private tabGroup: HTMLDivElement;
+    private tabGroupObj: TabGroup;
 
     constructor(div: HTMLDivElement, app: App, title: string, options: Dialog.Options, selection: Object, verovioProxy: VerovioWorkerProxy) {
         super(div, app, title, options);
@@ -71,10 +71,16 @@ export class DialogSettingsVerovio extends Dialog {
     }
 
     ////////////////////////////////////////////////////////////////////////
+    // Getters and setters
+    ////////////////////////////////////////////////////////////////////////
+
+    public getChangedOptions(): Options { return this.changedOptions; }
+
+    ////////////////////////////////////////////////////////////////////////
     // Async worker methods
     ////////////////////////////////////////////////////////////////////////    
 
-    async loadOptions() {
+    public async loadOptions() {
         // Get object describing the available options
         const availableOptions: AvailableOptions = await this.verovio.getAvailableOptions();
         console.log(availableOptions);
@@ -154,7 +160,7 @@ export class DialogSettingsVerovio extends Dialog {
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
 
-    diffOptions(options: Options, reset: boolean): Options {
+    private diffOptions(options: Options, reset: boolean): Options {
         const inputs = this.content.querySelectorAll('.vrv-dialog-input');
         const values: Options = {};
 
@@ -190,13 +196,17 @@ export class DialogSettingsVerovio extends Dialog {
         return values;
     }
 
-    ok(): void {
+    ////////////////////////////////////////////////////////////////////////
+    // Overriding methods
+    ////////////////////////////////////////////////////////////////////////
+
+    override ok(): void {
         this.changedOptions = this.diffOptions(this.currentOptions, false);
         // trigger reload only if something has changed
         (Object.keys(this.changedOptions).length === 0) ? super.cancel() : super.ok();
     }
 
-    reset(): void {
+    override reset(): void {
         this.changedOptions = this.diffOptions(this.defaultOptions, true);
         // trigger reload only if something has changed
         (Object.keys(this.changedOptions).length === 0) ? super.cancel() : super.ok();

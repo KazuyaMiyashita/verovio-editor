@@ -40,7 +40,7 @@ export class EditorView extends ResponsiveView {
         this.selectedItems = [];
     }
     ////////////////////////////////////////////////////////////////////////
-    // Overwriting methods
+    // Overriding methods
     ////////////////////////////////////////////////////////////////////////
     updateSVGDimensions() {
         super.updateSVGDimensions();

@@ -53,8 +53,32 @@ export class DialogGhImport extends Dialog {
         }
     }
     ////////////////////////////////////////////////////////////////////////
+    // Getters and setters
+    ////////////////////////////////////////////////////////////////////////
+    getData() { return this.data; }
+    getFilename() { return this.filename; }
+    ////////////////////////////////////////////////////////////////////////
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
+    updateSelectionAndBreadcrumbs() {
+        this.selection.style.display = 'none';
+        this.selection.innerHTML = '';
+        this.selection.style.display = 'none';
+        this.breadCrumbs.innerHTML = '';
+        const icon = (this.githubManager.selectedOrganization !== null) ? this.iconsInstitution : this.iconsUser;
+        if (!this.addSelection(this.githubManager.selectedAccountName, icon))
+            return;
+        if (!this.addSelection(this.githubManager.selectedRepoName, this.iconsRepo))
+            return;
+        if (!this.addSelection(this.githubManager.selectedBranchName, this.iconsBranch))
+            return;
+        const path = this.githubManager.selectedPath;
+        if (path.length < 2)
+            return;
+        this.breadCrumbs.style.display = 'flex';
+        for (let i = 0; i < path.length; i++)
+            this.addCrumb(path[i], i + 1);
+    }
     loadingStart(tab) {
         for (const node of this.tabs.querySelectorAll('.vrv-tab-selector')) {
             node.classList.remove("selected");
@@ -79,25 +103,6 @@ export class DialogGhImport extends Dialog {
             item.classList.add("checked");
         this.eventManager.bind(item, 'click', bind);
     }
-    updateSelectionAndBreadcrumbs() {
-        this.selection.style.display = 'none';
-        this.selection.innerHTML = '';
-        this.selection.style.display = 'none';
-        this.breadCrumbs.innerHTML = '';
-        const icon = (this.githubManager.selectedOrganization !== null) ? this.iconsInstitution : this.iconsUser;
-        if (!this.addSelection(this.githubManager.selectedAccountName, icon))
-            return;
-        if (!this.addSelection(this.githubManager.selectedRepoName, this.iconsRepo))
-            return;
-        if (!this.addSelection(this.githubManager.selectedBranchName, this.iconsBranch))
-            return;
-        const path = this.githubManager.selectedPath;
-        if (path.length < 2)
-            return;
-        this.breadCrumbs.style.display = 'flex';
-        for (let i = 0; i < path.length; i++)
-            this.addCrumb(path[i], i + 1);
-    }
     addSelection(name, icon) {
         if (name === '')
             return false;
@@ -115,6 +120,52 @@ export class DialogGhImport extends Dialog {
     ////////////////////////////////////////////////////////////////////////
     // Async network methods
     ////////////////////////////////////////////////////////////////////////
+    selectFile(e) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const element = e.target;
+            if (element.dataset.type === 'dir') {
+                if (element.dataset.name === '..') {
+                    this.githubManager.selectedPath.pop();
+                }
+                else {
+                    this.githubManager.appendToPath(element.dataset.name);
+                }
+                yield this.listFiles();
+            }
+            else {
+                const branch = this.githubManager.selectedBranchName;
+                const filename = this.githubManager.getPathString() + '/' + element.dataset.name;
+                const contents = yield this.githubManager.selectedRepo.getContents(branch, filename, true);
+                this.data = contents.data;
+                this.filename = element.dataset.name;
+                this.ok();
+            }
+        });
+    }
+    listFiles() {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (this.githubManager.selectedRepo === null) {
+                this.app.showNotification("Select a repository first");
+                return;
+            }
+            this.loadingStart(this.tabFile);
+            const branch = this.githubManager.selectedBranchName;
+            const path = this.githubManager.getPathString();
+            const contents = yield this.githubManager.selectedRepo.getContents(branch, path);
+            contents.data.sort((a, b) => (a.type > b.type) ? 1 : -1);
+            this.loadingEnd();
+            if (this.githubManager.selectedPath.length > 1) {
+                this.addItemToList('..', this.iconsFolder, { name: '..', type: 'dir' }, false, this.selectFile);
+            }
+            for (let i = 0; i < contents.data.length; i++) {
+                const name = contents.data[i].name;
+                const type = contents.data[i].type;
+                const icon = (type === 'dir') ? this.iconsFolder : this.iconsFile;
+                this.addItemToList(name, icon, { name: name, type: type }, false, this.selectFile);
+            }
+            this.updateSelectionAndBreadcrumbs();
+        });
+    }
     listUsers() {
         return __awaiter(this, void 0, void 0, function* () {
             this.loadingStart(this.tabUser);
@@ -168,30 +219,6 @@ export class DialogGhImport extends Dialog {
             this.updateSelectionAndBreadcrumbs();
         });
     }
-    listFiles() {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (this.githubManager.selectedRepo === null) {
-                this.app.showNotification("Select a repository first");
-                return;
-            }
-            this.loadingStart(this.tabFile);
-            const branch = this.githubManager.selectedBranchName;
-            const path = this.githubManager.getPathString();
-            const contents = yield this.githubManager.selectedRepo.getContents(branch, path);
-            contents.data.sort((a, b) => (a.type > b.type) ? 1 : -1);
-            this.loadingEnd();
-            if (this.githubManager.selectedPath.length > 1) {
-                this.addItemToList('..', this.iconsFolder, { name: '..', type: 'dir' }, false, this.selectFile);
-            }
-            for (let i = 0; i < contents.data.length; i++) {
-                const name = contents.data[i].name;
-                const type = contents.data[i].type;
-                const icon = (type === 'dir') ? this.iconsFolder : this.iconsFile;
-                this.addItemToList(name, icon, { name: name, type: type }, false, this.selectFile);
-            }
-            this.updateSelectionAndBreadcrumbs();
-        });
-    }
     selectUser(e) {
         return __awaiter(this, void 0, void 0, function* () {
             const element = e.target;
@@ -211,28 +238,6 @@ export class DialogGhImport extends Dialog {
             const element = e.target;
             yield this.githubManager.selectBranch(element.dataset.name);
             this.listFiles();
-        });
-    }
-    selectFile(e) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const element = e.target;
-            if (element.dataset.type === 'dir') {
-                if (element.dataset.name === '..') {
-                    this.githubManager.selectedPath.pop();
-                }
-                else {
-                    this.githubManager.appendToPath(element.dataset.name);
-                }
-                this.listFiles();
-            }
-            else {
-                const branch = this.githubManager.selectedBranchName;
-                const filename = this.githubManager.getPathString() + '/' + element.dataset.name;
-                const contents = yield this.githubManager.selectedRepo.getContents(branch, filename, true);
-                this.data = contents.data;
-                this.filename = element.dataset.name;
-                this.ok();
-            }
         });
     }
     ////////////////////////////////////////////////////////////////////////

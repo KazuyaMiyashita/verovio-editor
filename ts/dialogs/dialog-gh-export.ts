@@ -10,9 +10,9 @@ import { GitHubManager } from '../utils/github-manager.js';
 import { appendDivTo, appendInputTo, appendTextAreaTo } from '../utils/functions.js';
 
 export class DialogGhExport extends DialogGhImport {
-    fields: HTMLDivElement;
-    inputFile: HTMLInputElement;
-    inputMessage: HTMLTextAreaElement;
+    protected fields: HTMLDivElement;
+    protected inputFile: HTMLInputElement;
+    protected inputMessage: HTMLTextAreaElement;
 
     constructor(div: HTMLDivElement, app: App, title: string, options: Dialog.Options, githubManager: GitHubManager) {
         options.okLabel = 'Commit and push';
@@ -61,7 +61,15 @@ export class DialogGhExport extends DialogGhImport {
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
 
-    updateSelectionAndBreadcrumbs(): void {
+    private isValid(): boolean {
+        return (this.inputFile.value !== '' && this.inputMessage.value !== '');
+    }
+
+    ////////////////////////////////////////////////////////////////////////
+    // Overriding methods
+    ////////////////////////////////////////////////////////////////////////
+
+    override updateSelectionAndBreadcrumbs(): void {
         super.updateSelectionAndBreadcrumbs();
         if (this.githubManager.selectedBranchName === '') {
             this.fields.style.display = 'none';
@@ -72,11 +80,7 @@ export class DialogGhExport extends DialogGhImport {
 
     }
 
-    isValid(): boolean {
-        return (this.inputFile.value !== '' && this.inputMessage.value !== '');
-    }
-
-    ok(): void {
+    override ok(): void {
         if (!this.isValid()) return;
 
         const filename: string = this.githubManager.getPathString() + '/' + this.inputFile.value;

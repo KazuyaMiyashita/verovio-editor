@@ -729,7 +729,7 @@ export class App {
         const dlgRes = await dlg.show();
         if (dlgRes === 0) return;
         this.startLoading("Generating MEI file ...");
-        this.generateMEI(dlg.exportOptions);
+        this.generateMEI(dlg.getExportOptions());
     }
 
     async fileExportPDF(e: Event): Promise<any> {
@@ -760,7 +760,7 @@ export class App {
         const dlg = new DialogSelection(this.dialogDiv, this, "Apply a selection to the file currently loaded", { okLabel: "Apply", icon: "info", type: Dialog.Type.OKCancel }, this.options.selection);
         const dlgRes = await dlg.show();
         if (dlgRes === 1) {
-            this.options.selection = dlg.selection;
+            this.options.selection = dlg.getSelection();
             await this.applySelection();
             let event = new CustomEvent('onLoadData', {
                 detail: {
@@ -777,7 +777,7 @@ export class App {
         const dlg = new DialogGhImport(this.dialogDiv, this, "Import an MEI file from GitHub", {}, this.githubManager);
         const dlgRes = await dlg.show();
         if (dlgRes === 1) {
-            this.loadData(dlg.data as string, dlg.filename);
+            this.loadData(dlg.getData() as string, dlg.getFilename());
         }
     }
 
@@ -792,8 +792,8 @@ export class App {
         const dlg = new DialogSettingsEditor(this.dialogDiv, this, "Editor options", { okLabel: "Apply", icon: "info", type: Dialog.Type.OKCancel }, this.options);
         const dlgRes = await dlg.show();
         if (dlgRes === 1) {
-            this.options.verovioVersion = dlg.appOptions.verovioVersion;
-            if (dlg.reload) {
+            this.options.verovioVersion = dlg.getAppOptions().verovioVersion;
+            if (dlg.getReload()) {
                 const dlg = new Dialog(this.dialogDiv, this, "Reloading the editor", { okLabel: "Yes", icon: "question" });
                 dlg.setContent(marked.parse(reloadMsg));
                 if (await dlg.show() === 0) return;
@@ -807,7 +807,7 @@ export class App {
         await dlg.loadOptions();
         const dlgRes = await dlg.show();
         if (dlgRes === 1) {
-            await this.verovio.setOptions(dlg.changedOptions);
+            await this.verovio.setOptions(dlg.getChangedOptions());
             let event = new CustomEvent('onLoadData', {
                 detail: {
                     currentId: this.clientId,
