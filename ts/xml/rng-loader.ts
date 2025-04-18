@@ -2,11 +2,11 @@
  * The RNGLoader class for parsing and storing an RNG Schema.
  */
 export class RNGLoader {
-    rngns: string;
+    rngNs: string;
     tags: Object;
 
     constructor() {
-        this.rngns = "http://relaxng.org/ns/structure/1.0";
+        this.rngNs = "http://relaxng.org/ns/structure/1.0";
         this.tags = {}
     }
 
@@ -33,7 +33,7 @@ export class RNGLoader {
     }
 
     //////////////////////////////////////////////////////////////////////////////
-    // schemainfoCreator
+    // schemaInfoCreator
     //////////////////////////////////////////////////////////////////////////////
 
     /**
@@ -43,7 +43,7 @@ export class RNGLoader {
         "use strict";
         let /**@type{!Object<!string,!Array.<!Element>>}*/
             definitions = new Map<string, Element>,
-            defs = doc.getElementsByTagNameNS(this.rngns, "define"),
+            defs = doc.getElementsByTagNameNS(this.rngNs, "define"),
             i,
             name,
             def,
@@ -248,7 +248,7 @@ export class RNGLoader {
     findAllTopLevelElements(defs: Map<string, Element>, stack: Array<any>, doc: Document): Array<string> {
         "use strict";
         let top: Array<string> = [];
-        let starts = doc.getElementsByTagNameNS(this.rngns, "start");
+        let starts = doc.getElementsByTagNameNS(this.rngNs, "start");
         let e: Element;
         let i: number;
         for (i = 0; i < starts.length; i += 1) {
@@ -260,7 +260,7 @@ export class RNGLoader {
 
     isRng(e: Element, name: string): boolean {
         "use strict";
-        return e.namespaceURI === this.rngns && e.localName === name;
+        return e.namespaceURI === this.rngNs && e.localName === name;
     }
 }
 

@@ -3,7 +3,7 @@
  */
 export class RNGLoader {
     constructor() {
-        this.rngns = "http://relaxng.org/ns/structure/1.0";
+        this.rngNs = "http://relaxng.org/ns/structure/1.0";
         this.tags = {};
     }
     ////////////////////////////////////////////////////////////////////////
@@ -26,14 +26,14 @@ export class RNGLoader {
         this.tags = this.sortObject(elements);
     }
     //////////////////////////////////////////////////////////////////////////////
-    // schemainfoCreator
+    // schemaInfoCreator
     //////////////////////////////////////////////////////////////////////////////
     /**
      * Collect all <define/> elements.
      */
     collectDefinitions(doc) {
         "use strict";
-        let /**@type{!Object<!string,!Array.<!Element>>}*/ definitions = new Map, defs = doc.getElementsByTagNameNS(this.rngns, "define"), i, name, def, array;
+        let /**@type{!Object<!string,!Array.<!Element>>}*/ definitions = new Map, defs = doc.getElementsByTagNameNS(this.rngNs, "define"), i, name, def, array;
         for (i = 0; i < defs.length; i += 1) {
             def = defs.item(i);
             name = def.getAttribute("name");
@@ -226,7 +226,7 @@ export class RNGLoader {
     findAllTopLevelElements(defs, stack, doc) {
         "use strict";
         let top = [];
-        let starts = doc.getElementsByTagNameNS(this.rngns, "start");
+        let starts = doc.getElementsByTagNameNS(this.rngNs, "start");
         let e;
         let i;
         for (i = 0; i < starts.length; i += 1) {
@@ -237,7 +237,7 @@ export class RNGLoader {
     }
     isRng(e, name) {
         "use strict";
-        return e.namespaceURI === this.rngns && e.localName === name;
+        return e.namespaceURI === this.rngNs && e.localName === name;
     }
 }
 //# sourceMappingURL=rng-loader.js.map
