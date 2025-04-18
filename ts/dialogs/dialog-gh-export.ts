@@ -45,7 +45,7 @@ export class DialogGhExport extends DialogGhImport {
         const element: HTMLElement = e.target as HTMLElement;
         if (element.dataset.type === 'dir') {
             if (element.dataset.name === '..') {
-                this.githubManager.selectedPath.pop();
+                this.githubManager.selectedPathPop();
             }
             else {
                 this.githubManager.appendToPath(element.dataset.name);
@@ -71,7 +71,7 @@ export class DialogGhExport extends DialogGhImport {
 
     override updateSelectionAndBreadcrumbs(): void {
         super.updateSelectionAndBreadcrumbs();
-        if (this.githubManager.selectedBranchName === '') {
+        if (this.githubManager.getSelectedBranchName() === '') {
             this.fields.style.display = 'none';
         }
         else {

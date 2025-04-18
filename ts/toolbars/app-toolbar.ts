@@ -302,7 +302,7 @@ export class AppToolbar extends Toolbar {
         if (this.app.githubManager.isLoggedIn()) {
             this.githubMenu.style.display = 'block';
             this.updateToolbarBtnDisplay(this.logout, true);
-            this.login.setAttribute("data-before", this.app.githubManager.name);
+            this.login.setAttribute("data-before", this.app.githubManager.getName());
             this.login.classList.add("inactivated");
         }
 

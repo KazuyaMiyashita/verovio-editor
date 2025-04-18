@@ -9,18 +9,19 @@ declare global {
 }
 
 export class GitHubManager {
-    gh: any; // GitHub object
-    app: App;
-    name: string;
-    login: string;
-    user: any; // GitHub::User object
-    selectedUser: any; // GitHub::User object
-    selectedOrganization: any; // GitHub::Organization object
-    selectedAccountName: string;
-    selectedBranchName: string;
-    selectedRepo: any; // GitHub::Repository object
-    selectedRepoName: string;
-    selectedPath: Array<string>;
+    private name: string;
+    private login: string;
+    private user: any; // GitHub::User object
+    private selectedUser: any; // GitHub::User object
+    private selectedOrganization: any; // GitHub::Organization object
+    private selectedAccountName: string;
+    private selectedBranchName: string;
+    private selectedRepo: any; // GitHub::Repository object
+    private selectedRepoName: string;
+    private selectedPath: Array<string>;
+
+    private gh: any; // GitHub object
+    private readonly app: App;
 
     constructor(app: App) {
         this.app = app;
@@ -45,6 +46,31 @@ export class GitHubManager {
             this.initUser();
         }
     }
+
+    ////////////////////////////////////////////////////////////////////////
+    // Getters and setters
+    ////////////////////////////////////////////////////////////////////////
+
+    public getName(): string { return this.name; }
+
+    public getLogin(): string { return this.login; }
+
+    public getUser(): any { return this.user; }
+
+    public getSelectedUser(): any { return this.selectedUser; }
+
+    public getSelectedOrganization(): any { return this.selectedOrganization; }
+
+    public getSelectedAccountName(): string { return this.selectedAccountName; }
+
+    public getSelectedBranchName(): string { return this.selectedBranchName; }
+
+    public getSelectedRepo(): any { return this.selectedRepo; }
+
+    public getSelectedRepoName(): string { return this.selectedRepoName; }
+
+    public getSelectedPath(): Array<string> { return this.selectedPath; }
+    public selectedPathPop(): void { this.selectedPath.pop(); }
 
     ////////////////////////////////////////////////////////////////////////
     // Class-specific methods

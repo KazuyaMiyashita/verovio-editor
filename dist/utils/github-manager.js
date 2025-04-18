@@ -34,6 +34,20 @@ export class GitHubManager {
         }
     }
     ////////////////////////////////////////////////////////////////////////
+    // Getters and setters
+    ////////////////////////////////////////////////////////////////////////
+    getName() { return this.name; }
+    getLogin() { return this.login; }
+    getUser() { return this.user; }
+    getSelectedUser() { return this.selectedUser; }
+    getSelectedOrganization() { return this.selectedOrganization; }
+    getSelectedAccountName() { return this.selectedAccountName; }
+    getSelectedBranchName() { return this.selectedBranchName; }
+    getSelectedRepo() { return this.selectedRepo; }
+    getSelectedRepoName() { return this.selectedRepoName; }
+    getSelectedPath() { return this.selectedPath; }
+    selectedPathPop() { this.selectedPath.pop(); }
+    ////////////////////////////////////////////////////////////////////////
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
     getSessionCookie(name) {

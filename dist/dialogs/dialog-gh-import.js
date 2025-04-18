@@ -45,7 +45,7 @@ export class DialogGhImport extends Dialog {
         this.breadCrumbs = appendDivTo(this.content, { class: `vrv-path-breadcrumbs` });
         // Hide the OK button because the selection is done by clicking on a file
         this.okBtn.style.display = 'none';
-        if (this.githubManager.selectedBranchName !== '') {
+        if (this.githubManager.getSelectedBranchName() !== '') {
             this.listFiles();
         }
         else {
@@ -65,14 +65,14 @@ export class DialogGhImport extends Dialog {
         this.selection.innerHTML = '';
         this.selection.style.display = 'none';
         this.breadCrumbs.innerHTML = '';
-        const icon = (this.githubManager.selectedOrganization !== null) ? this.iconsInstitution : this.iconsUser;
-        if (!this.addSelection(this.githubManager.selectedAccountName, icon))
+        const icon = (this.githubManager.getSelectedOrganization() !== null) ? this.iconsInstitution : this.iconsUser;
+        if (!this.addSelection(this.githubManager.getSelectedAccountName(), icon))
             return;
-        if (!this.addSelection(this.githubManager.selectedRepoName, this.iconsRepo))
+        if (!this.addSelection(this.githubManager.getSelectedRepoName(), this.iconsRepo))
             return;
-        if (!this.addSelection(this.githubManager.selectedBranchName, this.iconsBranch))
+        if (!this.addSelection(this.githubManager.getSelectedBranchName(), this.iconsBranch))
             return;
-        const path = this.githubManager.selectedPath;
+        const path = this.githubManager.getSelectedPath();
         if (path.length < 2)
             return;
         this.breadCrumbs.style.display = 'flex';
@@ -125,7 +125,7 @@ export class DialogGhImport extends Dialog {
             const element = e.target;
             if (element.dataset.type === 'dir') {
                 if (element.dataset.name === '..') {
-                    this.githubManager.selectedPath.pop();
+                    this.githubManager.selectedPathPop();
                 }
                 else {
                     this.githubManager.appendToPath(element.dataset.name);
@@ -133,9 +133,9 @@ export class DialogGhImport extends Dialog {
                 yield this.listFiles();
             }
             else {
-                const branch = this.githubManager.selectedBranchName;
+                const branch = this.githubManager.getSelectedBranchName();
                 const filename = this.githubManager.getPathString() + '/' + element.dataset.name;
-                const contents = yield this.githubManager.selectedRepo.getContents(branch, filename, true);
+                const contents = yield this.githubManager.getSelectedRepo().getContents(branch, filename, true);
                 this.data = contents.data;
                 this.filename = element.dataset.name;
                 this.ok();
@@ -144,17 +144,17 @@ export class DialogGhImport extends Dialog {
     }
     listFiles() {
         return __awaiter(this, void 0, void 0, function* () {
-            if (this.githubManager.selectedRepo === null) {
+            if (this.githubManager.getSelectedRepo() === null) {
                 this.app.showNotification("Select a repository first");
                 return;
             }
             this.loadingStart(this.tabFile);
-            const branch = this.githubManager.selectedBranchName;
+            const branch = this.githubManager.getSelectedBranchName();
             const path = this.githubManager.getPathString();
-            const contents = yield this.githubManager.selectedRepo.getContents(branch, path);
+            const contents = yield this.githubManager.getSelectedRepo().getContents(branch, path);
             contents.data.sort((a, b) => (a.type > b.type) ? 1 : -1);
             this.loadingEnd();
-            if (this.githubManager.selectedPath.length > 1) {
+            if (this.githubManager.getSelectedPath().length > 1) {
                 this.addItemToList('..', this.iconsFolder, { name: '..', type: 'dir' }, false, this.selectFile);
             }
             for (let i = 0; i < contents.data.length; i++) {
@@ -169,13 +169,13 @@ export class DialogGhImport extends Dialog {
     listUsers() {
         return __awaiter(this, void 0, void 0, function* () {
             this.loadingStart(this.tabUser);
-            const orgs = yield this.githubManager.user.listOrgs();
+            const orgs = yield this.githubManager.getUser().listOrgs();
             this.loadingEnd();
-            const userChecked = (this.githubManager.selectedAccountName === this.githubManager.login);
-            this.addItemToList(this.githubManager.login, this.iconsUser, { login: this.githubManager.login }, userChecked, this.selectUser);
+            const userChecked = (this.githubManager.getSelectedAccountName() === this.githubManager.getLogin());
+            this.addItemToList(this.githubManager.getLogin(), this.iconsUser, { login: this.githubManager.getLogin() }, userChecked, this.selectUser);
             for (let i = 0; i < orgs.data.length; i++) {
                 const login = orgs.data[i].login;
-                const checked = (this.githubManager.selectedAccountName === login);
+                const checked = (this.githubManager.getSelectedAccountName() === login);
                 this.addItemToList(login, this.iconsInstitution, { login: login }, checked, this.selectUser);
             }
             this.updateSelectionAndBreadcrumbs();
@@ -185,17 +185,17 @@ export class DialogGhImport extends Dialog {
         return __awaiter(this, void 0, void 0, function* () {
             this.loadingStart(this.tabRepo);
             let repos;
-            if (this.githubManager.selectedOrganization !== null) {
-                repos = yield this.githubManager.selectedOrganization.getRepos();
+            if (this.githubManager.getSelectedOrganization() !== null) {
+                repos = yield this.githubManager.getSelectedOrganization().getRepos();
             }
             else {
-                repos = yield this.githubManager.selectedUser.listRepos({ type: 'owner' });
+                repos = yield this.githubManager.getSelectedUser().listRepos({ type: 'owner' });
             }
             repos.data.sort((a, b) => (a.name > b.name) ? 1 : -1);
             this.loadingEnd();
             for (let i = 0; i < repos.data.length; i++) {
                 const name = repos.data[i].name;
-                const checked = (this.githubManager.selectedRepoName === name);
+                const checked = (this.githubManager.getSelectedRepoName() === name);
                 this.addItemToList(name, this.iconsRepo, { name: name }, checked, this.selectRepo);
             }
             this.updateSelectionAndBreadcrumbs();
@@ -203,17 +203,17 @@ export class DialogGhImport extends Dialog {
     }
     listBranches() {
         return __awaiter(this, void 0, void 0, function* () {
-            if (this.githubManager.selectedRepo === null) {
+            if (this.githubManager.getSelectedRepo() === null) {
                 this.app.showNotification("Select a repository first");
                 return;
             }
             this.loadingStart(this.tabBranch);
-            const branches = yield this.githubManager.selectedRepo.listBranches();
+            const branches = yield this.githubManager.getSelectedRepo().listBranches();
             branches.data.sort((a, b) => (a.name > b.name) ? 1 : -1);
             this.loadingEnd();
             for (let i = 0; i < branches.data.length; i++) {
                 const name = branches.data[i].name;
-                const checked = (this.githubManager.selectedBranchName === name);
+                const checked = (this.githubManager.getSelectedBranchName() === name);
                 this.addItemToList(name, this.iconsBranch, { name: name }, checked, this.selectBranch);
             }
             this.updateSelectionAndBreadcrumbs();

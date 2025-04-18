@@ -14,8 +14,8 @@ export class GenericView {
 
     protected readonly app: App;
     protected readonly div: HTMLDivElement;
-
     protected active: boolean;
+    
     private display: string;
 
     constructor(div: HTMLDivElement, app: App) {
