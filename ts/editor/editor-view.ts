@@ -19,14 +19,16 @@ interface SelectedItem {
 };
 
 export class EditorView extends ResponsiveView {
-    midiPlayerElement: MidiPlayerElement;
-    svgOverlay: HTMLDivElement;
-    cursorPointerObj: EditorCursorPointer;
-    mouseMoveTimer: boolean;
-    draggingActive: boolean;
-    mouseOverId: string;
-    actionManager: ActionManager;
-    lastNote: { midiPitch: number, oct: string, pname: string };
+    public readonly  cursorPointerObj: EditorCursorPointer;
+    public readonly actionManager: ActionManager;
+
+    private readonly midiPlayerElement: MidiPlayerElement;
+    private svgOverlay: HTMLDivElement;
+    private mouseMoveTimer: boolean;
+    private draggingActive: boolean;
+    private mouseOverId: string;
+
+    private lastNote: { midiPitch: number, oct: string, pname: string };
 
     private selectedItems: Array<SelectedItem>;
 
@@ -64,7 +66,7 @@ export class EditorView extends ResponsiveView {
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
 
-    initCursor(): void {
+    private initCursor(): void {
         const svgRoot: SVGElement = this.svgWrapper.querySelector('svg');
         if (!svgRoot) return;
 
@@ -90,7 +92,7 @@ export class EditorView extends ResponsiveView {
     // Async worker methods
     ////////////////////////////////////////////////////////////////////////
 
-    async renderPage(lightEndLoading: boolean = false, createOverlay: boolean = true): Promise<any> {
+    public async renderPage(lightEndLoading: boolean = false, createOverlay: boolean = true): Promise<any> {
         const svg = await this.verovio.renderToSVG(this.currentPage);
         this.svgWrapper.innerHTML = svg;
         this.initCursor();
@@ -105,7 +107,7 @@ export class EditorView extends ResponsiveView {
         if (lightEndLoading) this.app.endLoading(true);
     }
 
-    async select(element: string, id: string): Promise<any> {
+    private async select(element: string, id: string): Promise<any> {
         this.highlightMouseOverReset();
         const pageWithElement = await this.verovio.getPageWithElement(id);
         if ((pageWithElement > 0) && (pageWithElement != this.currentPage)) {
@@ -116,7 +118,7 @@ export class EditorView extends ResponsiveView {
         this.addToSelection(element, id);
     }
 
-    async playNoteSound(): Promise<any> {
+    private async playNoteSound(): Promise<any> {
         const attr = await this.app.verovio.getElementAttr(this.selectedItems[0].id);
         if (!attr.pname || !attr.oct) return;
         if ((this.lastNote.pname === attr.pname) && (this.lastNote.oct === attr.oct)) return;
@@ -160,20 +162,20 @@ export class EditorView extends ResponsiveView {
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
 
-    clearSelection(): void {
+    public clearSelection(): void {
         this.highlightSelectedReset();
         this.selectedItems = [];
     }
 
-    hasSelection(): boolean {
+    public hasSelection(): boolean {
         return (this.scrollListener.length > 0);
     }
 
-    getSelection(): Array<SelectedItem> {
+    public getSelection(): Array<SelectedItem> {
         return this.selectedItems;
     }
 
-    addNodeToSelection(node: SVGElement): void {
+    public addNodeToSelection(node: SVGElement): void {
         let positionNode: SVGElement = node;
         if (node.classList.contains('note') || node.classList.contains('rest')) {
             positionNode = node.querySelector('use');
@@ -188,7 +190,7 @@ export class EditorView extends ResponsiveView {
         this.addToSelection(node.classList[0], node.id, x, y);
     }
 
-    addToSelection(element: string, id: string, x: number = null, y: number = null): void {
+    public addToSelection(element: string, id: string, x: number = null, y: number = null): void {
         let item: SelectedItem = {
             element: element,
             id: id,
@@ -200,7 +202,22 @@ export class EditorView extends ResponsiveView {
         this.highlightSelected();
     }
     
-    createOverlay(): void {
+    public getClosestMEIElement(node: SVGElement, elementType: string = null): SVGElement {
+        if (!node) {
+            return null;
+        }
+        else if (node.nodeName != "g" || node.classList.contains('bounding-box') || node.classList.contains('notehead')) {
+            return this.getClosestMEIElement((<SVGElement>node.parentNode), elementType);
+        }
+        else if (elementType && !node.classList.contains(elementType)) {
+            return this.getClosestMEIElement((<SVGElement>node.parentNode), elementType);
+        }
+        else {
+            return node;
+        }
+    }
+    
+    private createOverlay(): void {
         // Copy wrapper HTML to overlay
         this.svgOverlay.innerHTML = this.svgWrapper.innerHTML;
 
@@ -241,7 +258,7 @@ export class EditorView extends ResponsiveView {
         this.highlightSelected();
     }
 
-    highlightMouseOver(id: string) {
+    private highlightMouseOver(id: string) {
         this.highlightMouseOverReset();
         let element = <SVGElement>this.svgWrapper.querySelector('#' + id);
         if (element) {
@@ -250,7 +267,7 @@ export class EditorView extends ResponsiveView {
         }
     }
 
-    highlightMouseOverReset(): void {
+    private highlightMouseOverReset(): void {
         if (this.mouseOverId !== "") {
             let element = <SVGElement>this.svgWrapper.querySelector('#' + this.mouseOverId);
             if (element) element.style.filter = '';
@@ -258,7 +275,7 @@ export class EditorView extends ResponsiveView {
         this.mouseOverId = "";
     }
 
-    highlightSelected(): void {
+    private highlightSelected(): void {
         if (this.selectedItems.length === 1) {
             this.playNoteSound();
         }
@@ -268,14 +285,14 @@ export class EditorView extends ResponsiveView {
         }
     }
 
-    highlightSelectedReset(): void {
+    private highlightSelectedReset(): void {
         for (const item of this.selectedItems) {
             // Remove the color with and empty color string
             this.highlightWithColor(this.svgWrapper.querySelector('#' + item.id), '');
         }
     }
 
-    highlightWithColor(g: SVGElement, color: string) {
+    private highlightWithColor(g: SVGElement, color: string) {
         if (!g) return;
         for (const node of Array.from(g.querySelectorAll('*:not(g)'))) {
             const parent = node.parentNode as SVGElement;
@@ -284,21 +301,6 @@ export class EditorView extends ResponsiveView {
             const el = node as SVGElement;
             el.style.fill = color;
             el.style.stroke = color;
-        }
-    }
-
-    getClosestMEIElement(node: SVGElement, elementType: string = null): SVGElement {
-        if (!node) {
-            return null;
-        }
-        else if (node.nodeName != "g" || node.classList.contains('bounding-box') || node.classList.contains('notehead')) {
-            return this.getClosestMEIElement((<SVGElement>node.parentNode), elementType);
-        }
-        else if (elementType && !node.classList.contains(elementType)) {
-            return this.getClosestMEIElement((<SVGElement>node.parentNode), elementType);
-        }
-        else {
-            return node;
         }
     }
 

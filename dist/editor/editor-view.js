@@ -167,6 +167,20 @@ export class EditorView extends ResponsiveView {
         this.selectedItems.push(item);
         this.highlightSelected();
     }
+    getClosestMEIElement(node, elementType = null) {
+        if (!node) {
+            return null;
+        }
+        else if (node.nodeName != "g" || node.classList.contains('bounding-box') || node.classList.contains('notehead')) {
+            return this.getClosestMEIElement(node.parentNode, elementType);
+        }
+        else if (elementType && !node.classList.contains(elementType)) {
+            return this.getClosestMEIElement(node.parentNode, elementType);
+        }
+        else {
+            return node;
+        }
+    }
     createOverlay() {
         // Copy wrapper HTML to overlay
         this.svgOverlay.innerHTML = this.svgWrapper.innerHTML;
@@ -241,20 +255,6 @@ export class EditorView extends ResponsiveView {
             const el = node;
             el.style.fill = color;
             el.style.stroke = color;
-        }
-    }
-    getClosestMEIElement(node, elementType = null) {
-        if (!node) {
-            return null;
-        }
-        else if (node.nodeName != "g" || node.classList.contains('bounding-box') || node.classList.contains('notehead')) {
-            return this.getClosestMEIElement(node.parentNode, elementType);
-        }
-        else if (elementType && !node.classList.contains(elementType)) {
-            return this.getClosestMEIElement(node.parentNode, elementType);
-        }
-        else {
-            return node;
         }
     }
     ////////////////////////////////////////////////////////////////////////
