@@ -10,7 +10,7 @@ import { appendDivTo } from './utils/functions.js';
 
 export class AppStatusbar extends GenericView {
     active: boolean;
-    statustext: HTMLDivElement;
+    statusText: HTMLDivElement;
     div: HTMLDivElement;
 
     constructor(div: HTMLDivElement, app: App) {
@@ -18,7 +18,7 @@ export class AppStatusbar extends GenericView {
 
         this.active = true;
 
-        this.statustext = appendDivTo(this.div, { class: `vrv-status-text` });
+        this.statusText = appendDivTo(this.div, { class: `vrv-status-text` });
     }
 
     ////////////////////////////////////////////////////////////////////////
@@ -33,7 +33,7 @@ export class AppStatusbar extends GenericView {
         if (!super.onEndLoading(e)) return false;
         //console.debug("AppStatusbar::onEndLoading");
 
-        this.statustext.innerHTML = "Completed";
+        this.statusText.innerHTML = "Completed";
 
         return true;
     }
@@ -43,7 +43,7 @@ export class AppStatusbar extends GenericView {
         //console.debug("AppStatusbar:onStartLoading");
 
         let msg = (e.detail.light) ? e.detail.msg : "In progress ...";
-        this.statustext.innerHTML = msg;
+        this.statusText.innerHTML = msg;
 
         return true;
     }

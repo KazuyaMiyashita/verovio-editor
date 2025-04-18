@@ -8,7 +8,7 @@ export class AppStatusbar extends GenericView {
     constructor(div, app) {
         super(div, app);
         this.active = true;
-        this.statustext = appendDivTo(this.div, { class: `vrv-status-text` });
+        this.statusText = appendDivTo(this.div, { class: `vrv-status-text` });
     }
     ////////////////////////////////////////////////////////////////////////
     // Class-specific methods
@@ -20,7 +20,7 @@ export class AppStatusbar extends GenericView {
         if (!super.onEndLoading(e))
             return false;
         //console.debug("AppStatusbar::onEndLoading");
-        this.statustext.innerHTML = "Completed";
+        this.statusText.innerHTML = "Completed";
         return true;
     }
     onStartLoading(e) {
@@ -28,7 +28,7 @@ export class AppStatusbar extends GenericView {
             return false;
         //console.debug("AppStatusbar:onStartLoading");
         let msg = (e.detail.light) ? e.detail.msg : "In progress ...";
-        this.statustext.innerHTML = msg;
+        this.statusText.innerHTML = msg;
         return true;
     }
 }
