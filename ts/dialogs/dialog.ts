@@ -75,6 +75,10 @@ export class Dialog {
         }
     }
 
+    ////////////////////////////////////////////////////////////////////////
+    // Class-specific methods
+    ////////////////////////////////////////////////////////////////////////
+
     addButton(label: string, event: Function) {
         const btn = insertDivBefore(this.bottom, { class: `vrv-dialog-btn`, 'data-before': label }, this.cancelBtn);
         this.eventManager.bind(btn, 'click', event);
@@ -96,11 +100,6 @@ export class Dialog {
         this.boundKeyDown = (e: KeyboardEvent) => this.keyDownListener(e);
     }
 
-    keyDownListener(e: KeyboardEvent): void {
-        if (e.keyCode === 27) this.cancel(); // esc
-        else if (e.keyCode === 13) this.ok(); // enter
-    }
-
     cancel(): void {
         this.div.style.display = 'none';
         document.removeEventListener('keydown', this.boundKeyDown);
@@ -114,6 +113,10 @@ export class Dialog {
         this.deferred.resolve(resolveValue);
     }
 
+    ////////////////////////////////////////////////////////////////////////
+    // Async methods
+    ////////////////////////////////////////////////////////////////////////
+
     async show(): Promise<any> {
         this.div.style.display = 'block';
         this.okBtn.focus();
@@ -122,8 +125,13 @@ export class Dialog {
     }
 
     ////////////////////////////////////////////////////////////////////////
-    // Class-specific methods
+    // Event methods
     ////////////////////////////////////////////////////////////////////////
+
+    keyDownListener(e: KeyboardEvent): void {
+        if (e.keyCode === 27) this.cancel(); // esc
+        else if (e.keyCode === 13) this.ok(); // enter
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////

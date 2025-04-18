@@ -6,6 +6,10 @@ import { GenericView } from './generic-view.js';
 
 import { appendDivTo, appendInputTo } from './functions.js';
 
+////////////////////////////////////////////////////////////////////////
+// Function for recursively build the tree
+////////////////////////////////////////////////////////////////////////
+
 function buildTree(nodeData: any): TreeNode {
     const {
         id = null,
@@ -37,7 +41,11 @@ export class GenericTree extends GenericView {
         this.setDisplayFlex();
     }
 
-    reset(): void {
+    ////////////////////////////////////////////////////////////////////////
+    // Class-specific methods
+    ////////////////////////////////////////////////////////////////////////
+
+    protected reset(): void {
         this.eventManager.unbindAll();
         if (this.root) {
             this.root.reset();
@@ -46,19 +54,7 @@ export class GenericTree extends GenericView {
         this.root = null;
     }
 
-    onClick(e: MouseEvent): void {
-        // This need to be overridden
-    }
-
-    onMouseover(e: MouseEvent): void {
-        // This need to be overridden
-    }
-
-    onMouseout(e: MouseEvent): void {
-        // This need to be overridden
-    }
-
-    collapseNode(id: string) {
+    protected collapseNode(id: string) {
         this.traverse((node) => {
             if (node.id === id) {
                 if (!node.div.classList.contains("open")) return true;
@@ -71,7 +67,7 @@ export class GenericTree extends GenericView {
         });
     }
 
-    fromJson(json: any): void {
+    protected fromJson(json: any): void {
         if (!json || !json.element) throw new Error("Invalid JSON data: Missing 'element' property");
 
         this.root = buildTree(json);
@@ -80,7 +76,7 @@ export class GenericTree extends GenericView {
     }
 
     // Generic depth-first traversal method
-    traverse(callback: (node: TreeNode) => boolean | void): void {
+    protected traverse(callback: (node: TreeNode) => boolean | void): void {
         const visit = (node: TreeNode): boolean => {
             if (callback(node)) {
                 return true; // Stop if callback says so
@@ -92,16 +88,32 @@ export class GenericTree extends GenericView {
         };
         visit(this.root);
     }
+
+    ////////////////////////////////////////////////////////////////////////
+    // Events methods
+    ////////////////////////////////////////////////////////////////////////
+
+    onClick(e: MouseEvent): void {
+        // This need to be overridden
+    }
+
+    onMouseover(e: MouseEvent): void {
+        // This need to be overridden
+    }
+
+    onMouseout(e: MouseEvent): void {
+        // This need to be overridden
+    }
 }
 
 export class TreeNode {
     div: HTMLDivElement;
     label: HTMLDivElement;
-    id: string | null; // Unique node identifier
-    element: string; // XML tag name
-    attributes: Record<string, string>; // Key-value attributes
+    id: string | null; // xml:id
+    element: string; // tag name
+    attributes: Record<string, string>;
     children: TreeNode[];
-    isTextNode: boolean; // Flag for text nodes
+    isTextNode: boolean; // flag for text nodes
     isLeaf: boolean;
 
     constructor(
@@ -119,6 +131,10 @@ export class TreeNode {
         this.isTextNode = isTextNode;
         this.isLeaf = isLeaf;
     }
+
+    ////////////////////////////////////////////////////////////////////////
+    // Class-specific methods
+    ////////////////////////////////////////////////////////////////////////
 
     reset(): void {
         this.children.forEach(child => child.reset());

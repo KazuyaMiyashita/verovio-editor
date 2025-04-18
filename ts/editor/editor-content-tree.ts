@@ -21,58 +21,9 @@ export class EditorContentTree extends GenericTree {
         this.breadCrumbs = appendDivTo(this.breadCrumbsWrapper, { class: `vrv-tree-breadcrumbs` });
     }
 
-    addCrumb(element: string, id: string): void {
-        const crumb: HTMLDivElement = appendDivTo(this.breadCrumbs, { class: `vrv-tree-breadcrumb` });
-        crumb.innerHTML = element;
-        crumb.dataset.id = id
-        crumb.dataset.element = element;
-        this.eventManager.bind(crumb, 'click', this.onClick);
-        this.eventManager.bind(crumb, 'mouseover', this.onMouseover);
-        this.eventManager.bind(crumb, 'mouseout', this.onMouseout);
-    }
-
-    selectNode(node: TreeNode): void {
-        node.label.classList.add("target");
-        node.label.classList.add("checked");
-        const parentRect = this.root.div.getBoundingClientRect();
-        const childRect = node.div.getBoundingClientRect();
-        // Calculate offset of the node relative to root
-        const offsetTop = childRect.top - parentRect.top + this.root.div.scrollTop;
-        // arbitrary margin
-        this.root.div.scrollTo({ top: offsetTop - 50 });
-    }
-
-    async loadContext(context: Object, ancestors: Object, target: Object): Promise<any> {
-        this.reset();
-        this.fromJson(context);
-
-        this.traverse((node) => {
-            node.label.style.backgroundImage = `url(${App.iconFor(node.element)})`;
-            if (node.id === target['id']) {
-                this.selectNode(node);
-            }
-            return false;
-        });
-
-        if (Array.isArray(ancestors)) {
-            this.breadCrumbs.innerHTML = "";
-            for (let i = ancestors.length - 1; i >= 0; i--) {
-                this.addCrumb(ancestors[i]['element'], ancestors[i]['id']);
-            };
-        };
-        this.breadCrumbsWrapper.scrollLeft = this.breadCrumbsWrapper.scrollWidth;
-    }
-
     ////////////////////////////////////////////////////////////////////////
     // Custom event methods
     ////////////////////////////////////////////////////////////////////////
-
-    override onLoadData(e: CustomEvent): boolean {
-        if (!super.onLoadData(e)) return false;
-        //console.debug("EditorContentTree::onLoadData");
-
-        return true;
-    }
 
     ////////////////////////////////////////////////////////////////////////
     // Class-specific methods
@@ -100,6 +51,52 @@ export class EditorContentTree extends GenericTree {
         });
         this.app.customEventManager.dispatch(event);
     }
+
+    addCrumb(element: string, id: string): void {
+        const crumb: HTMLDivElement = appendDivTo(this.breadCrumbs, { class: `vrv-tree-breadcrumb` });
+        crumb.innerHTML = element;
+        crumb.dataset.id = id
+        crumb.dataset.element = element;
+        this.eventManager.bind(crumb, 'click', this.onClick);
+        this.eventManager.bind(crumb, 'mouseover', this.onMouseover);
+        this.eventManager.bind(crumb, 'mouseout', this.onMouseout);
+    }
+
+    selectNode(node: TreeNode): void {
+        node.label.classList.add("target");
+        node.label.classList.add("checked");
+        const parentRect = this.root.div.getBoundingClientRect();
+        const childRect = node.div.getBoundingClientRect();
+        // Calculate offset of the node relative to root
+        const offsetTop = childRect.top - parentRect.top + this.root.div.scrollTop;
+        // arbitrary margin
+        this.root.div.scrollTo({ top: offsetTop - 50 });
+    }
+
+    loadContext(context: Object, ancestors: Object, target: Object): void {
+        this.reset();
+        this.fromJson(context);
+
+        this.traverse((node) => {
+            node.label.style.backgroundImage = `url(${App.iconFor(node.element)})`;
+            if (node.id === target['id']) {
+                this.selectNode(node);
+            }
+            return false;
+        });
+
+        if (Array.isArray(ancestors)) {
+            this.breadCrumbs.innerHTML = "";
+            for (let i = ancestors.length - 1; i >= 0; i--) {
+                this.addCrumb(ancestors[i]['element'], ancestors[i]['id']);
+            };
+        };
+        this.breadCrumbsWrapper.scrollLeft = this.breadCrumbsWrapper.scrollWidth;
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+    // Event methods
+    //////////////////////////////////////////////////////////////////////////
 
     override onClick(e: MouseEvent): void {
         const element: HTMLElement = e.target as HTMLElement;

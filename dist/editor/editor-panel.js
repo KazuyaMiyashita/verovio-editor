@@ -211,7 +211,7 @@ export class EditorPanel extends GenericView {
     }
     //////////////////////////////////////////////////////////////////////////
     // Event methods
-    ////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////
     onDragInit(e) {
         document.addEventListener('mousemove', this.boundMouseMove);
         document.addEventListener('mouseup', this.boundMouseUp);
@@ -261,7 +261,7 @@ export class EditorPanel extends GenericView {
         let event = new CustomEvent('onResized');
         this.customEventManager.dispatch(event);
     }
-    onToggleOrientation() {
+    onToggleOrientation(e) {
         this.app.options.editorSplitterHorizontal = !this.app.options.editorSplitterHorizontal;
         this.split.classList.toggle("vertical");
         this.split.classList.toggle("horizontal");
@@ -269,7 +269,10 @@ export class EditorPanel extends GenericView {
         let event = new CustomEvent('onResized');
         this.app.customEventManager.dispatch(event);
     }
-    onToggle() {
+    ////////////////////////////////////////////////////////////////////////
+    // Async event methods
+    ////////////////////////////////////////////////////////////////////////
+    onToggle(e) {
         return __awaiter(this, void 0, void 0, function* () {
             if (!this.xmlEditorEnabled) {
                 this.xmlEditorEnabled = true;

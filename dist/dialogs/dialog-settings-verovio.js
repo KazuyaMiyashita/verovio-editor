@@ -59,6 +59,9 @@ export class DialogSettingsVerovio extends Dialog {
         this.box.style.maxWidth = `800px`;
         this.addButton("Reset", this.reset);
     }
+    ////////////////////////////////////////////////////////////////////////
+    // Async worker methods
+    ////////////////////////////////////////////////////////////////////////    
     loadOptions() {
         return __awaiter(this, void 0, void 0, function* () {
             // Get object describing the available options
@@ -132,6 +135,9 @@ export class DialogSettingsVerovio extends Dialog {
             }
         });
     }
+    ////////////////////////////////////////////////////////////////////////
+    // Class-specific methods
+    ////////////////////////////////////////////////////////////////////////
     diffOptions(options, reset) {
         const inputs = this.content.querySelectorAll('.vrv-dialog-input');
         const values = {};
@@ -167,9 +173,6 @@ export class DialogSettingsVerovio extends Dialog {
         });
         return values;
     }
-    ////////////////////////////////////////////////////////////////////////
-    // Class-specific methods
-    ////////////////////////////////////////////////////////////////////////
     ok() {
         this.changedOptions = this.diffOptions(this.currentOptions, false);
         // trigger reload only if something has changed

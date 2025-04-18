@@ -79,10 +79,82 @@ export class Keyboard {
         this.activate();
     }
 
+    ////////////////////////////////////////////////////////////////////////
+    // Async worker methods
+    ////////////////////////////////////////////////////////////////////////
+
+    async playNoteSound(midi: string): Promise<any> {
+
+        let midiNum: number = Number(midi);
+
+        // Limit the range to playable notes
+        if (Number(midi) > 107) return;
+        if (Number(midi) < 21) return;
+
+        this.midiPlayerElement.stop();
+        this.midiPlayerElement.currentTime = ((Number(midi) - 21) * 0.5);
+        this.midiPlayerElement.start();
+        setTimeout(() => {
+            this.midiPlayerElement.stop();
+        }, 500);
+          
+    }
+
+    ////////////////////////////////////////////////////////////////////////
+    // Class-specific methods
+    ////////////////////////////////////////////////////////////////////////
+
     bindListeners(): void {
         this.boundKeyDown = (e: KeyboardEvent) => this.keyDownListener(e);
         this.boundKeyUp = (e: KeyboardEvent) => this.keyUpListener(e);
     }
+    
+    activateLower() {
+        if (this.currentOctave <= 1) return;
+        this.currentOctave--;
+        this.activate();
+    }
+
+    activateHigher() {
+        if (this.currentOctave >= this.octaveNumbers.length) return;
+        this.currentOctave++;
+        this.activate();
+    }
+
+    activate() {
+        this.keys.querySelectorAll('.vrv-keyboard-key').forEach(element => element.classList.remove('selected'));
+        this.octaves.querySelectorAll('.vrv-keyboard-octave').forEach(element => element.classList.remove('selected'));
+
+        
+        let key = this.keys.children[(this.currentOctave - 1) * 12];
+        this.letters.forEach(letter => {
+            if (key) {
+                key.setAttribute('data-key', letter);
+                key.classList.add('selected');
+                key = key.nextElementSibling;
+            }
+        })
+        let octave = (this.octaves.children[this.currentOctave - 1] as HTMLElement);
+
+        octave.classList.add('selected');
+
+        let totalWidth = this.keys.scrollWidth;
+        if (totalWidth === 0) return;
+
+        let visibleWidth = this.keys.clientWidth;
+        let octaveWidth = octave.scrollWidth;
+        let octaveOffset = octave.offsetLeft;
+        let shift = octaveOffset - (visibleWidth / 2) + (octaveWidth / 2);
+        //this.keyboardWrapper.scrollLeft = shift;
+        this.keyboardWrapper.scroll({
+            left: shift,
+            behavior: "smooth",
+        });
+    }
+
+    ////////////////////////////////////////////////////////////////////////
+    // Event methods
+    ////////////////////////////////////////////////////////////////////////
 
     keyDownListener(e: KeyboardEvent): void {
         if (e.key === 'ArrowLeft') this.activateLower();
@@ -127,74 +199,6 @@ export class Keyboard {
     mouseLeaveListener(e: MouseEvent): void {
         document.removeEventListener('keydown', this.boundKeyDown);
         document.removeEventListener('keyup', this.boundKeyUp);
-    }
-
-    ////////////////////////////////////////////////////////////////////////
-    // Async worker methods
-    ////////////////////////////////////////////////////////////////////////
-
-    async playNoteSound(midi: string): Promise<any> {
-
-        let midiNum: number = Number(midi);
-
-        // Limit the range to playable notes
-        if (Number(midi) > 107) return;
-        if (Number(midi) < 21) return;
-
-        this.midiPlayerElement.stop();
-        this.midiPlayerElement.currentTime = ((Number(midi) - 21) * 0.5);
-        this.midiPlayerElement.start();
-        setTimeout(() => {
-            this.midiPlayerElement.stop();
-        }, 500);
-          
-    }
-
-    ////////////////////////////////////////////////////////////////////////
-    // Class-specific methods
-    ////////////////////////////////////////////////////////////////////////
-
-    activateLower() {
-        if (this.currentOctave <= 1) return;
-        this.currentOctave--;
-        this.activate();
-    }
-
-    activateHigher() {
-        if (this.currentOctave >= this.octaveNumbers.length) return;
-        this.currentOctave++;
-        this.activate();
-    }
-
-    activate() {
-        this.keys.querySelectorAll('.vrv-keyboard-key').forEach(element => element.classList.remove('selected'));
-        this.octaves.querySelectorAll('.vrv-keyboard-octave').forEach(element => element.classList.remove('selected'));
-
-        
-        let key = this.keys.children[(this.currentOctave - 1) * 12];
-        this.letters.forEach(letter => {
-            if (key) {
-                key.setAttribute('data-key', letter);
-                key.classList.add('selected');
-                key = key.nextElementSibling;
-            }
-        })
-        let octave = (this.octaves.children[this.currentOctave - 1] as HTMLElement);
-
-        octave.classList.add('selected');
-
-        let totalWidth = this.keys.scrollWidth;
-        if (totalWidth === 0) return;
-
-        let visibleWidth = this.keys.clientWidth;
-        let octaveWidth = octave.scrollWidth;
-        let octaveOffset = octave.offsetLeft;
-        let shift = octaveOffset - (visibleWidth / 2) + (octaveWidth / 2);
-        //this.keyboardWrapper.scrollLeft = shift;
-        this.keyboardWrapper.scroll({
-            left: shift,
-            behavior: "smooth",
-        });
     }
 }
 

@@ -28,6 +28,9 @@ export class GenericView {
         this.customEventManager.bind(this, 'onEditData', this.onEditData);
         this.customEventManager.bind(this, 'onZoom', this.onZoom);
     }
+    ////////////////////////////////////////////////////////////////////////
+    // Class-specific methods
+    ////////////////////////////////////////////////////////////////////////
     destroy() {
         // Nothing at this level
     }
@@ -53,10 +56,22 @@ export class GenericView {
         this.active = false;
         return true;
     }
+    onEditData(e) {
+        if (!this.active)
+            return false;
+        //console.debug("GenericView::onEditData");
+        return true;
+    }
     onEndLoading(e) {
         if (!this.active)
             return false;
         //console.debug("GenericView::onEndLoading");
+        return true;
+    }
+    onLoadData(e) {
+        if (!this.active)
+            return false;
+        //console.debug("GenericView::onLoadData");
         return true;
     }
     onPage(e) {
@@ -83,18 +98,6 @@ export class GenericView {
         if (!this.active)
             return false;
         //console.debug("GenericView::onStartLoading");
-        return true;
-    }
-    onLoadData(e) {
-        if (!this.active)
-            return false;
-        //console.debug("GenericView::onLoadData");
-        return true;
-    }
-    onEditData(e) {
-        if (!this.active)
-            return false;
-        //console.debug("GenericView::onEditData");
         return true;
     }
     onZoom(e) {

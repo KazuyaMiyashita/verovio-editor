@@ -244,6 +244,7 @@ export class ActionManager {
             yield this.editorViewObj.verovio.edit(editorAction);
             //await this.editorViewObj.updateLoadData();
             //this.editorViewObj.updateMEI();
+            yield this.editorViewObj.renderPage(true);
         });
     }
     // helper

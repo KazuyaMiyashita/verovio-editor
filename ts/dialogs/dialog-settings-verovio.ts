@@ -70,6 +70,10 @@ export class DialogSettingsVerovio extends Dialog {
         this.addButton("Reset", this.reset);
     }
 
+    ////////////////////////////////////////////////////////////////////////
+    // Async worker methods
+    ////////////////////////////////////////////////////////////////////////    
+
     async loadOptions() {
         // Get object describing the available options
         const availableOptions: AvailableOptions = await this.verovio.getAvailableOptions();
@@ -146,6 +150,10 @@ export class DialogSettingsVerovio extends Dialog {
         }
     }
 
+    ////////////////////////////////////////////////////////////////////////
+    // Class-specific methods
+    ////////////////////////////////////////////////////////////////////////
+
     diffOptions(options: Options, reset: boolean): Options {
         const inputs = this.content.querySelectorAll('.vrv-dialog-input');
         const values: Options = {};
@@ -181,10 +189,6 @@ export class DialogSettingsVerovio extends Dialog {
         });
         return values;
     }
-
-    ////////////////////////////////////////////////////////////////////////
-    // Class-specific methods
-    ////////////////////////////////////////////////////////////////////////
 
     ok(): void {
         this.changedOptions = this.diffOptions(this.currentOptions, false);

@@ -258,6 +258,7 @@ export class ActionManager {
         await this.editorViewObj.verovio.edit(editorAction);
         //await this.editorViewObj.updateLoadData();
         //this.editorViewObj.updateMEI();
+        await this.editorViewObj.renderPage(true);
     }
 
     // helper

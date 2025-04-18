@@ -59,11 +59,11 @@ export class DocumentView extends VerovioView {
             case (VerovioView.Refresh.Activate):
                 await this.updateActivate();
                 break;
-            case (VerovioView.Refresh.Resized):
-                await this.updateResize();
-                break;
             case (VerovioView.Refresh.LoadData):
                 await this.updateLoadData(true, mei, reload);
+                break;
+            case (VerovioView.Refresh.Resized):
+                await this.updateResized();
                 break;
             case (VerovioView.Refresh.Zoom):
                 await this.updateZoom();
@@ -99,13 +99,13 @@ export class DocumentView extends VerovioView {
             await this.verovio.redoLayout();
             const pageCount = await this.verovio.getPageCount();
             this.app.pageCount = pageCount;
-        }        
+        }
 
         while (this.docWrapper.firstChild) {
             this.docWrapper.firstChild.remove();
         }
 
-        await this.updateResize();
+        await this.updateResized();
 
         if (this.observer) {
             this.observer.lastPageIn = 0;
@@ -146,7 +146,7 @@ export class DocumentView extends VerovioView {
 
     }
 
-    async updateResize(): Promise<any> {
+    async updateResized(): Promise<any> {
         this.div.style.height = this.div.parentElement.style.height;
         this.div.style.width = this.div.parentElement.style.width;
 
@@ -169,7 +169,7 @@ export class DocumentView extends VerovioView {
 
     async updateZoom(): Promise<any> {
         if (this.app.options.documentViewSVG) {
-            await this.updateResize();
+            await this.updateResized();
             for (let idx = 0; idx < this.app.pageCount; idx++) {
                 let page = <HTMLElement>this.docWrapper.children[idx];
                 page.style.height = `${this.currentPageHeight}px`;
@@ -191,6 +191,48 @@ export class DocumentView extends VerovioView {
 
     ////////////////////////////////////////////////////////////////////////
     // Class-specific methods
+    ////////////////////////////////////////////////////////////////////////
+
+    handleObserver(entries: Array<IntersectionObserverEntry>, observer: DocumentViewObserver): void {
+        // Load page and update first and last page if necessary
+        for (let entry of entries) {
+            if (entry.isIntersecting) {
+                observer.view.loadPage(<HTMLElement>entry.target);
+                // Already load the next page (null if none)
+                observer.view.loadPage(<HTMLElement>entry.target.nextSibling);
+                // Keep the lastPageLoaded for pruning
+                observer.lastPageIn = parseInt((<HTMLElement>entry.target).dataset.page);
+            }
+        }
+    }
+
+    loadPage(pageElement: HTMLElement): void {
+        // This happens when loading the next page of the last page
+        if (pageElement === null) return;
+
+        if (!pageElement.dataset.loaded) {
+            // Mark it as loaded so we do not trigger it again
+            pageElement.dataset.loaded = "true";
+            this.renderPage(pageElement.dataset.page);
+        }
+    }
+
+    pruneDocument(): void {
+        for (let idx = 0; idx < this.app.pageCount; idx++) {
+            let page = <HTMLElement>this.docWrapper.children[idx];
+            if (idx < this.observer.lastPageIn - this.observer.pruningMargin) {
+                delete page.dataset.loaded;
+                page.innerHTML = '';
+            }
+            if (idx > this.observer.lastPageIn + this.observer.pruningMargin) {
+                delete page.dataset.loaded;
+                page.innerHTML = '';
+            }
+        }
+    }
+
+    ////////////////////////////////////////////////////////////////////////
+    // Async worker methods
     ////////////////////////////////////////////////////////////////////////
 
     async renderPage(pageIndex): Promise<any> {
@@ -232,44 +274,6 @@ export class DocumentView extends VerovioView {
             };
 
             img.src = svgUrl;
-        }
-    }
-
-    handleObserver(entries: Array<IntersectionObserverEntry>, observer: DocumentViewObserver): void {
-        // Load page and update first and last page if necessary
-        for (let entry of entries) {
-            if (entry.isIntersecting) {
-                observer.view.loadPage(<HTMLElement>entry.target);
-                // Already load the next page (null if none)
-                observer.view.loadPage(<HTMLElement>entry.target.nextSibling);
-                // Keep the lastPageLoaded for pruning
-                observer.lastPageIn = parseInt((<HTMLElement>entry.target).dataset.page);
-            }
-        }
-    }
-
-    loadPage(pageElement: HTMLElement): void {
-        // This happens when loading the next page of the last page
-        if (pageElement === null) return;
-
-        if (!pageElement.dataset.loaded) {
-            // Mark it as loaded so we do not trigger it again
-            pageElement.dataset.loaded = "true";
-            this.renderPage(pageElement.dataset.page);
-        }
-    }
-
-    pruneDocument(): void {
-        for (let idx = 0; idx < this.app.pageCount; idx++) {
-            let page = <HTMLElement>this.docWrapper.children[idx];
-            if (idx < this.observer.lastPageIn - this.observer.pruningMargin) {
-                delete page.dataset.loaded;
-                page.innerHTML = '';
-            }
-            if (idx > this.observer.lastPageIn + this.observer.pruningMargin) {
-                delete page.dataset.loaded;
-                page.innerHTML = '';
-            }
         }
     }
 

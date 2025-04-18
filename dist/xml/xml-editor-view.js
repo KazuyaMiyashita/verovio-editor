@@ -88,11 +88,10 @@ export class XMLEditorView extends GenericView {
         this.CMeditor.options.hintOptions.schemaInfo = this.rngLoader.tags;
     }
     ////////////////////////////////////////////////////////////////////////
-    // Getters and Setter
+    // Getters and Setters
     ////////////////////////////////////////////////////////////////////////
     isEdited() { return this.edited; }
     setEdited(edited) { this.edited = edited; }
-    //isEnabled(): boolean { return this.enabled; }
     isAutoMode() { return this.autoMode; }
     setMode(fileSize) {
         this.autoMode = (fileSize < (autoModeLimit * 1024 * 1024));
@@ -101,20 +100,8 @@ export class XMLEditorView extends GenericView {
     isAutoModeNotification() { return this.autoModeNotification; }
     setAutoModeNotification(autoModeNotification) { this.autoModeNotification = autoModeNotification; }
     ////////////////////////////////////////////////////////////////////////
-    // Async methods
+    // Async worker methods
     ////////////////////////////////////////////////////////////////////////
-    /*
-    async setEnabled(enabled: boolean): Promise<any> {
-        this.enabled = enabled;
-        if (this.enabled && this.autoModeNotification && !this.autoMode) {
-            const dlg = new Dialog(this.app.dialogDiv, this.app, "Live validation off", { icon: "warning", type: Dialog.Type.Msg });
-            dlg.setContent(marked.parse(autoModeOff));
-            await dlg.show();
-            // Do not show it again for that file.
-            this.autoModeNotification = false;
-        }
-    }
-    */
     validate(text, updateLinting, options) {
         return __awaiter(this, void 0, void 0, function* () {
             //console.debug( "XMLEditorView::validate");
@@ -321,14 +308,6 @@ export class XMLEditorView extends GenericView {
         this.CMeditor.setSize(this.div.style.width, this.div.style.height);
         return true;
     }
-    onSelect(e) {
-        if (!super.onSelect(e))
-            return false;
-        //console.debug("XMLEditorView::onSelect");
-        this.currentId = e.detail.id;
-        this.setCurrent(this.currentId);
-        return true;
-    }
     onLoadData(e) {
         if (!super.onLoadData(e))
             return false;
@@ -346,6 +325,14 @@ export class XMLEditorView extends GenericView {
             return false;
         //console.debug("XMLEditorView::onResized");
         this.CMeditor.setSize(this.div.style.width, this.div.style.height);
+        return true;
+    }
+    onSelect(e) {
+        if (!super.onSelect(e))
+            return false;
+        //console.debug("XMLEditorView::onSelect");
+        this.currentId = e.detail.id;
+        this.setCurrent(this.currentId);
         return true;
     }
 }

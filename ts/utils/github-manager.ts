@@ -46,6 +46,10 @@ export class GitHubManager {
         }
     }
 
+    ////////////////////////////////////////////////////////////////////////
+    // Class-specific methods
+    ////////////////////////////////////////////////////////////////////////
+
     getSessionCookie(name: string): string {
         let v: Array<string> = document.cookie.match('(^|;) ?' + name + '=([^;]*)(;|$)');
         return v ? v[2] : null;
@@ -83,6 +87,10 @@ export class GitHubManager {
         this.selectedPath = this.selectedPath.slice(0, value);
         this.storeSelection();
     }
+
+    ////////////////////////////////////////////////////////////////////////
+    // Async network methods
+    ////////////////////////////////////////////////////////////////////////
 
     async initUser(): Promise<any> {
         this.user = this.gh.getUser();

@@ -38,19 +38,8 @@ export class DialogGhExport extends DialogGhImport {
     }
 
     ////////////////////////////////////////////////////////////////////////
-    // Class-specific methods
+    // Async network methods
     ////////////////////////////////////////////////////////////////////////
-
-    updateSelectionAndBreadcrumbs(): void {
-        super.updateSelectionAndBreadcrumbs();
-        if (this.githubManager.selectedBranchName === '') {
-            this.fields.style.display = 'none';
-        }
-        else {
-            this.fields.style.display = 'grid';
-        }
-
-    }
 
     async selectFile(e: MouseEvent): Promise<any> {
         const element: HTMLElement = e.target as HTMLElement;
@@ -68,12 +57,23 @@ export class DialogGhExport extends DialogGhImport {
         }
     }
 
-    isValid(): boolean {
-        return (this.inputFile.value !== '' && this.inputMessage.value !== '');
+    ////////////////////////////////////////////////////////////////////////
+    // Class-specific methods
+    ////////////////////////////////////////////////////////////////////////
+
+    updateSelectionAndBreadcrumbs(): void {
+        super.updateSelectionAndBreadcrumbs();
+        if (this.githubManager.selectedBranchName === '') {
+            this.fields.style.display = 'none';
+        }
+        else {
+            this.fields.style.display = 'grid';
+        }
+
     }
 
-    enableOk(e: MouseEvent): void {
-        this.okBtn.classList.toggle('disabled', !this.isValid());
+    isValid(): boolean {
+        return (this.inputFile.value !== '' && this.inputMessage.value !== '');
     }
 
     ok(): void {
@@ -87,4 +87,11 @@ export class DialogGhExport extends DialogGhImport {
         super.ok();
     }
 
+    ////////////////////////////////////////////////////////////////////////
+    // Event methods
+    ////////////////////////////////////////////////////////////////////////
+
+    enableOk(e: MouseEvent): void {
+        this.okBtn.classList.toggle('disabled', !this.isValid());
+    }
 }

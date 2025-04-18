@@ -41,6 +41,9 @@ export class MidiToolbar extends Toolbar {
         this.updateToolbarBtnDisplay(this.stop, false);
         this.updateToolbarGrp(this.progressControl, false);
     }
+    ////////////////////////////////////////////////////////////////////////
+    // Class specific methods
+    ////////////////////////////////////////////////////////////////////////
     updateAll() {
         this.updateProgressBar();
         this.updateToolbarGrp(this.midiControls, (this.app.pageCount > 0));

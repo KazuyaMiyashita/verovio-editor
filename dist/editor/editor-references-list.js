@@ -1,12 +1,3 @@
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 import { App } from '../app.js';
 import { EventManager } from '../events/event-manager.js';
 import { GenericView } from '../utils/generic-view.js';
@@ -19,33 +10,28 @@ export class EditorReferenceList extends GenericView {
         this.eventManager = new EventManager(this);
         this.listWrapper = appendDivTo(this.div, { class: `vrv-reference-list-wrapper` });
     }
+    ////////////////////////////////////////////////////////////////////////
+    // Class-specific methods
+    ////////////////////////////////////////////////////////////////////////
     loadList(references, direction) {
-        return __awaiter(this, void 0, void 0, function* () {
-            this.listWrapper.innerHTML = "";
-            this.eventManager.unbindAll();
-            if (!Array.isArray(references))
-                return;
-            references.forEach(reference => {
-                let item = appendDivTo(this.listWrapper, { class: `vrv-reference-list-item vrv-mei-element` });
-                item.style.backgroundImage = `url(${App.iconFor(reference['element'])})`;
-                item.innerHTML = `${reference['element']}@${reference['referenceAttribute']}`;
-                item.dataset.id = reference['id'];
-                item.dataset.element = reference['element'];
-                this.eventManager.bind(item, "click", this.onClick);
-                this.eventManager.bind(item, "mouseover", this.onMouseover);
-                this.eventManager.bind(item, "mouseout", this.onMouseout);
-            });
+        this.listWrapper.innerHTML = "";
+        this.eventManager.unbindAll();
+        if (!Array.isArray(references))
+            return;
+        references.forEach(reference => {
+            let item = appendDivTo(this.listWrapper, { class: `vrv-reference-list-item vrv-mei-element` });
+            item.style.backgroundImage = `url(${App.iconFor(reference['element'])})`;
+            item.innerHTML = `${reference['element']}@${reference['referenceAttribute']}`;
+            item.dataset.id = reference['id'];
+            item.dataset.element = reference['element'];
+            this.eventManager.bind(item, "click", this.onClick);
+            this.eventManager.bind(item, "mouseover", this.onMouseover);
+            this.eventManager.bind(item, "mouseout", this.onMouseout);
         });
     }
     ////////////////////////////////////////////////////////////////////////
     // Custom event methods
     ////////////////////////////////////////////////////////////////////////
-    onLoadData(e) {
-        if (!super.onLoadData(e))
-            return false;
-        console.debug("EditorReferenceList::onLoadData");
-        return true;
-    }
     ////////////////////////////////////////////////////////////////////////
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
@@ -69,6 +55,9 @@ export class EditorReferenceList extends GenericView {
         });
         this.app.customEventManager.dispatch(event);
     }
+    //////////////////////////////////////////////////////////////////////////
+    // Event methods
+    //////////////////////////////////////////////////////////////////////////
     onClick(e) {
         const element = e.target;
         if (element.dataset.id) {

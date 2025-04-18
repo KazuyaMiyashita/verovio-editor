@@ -38,6 +38,10 @@ export class VerovioView extends GenericView {
         this.currentScale = this.app.zoomLevels[this.currentZoomIndex];
     }
 
+    ////////////////////////////////////////////////////////////////////////
+    // Class-specific method
+    ////////////////////////////////////////////////////////////////////////
+
     // Called to unsubscribe from all events. Probably a good idea to call this if the object is deleted.
     destroy(): void {
         this.eventManager.unbindAll();
@@ -66,11 +70,6 @@ export class VerovioView extends GenericView {
         this.boundResize = (e: Event) => this.resizeComponents(e);
     }
 
-    async refreshView(update: VerovioView.Refresh, lightEndLoading: boolean = false, mei: string = "", reload: boolean = false): Promise<any> {
-        console.debug("View::updateView should be overwritten");
-        console.debug(update);
-    }
-
     ////////////////////////////////////////////////////////////////////////
     // Custom event methods
     ////////////////////////////////////////////////////////////////////////
@@ -80,14 +79,6 @@ export class VerovioView extends GenericView {
         //console.debug("VerovioView::onActivate");
 
         this.refreshView(VerovioView.Refresh.Activate);
-        return true;
-    }
-
-    override onResized(e: CustomEvent): boolean {
-        if (!super.onResized(e)) return false;
-        //console.debug("VerovioView::onResized");
-
-        this.refreshView(VerovioView.Refresh.Resized);
         return true;
     }
 
@@ -102,6 +93,14 @@ export class VerovioView extends GenericView {
         return true;
     }
 
+    override onResized(e: CustomEvent): boolean {
+        if (!super.onResized(e)) return false;
+        //console.debug("VerovioView::onResized");
+
+        this.refreshView(VerovioView.Refresh.Resized);
+        return true;
+    }
+
     override onZoom(e: CustomEvent): boolean {
         if (!super.onZoom(e)) return false;
         //console.debug("VerovioView::onZoom");
@@ -109,6 +108,14 @@ export class VerovioView extends GenericView {
         this.currentScale = this.app.zoomLevels[this.currentZoomIndex];
         this.refreshView(VerovioView.Refresh.Zoom);
         return true;
+    }
+
+    ////////////////////////////////////////////////////////////////////////
+    // Async worker method
+    ////////////////////////////////////////////////////////////////////////
+
+    async refreshView(update: VerovioView.Refresh, lightEndLoading: boolean = false, mei: string = "", reload: boolean = false): Promise<any> {
+        console.debug("View::updateView should be overwritten");
     }
 
     ////////////////////////////////////////////////////////////////////////

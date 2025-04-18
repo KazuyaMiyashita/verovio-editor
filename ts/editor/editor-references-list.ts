@@ -19,8 +19,12 @@ export class EditorReferenceList extends GenericView {
 
         this.listWrapper = appendDivTo(this.div, { class: `vrv-reference-list-wrapper` });
     }
+    
+    ////////////////////////////////////////////////////////////////////////
+    // Class-specific methods
+    ////////////////////////////////////////////////////////////////////////
 
-    async loadList(references: Object, direction: EditorReferenceList.Direction): Promise<any> {
+    loadList(references: Object, direction: EditorReferenceList.Direction): void {
         this.listWrapper.innerHTML = "";
         this.eventManager.unbindAll();
         if (!Array.isArray(references)) return;
@@ -39,13 +43,6 @@ export class EditorReferenceList extends GenericView {
     ////////////////////////////////////////////////////////////////////////
     // Custom event methods
     ////////////////////////////////////////////////////////////////////////
-
-    override onLoadData(e: CustomEvent): boolean {
-        if (!super.onLoadData(e)) return false;
-        console.debug("EditorReferenceList::onLoadData");
-
-        return true;
-    }
 
     ////////////////////////////////////////////////////////////////////////
     // Class-specific methods
@@ -73,6 +70,10 @@ export class EditorReferenceList extends GenericView {
         });
         this.app.customEventManager.dispatch(event);
     }
+
+    //////////////////////////////////////////////////////////////////////////
+    // Event methods
+    //////////////////////////////////////////////////////////////////////////
 
     onClick(e: MouseEvent): void {
         const element: HTMLElement = e.target as HTMLElement;

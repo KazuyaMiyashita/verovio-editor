@@ -27,6 +27,9 @@ export class VerovioView extends GenericView {
         this.currentZoomIndex = this.app.currentZoomIndex;
         this.currentScale = this.app.zoomLevels[this.currentZoomIndex];
     }
+    ////////////////////////////////////////////////////////////////////////
+    // Class-specific method
+    ////////////////////////////////////////////////////////////////////////
     // Called to unsubscribe from all events. Probably a good idea to call this if the object is deleted.
     destroy() {
         this.eventManager.unbindAll();
@@ -50,12 +53,6 @@ export class VerovioView extends GenericView {
         this.boundMouseUp = (e) => this.mouseUpListener(e);
         this.boundResize = (e) => this.resizeComponents(e);
     }
-    refreshView(update_1) {
-        return __awaiter(this, arguments, void 0, function* (update, lightEndLoading = false, mei = "", reload = false) {
-            console.debug("View::updateView should be overwritten");
-            console.debug(update);
-        });
-    }
     ////////////////////////////////////////////////////////////////////////
     // Custom event methods
     ////////////////////////////////////////////////////////////////////////
@@ -64,13 +61,6 @@ export class VerovioView extends GenericView {
             return false;
         //console.debug("VerovioView::onActivate");
         this.refreshView(VerovioView.Refresh.Activate);
-        return true;
-    }
-    onResized(e) {
-        if (!super.onResized(e))
-            return false;
-        //console.debug("VerovioView::onResized");
-        this.refreshView(VerovioView.Refresh.Resized);
         return true;
     }
     onLoadData(e) {
@@ -84,6 +74,13 @@ export class VerovioView extends GenericView {
         this.refreshView(VerovioView.Refresh.LoadData, lightEndLoading, mei, reload);
         return true;
     }
+    onResized(e) {
+        if (!super.onResized(e))
+            return false;
+        //console.debug("VerovioView::onResized");
+        this.refreshView(VerovioView.Refresh.Resized);
+        return true;
+    }
     onZoom(e) {
         if (!super.onZoom(e))
             return false;
@@ -91,6 +88,14 @@ export class VerovioView extends GenericView {
         this.currentScale = this.app.zoomLevels[this.currentZoomIndex];
         this.refreshView(VerovioView.Refresh.Zoom);
         return true;
+    }
+    ////////////////////////////////////////////////////////////////////////
+    // Async worker method
+    ////////////////////////////////////////////////////////////////////////
+    refreshView(update_1) {
+        return __awaiter(this, arguments, void 0, function* (update, lightEndLoading = false, mei = "", reload = false) {
+            console.debug("View::updateView should be overwritten");
+        });
     }
     ////////////////////////////////////////////////////////////////////////
     // Event listeners

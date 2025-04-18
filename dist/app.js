@@ -279,8 +279,6 @@ export class App {
         this.endLoading();
         let eventActivate = new CustomEvent('onActivate');
         this.view.customEventManager.dispatch(eventActivate);
-        //let eventResized = new CustomEvent( 'onResized' );
-        //this.customEventManager.dispatch( eventResized );
     }
     createToolbar() {
         this.toolbarObj = new AppToolbar(this.toolbar, this);
@@ -372,14 +370,11 @@ export class App {
         }, 3500);
     }
     ////////////////////////////////////////////////////////////////////////
-    // Async methods
+    // Async worker methods
     ////////////////////////////////////////////////////////////////////////
     loadMEI(convert) {
         return __awaiter(this, void 0, void 0, function* () {
             this.startLoading("Loading the MEI data ...");
-            //await this.verovio.loadData(this.mei);
-            //await this.applySelection();
-            //this.pageCount = await this.verovio.getPageCount();
             if (convert) {
                 console.log("Converting to MEI");
                 yield this.verovio.loadData(this.mei);
@@ -554,6 +549,15 @@ export class App {
             this.customEventManager.dispatch(event);
         }
     }
+    login(e) {
+        location.href = `https://github.com/login/oauth/authorize?client_id=${this.clientId}&redirect_uri=${this.host}/oauth/redirect&scope=public_repo%20read:org`;
+    }
+    logout(e) {
+        location.href = `${this.host}/oauth/logout`;
+    }
+    ////////////////////////////////////////////////////////////////////////
+    // Async event methods
+    ////////////////////////////////////////////////////////////////////////
     fileImport(e) {
         return __awaiter(this, void 0, void 0, function* () {
             const element = e.target;
@@ -711,12 +715,6 @@ export class App {
             this.appReset = true;
             location.reload();
         });
-    }
-    login(e) {
-        location.href = `https://github.com/login/oauth/authorize?client_id=${this.clientId}&redirect_uri=${this.host}/oauth/redirect&scope=public_repo%20read:org`;
-    }
-    logout(e) {
-        location.href = `${this.host}/oauth/logout`;
     }
     setView(e) {
         return __awaiter(this, void 0, void 0, function* () {

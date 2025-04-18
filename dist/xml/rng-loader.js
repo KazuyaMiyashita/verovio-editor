@@ -6,6 +6,9 @@ export class RNGLoader {
         this.rngns = "http://relaxng.org/ns/structure/1.0";
         this.tags = {};
     }
+    ////////////////////////////////////////////////////////////////////////
+    // Class-specific method
+    ////////////////////////////////////////////////////////////////////////
     setRelaxNGSchema(data) {
         const parser = new window.DOMParser();
         const doc = parser.parseFromString(data, "text/xml");

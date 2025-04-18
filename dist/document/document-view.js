@@ -45,11 +45,11 @@ export class DocumentView extends VerovioView {
                 case (VerovioView.Refresh.Activate):
                     yield this.updateActivate();
                     break;
-                case (VerovioView.Refresh.Resized):
-                    yield this.updateResize();
-                    break;
                 case (VerovioView.Refresh.LoadData):
                     yield this.updateLoadData(true, mei, reload);
+                    break;
+                case (VerovioView.Refresh.Resized):
+                    yield this.updateResized();
                     break;
                 case (VerovioView.Refresh.Zoom):
                     yield this.updateZoom();
@@ -89,7 +89,7 @@ export class DocumentView extends VerovioView {
             while (this.docWrapper.firstChild) {
                 this.docWrapper.firstChild.remove();
             }
-            yield this.updateResize();
+            yield this.updateResized();
             if (this.observer) {
                 this.observer.lastPageIn = 0;
             }
@@ -124,7 +124,7 @@ export class DocumentView extends VerovioView {
             }
         });
     }
-    updateResize() {
+    updateResized() {
         return __awaiter(this, void 0, void 0, function* () {
             this.div.style.height = this.div.parentElement.style.height;
             this.div.style.width = this.div.parentElement.style.width;
@@ -146,7 +146,7 @@ export class DocumentView extends VerovioView {
     updateZoom() {
         return __awaiter(this, void 0, void 0, function* () {
             if (this.app.options.documentViewSVG) {
-                yield this.updateResize();
+                yield this.updateResized();
                 for (let idx = 0; idx < this.app.pageCount; idx++) {
                     let page = this.docWrapper.children[idx];
                     page.style.height = `${this.currentPageHeight}px`;
@@ -169,40 +169,6 @@ export class DocumentView extends VerovioView {
     ////////////////////////////////////////////////////////////////////////
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
-    renderPage(pageIndex) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const svg = yield this.verovio.renderToSVG(pageIndex);
-            const page = this.docWrapper.children[pageIndex - 1];
-            // SVG
-            if (this.app.options.documentViewSVG) {
-                const scaleSvg = this.parseAndScaleSVG(svg, this.currentPageHeight, this.currentPageWidth);
-                this.docWrapper.children[pageIndex - 1].appendChild(scaleSvg);
-                // With SVG we need to prune the document
-                clearTimeout(this.pruning);
-                const timerThis = this;
-                this.pruning = setTimeout(function () {
-                    timerThis.pruneDocument();
-                }, 200);
-            }
-            // Canvas
-            else {
-                const canvas = page.firstElementChild;
-                const ctx = canvas.getContext("2d");
-                const domURL = self.URL || self.webkitURL;
-                const img = new Image();
-                const svgBlob = new Blob([`${svg}`], { type: "image/svg+xml" });
-                const svgUrl = domURL.createObjectURL(svgBlob);
-                const originalHeight = this.app.verovioOptions.pageHeight;
-                const originalWidth = this.app.verovioOptions.pageWidth;
-                canvas.height = this.currentPageHeight;
-                canvas.width = this.currentPageWidth;
-                img.onload = function () {
-                    ctx.drawImage(img, 0, 0, originalWidth, originalHeight, 0, 0, canvas.width, canvas.height);
-                };
-                img.src = svgUrl;
-            }
-        });
-    }
     handleObserver(entries, observer) {
         // Load page and update first and last page if necessary
         for (let entry of entries) {
@@ -237,6 +203,43 @@ export class DocumentView extends VerovioView {
                 page.innerHTML = '';
             }
         }
+    }
+    ////////////////////////////////////////////////////////////////////////
+    // Async worker methods
+    ////////////////////////////////////////////////////////////////////////
+    renderPage(pageIndex) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const svg = yield this.verovio.renderToSVG(pageIndex);
+            const page = this.docWrapper.children[pageIndex - 1];
+            // SVG
+            if (this.app.options.documentViewSVG) {
+                const scaleSvg = this.parseAndScaleSVG(svg, this.currentPageHeight, this.currentPageWidth);
+                this.docWrapper.children[pageIndex - 1].appendChild(scaleSvg);
+                // With SVG we need to prune the document
+                clearTimeout(this.pruning);
+                const timerThis = this;
+                this.pruning = setTimeout(function () {
+                    timerThis.pruneDocument();
+                }, 200);
+            }
+            // Canvas
+            else {
+                const canvas = page.firstElementChild;
+                const ctx = canvas.getContext("2d");
+                const domURL = self.URL || self.webkitURL;
+                const img = new Image();
+                const svgBlob = new Blob([`${svg}`], { type: "image/svg+xml" });
+                const svgUrl = domURL.createObjectURL(svgBlob);
+                const originalHeight = this.app.verovioOptions.pageHeight;
+                const originalWidth = this.app.verovioOptions.pageWidth;
+                canvas.height = this.currentPageHeight;
+                canvas.width = this.currentPageWidth;
+                img.onload = function () {
+                    ctx.drawImage(img, 0, 0, originalWidth, originalHeight, 0, 0, canvas.width, canvas.height);
+                };
+                img.src = svgUrl;
+            }
+        });
     }
 }
 //# sourceMappingURL=document-view.js.map

@@ -37,18 +37,6 @@ export class EditorContentPanel extends GenericView {
     ////////////////////////////////////////////////////////////////////////
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
-    updateContent(id) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const contextOk = yield this.app.verovio.edit({ action: 'context', param: { elementId: `${id}` } });
-            if (contextOk) {
-                const jsonContext = yield this.app.verovio.editInfo();
-                console.log(jsonContext);
-                this.contentTreeObj.loadContext(jsonContext['context'], jsonContext['ancestors'], jsonContext['object']);
-                this.referencesFromObj.loadList(jsonContext['referringElements'], EditorReferenceList.Direction.From);
-                this.referencesToObj.loadList(jsonContext['referencedElements'], EditorReferenceList.Direction.To);
-            }
-        });
-    }
     addFieldSet(label, flexGrow = 1) {
         let legend = appendDivTo(this.div, { class: `vrv-legend` });
         legend.innerHTML = label;
@@ -63,20 +51,22 @@ export class EditorContentPanel extends GenericView {
         return fieldSet;
     }
     ////////////////////////////////////////////////////////////////////////
+    // Async worker methods
+    ////////////////////////////////////////////////////////////////////////
+    updateContent(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const contextOk = yield this.app.verovio.edit({ action: 'context', param: { elementId: `${id}` } });
+            if (contextOk) {
+                const jsonContext = yield this.app.verovio.editInfo();
+                this.contentTreeObj.loadContext(jsonContext['context'], jsonContext['ancestors'], jsonContext['object']);
+                this.referencesFromObj.loadList(jsonContext['referringElements'], EditorReferenceList.Direction.From);
+                this.referencesToObj.loadList(jsonContext['referencedElements'], EditorReferenceList.Direction.To);
+            }
+        });
+    }
+    ////////////////////////////////////////////////////////////////////////
     // Custom event methods
     ////////////////////////////////////////////////////////////////////////
-    onActivate(e) {
-        if (!super.onActivate(e))
-            return false;
-        //console.debug("EditorContentPanel::onActivate");
-        return true;
-    }
-    onLoadData(e) {
-        if (!super.onLoadData(e))
-            return false;
-        //console.debug("EditorContentTree::onLoadData");
-        return true;
-    }
     onSelect(e) {
         if (!super.onSelect(e))
             return false;

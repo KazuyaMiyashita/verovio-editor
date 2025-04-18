@@ -30,7 +30,6 @@ import { VerovioView } from './verovio/verovio-view.js';
 
 import { appendAnchorTo, appendDivTo, appendInputTo, appendLinkTo, appendTextAreaTo } from './utils/functions.js';
 import { aboutMsg, reloadMsg, resetMsg, version } from './utils/messages.js';
-import { GenericTree } from './utils/generic-tree.js';
 
 const filter = '/svg/filter.xml';
 const host = (window.location.hostname == "localhost") ? `http://${window.location.host}` : "https://editor.verovio.org";
@@ -100,7 +99,7 @@ export class App {
     public pageCount: number;
     public currentZoomIndex: number;
 
-    private mei: string;
+    public mei: string;
 
     constructor(div: HTMLDivElement, options?: App.Options) {
         this.clientId = "fd81068a15354a300522";
@@ -400,9 +399,6 @@ export class App {
 
         let eventActivate = new CustomEvent('onActivate');
         this.view.customEventManager.dispatch(eventActivate);
-
-        //let eventResized = new CustomEvent( 'onResized' );
-        //this.customEventManager.dispatch( eventResized );
     }
 
     createToolbar(): void {
@@ -503,17 +499,11 @@ export class App {
     }
 
     ////////////////////////////////////////////////////////////////////////
-    // Async methods
+    // Async worker methods
     ////////////////////////////////////////////////////////////////////////
 
     async loadMEI(convert: boolean): Promise<any> {
         this.startLoading("Loading the MEI data ...");
-
-        //await this.verovio.loadData(this.mei);
-
-        //await this.applySelection();
-
-        //this.pageCount = await this.verovio.getPageCount();
 
         if (convert) {
             console.log("Converting to MEI");
@@ -698,6 +688,18 @@ export class App {
         }
     }
 
+    login(e: Event): void {
+        location.href = `https://github.com/login/oauth/authorize?client_id=${this.clientId}&redirect_uri=${this.host}/oauth/redirect&scope=public_repo%20read:org`;
+    }
+
+    logout(e: Event): void {
+        location.href = `${this.host}/oauth/logout`;
+    }
+
+    ////////////////////////////////////////////////////////////////////////
+    // Async event methods
+    ////////////////////////////////////////////////////////////////////////
+
     async fileImport(e: MouseEvent): Promise<any> {
         const element = e.target as HTMLElement;
         if (element.dataset.ext === 'MEI') this.input.accept = ".xml, .mei";
@@ -833,14 +835,6 @@ export class App {
         window.localStorage.removeItem("options");
         this.appReset = true;
         location.reload();
-    }
-
-    login(e: Event): void {
-        location.href = `https://github.com/login/oauth/authorize?client_id=${this.clientId}&redirect_uri=${this.host}/oauth/redirect&scope=public_repo%20read:org`;
-    }
-
-    logout(e: Event): void {
-        location.href = `${this.host}/oauth/logout`;
     }
 
     async setView(e: Event): Promise<any> {

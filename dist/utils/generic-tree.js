@@ -1,5 +1,8 @@
 import { GenericView } from './generic-view.js';
 import { appendDivTo } from './functions.js';
+////////////////////////////////////////////////////////////////////////
+// Function for recursively build the tree
+////////////////////////////////////////////////////////////////////////
 function buildTree(nodeData) {
     const { id = null, element, attributes = {}, children = [], isTextNode = false, isLeaf = false } = nodeData;
     const node = new TreeNode(id, element, attributes, [], isTextNode, isLeaf);
@@ -15,6 +18,9 @@ export class GenericTree extends GenericView {
         this.hideRoot = false;
         this.setDisplayFlex();
     }
+    ////////////////////////////////////////////////////////////////////////
+    // Class-specific methods
+    ////////////////////////////////////////////////////////////////////////
     reset() {
         this.eventManager.unbindAll();
         if (this.root) {
@@ -22,15 +28,6 @@ export class GenericTree extends GenericView {
             this.rootElement.remove();
         }
         this.root = null;
-    }
-    onClick(e) {
-        // This need to be overridden
-    }
-    onMouseover(e) {
-        // This need to be overridden
-    }
-    onMouseout(e) {
-        // This need to be overridden
     }
     collapseNode(id) {
         this.traverse((node) => {
@@ -67,6 +64,18 @@ export class GenericTree extends GenericView {
         };
         visit(this.root);
     }
+    ////////////////////////////////////////////////////////////////////////
+    // Events methods
+    ////////////////////////////////////////////////////////////////////////
+    onClick(e) {
+        // This need to be overridden
+    }
+    onMouseover(e) {
+        // This need to be overridden
+    }
+    onMouseout(e) {
+        // This need to be overridden
+    }
 }
 export class TreeNode {
     constructor(id, element, attributes = {}, children = [], isTextNode = false, isLeaf = false) {
@@ -77,6 +86,9 @@ export class TreeNode {
         this.isTextNode = isTextNode;
         this.isLeaf = isLeaf;
     }
+    ////////////////////////////////////////////////////////////////////////
+    // Class-specific methods
+    ////////////////////////////////////////////////////////////////////////
     reset() {
         this.children.forEach(child => child.reset());
         this.div.innerHTML = "";

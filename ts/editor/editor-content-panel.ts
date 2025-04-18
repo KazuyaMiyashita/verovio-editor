@@ -48,17 +48,6 @@ export class EditorContentPanel extends GenericView {
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
 
-    async updateContent(id: string): Promise<any> {
-        const contextOk = await this.app.verovio.edit({ action: 'context', param: { elementId: `${id}` } });
-        if (contextOk) {
-            const jsonContext = await this.app.verovio.editInfo();
-            console.log(jsonContext);
-            this.contentTreeObj.loadContext(jsonContext['context'], jsonContext['ancestors'], jsonContext['object']);
-            this.referencesFromObj.loadList(jsonContext['referringElements'], EditorReferenceList.Direction.From);
-            this.referencesToObj.loadList(jsonContext['referencedElements'], EditorReferenceList.Direction.To);
-        }
-    }
-
     addFieldSet(label: string, flexGrow: number = 1): HTMLDivElement {
         let legend = appendDivTo(this.div, { class: `vrv-legend` });
         legend.innerHTML = label;
@@ -73,20 +62,22 @@ export class EditorContentPanel extends GenericView {
     }
 
     ////////////////////////////////////////////////////////////////////////
-    // Custom event methods
+    // Async worker methods
     ////////////////////////////////////////////////////////////////////////
 
-    override onActivate(e: CustomEvent): boolean {
-        if (!super.onActivate(e)) return false;
-        //console.debug("EditorContentPanel::onActivate");
-        return true;
+    async updateContent(id: string): Promise<any> {
+        const contextOk = await this.app.verovio.edit({ action: 'context', param: { elementId: `${id}` } });
+        if (contextOk) {
+            const jsonContext = await this.app.verovio.editInfo();
+            this.contentTreeObj.loadContext(jsonContext['context'], jsonContext['ancestors'], jsonContext['object']);
+            this.referencesFromObj.loadList(jsonContext['referringElements'], EditorReferenceList.Direction.From);
+            this.referencesToObj.loadList(jsonContext['referencedElements'], EditorReferenceList.Direction.To);
+        }
     }
 
-    override onLoadData(e: CustomEvent): boolean {
-        if (!super.onLoadData(e)) return false;
-        //console.debug("EditorContentTree::onLoadData");
-        return true;
-    }
+    ////////////////////////////////////////////////////////////////////////
+    // Custom event methods
+    ////////////////////////////////////////////////////////////////////////
 
     override onSelect(e: CustomEvent): boolean {
         if (!super.onSelect(e)) return false;
@@ -94,7 +85,7 @@ export class EditorContentPanel extends GenericView {
         return true;
     }
 
-    //////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////
     // Event methods
     ////////////////////////////////////////////////////////////////////////
 }

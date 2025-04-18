@@ -28,6 +28,10 @@ export class TabGroup extends GenericView {
         this.eventManager = new EventManager(this);
     }
 
+    ////////////////////////////////////////////////////////////////////////
+    // Class-specific methods
+    ////////////////////////////////////////////////////////////////////////
+
     addTab(label: string): Tab {
         let content = appendDivTo(this.div, { class: `vrv-tab-content` });
         let tab = new Tab(content, this, label);
@@ -46,6 +50,15 @@ export class TabGroup extends GenericView {
     setHeight(height: number): void {
         this.div.style.minHeight = `${height}px`;
         this.div.style.maxHeight = `${height}px`;
+    }
+
+    select(tabId: string): void {
+        if (this.selectedTab && this.selectedTab.tabId === tabId) return;
+        this.tabs.forEach(tab => {
+            if (tabId === tab.tabId) this.selectedTab = tab;
+            else tab.deselect();
+        });
+        this.selectedTab.select();
     }
 
     ////////////////////////////////////////////////////////////////////////
@@ -81,25 +94,16 @@ export class TabGroup extends GenericView {
         return true;
     }
 
-    ////////////////////////////////////////////////////////////////////////
-    // Class-specific methods
-    ////////////////////////////////////////////////////////////////////////
-
     dispatchToAll(e: CustomEvent): void {
         this.tabs.forEach(tab => {
             tab.customEventManager.dispatch(e);
         });
     }
-
-    select(tabId: string): void {
-        if (this.selectedTab && this.selectedTab.tabId === tabId) return;
-        this.tabs.forEach(tab => {
-            if (tabId === tab.tabId) this.selectedTab = tab;
-            else tab.deselect();
-        });
-        this.selectedTab.select();
-    }
-
+        
+    ////////////////////////////////////////////////////////////////////////
+    // Event methods
+    ////////////////////////////////////////////////////////////////////////
+    
     onSelectTab(e: MouseEvent): void {
         const element: HTMLElement = e.target as HTMLElement;
         this.select(element.dataset.tab);
@@ -120,6 +124,10 @@ export class Tab extends GenericView {
         this.tabSelector.innerHTML = label;
         tabGroup.eventManager.bind(this.tabSelector, 'click', tabGroup.onSelectTab);
     }
+
+    ////////////////////////////////////////////////////////////////////////
+    // Class-specific methods
+    ////////////////////////////////////////////////////////////////////////
 
     select() {
         this.tabSelector.classList.add("selected");

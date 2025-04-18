@@ -29,11 +29,11 @@ export class ResponsiveView extends VerovioView {
                 case (VerovioView.Refresh.Activate):
                     yield this.updateActivate();
                     break;
-                case (VerovioView.Refresh.Resized):
-                    yield this.updateResize();
-                    break;
                 case (VerovioView.Refresh.LoadData):
                     yield this.updateLoadData(mei, reload);
+                    break;
+                case (VerovioView.Refresh.Resized):
+                    yield this.updateResized();
                     break;
                 case (VerovioView.Refresh.Zoom):
                     yield this.updateZoom();
@@ -65,10 +65,10 @@ export class ResponsiveView extends VerovioView {
             }
             yield this.verovio.loadData(mei);
             this.app.pageCount = yield this.verovio.getPageCount();
-            yield this.updateResize();
+            yield this.updateResized();
         });
     }
-    updateResize() {
+    updateResized() {
         return __awaiter(this, void 0, void 0, function* () {
             if (!(this instanceof EditorView)) {
                 this.div.style.height = this.div.parentElement.style.height;
@@ -99,9 +99,12 @@ export class ResponsiveView extends VerovioView {
     }
     updateZoom() {
         return __awaiter(this, void 0, void 0, function* () {
-            yield this.updateResize();
+            yield this.updateResized();
         });
     }
+    ////////////////////////////////////////////////////////////////////////
+    // Async worker methods
+    ////////////////////////////////////////////////////////////////////////
     renderPage() {
         return __awaiter(this, arguments, void 0, function* (lightEndLoading = false) {
             const svg = yield this.verovio.renderToSVG(this.currentPage);
@@ -147,20 +150,18 @@ export class ResponsiveView extends VerovioView {
             }
         });
     }
-    midiStop() {
-        return __awaiter(this, void 0, void 0, function* () {
-            for (let i = 0, len = this.midiIds.length; i < len; i++) {
-                let note = this.svgWrapper.querySelector('#' + this.midiIds[i]);
-                if (note)
-                    note.style.filter = "";
-            }
-            ;
-            this.midiIds = [];
-        });
-    }
     ////////////////////////////////////////////////////////////////////////
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
+    midiStop() {
+        for (let i = 0, len = this.midiIds.length; i < len; i++) {
+            let note = this.svgWrapper.querySelector('#' + this.midiIds[i]);
+            if (note)
+                note.style.filter = "";
+        }
+        ;
+        this.midiIds = [];
+    }
     updateSVGDimensions() {
         this.svgWrapper.style.height = this.div.style.height;
         this.svgWrapper.style.width = this.div.style.width;

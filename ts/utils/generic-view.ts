@@ -44,6 +44,10 @@ export class GenericView {
         this.customEventManager.bind(this, 'onZoom', this.onZoom);
     }
 
+    ////////////////////////////////////////////////////////////////////////
+    // Class-specific methods
+    ////////////////////////////////////////////////////////////////////////
+
     destroy(): void {
         // Nothing at this level
     }
@@ -74,9 +78,21 @@ export class GenericView {
         return true;
     }
 
+    onEditData(e: CustomEvent): boolean {
+        if (!this.active) return false;
+        //console.debug("GenericView::onEditData");
+        return true;
+    }
+
     onEndLoading(e: CustomEvent): boolean {
         if (!this.active) return false;
         //console.debug("GenericView::onEndLoading");
+        return true;
+    }
+
+    onLoadData(e: CustomEvent): boolean {
+        if (!this.active) return false;
+        //console.debug("GenericView::onLoadData");
         return true;
     }
 
@@ -102,18 +118,6 @@ export class GenericView {
     onStartLoading(e: CustomEvent): boolean {
         if (!this.active) return false;
         //console.debug("GenericView::onStartLoading");
-        return true;
-    }
-
-    onLoadData(e: CustomEvent): boolean {
-        if (!this.active) return false;
-        //console.debug("GenericView::onLoadData");
-        return true;
-    }
-
-    onEditData(e: CustomEvent): boolean {
-        if (!this.active) return false;
-        //console.debug("GenericView::onEditData");
         return true;
     }
 

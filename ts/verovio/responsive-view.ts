@@ -31,11 +31,11 @@ export class ResponsiveView extends VerovioView {
             case (VerovioView.Refresh.Activate):
                 await this.updateActivate();
                 break;
-            case (VerovioView.Refresh.Resized):
-                await this.updateResize();
-                break;
             case (VerovioView.Refresh.LoadData):
                 await this.updateLoadData(mei, reload);
+                break;
+            case (VerovioView.Refresh.Resized):
+                await this.updateResized();
                 break;
             case (VerovioView.Refresh.Zoom):
                 await this.updateZoom();
@@ -67,10 +67,10 @@ export class ResponsiveView extends VerovioView {
         }
         await this.verovio.loadData(mei);
         this.app.pageCount = await this.verovio.getPageCount();
-        await this.updateResize();
+        await this.updateResized();
     }
 
-    async updateResize(): Promise<any> {
+    async updateResized(): Promise<any> {
         if (!(this instanceof EditorView)) {
             this.div.style.height = this.div.parentElement.style.height;
             this.div.style.width = this.div.parentElement.style.width;
@@ -101,8 +101,12 @@ export class ResponsiveView extends VerovioView {
     }
 
     async updateZoom(): Promise<any> {
-        await this.updateResize();
+        await this.updateResized();
     }
+
+    ////////////////////////////////////////////////////////////////////////
+    // Async worker methods
+    ////////////////////////////////////////////////////////////////////////
 
     async renderPage(lightEndLoading: boolean = false): Promise<any> {
         const svg = await this.verovio.renderToSVG(this.currentPage);
@@ -144,18 +148,18 @@ export class ResponsiveView extends VerovioView {
         }
     }
 
-    async midiStop(): Promise<any> {
+    ////////////////////////////////////////////////////////////////////////
+    // Class-specific methods
+    ////////////////////////////////////////////////////////////////////////
+
+    midiStop(): void {
         for (let i = 0, len = this.midiIds.length; i < len; i++) {
             let note = <SVGElement>this.svgWrapper.querySelector('#' + this.midiIds[i]);
             if (note) note.style.filter = "";
         };
         this.midiIds = [];
     }
-
-    ////////////////////////////////////////////////////////////////////////
-    // Class-specific methods
-    ////////////////////////////////////////////////////////////////////////
-
+    
     updateSVGDimensions(): void {
         this.svgWrapper.style.height = this.div.style.height;
         this.svgWrapper.style.width = this.div.style.width;

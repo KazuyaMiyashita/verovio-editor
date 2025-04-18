@@ -299,7 +299,7 @@ export class EditorPanel extends GenericView {
 
     //////////////////////////////////////////////////////////////////////////
     // Event methods
-    ////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////
 
     onDragInit(e: MouseEvent): void {
         document.addEventListener('mousemove', this.boundMouseMove);
@@ -355,7 +355,7 @@ export class EditorPanel extends GenericView {
         this.customEventManager.dispatch(event);
     }
 
-    onToggleOrientation(): void {
+    onToggleOrientation(e: Event): void {
         this.app.options.editorSplitterHorizontal = !this.app.options.editorSplitterHorizontal;
         this.split.classList.toggle("vertical");
         this.split.classList.toggle("horizontal");
@@ -364,7 +364,11 @@ export class EditorPanel extends GenericView {
         this.app.customEventManager.dispatch(event);
     }
 
-    async onToggle(): Promise<any> {
+    ////////////////////////////////////////////////////////////////////////
+    // Async event methods
+    ////////////////////////////////////////////////////////////////////////
+
+    async onToggle(e: Event): Promise<any> {
         if (!this.xmlEditorEnabled) {
             this.xmlEditorEnabled = true;
             if (this.xmlEditorViewObj.isAutoModeNotification() && !this.xmlEditorViewObj.isAutoMode()) {

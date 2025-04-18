@@ -77,6 +77,10 @@ export class MidiToolbar extends Toolbar {
         this.updateToolbarGrp(this.progressControl, false);
     }
 
+    ////////////////////////////////////////////////////////////////////////
+    // Class specific methods
+    ////////////////////////////////////////////////////////////////////////
+
     updateAll(): void {
         this.updateProgressBar();
 

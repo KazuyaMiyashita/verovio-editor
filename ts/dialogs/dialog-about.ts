@@ -13,6 +13,10 @@ export class DialogAbout extends Dialog {
         super(div, app, title, { okLabel: "Close", icon: "info", type: Dialog.Type.Msg });
     }
 
+    ////////////////////////////////////////////////////////////////////////
+    // Async network methods
+    ////////////////////////////////////////////////////////////////////////
+
     async load() {
 
         let lib = appendDivTo(this.content, {});

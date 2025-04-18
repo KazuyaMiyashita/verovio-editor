@@ -117,13 +117,11 @@ export class XMLEditorView extends GenericView {
     }
 
     ////////////////////////////////////////////////////////////////////////
-    // Getters and Setter
+    // Getters and Setters
     ////////////////////////////////////////////////////////////////////////
 
     isEdited(): boolean { return this.edited; }
     setEdited(edited: boolean): void { this.edited = edited; }
-
-    //isEnabled(): boolean { return this.enabled; }
 
     isAutoMode(): boolean { return this.autoMode; }
     setMode(fileSize: number): void {
@@ -135,21 +133,8 @@ export class XMLEditorView extends GenericView {
     setAutoModeNotification(autoModeNotification: boolean): void { this.autoModeNotification = autoModeNotification;  }
 
     ////////////////////////////////////////////////////////////////////////
-    // Async methods
+    // Async worker methods
     ////////////////////////////////////////////////////////////////////////
-
-    /*
-    async setEnabled(enabled: boolean): Promise<any> {
-        this.enabled = enabled;
-        if (this.enabled && this.autoModeNotification && !this.autoMode) {
-            const dlg = new Dialog(this.app.dialogDiv, this.app, "Live validation off", { icon: "warning", type: Dialog.Type.Msg });
-            dlg.setContent(marked.parse(autoModeOff));
-            await dlg.show();
-            // Do not show it again for that file.
-            this.autoModeNotification = false;
-        }
-    }
-    */
 
     async validate(text: string, updateLinting: Function, options: any): Promise<any> {
         //console.debug( "XMLEditorView::validate");
@@ -355,17 +340,9 @@ export class XMLEditorView extends GenericView {
     override onActivate(e: CustomEvent): boolean {
         if (!super.onActivate(e)) return false;
         //console.debug("XMLEditorView::onActivate");
+        
         this.CMeditor.refresh();
         this.CMeditor.setSize(this.div.style.width, this.div.style.height);
-
-        return true;
-    }
-
-    override onSelect(e: CustomEvent): boolean {
-        if (!super.onSelect(e)) return false;
-        //console.debug("XMLEditorView::onSelect");
-        this.currentId = e.detail.id;
-        this.setCurrent(this.currentId);
 
         return true;
     }
@@ -385,8 +362,16 @@ export class XMLEditorView extends GenericView {
     override onResized(e: CustomEvent): boolean {
         if (!super.onResized(e)) return false;
         //console.debug("XMLEditorView::onResized");
-
         this.CMeditor.setSize(this.div.style.width, this.div.style.height);
+
+        return true;
+    }
+
+    override onSelect(e: CustomEvent): boolean {
+        if (!super.onSelect(e)) return false;
+        //console.debug("XMLEditorView::onSelect");
+        this.currentId = e.detail.id;
+        this.setCurrent(this.currentId);
 
         return true;
     }

@@ -31,17 +31,8 @@ export class DialogGhExport extends DialogGhImport {
         this.eventManager.bind(this.inputMessage, 'input', this.enableOk);
     }
     ////////////////////////////////////////////////////////////////////////
-    // Class-specific methods
+    // Async network methods
     ////////////////////////////////////////////////////////////////////////
-    updateSelectionAndBreadcrumbs() {
-        super.updateSelectionAndBreadcrumbs();
-        if (this.githubManager.selectedBranchName === '') {
-            this.fields.style.display = 'none';
-        }
-        else {
-            this.fields.style.display = 'grid';
-        }
-    }
     selectFile(e) {
         return __awaiter(this, void 0, void 0, function* () {
             const element = e.target;
@@ -59,11 +50,20 @@ export class DialogGhExport extends DialogGhImport {
             }
         });
     }
+    ////////////////////////////////////////////////////////////////////////
+    // Class-specific methods
+    ////////////////////////////////////////////////////////////////////////
+    updateSelectionAndBreadcrumbs() {
+        super.updateSelectionAndBreadcrumbs();
+        if (this.githubManager.selectedBranchName === '') {
+            this.fields.style.display = 'none';
+        }
+        else {
+            this.fields.style.display = 'grid';
+        }
+    }
     isValid() {
         return (this.inputFile.value !== '' && this.inputMessage.value !== '');
-    }
-    enableOk(e) {
-        this.okBtn.classList.toggle('disabled', !this.isValid());
     }
     ok() {
         if (!this.isValid())
@@ -72,6 +72,12 @@ export class DialogGhExport extends DialogGhImport {
         const commitMsg = this.inputMessage.value;
         this.githubManager.writeFile(filename, commitMsg);
         super.ok();
+    }
+    ////////////////////////////////////////////////////////////////////////
+    // Event methods
+    ////////////////////////////////////////////////////////////////////////
+    enableOk(e) {
+        this.okBtn.classList.toggle('disabled', !this.isValid());
     }
 }
 //# sourceMappingURL=dialog-gh-export.js.map

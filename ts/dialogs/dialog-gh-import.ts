@@ -87,6 +87,10 @@ export class DialogGhImport extends Dialog {
         }
     }
 
+    ////////////////////////////////////////////////////////////////////////
+    // Class-specific methods
+    ////////////////////////////////////////////////////////////////////////
+
     loadingStart(tab: HTMLDivElement): void {
         for (const node of this.tabs.querySelectorAll('.vrv-tab-selector')) {
             node.classList.remove("selected");
@@ -145,18 +149,8 @@ export class DialogGhImport extends Dialog {
     }
 
     ////////////////////////////////////////////////////////////////////////
-    // Class-specific methods
+    // Async network methods
     ////////////////////////////////////////////////////////////////////////
-
-    selectTab(e: MouseEvent): void {
-        const element: HTMLElement = e.target as HTMLElement;
-        switch (element.dataset.tab) {
-            case ('user'): this.listUsers(); break;
-            case ('repo'): this.listRepos(); break;
-            case ('branch'): this.listBranches(); break;
-            case ('file'): this.listFiles(); break;
-        }
-    }
 
     async listUsers(): Promise<any> {
         this.loadingStart(this.tabUser);
@@ -279,10 +273,23 @@ export class DialogGhImport extends Dialog {
         }
     }
 
+    ////////////////////////////////////////////////////////////////////////
+    // Event methods
+    ////////////////////////////////////////////////////////////////////////
+
     selectCrumb(e: MouseEvent): void {
         const element: HTMLElement = e.target as HTMLElement;
         this.githubManager.slicePathTo(Number(element.dataset.value));
         this.listFiles();
     }
 
+    selectTab(e: MouseEvent): void {
+        const element: HTMLElement = e.target as HTMLElement;
+        switch (element.dataset.tab) {
+            case ('user'): this.listUsers(); break;
+            case ('repo'): this.listRepos(); break;
+            case ('branch'): this.listBranches(); break;
+            case ('file'): this.listFiles(); break;
+        }
+    }
 }

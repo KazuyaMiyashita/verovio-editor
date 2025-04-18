@@ -104,7 +104,7 @@ export class MidiPlayer {
     // Internal methods for updating the UI
     ////////////////////////////////////////////////////////////////////////
 
-    onUpdateNoteTime(time: number): void {        
+    private onUpdateNoteTime(time: number): void {        
         const midiTime = time * 1000;
         // If the progress bar timer is behind, use the note time
         if (this.currentTime < midiTime) {
@@ -113,7 +113,7 @@ export class MidiPlayer {
         }
     }
 
-    onUpdate(time: number): void {
+    private onUpdate(time: number): void {
         this.currentTime = time;
         this.currentTimeStr = this.samplesToTime(this.currentTime);
 
@@ -121,6 +121,33 @@ export class MidiPlayer {
 
         if (this.view) this.view.midiUpdate(time);
     }
+
+    private startTimer(): void {
+      if (this.progressBarTimer === null) {
+        this.progressBarTimer = setInterval(() => {
+            this.onUpdate(this.currentTime);
+            this.currentTime += 50;
+        }, 50);
+      }
+    }
+
+    private stopTimer(): void {
+      if (this.progressBarTimer !== null) {
+        clearInterval(this.progressBarTimer);
+          this.progressBarTimer = null;
+      }
+    }
+
+    private samplesToTime(time: number): string {
+        let timeInSec = Math.floor( time / 1000 );
+        let sec = timeInSec % 60;
+        let min = timeInSec / 60 | 0;
+        return min + ':' + ( sec === 0 ? '00' : sec < 10 ? '0' + sec : sec );        
+    }
+
+    ////////////////////////////////////////////////////////////////////////
+    // Custom event methods
+    ////////////////////////////////////////////////////////////////////////
 
     onStop(e: CustomEvent): void {
         // Custom event from the html-midi-player
@@ -131,33 +158,5 @@ export class MidiPlayer {
 
             if (this.view) this.view.midiStop();
         }
-    }
-
-    ////////////////////////////////////////////////////////////////////////
-    // Internal methods
-    ////////////////////////////////////////////////////////////////////////
-
-
-    startTimer(): void {
-      if (this.progressBarTimer === null) {
-        this.progressBarTimer = setInterval(() => {
-            this.onUpdate(this.currentTime);
-            this.currentTime += 50;
-        }, 50);
-      }
-    }
-
-    stopTimer(): void {
-      if (this.progressBarTimer !== null) {
-        clearInterval(this.progressBarTimer);
-          this.progressBarTimer = null;
-      }
-    }
-
-    samplesToTime(time: number): string {
-        let timeInSec = Math.floor( time / 1000 );
-        let sec = timeInSec % 60;
-        let min = timeInSec / 60 | 0;
-        return min + ':' + ( sec === 0 ? '00' : sec < 10 ? '0' + sec : sec );        
     }
 }

@@ -86,19 +86,6 @@ export class MidiPlayer {
         if (this.view)
             this.view.midiUpdate(time);
     }
-    onStop(e) {
-        // Custom event from the html-midi-player
-        if (e.detail.finished) {
-            this.midiToolbar.pausing = false;
-            this.midiToolbar.playing = false;
-            this.midiToolbar.updateAll();
-            if (this.view)
-                this.view.midiStop();
-        }
-    }
-    ////////////////////////////////////////////////////////////////////////
-    // Internal methods
-    ////////////////////////////////////////////////////////////////////////
     startTimer() {
         if (this.progressBarTimer === null) {
             this.progressBarTimer = setInterval(() => {
@@ -118,6 +105,19 @@ export class MidiPlayer {
         let sec = timeInSec % 60;
         let min = timeInSec / 60 | 0;
         return min + ':' + (sec === 0 ? '00' : sec < 10 ? '0' + sec : sec);
+    }
+    ////////////////////////////////////////////////////////////////////////
+    // Custom event methods
+    ////////////////////////////////////////////////////////////////////////
+    onStop(e) {
+        // Custom event from the html-midi-player
+        if (e.detail.finished) {
+            this.midiToolbar.pausing = false;
+            this.midiToolbar.playing = false;
+            this.midiToolbar.updateAll();
+            if (this.view)
+                this.view.midiStop();
+        }
     }
 }
 //# sourceMappingURL=midi-player.js.map

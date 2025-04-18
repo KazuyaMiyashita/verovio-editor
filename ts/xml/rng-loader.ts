@@ -10,6 +10,10 @@ export class RNGLoader {
         this.tags = {}
     }
 
+    ////////////////////////////////////////////////////////////////////////
+    // Class-specific method
+    ////////////////////////////////////////////////////////////////////////
+
     setRelaxNGSchema(data: string): void {
         const parser = new window.DOMParser();
         const doc = parser.parseFromString(data, "text/xml");

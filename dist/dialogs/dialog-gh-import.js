@@ -52,6 +52,9 @@ export class DialogGhImport extends Dialog {
             this.listRepos();
         }
     }
+    ////////////////////////////////////////////////////////////////////////
+    // Class-specific methods
+    ////////////////////////////////////////////////////////////////////////
     loadingStart(tab) {
         for (const node of this.tabs.querySelectorAll('.vrv-tab-selector')) {
             node.classList.remove("selected");
@@ -110,25 +113,8 @@ export class DialogGhImport extends Dialog {
         this.eventManager.bind(crumb, 'click', this.selectCrumb);
     }
     ////////////////////////////////////////////////////////////////////////
-    // Class-specific methods
+    // Async network methods
     ////////////////////////////////////////////////////////////////////////
-    selectTab(e) {
-        const element = e.target;
-        switch (element.dataset.tab) {
-            case ('user'):
-                this.listUsers();
-                break;
-            case ('repo'):
-                this.listRepos();
-                break;
-            case ('branch'):
-                this.listBranches();
-                break;
-            case ('file'):
-                this.listFiles();
-                break;
-        }
-    }
     listUsers() {
         return __awaiter(this, void 0, void 0, function* () {
             this.loadingStart(this.tabUser);
@@ -249,10 +235,30 @@ export class DialogGhImport extends Dialog {
             }
         });
     }
+    ////////////////////////////////////////////////////////////////////////
+    // Event methods
+    ////////////////////////////////////////////////////////////////////////
     selectCrumb(e) {
         const element = e.target;
         this.githubManager.slicePathTo(Number(element.dataset.value));
         this.listFiles();
+    }
+    selectTab(e) {
+        const element = e.target;
+        switch (element.dataset.tab) {
+            case ('user'):
+                this.listUsers();
+                break;
+            case ('repo'):
+                this.listRepos();
+                break;
+            case ('branch'):
+                this.listBranches();
+                break;
+            case ('file'):
+                this.listFiles();
+                break;
+        }
     }
 }
 //# sourceMappingURL=dialog-gh-import.js.map
