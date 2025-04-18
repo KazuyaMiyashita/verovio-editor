@@ -25,15 +25,16 @@ class DocumentViewObserver extends IntersectionObserver {
 }
 
 export class DocumentView extends VerovioView {
-    observer: DocumentViewObserver;
-    pruning: number;
-    currentPageHeight: number;
-    currentPageWidth: number;
-    currentDocHeight: number;
-    currentDocWidth: number;
-    currentDocMargin: number;
+    protected currentPageHeight: number;
+    protected currentPageWidth: number;
+    protected currentDocHeight: number;
+    protected currentDocWidth: number;
+    protected currentDocMargin: number;
 
-    docWrapper: HTMLDivElement;
+    private pruning: number;
+
+    private readonly observer: DocumentViewObserver;
+    private readonly docWrapper: HTMLDivElement;
 
     constructor(div: HTMLDivElement, app: App, verovio: VerovioWorkerProxy) {
         super(div, app, verovio);
@@ -193,7 +194,7 @@ export class DocumentView extends VerovioView {
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
 
-    handleObserver(entries: Array<IntersectionObserverEntry>, observer: DocumentViewObserver): void {
+    private handleObserver(entries: Array<IntersectionObserverEntry>, observer: DocumentViewObserver): void {
         // Load page and update first and last page if necessary
         for (let entry of entries) {
             if (entry.isIntersecting) {
@@ -206,7 +207,7 @@ export class DocumentView extends VerovioView {
         }
     }
 
-    loadPage(pageElement: HTMLElement): void {
+    private loadPage(pageElement: HTMLElement): void {
         // This happens when loading the next page of the last page
         if (pageElement === null) return;
 
@@ -217,7 +218,7 @@ export class DocumentView extends VerovioView {
         }
     }
 
-    pruneDocument(): void {
+    private pruneDocument(): void {
         for (let idx = 0; idx < this.app.pageCount; idx++) {
             let page = <HTMLElement>this.docWrapper.children[idx];
             if (idx < this.observer.lastPageIn - this.observer.pruningMargin) {
@@ -235,7 +236,7 @@ export class DocumentView extends VerovioView {
     // Async worker methods
     ////////////////////////////////////////////////////////////////////////
 
-    async renderPage(pageIndex): Promise<any> {
+    private async renderPage(pageIndex): Promise<any> {
         const svg: string = await this.verovio.renderToSVG(pageIndex);
         const page: Element = this.docWrapper.children[pageIndex - 1];
 

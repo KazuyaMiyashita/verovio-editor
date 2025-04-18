@@ -5,13 +5,10 @@
 
 import { App } from './app.js';
 import { GenericView } from './utils/generic-view.js';
-
 import { appendDivTo } from './utils/functions.js';
 
 export class AppStatusbar extends GenericView {
-    active: boolean;
-    statusText: HTMLDivElement;
-    div: HTMLDivElement;
+    private statusText: HTMLDivElement;
 
     constructor(div: HTMLDivElement, app: App) {
         super(div, app);

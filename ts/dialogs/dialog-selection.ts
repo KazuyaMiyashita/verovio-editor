@@ -13,7 +13,6 @@ export class DialogSelection extends Dialog {
     protected selectEnd: HTMLInputElement;
     protected selection: Object;
 
-
     constructor(div: HTMLDivElement, app: App, title: string, options: Dialog.Options, selection: Object) {
         super(div, app, title, options);
 
