@@ -5,9 +5,10 @@ import { Tab } from '../utils/tab-group.js'
 import { appendDivTo } from '../utils/functions.js';
 
 export class EditorReferenceList extends GenericView {
-    tab: Tab;
-    listWrapper: HTMLDivElement;
-    eventManager: EventManager;
+    public readonly eventManager: EventManager;
+
+    private tab: Tab;
+    private listWrapper: HTMLDivElement;
 
     constructor(div: HTMLDivElement, app: App, tab: Tab) {
         super(div, app);
@@ -24,7 +25,7 @@ export class EditorReferenceList extends GenericView {
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
 
-    loadList(references: Object, direction: EditorReferenceList.Direction): void {
+    public loadList(references: Object, direction: EditorReferenceList.Direction): void {
         this.listWrapper.innerHTML = "";
         this.eventManager.unbindAll();
         if (!Array.isArray(references)) return;
@@ -48,7 +49,7 @@ export class EditorReferenceList extends GenericView {
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
 
-    select(element: string, id: string) {
+    private select(element: string, id: string) {
         let event = new CustomEvent('onSelect', {
             detail: {
                 id: id,
@@ -60,7 +61,7 @@ export class EditorReferenceList extends GenericView {
 
     }
 
-    cursorActivity(id: string, activity: string) {
+    private cursorActivity(id: string, activity: string) {
         let event = new CustomEvent('onCursorActivity', {
             detail: {
                 id: id,
