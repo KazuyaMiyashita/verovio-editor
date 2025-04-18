@@ -183,13 +183,13 @@ export class AppToolbar extends Toolbar {
         }
     }
     updateAll() {
-        this.updateToolbarBtnEnabled(this.prevPage, (this.app.toolbarView.getCurrentPage() > 1));
-        this.updateToolbarBtnEnabled(this.nextPage, (this.app.toolbarView.getCurrentPage() < this.app.pageCount));
-        this.updateToolbarBtnEnabled(this.zoomOut, ((this.app.pageCount > 0) && (this.app.toolbarView.getCurrentZoomIndex() > 0)));
-        this.updateToolbarBtnEnabled(this.zoomIn, ((this.app.pageCount > 0) && (this.app.toolbarView.getCurrentZoomIndex() < this.app.zoomLevels.length - 1)));
-        let isResponsive = ((this.app.view instanceof ResponsiveView) && !(this.app.view instanceof EditorPanel));
-        let isEditor = (this.app.view instanceof EditorPanel);
-        let isDocument = (this.app.view instanceof DocumentView);
+        this.updateToolbarBtnEnabled(this.prevPage, (this.app.getToolbarView().getCurrentPage() > 1));
+        this.updateToolbarBtnEnabled(this.nextPage, (this.app.getToolbarView().getCurrentPage() < this.app.getPageCount()));
+        this.updateToolbarBtnEnabled(this.zoomOut, ((this.app.getPageCount() > 0) && (this.app.getToolbarView().getCurrentZoomIndex() > 0)));
+        this.updateToolbarBtnEnabled(this.zoomIn, ((this.app.getPageCount() > 0) && (this.app.getToolbarView().getCurrentZoomIndex() < this.app.zoomLevels.length - 1)));
+        let isResponsive = ((this.app.getView() instanceof ResponsiveView) && !(this.app.getView() instanceof EditorPanel));
+        let isEditor = (this.app.getView() instanceof EditorPanel);
+        let isDocument = (this.app.getView() instanceof DocumentView);
         const hasSelection = (this.app.options.selection && Object.keys(this.app.options.selection).length !== 0);
         this.updateToolbarGrp(this.pageControls, !isDocument);
         this.updateToolbarGrp(this.midiPlayerSubToolbar, isEditor || isResponsive);

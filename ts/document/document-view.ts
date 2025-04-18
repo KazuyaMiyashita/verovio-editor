@@ -94,12 +94,10 @@ export class DocumentView extends VerovioView {
                 mei = await this.verovio.getMEI({});
             }
             await this.verovio.loadData(mei);
-            this.app.pageCount = await this.verovio.getPageCount();
-            // We do not need to redo the layout when changing zoom with canvas
             await this.verovio.setOptions(this.app.verovioOptions);
             await this.verovio.redoLayout();
             const pageCount = await this.verovio.getPageCount();
-            this.app.pageCount = pageCount;
+            this.app.setPageCount(pageCount);
         }
 
         while (this.docWrapper.firstChild) {
@@ -112,7 +110,7 @@ export class DocumentView extends VerovioView {
             this.observer.lastPageIn = 0;
         }
 
-        for (let idx = 0; idx < this.app.pageCount; idx++) {
+        for (let idx = 0; idx < this.app.getPageCount(); idx++) {
             const pageWrapper = appendDivTo(this.docWrapper, { class: `vrv-page-wrapper` });
 
             pageWrapper.style.height = `${this.currentPageHeight}px`;
@@ -161,7 +159,7 @@ export class DocumentView extends VerovioView {
             this.docWrapper.style.width = `${this.currentDocWidth}px`;
 
             this.currentPageHeight = this.app.verovioOptions.pageHeight * this.currentScale / 100;
-            const docHeight = (this.currentPageHeight + this.currentDocMargin + 2 * this.app.options.documentViewPageBorder) * this.app.pageCount + this.currentDocMargin;
+            const docHeight = (this.currentPageHeight + this.currentDocMargin + 2 * this.app.options.documentViewPageBorder) * this.app.getPageCount() + this.currentDocMargin;
             const elementHeight = parseInt(this.div.parentElement.style.height, 10);
             this.currentDocHeight = Math.max(elementHeight, docHeight);
             this.docWrapper.style.height = `${this.currentDocHeight}px`;
@@ -171,7 +169,7 @@ export class DocumentView extends VerovioView {
     async updateZoom(): Promise<any> {
         if (this.app.options.documentViewSVG) {
             await this.updateResized();
-            for (let idx = 0; idx < this.app.pageCount; idx++) {
+            for (let idx = 0; idx < this.app.getPageCount(); idx++) {
                 let page = <HTMLElement>this.docWrapper.children[idx];
                 page.style.height = `${this.currentPageHeight}px`;
                 page.style.width = `${this.currentPageWidth}px`;
@@ -219,7 +217,7 @@ export class DocumentView extends VerovioView {
     }
 
     private pruneDocument(): void {
-        for (let idx = 0; idx < this.app.pageCount; idx++) {
+        for (let idx = 0; idx < this.app.getPageCount(); idx++) {
             let page = <HTMLElement>this.docWrapper.children[idx];
             if (idx < this.observer.lastPageIn - this.observer.pruningMargin) {
                 delete page.dataset.loaded;

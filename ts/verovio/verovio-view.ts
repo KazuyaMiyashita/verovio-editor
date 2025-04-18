@@ -33,7 +33,7 @@ export class VerovioView extends GenericView {
 
         // Common members
         this.currentPage = 1;
-        this.currentZoomIndex = this.app.currentZoomIndex;
+        this.currentZoomIndex = this.app.getCurrentZoomIndex();
         this.currentScale = this.app.zoomLevels[this.currentZoomIndex];
     }
 

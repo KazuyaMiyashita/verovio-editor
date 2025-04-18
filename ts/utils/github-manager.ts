@@ -120,7 +120,8 @@ export class GitHubManager {
 
     public async writeFile(filename: string, commitMsg: string): Promise<any> {
         try {
-            await this.selectedRepo.writeFile(this.selectedBranchName, filename, this.app.mei, commitMsg, {});
+            let mei = this.app.verovio.getMEI({});
+            await this.selectedRepo.writeFile(this.selectedBranchName, filename, mei, commitMsg, {});
             this.app.showNotification("File was successfully pushed to GitHub");
         }
         catch (err) {

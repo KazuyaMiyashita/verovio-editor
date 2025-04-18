@@ -39,9 +39,9 @@ export class ActionManager {
         await this.editorViewObj.verovio.edit(editorAction);
         // WIP disable redo layout
         //await this.view.verovio.redoLayout();
-        this.app.pageCount = await this.verovio.getPageCount();
-        if (this.editorViewObj.getCurrentPage() > this.app.pageCount) {
-            this.editorViewObj.setCurrentPage(this.app.pageCount);
+        this.app.setPageCount(await this.verovio.getPageCount());
+        if (this.editorViewObj.getCurrentPage() > this.app.getPageCount()) {
+            this.editorViewObj.setCurrentPage(this.app.getPageCount());
         }
         await this.editorViewObj.renderPage(true);
         //this.view.updateMEI();

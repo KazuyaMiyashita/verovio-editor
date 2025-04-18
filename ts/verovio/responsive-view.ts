@@ -66,7 +66,7 @@ export class ResponsiveView extends VerovioView {
             mei = await this.verovio.getMEI({});
         }
         await this.verovio.loadData(mei);
-        this.app.pageCount = await this.verovio.getPageCount();
+        this.app.setPageCount(await this.verovio.getPageCount());
         await this.updateResized();
     }
 
@@ -88,12 +88,12 @@ export class ResponsiveView extends VerovioView {
             if (this.app.verovioOptions.pageHeight !== 0) {
                 await this.verovio.setOptions(this.app.verovioOptions);
             }
-            if (this.app.pageCount > 0) {
+            if (this.app.getPageCount() > 0) {
                 await this.verovio.setOptions(this.app.verovioOptions);
                 await this.verovio.redoLayout(this.app.verovioOptions);
-                this.app.pageCount = await this.verovio.getPageCount();
-                if (this.currentPage > this.app.pageCount) {
-                    this.currentPage = this.app.pageCount
+                this.app.setPageCount(await this.verovio.getPageCount());
+                if (this.currentPage > this.app.getPageCount()) {
+                    this.currentPage = this.app.getPageCount()
                 }
                 await this.renderPage();
             }

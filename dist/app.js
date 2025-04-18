@@ -202,12 +202,59 @@ export class App {
             }
         });
     }
-    destroy() {
-        this.eventManager.unbindAll();
-    }
+    ////////////////////////////////////////////////////////////////////////
+    // Getters and setters
+    ////////////////////////////////////////////////////////////////////////
+    getView() { return this.view; }
+    getToolbarView() { return this.toolbarView; }
+    getPageCount() { return this.pageCount; }
+    setPageCount(pageCount) { this.pageCount = pageCount; }
+    getCurrentZoomIndex() { return this.currentZoomIndex; }
     ////////////////////////////////////////////////////////////////////////
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
+    startLoading(msg, light = false) {
+        if (light) {
+            this.views.style.pointerEvents = 'none';
+        }
+        else {
+            this.views.style.overflow = 'hidden';
+            this.loader.style.display = `flex`;
+            this.loadingCount++;
+        }
+        this.loaderText.innerHTML = msg;
+        let event = new CustomEvent('onStartLoading', {
+            detail: {
+                light: light,
+                msg: msg
+            }
+        });
+        this.customEventManager.dispatch(event);
+    }
+    endLoading(light = false) {
+        if (!light) {
+            this.loadingCount--;
+            if (this.loadingCount < 0)
+                console.error("endLoading index corrupted");
+        }
+        // We have other tasks being performed
+        if (this.loadingCount > 0)
+            return;
+        this.views.style.overflow = 'scroll';
+        this.loader.style.display = 'none';
+        this.views.style.pointerEvents = '';
+        this.views.style.opacity = '';
+        let event = new CustomEvent('onEndLoading');
+        this.customEventManager.dispatch(event);
+    }
+    showNotification(message) {
+        this.notificationStack.push(message);
+        if (this.notificationStack.length < 2)
+            this.pushNotification();
+    }
+    destroy() {
+        this.eventManager.unbindAll();
+    }
     getWorkerURL(url) {
         const content = `importScripts("${url}");`;
         return URL.createObjectURL(new Blob([content], { type: "text/javascript" }));
@@ -310,45 +357,6 @@ export class App {
             this.loadMEI(convert);
         }
     }
-    startLoading(msg, light = false) {
-        if (light) {
-            this.views.style.pointerEvents = 'none';
-        }
-        else {
-            this.views.style.overflow = 'hidden';
-            this.loader.style.display = `flex`;
-            this.loadingCount++;
-        }
-        this.loaderText.innerHTML = msg;
-        let event = new CustomEvent('onStartLoading', {
-            detail: {
-                light: light,
-                msg: msg
-            }
-        });
-        this.customEventManager.dispatch(event);
-    }
-    endLoading(light = false) {
-        if (!light) {
-            this.loadingCount--;
-            if (this.loadingCount < 0)
-                console.error("endLoading index corrupted");
-        }
-        // We have other tasks being performed
-        if (this.loadingCount > 0)
-            return;
-        this.views.style.overflow = 'scroll';
-        this.loader.style.display = 'none';
-        this.views.style.pointerEvents = '';
-        this.views.style.opacity = '';
-        let event = new CustomEvent('onEndLoading');
-        this.customEventManager.dispatch(event);
-    }
-    showNotification(message) {
-        this.notificationStack.push(message);
-        if (this.notificationStack.length < 2)
-            this.pushNotification();
-    }
     pushNotification() {
         this.notification.innerHTML = this.notificationStack[0];
         this.notification.classList.remove("disabled");
@@ -363,6 +371,11 @@ export class App {
     ////////////////////////////////////////////////////////////////////////
     // Async worker methods
     ////////////////////////////////////////////////////////////////////////
+    async playMEI() {
+        const base64midi = await this.verovio.renderToMIDI();
+        const midiFile = 'data:audio/midi;base64,' + base64midi;
+        this.midiPlayer.playFile(midiFile);
+    }
     async loadMEI(convert) {
         this.startLoading("Loading the MEI data ...");
         if (convert) {
@@ -406,11 +419,6 @@ export class App {
             dlg.setContent(`The Schema '${schemaMatch[1]}' in the file is different from the one in the editor<br><br>The validation in the editor will use the Schema '${this.options.schemaDefault}'`);
             await dlg.show();
         }
-    }
-    async playMEI() {
-        const base64midi = await this.verovio.renderToMIDI();
-        const midiFile = 'data:audio/midi;base64,' + base64midi;
-        this.midiPlayer.playFile(midiFile);
     }
     async generatePDF() {
         if (!this.pdf) {

@@ -39,10 +39,32 @@ declare global {
 }
 
 export class App {
+    // public members
+    private mei: string;
+
+    // public readonly members
+    public readonly dialogDiv: HTMLDivElement;
+    public readonly host: string;
+    public readonly customEventManager: CustomEventManager;
+    public readonly zoomLevels: Array<number>;
+    public readonly eventManager: EventManager;
+    public readonly id: string;
+    public readonly githubManager: GitHubManager;
+    public readonly options: App.Options;
+    public readonly fileStack: FileStack;
+
+    public readonly verovio: VerovioWorkerProxy;
+    public readonly validator: ValidatorWorkerProxy;
+    public readonly rngLoader: RNGLoader;
+
+    public readonly verovioOptions: VerovioView.Options;
+
     // private members
-    private clientId: string;
-    private div: HTMLDivElement;
-    public notificationStack: Array<string>;
+    private view: GenericView;
+    private toolbarView: VerovioView;
+
+    private pageCount: number;
+    private currentZoomIndex: number;
 
     private loadingCount: number;
     public toolbarObj: AppToolbar;
@@ -75,31 +97,9 @@ export class App {
     private view2: HTMLDivElement;
     private view3: HTMLDivElement;
 
-    // readonly members
-    readonly dialogDiv: HTMLDivElement;
-    readonly host: string;
-    readonly customEventManager: CustomEventManager;
-    readonly zoomLevels: Array<number>;
-    readonly eventManager: EventManager;
-    readonly id: string;
-    readonly githubManager: GitHubManager;
-    readonly options: App.Options;
-    readonly fileStack: FileStack;
-
-    readonly verovio: VerovioWorkerProxy;
-    readonly validator: ValidatorWorkerProxy;
-    readonly rngLoader: RNGLoader;
-
-    readonly verovioOptions: VerovioView.Options;
-
-    // public members
-    public view: GenericView;
-    public toolbarView: VerovioView;
-
-    public pageCount: number;
-    public currentZoomIndex: number;
-
-    public mei: string;
+    private readonly clientId: string;
+    private readonly div: HTMLDivElement;
+    private readonly notificationStack: Array<string>;
 
     constructor(div: HTMLDivElement, options?: App.Options) {
         this.clientId = "fd81068a15354a300522";
@@ -318,20 +318,74 @@ export class App {
         });
     }
 
-    destroy(): void {
-        this.eventManager.unbindAll();
-    }
+    ////////////////////////////////////////////////////////////////////////
+    // Getters and setters
+    ////////////////////////////////////////////////////////////////////////
+
+    public getView(): GenericView { return this.view; }
+    
+    public getToolbarView(): VerovioView { return this.toolbarView; }
+    
+    public getPageCount(): number { return this.pageCount; }
+    public setPageCount(pageCount: number): void { this.pageCount = pageCount; }
+    
+    public getCurrentZoomIndex(): number { return this.currentZoomIndex; }
 
     ////////////////////////////////////////////////////////////////////////
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
 
-    getWorkerURL(url: string): string {
+    public startLoading(msg: string, light: boolean = false): void {
+        if (light) {
+            this.views.style.pointerEvents = 'none';
+        }
+        else {
+            this.views.style.overflow = 'hidden';
+            this.loader.style.display = `flex`;
+            this.loadingCount++;
+        }
+        this.loaderText.innerHTML = msg;
+        let event = new CustomEvent('onStartLoading', {
+            detail: {
+                light: light,
+                msg: msg
+            }
+        });
+        this.customEventManager.dispatch(event);
+    }
+
+    public endLoading(light: boolean = false): void {
+        if (!light) {
+            this.loadingCount--;
+            if (this.loadingCount < 0) console.error("endLoading index corrupted");
+        }
+
+        // We have other tasks being performed
+        if (this.loadingCount > 0) return;
+
+        this.views.style.overflow = 'scroll';
+        this.loader.style.display = 'none';
+        this.views.style.pointerEvents = '';
+        this.views.style.opacity = '';
+        let event = new CustomEvent('onEndLoading');
+        this.customEventManager.dispatch(event);
+    }
+
+    public showNotification(message: string): void {
+        this.notificationStack.push(message);
+        if (this.notificationStack.length < 2) this.pushNotification();
+    }
+    
+    public destroy(): void {
+        this.eventManager.unbindAll();
+    }
+
+    private getWorkerURL(url: string): string {
         const content: string = `importScripts("${url}");`;
         return <string>URL.createObjectURL(new Blob([content], { type: "text/javascript" }));
     }
 
-    createInterfaceAndLoadData(): void {
+    private createInterfaceAndLoadData(): void {
         this.startLoading("Create the interface ...");
         this.createToolbar();
         this.createViews();
@@ -353,7 +407,7 @@ export class App {
         }
     }
 
-    createViews(): void {
+    private createViews(): void {
         this.startLoading("Loading the views ...");
 
         this.view = null;
@@ -401,7 +455,7 @@ export class App {
         this.view.customEventManager.dispatch(eventActivate);
     }
 
-    createToolbar(): void {
+    private createToolbar(): void {
         this.toolbarObj = new AppToolbar(this.toolbar, this);
         this.customEventManager.addToPropagationList(this.toolbarObj.customEventManager);
 
@@ -410,14 +464,14 @@ export class App {
         this.customEventManager.addToPropagationList(this.midiToolbarObj.customEventManager);
     }
 
-    createStatusbar(): void {
+    private createStatusbar(): void {
         if (!this.options.enableStatusbar) return;
 
         this.statusbarObj = new AppStatusbar(this.statusbar, this);
         this.customEventManager.addToPropagationList(this.statusbarObj.customEventManager);
     }
 
-    createFilter(): void {
+    private createFilter(): void {
         const filterDiv = appendDivTo(this.div, { class: `vrv-filter` });
 
         var xHttp = new XMLHttpRequest();
@@ -430,7 +484,7 @@ export class App {
         xHttp.send();
     }
 
-    loadData(mei: string, filename: string = "untitled.xml", convert: boolean = false, onlyIfEmpty: boolean = false): void {
+    private loadData(mei: string, filename: string = "untitled.xml", convert: boolean = false, onlyIfEmpty: boolean = false): void {
         if (this.mei.length != 0) {
             // This is useful for loading the app with a default file but not if one exists
             if (onlyIfEmpty) return;
@@ -445,48 +499,7 @@ export class App {
         }
     }
 
-    startLoading(msg: string, light: boolean = false): void {
-        if (light) {
-            this.views.style.pointerEvents = 'none';
-        }
-        else {
-            this.views.style.overflow = 'hidden';
-            this.loader.style.display = `flex`;
-            this.loadingCount++;
-        }
-        this.loaderText.innerHTML = msg;
-        let event = new CustomEvent('onStartLoading', {
-            detail: {
-                light: light,
-                msg: msg
-            }
-        });
-        this.customEventManager.dispatch(event);
-    }
-
-    endLoading(light: boolean = false): void {
-        if (!light) {
-            this.loadingCount--;
-            if (this.loadingCount < 0) console.error("endLoading index corrupted");
-        }
-
-        // We have other tasks being performed
-        if (this.loadingCount > 0) return;
-
-        this.views.style.overflow = 'scroll';
-        this.loader.style.display = 'none';
-        this.views.style.pointerEvents = '';
-        this.views.style.opacity = '';
-        let event = new CustomEvent('onEndLoading');
-        this.customEventManager.dispatch(event);
-    }
-
-    showNotification(message: string): void {
-        this.notificationStack.push(message);
-        if (this.notificationStack.length < 2) this.pushNotification();
-    }
-
-    pushNotification() {
+    private pushNotification() {
         this.notification.innerHTML = this.notificationStack[0];
         this.notification.classList.remove("disabled");
 
@@ -502,7 +515,13 @@ export class App {
     // Async worker methods
     ////////////////////////////////////////////////////////////////////////
 
-    async loadMEI(convert: boolean): Promise<any> {
+    public async playMEI(): Promise<any> {
+        const base64midi = await this.verovio.renderToMIDI();
+        const midiFile = 'data:audio/midi;base64,' + base64midi;
+        this.midiPlayer.playFile(midiFile);
+    }
+
+    private async loadMEI(convert: boolean): Promise<any> {
         this.startLoading("Loading the MEI data ...");
 
         if (convert) {
@@ -530,13 +549,13 @@ export class App {
         this.view.customEventManager.dispatch(event);
     }
 
-    async applySelection(): Promise<any> {
+    private async applySelection(): Promise<any> {
         let selection = this.options.selection;
         if (!selection || Object.keys(selection).length === 0) selection = {};
         await this.verovio.select(selection);
     }
 
-    async checkSchema(): Promise<any> {
+    private async checkSchema(): Promise<any> {
         if (!this.options.enableEditor) return;
         const hasSchema = /<\?xml-model.*schematypens=\"http?:\/\/relaxng\.org\/ns\/structure\/1\.0\"/
         const hasSchemaMatch = hasSchema.exec(this.mei);
@@ -551,13 +570,7 @@ export class App {
         }
     }
 
-    async playMEI(): Promise<any> {
-        const base64midi = await this.verovio.renderToMIDI();
-        const midiFile = 'data:audio/midi;base64,' + base64midi;
-        this.midiPlayer.playFile(midiFile);
-    }
-
-    async generatePDF(): Promise<any> {
+    private async generatePDF(): Promise<any> {
         if (!this.pdf) {
             const pdfWorkerURL = this.getWorkerURL(`${this.host}/dist/document/pdf-worker.js`);
             const pdfWorker = new Worker(pdfWorkerURL);
@@ -574,7 +587,7 @@ export class App {
         this.output.click();
     }
 
-    async generateMIDI(): Promise<any> {
+    private async generateMIDI(): Promise<any> {
         const midiOutputStr = await this.verovio.renderToMIDI();
 
         this.endLoading();
@@ -584,7 +597,7 @@ export class App {
         this.output.click();
     }
 
-    async generateMEI(options: App.MEIExportOptions): Promise<any> {
+    private async generateMEI(options: App.MEIExportOptions): Promise<any> {
         const meiOutputStr = await this.verovio.getMEI(options);
         this.endLoading();
         this.output.href = 'data:text/xml;charset=utf-8,' + encodeURIComponent(meiOutputStr);
