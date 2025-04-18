@@ -7,13 +7,13 @@ import { App } from '../app.js';
 import { EventManager } from '../events/event-manager.js';
 import { GenericView } from './generic-view.js';
 import { appendDivTo } from './functions.js';
-import { randomHex } from '../utils/functions.js';
 
 export class TabGroup extends GenericView {
-    selectedTab: Tab;
-    tabSelectors: HTMLDivElement;
+    public readonly tabSelectors: HTMLDivElement;
+    public readonly eventManager: EventManager;
+
+    private selectedTab: Tab;
     private tabs: Array<Tab>;
-    eventManager: EventManager;
 
     constructor(div: HTMLDivElement, app: App) {
         super(div, app);
@@ -29,10 +29,16 @@ export class TabGroup extends GenericView {
     }
 
     ////////////////////////////////////////////////////////////////////////
+    // Getters and setters
+    ////////////////////////////////////////////////////////////////////////
+
+    public getSelectedTab(): Tab { return this.selectedTab; }
+
+    ////////////////////////////////////////////////////////////////////////
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
 
-    addTab(label: string): Tab {
+    public addTab(label: string): Tab {
         let content = appendDivTo(this.div, { class: `vrv-tab-content` });
         let tab = new Tab(content, this.app, this, label);
         // Select the first one by default
@@ -47,15 +53,15 @@ export class TabGroup extends GenericView {
         return tab;
     }
 
-    setHeight(height: number): void {
+    public setHeight(height: number): void {
         this.div.style.minHeight = `${height}px`;
         this.div.style.maxHeight = `${height}px`;
     }
 
-    select(tabId: string): void {
-        if (this.selectedTab && this.selectedTab.tabId === tabId) return;
+    public select(id: string): void {
+        if (this.selectedTab && this.selectedTab.id === id) return;
         this.tabs.forEach(tab => {
-            if (tabId === tab.tabId) this.selectedTab = tab;
+            if (id === tab.id) this.selectedTab = tab;
             else tab.deselect();
         });
         this.selectedTab.select();
@@ -94,7 +100,7 @@ export class TabGroup extends GenericView {
         return true;
     }
 
-    dispatchToAll(e: CustomEvent): void {
+    private dispatchToAll(e: CustomEvent): void {
         this.tabs.forEach(tab => {
             tab.customEventManager.dispatch(e);
         });
@@ -112,15 +118,13 @@ export class TabGroup extends GenericView {
 }
 
 export class Tab extends GenericView {
-    tabGroupObj: TabGroup;
-    tabSelector: HTMLDivElement;
-    tabId: string;
+    private tabGroupObj: TabGroup;
+    private tabSelector: HTMLDivElement;
 
     constructor(div: HTMLDivElement, app: App, tabGroup: TabGroup, label: string) {
         super(div, app);
         this.tabGroupObj = tabGroup;
-        this.tabId = randomHex(16);
-        this.tabSelector = appendDivTo(tabGroup.tabSelectors, { class: `vrv-tab-selector`, dataset: { tab: `${this.tabId}` } });
+        this.tabSelector = appendDivTo(tabGroup.tabSelectors, { class: `vrv-tab-selector`, dataset: { tab: `${this.id}` } });
         this.tabSelector.innerHTML = label;
         tabGroup.eventManager.bind(this.tabSelector, 'click', tabGroup.onSelectTab);
     }
@@ -129,22 +133,22 @@ export class Tab extends GenericView {
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
 
-    select() {
+    public select() {
         this.tabSelector.classList.add("selected");
         this.div.style.display = 'block';
         let event = new CustomEvent('onActivate');
         this.customEventManager.dispatch(event);
     }
 
-    deselect() {
+    public deselect() {
         this.tabSelector.classList.remove("selected");
         this.div.style.display = 'none';
         let event = new CustomEvent('onDeactivate');
         this.customEventManager.dispatch(event);
     }
 
-    isSelected(): boolean {
-        return (this.tabGroupObj.selectedTab === this);
+    public isSelected(): boolean {
+        return (this.tabGroupObj.getSelectedTab() === this);
     }
 
     ////////////////////////////////////////////////////////////////////////

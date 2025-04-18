@@ -10,10 +10,10 @@ import { randomHex } from '../utils/functions.js';
 
 export class GenericView {
     public readonly customEventManager: CustomEventManager;
+    public readonly id: string;
 
     protected readonly app: App;
     protected readonly div: HTMLDivElement;
-    protected readonly id: string;
 
     protected active: boolean;
     private display: string;

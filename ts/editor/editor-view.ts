@@ -211,7 +211,7 @@ export class EditorView extends ResponsiveView {
             (<SVGElement>node).style.fill = 'transparent';
         }
 
-        // Remove bouding boxes for /slur and /tie
+        // Remove bounding boxes for /slur and /tie
         for (const node of this.svgOverlay.querySelectorAll('.slur.bounding-box, .tie.bounding-box')) {
             node.parentNode.removeChild(node);
         }
