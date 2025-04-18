@@ -205,35 +205,35 @@ export class EditorView extends ResponsiveView {
         this.svgOverlay.innerHTML = this.svgWrapper.innerHTML;
 
         // Remove all the bounding boxes from the original wrapper because we do not want to highlight them
-        for (const node of this.svgWrapper.querySelectorAll('g.bounding-box')) {
+        Array.from(this.svgWrapper.querySelectorAll('g.bounding-box')).forEach(node => {
             node.parentNode.removeChild(node);
-        }
+        });
 
         // Make all /g, /path and /text transparent
-        for (const node of this.svgOverlay.querySelectorAll('g, path, text, polyline')) {
+        Array.from(this.svgOverlay.querySelectorAll('g, path, text, polyline')).forEach(node => {
             (<SVGElement>node).style.stroke = 'transparent';
             (<SVGElement>node).style.fill = 'transparent';
-        }
+        });
 
         // Remove bounding boxes for /slur and /tie
-        for (const node of this.svgOverlay.querySelectorAll('.slur.bounding-box, .tie.bounding-box')) {
+        Array.from(this.svgOverlay.querySelectorAll('.slur.bounding-box, .tie.bounding-box')).forEach(node => {
             node.parentNode.removeChild(node);
-        }
+        });
 
         // Increase border for facilitating selection of some elements
-        for (const node of this.svgOverlay.querySelectorAll('.slur path, .tie path, .stem rect, .dots ellipse, .barLineAttr path')) {
+        Array.from(this.svgOverlay.querySelectorAll('.slur path, .tie path, .stem rect, .dots ellipse, .barLineAttr path')).forEach(node => {
             //node.style.stroke = 'red';
             (<SVGElement>node).style.strokeWidth = "90"; // A default MEI unit
-        }
+        });
 
         // Add event listeners for click on /g
-        for (const node of this.svgOverlay.querySelectorAll('g')) {
+        Array.from(this.svgOverlay.querySelectorAll('g')).forEach(node => {
             this.eventManager.bind(node, 'mousedown', this.mouseDownListener);
-        }
+        });
 
-        for (const node of this.svgOverlay.querySelectorAll('g.staff')) {
+        Array.from(this.svgOverlay.querySelectorAll('g.staff')).forEach(node => {
             this.eventManager.bind(node, 'mouseenter', this.mouseEnterListener);
-        }
+        });
 
         // Add an event listener to the overlay of note input
         this.eventManager.bind(this.svgOverlay, 'mousedown', this.mouseDownListener);
@@ -277,11 +277,13 @@ export class EditorView extends ResponsiveView {
 
     highlightWithColor(g: SVGElement, color: string) {
         if (!g) return;
-        for (const node of g.querySelectorAll('*:not(g)')) {
-            // Do not highlight bounding boxes elements
-            if ((<SVGElement>node.parentNode).classList.contains('bounding-box')) continue;
-            (<SVGElement>node).style.fill = color;
-            (<SVGElement>node).style.stroke = color;
+        for (const node of Array.from(g.querySelectorAll('*:not(g)'))) {
+            const parent = node.parentNode as SVGElement;
+            // Do not highlight bounding box elements
+            if (parent.classList.contains('bounding-box')) continue;
+            const el = node as SVGElement;
+            el.style.fill = color;
+            el.style.stroke = color;
         }
     }
 

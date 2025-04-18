@@ -2,15 +2,6 @@
  * The App class is the main class of the application.
  * It requires a HTMLDivElement to be put on.
  */
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 import { AppStatusbar } from './app-statusbar.js';
 import { AppToolbar } from './toolbars/app-toolbar.js';
 import { Dialog } from './dialogs/dialog.js';
@@ -186,30 +177,30 @@ export class App {
         }
         // Listen and wait for Module to emit onRuntimeInitialized
         this.startLoading("Loading Verovio ...");
-        this.verovio.onRuntimeInitialized().then(() => __awaiter(this, void 0, void 0, function* () {
-            const version = yield this.verovio.getVersion();
+        this.verovio.onRuntimeInitialized().then(async () => {
+            const version = await this.verovio.getVersion();
             console.log(version);
             this.endLoading();
             if (this.options.enableEditor) {
                 this.startLoading("Loading the XML validator ...");
                 // Listen and wait for Module to emit onRuntimeInitialized
-                this.validator.onRuntimeInitialized().then(() => __awaiter(this, void 0, void 0, function* () {
+                this.validator.onRuntimeInitialized().then(async () => {
                     this.currentSchema = this.options.schema;
-                    const response = yield fetch(this.currentSchema);
-                    const data = yield response.text();
+                    const response = await fetch(this.currentSchema);
+                    const data = await response.text();
                     if (this.options.enableValidation) {
-                        const res = yield this.validator.setRelaxNGSchema(data);
+                        const res = await this.validator.setRelaxNGSchema(data);
                         console.log("Schema loaded", res);
                     }
                     this.rngLoader.setRelaxNGSchema(data);
                     this.endLoading();
                     this.createInterfaceAndLoadData();
-                }));
+                });
             }
             else {
                 this.createInterfaceAndLoadData();
             }
-        }));
+        });
     }
     destroy() {
         this.eventManager.unbindAll();
@@ -372,95 +363,81 @@ export class App {
     ////////////////////////////////////////////////////////////////////////
     // Async worker methods
     ////////////////////////////////////////////////////////////////////////
-    loadMEI(convert) {
-        return __awaiter(this, void 0, void 0, function* () {
-            this.startLoading("Loading the MEI data ...");
-            if (convert) {
-                console.log("Converting to MEI");
-                yield this.verovio.loadData(this.mei);
-                this.mei = yield this.verovio.getMEI({});
-            }
-            if (this.viewEditorObj) {
-                this.viewEditorObj.xmlEditorEnabled = false;
-                this.viewEditorObj.xmlEditorViewObj.setMode(this.mei.length);
-            }
-            yield this.checkSchema();
-            let event = new CustomEvent('onLoadData', {
-                detail: {
-                    currentId: this.clientId,
-                    caller: this.view,
-                    lightEndLoading: false,
-                    mei: this.mei
-                }
-            });
-            this.view.customEventManager.dispatch(event);
-        });
-    }
-    applySelection() {
-        return __awaiter(this, void 0, void 0, function* () {
-            let selection = this.options.selection;
-            if (!selection || Object.keys(selection).length === 0)
-                selection = {};
-            yield this.verovio.select(selection);
-        });
-    }
-    checkSchema() {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (!this.options.enableEditor)
-                return;
-            const hasSchema = /<\?xml-model.*schematypens=\"http?:\/\/relaxng\.org\/ns\/structure\/1\.0\"/;
-            const hasSchemaMatch = hasSchema.exec(this.mei);
-            if (!hasSchemaMatch)
-                return;
-            const schema = /<\?xml-model.*href="([^"]*).*/;
-            const schemaMatch = schema.exec(this.mei);
-            if (schemaMatch && schemaMatch[1] !== this.currentSchema) {
-                this.currentSchema = this.options.schemaDefault;
-                const dlg = new Dialog(this.dialogDiv, this, "Different Schema in the file", { icon: "warning", type: Dialog.Type.Msg });
-                dlg.setContent(`The Schema '${schemaMatch[1]}' in the file is different from the one in the editor<br><br>The validation in the editor will use the Schema '${this.options.schemaDefault}'`);
-                yield dlg.show();
+    async loadMEI(convert) {
+        this.startLoading("Loading the MEI data ...");
+        if (convert) {
+            console.log("Converting to MEI");
+            await this.verovio.loadData(this.mei);
+            this.mei = await this.verovio.getMEI({});
+        }
+        if (this.viewEditorObj) {
+            this.viewEditorObj.xmlEditorEnabled = false;
+            this.viewEditorObj.xmlEditorViewObj.setMode(this.mei.length);
+        }
+        await this.checkSchema();
+        let event = new CustomEvent('onLoadData', {
+            detail: {
+                currentId: this.clientId,
+                caller: this.view,
+                lightEndLoading: false,
+                mei: this.mei
             }
         });
+        this.view.customEventManager.dispatch(event);
     }
-    playMEI() {
-        return __awaiter(this, void 0, void 0, function* () {
-            const base64midi = yield this.verovio.renderToMIDI();
-            const midiFile = 'data:audio/midi;base64,' + base64midi;
-            this.midiPlayer.playFile(midiFile);
-        });
+    async applySelection() {
+        let selection = this.options.selection;
+        if (!selection || Object.keys(selection).length === 0)
+            selection = {};
+        await this.verovio.select(selection);
     }
-    generatePDF() {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (!this.pdf) {
-                const pdfWorkerURL = this.getWorkerURL(`${this.host}/dist/pdf-worker.js`);
-                const pdfWorker = new Worker(pdfWorkerURL);
-                this.pdf = new PDFWorkerProxy(pdfWorker);
-            }
-            const pdfGenerator = new PDFGenerator(this.verovio, this.pdf, this.verovioOptions.scale);
-            const pdfOutputStr = yield pdfGenerator.generateFile();
-            this.endLoading();
-            this.output.href = `${pdfOutputStr}`;
-            this.output.download = this.filename.replace(/\.[^\.]*$/, '.pdf');
-            this.output.click();
-        });
+    async checkSchema() {
+        if (!this.options.enableEditor)
+            return;
+        const hasSchema = /<\?xml-model.*schematypens=\"http?:\/\/relaxng\.org\/ns\/structure\/1\.0\"/;
+        const hasSchemaMatch = hasSchema.exec(this.mei);
+        if (!hasSchemaMatch)
+            return;
+        const schema = /<\?xml-model.*href="([^"]*).*/;
+        const schemaMatch = schema.exec(this.mei);
+        if (schemaMatch && schemaMatch[1] !== this.currentSchema) {
+            this.currentSchema = this.options.schemaDefault;
+            const dlg = new Dialog(this.dialogDiv, this, "Different Schema in the file", { icon: "warning", type: Dialog.Type.Msg });
+            dlg.setContent(`The Schema '${schemaMatch[1]}' in the file is different from the one in the editor<br><br>The validation in the editor will use the Schema '${this.options.schemaDefault}'`);
+            await dlg.show();
+        }
     }
-    generateMIDI() {
-        return __awaiter(this, void 0, void 0, function* () {
-            const midiOutputStr = yield this.verovio.renderToMIDI();
-            this.endLoading();
-            this.output.href = `data:audio/midi;base64,${midiOutputStr}`;
-            this.output.download = this.filename.replace(/\.[^\.]*$/, '.mid');
-            this.output.click();
-        });
+    async playMEI() {
+        const base64midi = await this.verovio.renderToMIDI();
+        const midiFile = 'data:audio/midi;base64,' + base64midi;
+        this.midiPlayer.playFile(midiFile);
     }
-    generateMEI(options) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const meiOutputStr = yield this.verovio.getMEI(options);
-            this.endLoading();
-            this.output.href = 'data:text/xml;charset=utf-8,' + encodeURIComponent(meiOutputStr);
-            this.output.download = this.filename.replace(/\.[^\.]*$/, '.mei');
-            this.output.click();
-        });
+    async generatePDF() {
+        if (!this.pdf) {
+            const pdfWorkerURL = this.getWorkerURL(`${this.host}/dist/document/pdf-worker.js`);
+            const pdfWorker = new Worker(pdfWorkerURL);
+            this.pdf = new PDFWorkerProxy(pdfWorker);
+        }
+        const pdfGenerator = new PDFGenerator(this.verovio, this.pdf, this.verovioOptions.scale);
+        const pdfOutputStr = await pdfGenerator.generateFile();
+        this.endLoading();
+        this.output.href = `${pdfOutputStr}`;
+        this.output.download = this.filename.replace(/\.[^\.]*$/, '.pdf');
+        this.output.click();
+    }
+    async generateMIDI() {
+        const midiOutputStr = await this.verovio.renderToMIDI();
+        this.endLoading();
+        this.output.href = `data:audio/midi;base64,${midiOutputStr}`;
+        this.output.download = this.filename.replace(/\.[^\.]*$/, '.mid');
+        this.output.click();
+    }
+    async generateMEI(options) {
+        const meiOutputStr = await this.verovio.getMEI(options);
+        this.endLoading();
+        this.output.href = 'data:text/xml;charset=utf-8,' + encodeURIComponent(meiOutputStr);
+        this.output.download = this.filename.replace(/\.[^\.]*$/, '.mei');
+        this.output.click();
     }
     ////////////////////////////////////////////////////////////////////////
     // Custom event methods
@@ -558,198 +535,166 @@ export class App {
     ////////////////////////////////////////////////////////////////////////
     // Async event methods
     ////////////////////////////////////////////////////////////////////////
-    fileImport(e) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const element = e.target;
-            if (element.dataset.ext === 'MEI')
-                this.input.accept = ".xml, .mei";
-            else if (element.dataset.ext === 'MusicXML')
-                this.input.accept = ".xml, .musicxml";
-            //console.log( element.dataset.ext );
-            this.input.dataset.ext = element.dataset.ext;
-            this.input.click();
-        });
+    async fileImport(e) {
+        const element = e.target;
+        if (element.dataset.ext === 'MEI')
+            this.input.accept = ".xml, .mei";
+        else if (element.dataset.ext === 'MusicXML')
+            this.input.accept = ".xml, .musicxml";
+        //console.log( element.dataset.ext );
+        this.input.dataset.ext = element.dataset.ext;
+        this.input.click();
     }
-    fileInput(e) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const element = e.target;
-            let file = element.files[0];
-            if (!file)
-                return;
-            let reader = new FileReader();
-            const readerThis = this;
-            const filename = file.name;
-            const convert = (element.dataset.ext != 'MEI') ? true : false;
-            reader.onload = function (e) {
-                return __awaiter(this, void 0, void 0, function* () {
-                    readerThis.loadData(e.target.result, filename, convert);
-                });
-            };
-            reader.readAsText(file);
-        });
+    async fileInput(e) {
+        const element = e.target;
+        let file = element.files[0];
+        if (!file)
+            return;
+        let reader = new FileReader();
+        const readerThis = this;
+        const filename = file.name;
+        const convert = (element.dataset.ext != 'MEI') ? true : false;
+        reader.onload = async function (e) {
+            readerThis.loadData(e.target.result, filename, convert);
+        };
+        reader.readAsText(file);
     }
-    fileExport(e) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const dlg = new DialogExport(this.dialogDiv, this, "Select MEI export parameters");
-            const dlgRes = yield dlg.show();
-            if (dlgRes === 0)
-                return;
-            this.startLoading("Generating MEI file ...");
-            this.generateMEI(dlg.getExportOptions());
-        });
+    async fileExport(e) {
+        const dlg = new DialogExport(this.dialogDiv, this, "Select MEI export parameters");
+        const dlgRes = await dlg.show();
+        if (dlgRes === 0)
+            return;
+        this.startLoading("Generating MEI file ...");
+        this.generateMEI(dlg.getExportOptions());
     }
-    fileExportPDF(e) {
-        return __awaiter(this, void 0, void 0, function* () {
-            this.startLoading("Generating PDF file ...");
-            this.generatePDF();
-        });
+    async fileExportPDF(e) {
+        this.startLoading("Generating PDF file ...");
+        this.generatePDF();
     }
-    fileExportMIDI(e) {
-        return __awaiter(this, void 0, void 0, function* () {
-            this.startLoading("Generating MIDI file ...");
-            this.generateMIDI();
-        });
+    async fileExportMIDI(e) {
+        this.startLoading("Generating MIDI file ...");
+        this.generateMIDI();
     }
-    fileCopyToClipboard(e) {
-        return __awaiter(this, void 0, void 0, function* () {
-            this.fileCopy.value = this.mei;
-            this.fileCopy.select();
-            document.execCommand('copy');
-            this.showNotification("MEI copied to clipboard");
-        });
+    async fileCopyToClipboard(e) {
+        this.fileCopy.value = this.mei;
+        this.fileCopy.select();
+        document.execCommand('copy');
+        this.showNotification("MEI copied to clipboard");
     }
-    fileLoadRecent(e) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const element = e.target;
-            //console.log( e.target.dataset.idx );
-            let file = this.fileStack.load(Number(element.dataset.idx));
-            this.loadData(file.data, file.filename);
-        });
+    async fileLoadRecent(e) {
+        const element = e.target;
+        //console.log( e.target.dataset.idx );
+        let file = this.fileStack.load(Number(element.dataset.idx));
+        this.loadData(file.data, file.filename);
     }
-    fileSelection(e) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const dlg = new DialogSelection(this.dialogDiv, this, "Apply a selection to the file currently loaded", { okLabel: "Apply", icon: "info", type: Dialog.Type.OKCancel }, this.options.selection);
-            const dlgRes = yield dlg.show();
-            if (dlgRes === 1) {
-                this.options.selection = dlg.getSelection();
-                yield this.applySelection();
-                let event = new CustomEvent('onLoadData', {
-                    detail: {
-                        currentId: this.clientId,
-                        caller: this.view,
-                        reload: true
-                    }
-                });
-                this.customEventManager.dispatch(event);
-            }
-        });
-    }
-    githubImport(e) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const dlg = new DialogGhImport(this.dialogDiv, this, "Import an MEI file from GitHub", {}, this.githubManager);
-            const dlgRes = yield dlg.show();
-            if (dlgRes === 1) {
-                this.loadData(dlg.getData(), dlg.getFilename());
-            }
-        });
-    }
-    githubExport(e) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const dlg = new DialogGhExport(this.dialogDiv, this, "Export an MEI file to GitHub", {}, this.githubManager);
-            const dlgRes = yield dlg.show();
-            if (dlgRes === 1) {
-            }
-        });
-    }
-    settingsEditor(e) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const dlg = new DialogSettingsEditor(this.dialogDiv, this, "Editor options", { okLabel: "Apply", icon: "info", type: Dialog.Type.OKCancel }, this.options);
-            const dlgRes = yield dlg.show();
-            if (dlgRes === 1) {
-                this.options.verovioVersion = dlg.getAppOptions().verovioVersion;
-                if (dlg.isReload()) {
-                    const dlg = new Dialog(this.dialogDiv, this, "Reloading the editor", { okLabel: "Yes", icon: "question" });
-                    dlg.setContent(marked.parse(reloadMsg));
-                    if ((yield dlg.show()) === 0)
-                        return;
-                    location.reload();
-                }
-            }
-        });
-    }
-    settingsVerovio(e) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const dlg = new DialogSettingsVerovio(this.dialogDiv, this, "Verovio options", { okLabel: "Apply", icon: "info", type: Dialog.Type.OKCancel }, this.options.selection, this.verovio);
-            yield dlg.loadOptions();
-            const dlgRes = yield dlg.show();
-            if (dlgRes === 1) {
-                yield this.verovio.setOptions(dlg.getChangedOptions());
-                let event = new CustomEvent('onLoadData', {
-                    detail: {
-                        currentId: this.clientId,
-                        caller: this.view,
-                        reload: true
-                    }
-                });
-                this.customEventManager.dispatch(event);
-            }
-        });
-    }
-    helpAbout(e) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const dlg = new DialogAbout(this.dialogDiv, this, "About this application");
-            const vrvVersion = yield this.verovio.getVersion();
-            dlg.setContent(marked.parse(aboutMsg + `\n\nVerovio: ${vrvVersion}`));
-            yield dlg.load();
-            yield dlg.show();
-        });
-    }
-    helpReset(e) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const dlg = new Dialog(this.dialogDiv, this, "Reset to default", { okLabel: "Yes", icon: "question" });
-            dlg.setContent(marked.parse(resetMsg));
-            if ((yield dlg.show()) === 0)
-                return;
-            this.fileStack.reset();
-            window.localStorage.removeItem("options");
-            this.appReset = true;
-            location.reload();
-        });
-    }
-    setView(e) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const element = e.target;
-            if (this.midiPlayer && this.midiPlayer.isPlaying()) {
-                this.midiPlayer.stop();
-            }
-            let event = new CustomEvent('onDeactivate');
-            this.view.customEventManager.dispatch(event);
-            if (element.dataset.view == 'document') {
-                this.view = this.viewDocumentObj;
-                this.toolbarView = this.viewDocumentObj;
-            }
-            else if (element.dataset.view == 'editor') {
-                this.view = this.viewEditorObj;
-                this.toolbarView = this.viewEditorObj.editorViewObj;
-            }
-            else if (element.dataset.view == 'responsive') {
-                this.view = this.viewResponsiveObj;
-                this.toolbarView = this.viewResponsiveObj;
-            }
-            this.startLoading("Switching view ...");
-            let eventActivate = new CustomEvent('onActivate');
-            this.view.customEventManager.dispatch(eventActivate);
-            let eventLoadData = new CustomEvent('onLoadData', {
+    async fileSelection(e) {
+        const dlg = new DialogSelection(this.dialogDiv, this, "Apply a selection to the file currently loaded", { okLabel: "Apply", icon: "info", type: Dialog.Type.OKCancel }, this.options.selection);
+        const dlgRes = await dlg.show();
+        if (dlgRes === 1) {
+            this.options.selection = dlg.getSelection();
+            await this.applySelection();
+            let event = new CustomEvent('onLoadData', {
                 detail: {
                     currentId: this.clientId,
                     caller: this.view,
-                    reload: true,
-                    lightEndLoading: false
+                    reload: true
                 }
             });
-            this.customEventManager.dispatch(eventLoadData);
-            this.toolbarObj.customEventManager.dispatch(eventActivate);
+            this.customEventManager.dispatch(event);
+        }
+    }
+    async githubImport(e) {
+        const dlg = new DialogGhImport(this.dialogDiv, this, "Import an MEI file from GitHub", {}, this.githubManager);
+        const dlgRes = await dlg.show();
+        if (dlgRes === 1) {
+            this.loadData(dlg.getData(), dlg.getFilename());
+        }
+    }
+    async githubExport(e) {
+        const dlg = new DialogGhExport(this.dialogDiv, this, "Export an MEI file to GitHub", {}, this.githubManager);
+        const dlgRes = await dlg.show();
+        if (dlgRes === 1) {
+        }
+    }
+    async settingsEditor(e) {
+        const dlg = new DialogSettingsEditor(this.dialogDiv, this, "Editor options", { okLabel: "Apply", icon: "info", type: Dialog.Type.OKCancel }, this.options);
+        const dlgRes = await dlg.show();
+        if (dlgRes === 1) {
+            this.options.verovioVersion = dlg.getAppOptions().verovioVersion;
+            if (dlg.isReload()) {
+                const dlg = new Dialog(this.dialogDiv, this, "Reloading the editor", { okLabel: "Yes", icon: "question" });
+                dlg.setContent(marked.parse(reloadMsg));
+                if (await dlg.show() === 0)
+                    return;
+                location.reload();
+            }
+        }
+    }
+    async settingsVerovio(e) {
+        const dlg = new DialogSettingsVerovio(this.dialogDiv, this, "Verovio options", { okLabel: "Apply", icon: "info", type: Dialog.Type.OKCancel }, this.options.selection, this.verovio);
+        await dlg.loadOptions();
+        const dlgRes = await dlg.show();
+        if (dlgRes === 1) {
+            await this.verovio.setOptions(dlg.getChangedOptions());
+            let event = new CustomEvent('onLoadData', {
+                detail: {
+                    currentId: this.clientId,
+                    caller: this.view,
+                    reload: true
+                }
+            });
+            this.customEventManager.dispatch(event);
+        }
+    }
+    async helpAbout(e) {
+        const dlg = new DialogAbout(this.dialogDiv, this, "About this application");
+        const vrvVersion = await this.verovio.getVersion();
+        dlg.setContent(marked.parse(aboutMsg + `\n\nVerovio: ${vrvVersion}`));
+        await dlg.load();
+        await dlg.show();
+    }
+    async helpReset(e) {
+        const dlg = new Dialog(this.dialogDiv, this, "Reset to default", { okLabel: "Yes", icon: "question" });
+        dlg.setContent(marked.parse(resetMsg));
+        if (await dlg.show() === 0)
+            return;
+        this.fileStack.reset();
+        window.localStorage.removeItem("options");
+        this.appReset = true;
+        location.reload();
+    }
+    async setView(e) {
+        const element = e.target;
+        if (this.midiPlayer && this.midiPlayer.isPlaying()) {
+            this.midiPlayer.stop();
+        }
+        let event = new CustomEvent('onDeactivate');
+        this.view.customEventManager.dispatch(event);
+        if (element.dataset.view == 'document') {
+            this.view = this.viewDocumentObj;
+            this.toolbarView = this.viewDocumentObj;
+        }
+        else if (element.dataset.view == 'editor') {
+            this.view = this.viewEditorObj;
+            this.toolbarView = this.viewEditorObj.editorViewObj;
+        }
+        else if (element.dataset.view == 'responsive') {
+            this.view = this.viewResponsiveObj;
+            this.toolbarView = this.viewResponsiveObj;
+        }
+        this.startLoading("Switching view ...");
+        let eventActivate = new CustomEvent('onActivate');
+        this.view.customEventManager.dispatch(eventActivate);
+        let eventLoadData = new CustomEvent('onLoadData', {
+            detail: {
+                currentId: this.clientId,
+                caller: this.view,
+                reload: true,
+                lightEndLoading: false
+            }
         });
+        this.customEventManager.dispatch(eventLoadData);
+        this.toolbarObj.customEventManager.dispatch(eventActivate);
     }
 }
 ////////////////////////////////////////////////////////////////////////

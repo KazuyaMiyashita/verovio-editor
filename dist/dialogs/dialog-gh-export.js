@@ -1,15 +1,6 @@
 /**
  * The DialogGhImport class for navigating GitHub and selecting a file.
  */
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 import { DialogGhImport } from './dialog-gh-import.js';
 import { appendDivTo, appendInputTo, appendTextAreaTo } from '../utils/functions.js';
 export class DialogGhExport extends DialogGhImport {
@@ -33,22 +24,20 @@ export class DialogGhExport extends DialogGhImport {
     ////////////////////////////////////////////////////////////////////////
     // Async network methods
     ////////////////////////////////////////////////////////////////////////
-    selectFile(e) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const element = e.target;
-            if (element.dataset.type === 'dir') {
-                if (element.dataset.name === '..') {
-                    this.githubManager.selectedPathPop();
-                }
-                else {
-                    this.githubManager.appendToPath(element.dataset.name);
-                }
-                this.listFiles();
+    async selectFile(e) {
+        const element = e.target;
+        if (element.dataset.type === 'dir') {
+            if (element.dataset.name === '..') {
+                this.githubManager.selectedPathPop();
             }
             else {
-                this.inputFile.value = element.dataset.name;
+                this.githubManager.appendToPath(element.dataset.name);
             }
-        });
+            this.listFiles();
+        }
+        else {
+            this.inputFile.value = element.dataset.name;
+        }
     }
     ////////////////////////////////////////////////////////////////////////
     // Class-specific methods

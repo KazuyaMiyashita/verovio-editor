@@ -5,7 +5,7 @@
 import { EditorView } from './editor-view.js';
 
 export class EditorCursorPointer {
-    private editorViewObj: EditorView;
+    private readonly editorViewObj: EditorView;
 
     private activated: boolean;
 

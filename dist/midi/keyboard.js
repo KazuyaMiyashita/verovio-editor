@@ -1,15 +1,6 @@
 /**
  * The Keyboard class.
  */
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 import { EventManager } from '../events/event-manager.js';
 import { appendDivTo, appendMidiPlayerTo } from '../utils/functions.js';
 import { midiScale } from './midi-scale.js';
@@ -61,21 +52,19 @@ export class Keyboard {
     ////////////////////////////////////////////////////////////////////////
     // Async worker methods
     ////////////////////////////////////////////////////////////////////////
-    playNoteSound(midi) {
-        return __awaiter(this, void 0, void 0, function* () {
-            let midiNum = Number(midi);
-            // Limit the range to playable notes
-            if (Number(midi) > 107)
-                return;
-            if (Number(midi) < 21)
-                return;
+    async playNoteSound(midi) {
+        let midiNum = Number(midi);
+        // Limit the range to playable notes
+        if (Number(midi) > 107)
+            return;
+        if (Number(midi) < 21)
+            return;
+        this.midiPlayerElement.stop();
+        this.midiPlayerElement.currentTime = ((Number(midi) - 21) * 0.5);
+        this.midiPlayerElement.start();
+        setTimeout(() => {
             this.midiPlayerElement.stop();
-            this.midiPlayerElement.currentTime = ((Number(midi) - 21) * 0.5);
-            this.midiPlayerElement.start();
-            setTimeout(() => {
-                this.midiPlayerElement.stop();
-            }, 500);
-        });
+        }, 500);
     }
     ////////////////////////////////////////////////////////////////////////
     // Class-specific methods

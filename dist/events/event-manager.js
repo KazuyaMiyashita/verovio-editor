@@ -10,8 +10,11 @@ export class EventManager {
         this.cache = {};
         this.appIDAttr = 'data-app-el-id';
     }
-    // Binds function `fct` to element `el` on event `ev`
+    ////////////////////////////////////////////////////////////////////////
+    // Class-specific methods
+    ////////////////////////////////////////////////////////////////////////
     bind(el, ev, fct) {
+        // Binds function `fct` to element `el` on event `ev`
         // Assign the element a random ID for the EventManager to reference it by (or get it if we already have one)
         let appID = el.getAttribute(this.appIDAttr) || el.getAttribute('id');
         if (!appID) {
@@ -39,8 +42,8 @@ export class EventManager {
             return;
         if (appID in this.cache) {
             if (ev in this.cache[appID]) {
-                for (let boundFunct of this.cache[appID][ev]) {
-                    el.removeEventListener(ev, boundFunct);
+                for (let boundFunction of this.cache[appID][ev]) {
+                    el.removeEventListener(ev, boundFunction);
                 }
             }
         }
@@ -57,8 +60,8 @@ export class EventManager {
             if (!el)
                 continue;
             for (let ev in this.cache[appID]) {
-                for (let funct of this.cache[appID][ev]) {
-                    el.removeEventListener(ev, funct);
+                for (let func of this.cache[appID][ev]) {
+                    el.removeEventListener(ev, func);
                 }
             }
         }

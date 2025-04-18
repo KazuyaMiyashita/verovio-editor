@@ -14,6 +14,7 @@ class PDFDeferred {
     public resolve: ((value: (PromiseLike<unknown> | unknown)) => void) | undefined;
 
     constructor() {
+        // @ts-ignore
         this.promise = new Promise((resolve, reject) => {
             this.reject = reject
             this.resolve = resolve

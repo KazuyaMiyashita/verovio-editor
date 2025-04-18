@@ -2,15 +2,6 @@
  * The EditorView class implements editor interactions, such as selecting and dragging.
  * It uses a responsive layout.
  */
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 import { ActionManager } from '../events/action-manager.js';
 import { EditorCursorPointer } from './editor-cursor-pointer.js';
 import { ResponsiveView } from '../verovio/responsive-view.js';
@@ -63,88 +54,82 @@ export class EditorView extends ResponsiveView {
     ////////////////////////////////////////////////////////////////////////
     // Async worker methods
     ////////////////////////////////////////////////////////////////////////
-    renderPage() {
-        return __awaiter(this, arguments, void 0, function* (lightEndLoading = false, createOverlay = true) {
-            const svg = yield this.verovio.renderToSVG(this.currentPage);
-            this.svgWrapper.innerHTML = svg;
-            this.initCursor();
-            // create the overlay if necessary
-            if (createOverlay) {
-                this.createOverlay();
-            }
-            //  make sure highlights are up to date
-            this.highlightSelected();
-            if (lightEndLoading)
-                this.app.endLoading(true);
-        });
+    async renderPage(lightEndLoading = false, createOverlay = true) {
+        const svg = await this.verovio.renderToSVG(this.currentPage);
+        this.svgWrapper.innerHTML = svg;
+        this.initCursor();
+        // create the overlay if necessary
+        if (createOverlay) {
+            this.createOverlay();
+        }
+        //  make sure highlights are up to date
+        this.highlightSelected();
+        if (lightEndLoading)
+            this.app.endLoading(true);
     }
-    select(element, id) {
-        return __awaiter(this, void 0, void 0, function* () {
-            this.highlightMouseOverReset();
-            const pageWithElement = yield this.verovio.getPageWithElement(id);
-            if ((pageWithElement > 0) && (pageWithElement != this.currentPage)) {
-                this.currentPage = pageWithElement;
-                let event = new CustomEvent('onPage');
-                this.app.customEventManager.dispatch(event);
-                ;
-            }
-            this.addToSelection(element, id);
-        });
+    async select(element, id) {
+        this.highlightMouseOverReset();
+        const pageWithElement = await this.verovio.getPageWithElement(id);
+        if ((pageWithElement > 0) && (pageWithElement != this.currentPage)) {
+            this.currentPage = pageWithElement;
+            let event = new CustomEvent('onPage');
+            this.app.customEventManager.dispatch(event);
+            ;
+        }
+        this.addToSelection(element, id);
     }
-    playNoteSound() {
-        return __awaiter(this, void 0, void 0, function* () {
-            const attr = yield this.app.verovio.getElementAttr(this.selectedItems[0].id);
-            if (!attr.pname || !attr.oct)
-                return;
-            if ((this.lastNote.pname === attr.pname) && (this.lastNote.oct === attr.oct))
-                return;
-            this.lastNote.pname = attr.pname;
-            this.lastNote.oct = attr.oct;
-            var midiBase = 0;
-            switch (attr.pname) {
-                case 'd':
-                    midiBase = 2;
-                    break;
-                case 'e':
-                    midiBase = 4;
-                    break;
-                case 'f':
-                    midiBase = 5;
-                    break;
-                case 'g':
-                    midiBase = 7;
-                    break;
-                case 'a':
-                    midiBase = 9;
-                    break;
-                case 'b':
-                    midiBase = 11;
-                    break;
-            }
-            if (attr.accid) {
-                if (attr.accid == 'f')
-                    midiBase--;
-                else if (attr.accid == 's')
-                    midiBase++;
-            }
-            let midiPitch = midiBase + (parseInt(attr.oct)) * 12;
-            if (midiPitch < 0 || midiPitch > 96)
-                return;
-            if (this.lastNote.midiPitch === midiPitch)
-                return;
-            this.lastNote.midiPitch = midiPitch;
-            // Limit the range to playable notes
-            if (midiPitch > 107)
-                return;
-            if (midiPitch < 21)
-                return;
+    async playNoteSound() {
+        const attr = await this.app.verovio.getElementAttr(this.selectedItems[0].id);
+        if (!attr.pname || !attr.oct)
+            return;
+        if ((this.lastNote.pname === attr.pname) && (this.lastNote.oct === attr.oct))
+            return;
+        this.lastNote.pname = attr.pname;
+        this.lastNote.oct = attr.oct;
+        var midiBase = 0;
+        switch (attr.pname) {
+            case 'd':
+                midiBase = 2;
+                break;
+            case 'e':
+                midiBase = 4;
+                break;
+            case 'f':
+                midiBase = 5;
+                break;
+            case 'g':
+                midiBase = 7;
+                break;
+            case 'a':
+                midiBase = 9;
+                break;
+            case 'b':
+                midiBase = 11;
+                break;
+        }
+        if (attr.accid) {
+            if (attr.accid == 'f')
+                midiBase--;
+            else if (attr.accid == 's')
+                midiBase++;
+        }
+        let midiPitch = midiBase + (parseInt(attr.oct)) * 12;
+        if (midiPitch < 0 || midiPitch > 96)
+            return;
+        if (this.lastNote.midiPitch === midiPitch)
+            return;
+        this.lastNote.midiPitch = midiPitch;
+        // Limit the range to playable notes
+        if (midiPitch > 107)
+            return;
+        if (midiPitch < 21)
+            return;
+        this.midiPlayerElement.stop();
+        this.midiPlayerElement.currentTime = ((midiPitch - 21) * 0.5);
+        this.midiPlayerElement.start();
+        setTimeout(() => {
             this.midiPlayerElement.stop();
-            this.midiPlayerElement.currentTime = ((midiPitch - 21) * 0.5);
-            this.midiPlayerElement.start();
-            setTimeout(() => {
-                this.midiPlayerElement.stop();
-            }, 500);
-        });
+        }, 500);
     }
     ////////////////////////////////////////////////////////////////////////
     // Class-specific methods
@@ -186,30 +171,30 @@ export class EditorView extends ResponsiveView {
         // Copy wrapper HTML to overlay
         this.svgOverlay.innerHTML = this.svgWrapper.innerHTML;
         // Remove all the bounding boxes from the original wrapper because we do not want to highlight them
-        for (const node of this.svgWrapper.querySelectorAll('g.bounding-box')) {
+        Array.from(this.svgWrapper.querySelectorAll('g.bounding-box')).forEach(node => {
             node.parentNode.removeChild(node);
-        }
+        });
         // Make all /g, /path and /text transparent
-        for (const node of this.svgOverlay.querySelectorAll('g, path, text, polyline')) {
+        Array.from(this.svgOverlay.querySelectorAll('g, path, text, polyline')).forEach(node => {
             node.style.stroke = 'transparent';
             node.style.fill = 'transparent';
-        }
+        });
         // Remove bounding boxes for /slur and /tie
-        for (const node of this.svgOverlay.querySelectorAll('.slur.bounding-box, .tie.bounding-box')) {
+        Array.from(this.svgOverlay.querySelectorAll('.slur.bounding-box, .tie.bounding-box')).forEach(node => {
             node.parentNode.removeChild(node);
-        }
+        });
         // Increase border for facilitating selection of some elements
-        for (const node of this.svgOverlay.querySelectorAll('.slur path, .tie path, .stem rect, .dots ellipse, .barLineAttr path')) {
+        Array.from(this.svgOverlay.querySelectorAll('.slur path, .tie path, .stem rect, .dots ellipse, .barLineAttr path')).forEach(node => {
             //node.style.stroke = 'red';
             node.style.strokeWidth = "90"; // A default MEI unit
-        }
+        });
         // Add event listeners for click on /g
-        for (const node of this.svgOverlay.querySelectorAll('g')) {
+        Array.from(this.svgOverlay.querySelectorAll('g')).forEach(node => {
             this.eventManager.bind(node, 'mousedown', this.mouseDownListener);
-        }
-        for (const node of this.svgOverlay.querySelectorAll('g.staff')) {
+        });
+        Array.from(this.svgOverlay.querySelectorAll('g.staff')).forEach(node => {
             this.eventManager.bind(node, 'mouseenter', this.mouseEnterListener);
-        }
+        });
         // Add an event listener to the overlay of note input
         this.eventManager.bind(this.svgOverlay, 'mousedown', this.mouseDownListener);
         this.highlightSelected();
@@ -248,12 +233,14 @@ export class EditorView extends ResponsiveView {
     highlightWithColor(g, color) {
         if (!g)
             return;
-        for (const node of g.querySelectorAll('*:not(g)')) {
-            // Do not highlight bounding boxes elements
-            if (node.parentNode.classList.contains('bounding-box'))
+        for (const node of Array.from(g.querySelectorAll('*:not(g)'))) {
+            const parent = node.parentNode;
+            // Do not highlight bounding box elements
+            if (parent.classList.contains('bounding-box'))
                 continue;
-            node.style.fill = color;
-            node.style.stroke = color;
+            const el = node;
+            el.style.fill = color;
+            el.style.stroke = color;
         }
     }
     getClosestMEIElement(node, elementType = null) {

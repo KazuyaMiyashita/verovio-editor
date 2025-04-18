@@ -9,6 +9,9 @@ export class CustomEventManager {
         this.objs = new Map;
         this.propagationList = [];
     }
+    ////////////////////////////////////////////////////////////////////////
+    // Class-specific methods
+    ////////////////////////////////////////////////////////////////////////
     // Binds function `fct` to element `el` on event `ev`
     bind(obj, ev, fct) {
         if (!this.cache.has(obj.id)) {

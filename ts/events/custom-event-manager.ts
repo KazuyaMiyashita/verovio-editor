@@ -8,9 +8,9 @@ import { App } from '../app.js';
 import { GenericView } from "../utils/generic-view.js";
 
 export class CustomEventManager {
-    cache: Map<string, Map<string, Function>>;
-    objs: Map<string, GenericView | App>;
-    propagationList: Array<CustomEventManager>;
+    private readonly cache: Map<string, Map<string, Function>>;
+    private readonly objs: Map<string, GenericView | App>;
+    private readonly propagationList: Array<CustomEventManager>;
 
     constructor() {
         this.cache = new Map<string, Map<string, Function>>;
@@ -18,8 +18,12 @@ export class CustomEventManager {
         this.propagationList = []
     }
 
+    ////////////////////////////////////////////////////////////////////////
+    // Class-specific methods
+    ////////////////////////////////////////////////////////////////////////
+
     // Binds function `fct` to element `el` on event `ev`
-    bind(obj: GenericView | App, ev: string, fct: Function) {
+    public bind(obj: GenericView | App, ev: string, fct: Function) {
         if (!this.cache.has(obj.id)) {
             this.cache.set(obj.id, new Map<string, Function>);
             this.objs.set(obj.id, obj);
@@ -31,7 +35,7 @@ export class CustomEventManager {
         }
     }
 
-    addToPropagationList(customEventManager: CustomEventManager) {
+    public addToPropagationList(customEventManager: CustomEventManager) {
         if (!(this.propagationList.includes(customEventManager)))
             this.propagationList.push(customEventManager);
     }
@@ -50,7 +54,7 @@ export class CustomEventManager {
     }
     */
 
-    dispatch(event: Event) {
+    public dispatch(event: Event) {
         for (let objId of this.cache.keys()) {
             const bindings: Map<string, Function> = this.cache.get(objId);
             for (let ev of bindings.keys()) {

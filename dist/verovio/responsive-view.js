@@ -1,15 +1,6 @@
 /**
  * The ResponsiveView class implements a dynamic rendering view fitting and adjusting to the view port.
  */
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 import { EditorView } from '../editor/editor-view.js';
 import { VerovioView } from '../verovio/verovio-view.js';
 import { appendDivTo } from '../utils/functions.js';
@@ -23,132 +14,118 @@ export class ResponsiveView extends VerovioView {
     ////////////////////////////////////////////////////////////////////////
     // VerovioView update methods
     ////////////////////////////////////////////////////////////////////////
-    refreshView(update_1) {
-        return __awaiter(this, arguments, void 0, function* (update, lightEndLoading = true, mei = "", reload = false) {
-            switch (update) {
-                case (VerovioView.Refresh.Activate):
-                    yield this.updateActivate();
-                    break;
-                case (VerovioView.Refresh.LoadData):
-                    yield this.updateLoadData(mei, reload);
-                    break;
-                case (VerovioView.Refresh.Resized):
-                    yield this.updateResized();
-                    break;
-                case (VerovioView.Refresh.Zoom):
-                    yield this.updateZoom();
-                    break;
-            }
-            this.app.endLoading(lightEndLoading);
-        });
+    async refreshView(update, lightEndLoading = true, mei = "", reload = false) {
+        switch (update) {
+            case (VerovioView.Refresh.Activate):
+                await this.updateActivate();
+                break;
+            case (VerovioView.Refresh.LoadData):
+                await this.updateLoadData(mei, reload);
+                break;
+            case (VerovioView.Refresh.Resized):
+                await this.updateResized();
+                break;
+            case (VerovioView.Refresh.Zoom):
+                await this.updateZoom();
+                break;
+        }
+        this.app.endLoading(lightEndLoading);
     }
-    updateActivate() {
-        return __awaiter(this, void 0, void 0, function* () {
-            this.app.verovioOptions.adjustPageHeight = true;
-            this.app.verovioOptions.breaks = 'auto';
-            this.app.verovioOptions.footer = 'none';
+    async updateActivate() {
+        this.app.verovioOptions.adjustPageHeight = true;
+        this.app.verovioOptions.breaks = 'auto';
+        this.app.verovioOptions.footer = 'none';
+        this.app.verovioOptions.scale = this.currentScale;
+        this.app.verovioOptions.pageHeight = this.svgWrapper.clientHeight * (100 / this.app.verovioOptions.scale);
+        this.app.verovioOptions.pageWidth = this.svgWrapper.clientWidth * (100 / this.app.verovioOptions.scale);
+        this.app.verovioOptions.justifyVertically = false;
+        this.app.midiPlayer.setView(this);
+        this.midiIds = [];
+        if (this.app.verovioOptions.pageHeight !== 0) {
+            await this.verovio.setOptions(this.app.verovioOptions);
+        }
+    }
+    async updateLoadData(mei, reload) {
+        if (reload) {
+            mei = await this.verovio.getMEI({});
+        }
+        await this.verovio.loadData(mei);
+        this.app.pageCount = await this.verovio.getPageCount();
+        await this.updateResized();
+    }
+    async updateResized() {
+        if (!(this instanceof EditorView)) {
+            this.div.style.height = this.div.parentElement.style.height;
+            this.div.style.width = this.div.parentElement.style.width;
+        }
+        if (this.div && this.svgWrapper) {
+            this.updateSVGDimensions();
+            // Reset pageHeight and pageWidth to match the effective scaled viewport width
             this.app.verovioOptions.scale = this.currentScale;
             this.app.verovioOptions.pageHeight = this.svgWrapper.clientHeight * (100 / this.app.verovioOptions.scale);
             this.app.verovioOptions.pageWidth = this.svgWrapper.clientWidth * (100 / this.app.verovioOptions.scale);
-            this.app.verovioOptions.justifyVertically = false;
-            this.app.midiPlayer.setView(this);
-            this.midiIds = [];
+            // Not sure why we need to remove the top margin from the calculation... to be investigated
+            this.app.verovioOptions.pageHeight -= (this.app.verovioOptions.pageMarginTop) * (100 / this.app.verovioOptions.scale);
             if (this.app.verovioOptions.pageHeight !== 0) {
-                yield this.verovio.setOptions(this.app.verovioOptions);
+                await this.verovio.setOptions(this.app.verovioOptions);
             }
-        });
-    }
-    updateLoadData(mei, reload) {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (reload) {
-                mei = yield this.verovio.getMEI({});
-            }
-            yield this.verovio.loadData(mei);
-            this.app.pageCount = yield this.verovio.getPageCount();
-            yield this.updateResized();
-        });
-    }
-    updateResized() {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (!(this instanceof EditorView)) {
-                this.div.style.height = this.div.parentElement.style.height;
-                this.div.style.width = this.div.parentElement.style.width;
-            }
-            if (this.div && this.svgWrapper) {
-                this.updateSVGDimensions();
-                // Reset pageHeight and pageWidth to match the effective scaled viewport width
-                this.app.verovioOptions.scale = this.currentScale;
-                this.app.verovioOptions.pageHeight = this.svgWrapper.clientHeight * (100 / this.app.verovioOptions.scale);
-                this.app.verovioOptions.pageWidth = this.svgWrapper.clientWidth * (100 / this.app.verovioOptions.scale);
-                // Not sure why we need to remove the top margin from the calculation... to be investigated
-                this.app.verovioOptions.pageHeight -= (this.app.verovioOptions.pageMarginTop) * (100 / this.app.verovioOptions.scale);
-                if (this.app.verovioOptions.pageHeight !== 0) {
-                    yield this.verovio.setOptions(this.app.verovioOptions);
+            if (this.app.pageCount > 0) {
+                await this.verovio.setOptions(this.app.verovioOptions);
+                await this.verovio.redoLayout(this.app.verovioOptions);
+                this.app.pageCount = await this.verovio.getPageCount();
+                if (this.currentPage > this.app.pageCount) {
+                    this.currentPage = this.app.pageCount;
                 }
-                if (this.app.pageCount > 0) {
-                    yield this.verovio.setOptions(this.app.verovioOptions);
-                    yield this.verovio.redoLayout(this.app.verovioOptions);
-                    this.app.pageCount = yield this.verovio.getPageCount();
-                    if (this.currentPage > this.app.pageCount) {
-                        this.currentPage = this.app.pageCount;
-                    }
-                    yield this.renderPage();
-                }
+                await this.renderPage();
             }
-        });
+        }
     }
-    updateZoom() {
-        return __awaiter(this, void 0, void 0, function* () {
-            yield this.updateResized();
-        });
+    async updateZoom() {
+        await this.updateResized();
     }
     ////////////////////////////////////////////////////////////////////////
     // Async worker methods
     ////////////////////////////////////////////////////////////////////////
-    renderPage() {
-        return __awaiter(this, arguments, void 0, function* (lightEndLoading = false) {
-            const svg = yield this.verovio.renderToSVG(this.currentPage);
-            this.svgWrapper.innerHTML = svg;
-            if (lightEndLoading)
-                this.app.endLoading(true);
-        });
+    async renderPage(lightEndLoading = false) {
+        const svg = await this.verovio.renderToSVG(this.currentPage);
+        this.svgWrapper.innerHTML = svg;
+        if (lightEndLoading)
+            this.app.endLoading(true);
     }
-    midiUpdate(time) {
-        return __awaiter(this, void 0, void 0, function* () {
-            //const animateStart = document.getElementById( "highlighting-start" );
-            let vrvTime = time;
-            let elementsAtTime = yield this.app.verovio.getElementsAtTime(vrvTime);
-            if (Object.keys(elementsAtTime).length === 0 || elementsAtTime.page === 0) {
-                //console.debug( "Nothing returned by getElementsAtTime" );
-                return;
-            }
-            if (elementsAtTime.page != this.currentPage) {
-                this.currentPage = elementsAtTime.page;
-                this.app.startLoading("Loading content ...", true);
-                let event = new CustomEvent('onPage');
-                this.app.customEventManager.dispatch(event);
-            }
-            if ((elementsAtTime.notes.length > 0) && (this.midiIds != elementsAtTime.notes)) {
-                //updatePageOrScrollTo(elementsAtTime.notes[0]);
-                for (let i = 0, len = this.midiIds.length; i < len; i++) {
-                    let noteId = this.midiIds[i];
-                    if (elementsAtTime.notes.indexOf(noteId) === -1) {
-                        let note = this.svgWrapper.querySelector('#' + noteId);
-                        if (note)
-                            note.style.filter = "";
-                    }
-                }
-                ;
-                this.midiIds = elementsAtTime.notes;
-                for (let i = 0, len = this.midiIds.length; i < len; i++) {
-                    let note = this.svgWrapper.querySelector('#' + this.midiIds[i]);
+    async midiUpdate(time) {
+        //const animateStart = document.getElementById( "highlighting-start" );
+        let vrvTime = time;
+        let elementsAtTime = await this.app.verovio.getElementsAtTime(vrvTime);
+        if (Object.keys(elementsAtTime).length === 0 || elementsAtTime.page === 0) {
+            //console.debug( "Nothing returned by getElementsAtTime" );
+            return;
+        }
+        if (elementsAtTime.page != this.currentPage) {
+            this.currentPage = elementsAtTime.page;
+            this.app.startLoading("Loading content ...", true);
+            let event = new CustomEvent('onPage');
+            this.app.customEventManager.dispatch(event);
+        }
+        if ((elementsAtTime.notes.length > 0) && (this.midiIds != elementsAtTime.notes)) {
+            //updatePageOrScrollTo(elementsAtTime.notes[0]);
+            for (let i = 0, len = this.midiIds.length; i < len; i++) {
+                let noteId = this.midiIds[i];
+                if (elementsAtTime.notes.indexOf(noteId) === -1) {
+                    let note = this.svgWrapper.querySelector('#' + noteId);
                     if (note)
-                        note.style.filter = "url(#highlighting)";
-                    //if ( note ) animateStart.beginElement();
+                        note.style.filter = "";
                 }
-                ;
             }
-        });
+            ;
+            this.midiIds = elementsAtTime.notes;
+            for (let i = 0, len = this.midiIds.length; i < len; i++) {
+                let note = this.svgWrapper.querySelector('#' + this.midiIds[i]);
+                if (note)
+                    note.style.filter = "url(#highlighting)";
+                //if ( note ) animateStart.beginElement();
+            }
+            ;
+        }
     }
     ////////////////////////////////////////////////////////////////////////
     // Class-specific methods

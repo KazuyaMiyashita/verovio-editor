@@ -3,9 +3,9 @@
  */
 
 export class Deferred {
-    promise: Promise<string>;
-    reject: Function;
-    resolve: Function
+    public readonly promise: Promise<string>;
+    public reject: Function;
+    public resolve: Function
 
     constructor() {
         this.promise = new Promise((resolve: Function, reject: Function) => {

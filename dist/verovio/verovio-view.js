@@ -3,15 +3,6 @@
  * It should not be instantiated directly but only through inherited classes.
  * The VerovioView is attached to a VerovioMessenger.
  */
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 import { GenericView } from '../utils/generic-view.js';
 import { EventManager } from '../events/event-manager.js';
 export class VerovioView extends GenericView {
@@ -104,10 +95,8 @@ export class VerovioView extends GenericView {
     ////////////////////////////////////////////////////////////////////////
     // Async worker method
     ////////////////////////////////////////////////////////////////////////
-    refreshView(update_1) {
-        return __awaiter(this, arguments, void 0, function* (update, lightEndLoading = false, mei = "", reload = false) {
-            console.debug("View::updateView should be overwritten");
-        });
+    async refreshView(update, lightEndLoading = false, mei = "", reload = false) {
+        console.debug("View::updateView should be overwritten");
     }
     ////////////////////////////////////////////////////////////////////////
     // Event listeners

@@ -1,15 +1,6 @@
 /**
  * The EditorPanel class implements a panel with both Verovio and XML views.
  */
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 import { Dialog } from '../dialogs/dialog.js';
 import { EditorContentPanel } from './editor-content-panel.js';
 import { EditorToolbar } from '../toolbars/editor-toolbar.js';
@@ -272,45 +263,43 @@ export class EditorPanel extends GenericView {
     ////////////////////////////////////////////////////////////////////////
     // Async event methods
     ////////////////////////////////////////////////////////////////////////
-    onToggle(e) {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (!this.xmlEditorEnabled) {
-                this.xmlEditorEnabled = true;
-                if (this.xmlEditorViewObj.isAutoModeNotification() && !this.xmlEditorViewObj.isAutoMode()) {
-                    const dlg = new Dialog(this.app.dialogDiv, this.app, "Live validation off", { icon: "warning", type: Dialog.Type.Msg });
-                    dlg.setContent(marked.parse(autoModeOff));
-                    yield dlg.show();
-                    // Do not show it again for that file.
-                    this.xmlEditorViewObj.setAutoModeNotification(false);
+    async onToggle(e) {
+        if (!this.xmlEditorEnabled) {
+            this.xmlEditorEnabled = true;
+            if (this.xmlEditorViewObj.isAutoModeNotification() && !this.xmlEditorViewObj.isAutoMode()) {
+                const dlg = new Dialog(this.app.dialogDiv, this.app, "Live validation off", { icon: "warning", type: Dialog.Type.Msg });
+                dlg.setContent(marked.parse(autoModeOff));
+                await dlg.show();
+                // Do not show it again for that file.
+                this.xmlEditorViewObj.setAutoModeNotification(false);
+            }
+        }
+        else {
+            if (this.xmlEditorViewObj.isEdited()) {
+                const dlg = new Dialog(this.app.dialogDiv, this.app, "Un-synchronized changes", { okLabel: "Yes", icon: "question" });
+                dlg.setContent(marked.parse(editedXML));
+                if (await dlg.show() === 0)
+                    return;
+                this.xmlEditorViewObj.setEdited(false);
+            }
+            this.xmlEditorEnabled = false;
+        }
+        this.app.startLoading("Adjusting the interface ...", true);
+        let event = new CustomEvent('onActivate');
+        this.customEventManager.dispatch(event);
+        // We enabled the XML editor, update its data
+        if (this.xmlEditorEnabled) {
+            const mei = await this.verovio.getMEI({});
+            event = new CustomEvent('onLoadData', {
+                detail: {
+                    caller: this.editorView,
+                    mei: mei
                 }
-            }
-            else {
-                if (this.xmlEditorViewObj.isEdited()) {
-                    const dlg = new Dialog(this.app.dialogDiv, this.app, "Un-synchronized changes", { okLabel: "Yes", icon: "question" });
-                    dlg.setContent(marked.parse(editedXML));
-                    if ((yield dlg.show()) === 0)
-                        return;
-                    this.xmlEditorViewObj.setEdited(false);
-                }
-                this.xmlEditorEnabled = false;
-            }
-            this.app.startLoading("Adjusting the interface ...", true);
-            let event = new CustomEvent('onActivate');
-            this.customEventManager.dispatch(event);
-            // We enabled the XML editor, update its data
-            if (this.xmlEditorEnabled) {
-                const mei = yield this.verovio.getMEI({});
-                event = new CustomEvent('onLoadData', {
-                    detail: {
-                        caller: this.editorView,
-                        mei: mei
-                    }
-                });
-                this.app.customEventManager.dispatch(event);
-            }
-            event = new CustomEvent('onResized');
-            this.customEventManager.dispatch(event);
-        });
+            });
+            this.app.customEventManager.dispatch(event);
+        }
+        event = new CustomEvent('onResized');
+        this.customEventManager.dispatch(event);
     }
     onForceReload(e) {
         if (this.xmlEditorViewObj && this.xmlEditorViewObj.isEdited()) {

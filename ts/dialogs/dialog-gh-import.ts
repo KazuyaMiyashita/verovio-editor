@@ -115,9 +115,9 @@ export class DialogGhImport extends Dialog {
     }
     
     private loadingStart(tab: HTMLDivElement): void {
-        for (const node of this.tabs.querySelectorAll('.vrv-tab-selector')) {
+        Array.from(this.tabs.querySelectorAll('.vrv-tab-selector')).forEach(node => {
             node.classList.remove("selected");
-        }
+        });
         tab.classList.add("selected");
 
         this.list.innerHTML = "";

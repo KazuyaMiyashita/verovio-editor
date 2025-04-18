@@ -11,6 +11,7 @@ class ValidatorDeferred {
     public resolve!: (value: (PromiseLike<unknown> | unknown)) => void;
 
     constructor() {
+        //@ts-ignore
         this.promise = new Promise((resolve, reject) => {
             this.reject = reject;
             this.resolve = resolve;

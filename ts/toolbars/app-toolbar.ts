@@ -245,13 +245,13 @@ export class AppToolbar extends Toolbar {
         // Bindings for hiding menu once an item has be click - the corresponding class is
         // removed when the toolbar is moused over
 
-        for (const node of this.div.querySelectorAll('div.vrv-menu')) {
+        Array.from(this.div.querySelectorAll('div.vrv-menu')).forEach(node => {
             this.eventManager.bind(node, 'mouseover', this.onMouseOver);
-        }
+        });
 
-        for (const node of this.div.querySelectorAll('div.vrv-menu-text')) {
+        Array.from(this.div.querySelectorAll('div.vrv-menu-text')).forEach(node => {
             this.eventManager.bind(node, 'click', this.onClick);
-        }
+        });
     }
 
     ////////////////////////////////////////////////////////////////////////
@@ -314,17 +314,17 @@ export class AppToolbar extends Toolbar {
     ////////////////////////////////////////////////////////////////////////
 
     onMouseOver(e: CustomEvent): void {
-        for (const node of this.div.querySelectorAll('div.vrv-menu-content')) {
+        Array.from(this.div.querySelectorAll('div.vrv-menu-content')).forEach(node => {
             // Hide the menu content
             node.classList.remove("clicked");
-        }
+        });
     }
 
     onClick(e: CustomEvent): void {
-        for (const node of this.div.querySelectorAll('div.vrv-menu-content')) {
+        Array.from(this.div.querySelectorAll('div.vrv-menu-content')).forEach(node => {
             // Remove the class so the menu content is shown again with a hover
             node.classList.add("clicked");
-        }
+        });
     }
 
     ////////////////////////////////////////////////////////////////////////

@@ -4,15 +4,6 @@
  * For browser supporting it an IntersectionObserver is used to lazy-load the rendering of the pages.
  * When SVG rendering is use, a limited number of pages it keep in the DOM.
  */
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 import { VerovioView } from '../verovio/verovio-view.js';
 import { appendCanvasTo, appendDivTo } from '../utils/functions.js';
 class DocumentViewObserver extends IntersectionObserver {
@@ -39,132 +30,122 @@ export class DocumentView extends VerovioView {
     ////////////////////////////////////////////////////////////////////////
     // VerovioView update methods
     ////////////////////////////////////////////////////////////////////////
-    refreshView(update_1) {
-        return __awaiter(this, arguments, void 0, function* (update, lightEndLoading = true, mei = "", reload = false) {
-            switch (update) {
-                case (VerovioView.Refresh.Activate):
-                    yield this.updateActivate();
-                    break;
-                case (VerovioView.Refresh.LoadData):
-                    yield this.updateLoadData(true, mei, reload);
-                    break;
-                case (VerovioView.Refresh.Resized):
-                    yield this.updateResized();
-                    break;
-                case (VerovioView.Refresh.Zoom):
-                    yield this.updateZoom();
-                    break;
-            }
-            this.app.endLoading(lightEndLoading);
-        });
+    async refreshView(update, lightEndLoading = true, mei = "", reload = false) {
+        switch (update) {
+            case (VerovioView.Refresh.Activate):
+                await this.updateActivate();
+                break;
+            case (VerovioView.Refresh.LoadData):
+                await this.updateLoadData(true, mei, reload);
+                break;
+            case (VerovioView.Refresh.Resized):
+                await this.updateResized();
+                break;
+            case (VerovioView.Refresh.Zoom):
+                await this.updateZoom();
+                break;
+        }
+        this.app.endLoading(lightEndLoading);
     }
-    updateActivate() {
-        return __awaiter(this, void 0, void 0, function* () {
-            while (this.docWrapper.firstChild) {
-                this.docWrapper.firstChild.remove();
-            }
-            this.app.verovioOptions.adjustPageHeight = false;
-            this.app.verovioOptions.breaks = 'encoded';
-            this.app.verovioOptions.footer = 'auto';
-            this.app.verovioOptions.scale = 100;
-            this.app.verovioOptions.pageHeight = 2970;
-            this.app.verovioOptions.pageWidth = 2100;
-            this.app.verovioOptions.justifyVertically = true;
-        });
+    async updateActivate() {
+        while (this.docWrapper.firstChild) {
+            this.docWrapper.firstChild.remove();
+        }
+        this.app.verovioOptions.adjustPageHeight = false;
+        this.app.verovioOptions.breaks = 'encoded';
+        this.app.verovioOptions.footer = 'auto';
+        this.app.verovioOptions.scale = 100;
+        this.app.verovioOptions.pageHeight = 2970;
+        this.app.verovioOptions.pageWidth = 2100;
+        this.app.verovioOptions.justifyVertically = true;
     }
-    updateLoadData(redoLayout, mei, reload) {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (redoLayout) {
-                if (reload) {
-                    mei = yield this.verovio.getMEI({});
-                }
-                yield this.verovio.loadData(mei);
-                this.app.pageCount = yield this.verovio.getPageCount();
-                // We do not need to redo the layout when changing zoom with canvas
-                yield this.verovio.setOptions(this.app.verovioOptions);
-                yield this.verovio.redoLayout();
-                const pageCount = yield this.verovio.getPageCount();
-                this.app.pageCount = pageCount;
+    async updateLoadData(redoLayout, mei, reload) {
+        if (redoLayout) {
+            if (reload) {
+                mei = await this.verovio.getMEI({});
             }
-            while (this.docWrapper.firstChild) {
-                this.docWrapper.firstChild.remove();
+            await this.verovio.loadData(mei);
+            this.app.pageCount = await this.verovio.getPageCount();
+            // We do not need to redo the layout when changing zoom with canvas
+            await this.verovio.setOptions(this.app.verovioOptions);
+            await this.verovio.redoLayout();
+            const pageCount = await this.verovio.getPageCount();
+            this.app.pageCount = pageCount;
+        }
+        while (this.docWrapper.firstChild) {
+            this.docWrapper.firstChild.remove();
+        }
+        await this.updateResized();
+        if (this.observer) {
+            this.observer.lastPageIn = 0;
+        }
+        for (let idx = 0; idx < this.app.pageCount; idx++) {
+            const pageWrapper = appendDivTo(this.docWrapper, { class: `vrv-page-wrapper` });
+            pageWrapper.style.height = `${this.currentPageHeight}px`;
+            pageWrapper.style.width = `${this.currentPageWidth}px`;
+            pageWrapper.style.marginTop = `${this.currentDocMargin}px`;
+            pageWrapper.style.marginBottom = `${this.currentDocMargin}px`;
+            pageWrapper.style.border = `solid ${this.app.options.documentViewPageBorder}px lightgray`;
+            pageWrapper.dataset.page = (idx + 1).toString();
+            if (!this.app.options.documentViewSVG) {
+                const img = appendCanvasTo(pageWrapper, { class: `` });
+                let ctx = img.getContext("2d");
+                ctx.canvas.width = this.currentPageWidth;
+                ctx.canvas.height = this.currentPageHeight;
+                // font size between 10 and 25
+                let fontSize = Math.max(this.currentScale, 10);
+                fontSize = Math.min(fontSize, 25);
+                ctx.font = `${fontSize}px Helvetica`;
+                ctx.fillStyle = "grey";
+                ctx.textAlign = "center";
+                ctx.fillText("Loading ...", this.currentPageWidth / 2, this.currentPageHeight / 6);
+                pageWrapper.appendChild(img);
             }
-            yield this.updateResized();
             if (this.observer) {
-                this.observer.lastPageIn = 0;
-            }
-            for (let idx = 0; idx < this.app.pageCount; idx++) {
-                const pageWrapper = appendDivTo(this.docWrapper, { class: `vrv-page-wrapper` });
-                pageWrapper.style.height = `${this.currentPageHeight}px`;
-                pageWrapper.style.width = `${this.currentPageWidth}px`;
-                pageWrapper.style.marginTop = `${this.currentDocMargin}px`;
-                pageWrapper.style.marginBottom = `${this.currentDocMargin}px`;
-                pageWrapper.style.border = `solid ${this.app.options.documentViewPageBorder}px lightgray`;
-                pageWrapper.dataset.page = (idx + 1).toString();
-                if (!this.app.options.documentViewSVG) {
-                    const img = appendCanvasTo(pageWrapper, { class: `` });
-                    let ctx = img.getContext("2d");
-                    ctx.canvas.width = this.currentPageWidth;
-                    ctx.canvas.height = this.currentPageHeight;
-                    // font size between 10 and 25
-                    let fontSize = Math.max(this.currentScale, 10);
-                    fontSize = Math.min(fontSize, 25);
-                    ctx.font = `${fontSize}px Helvetica`;
-                    ctx.fillStyle = "grey";
-                    ctx.textAlign = "center";
-                    ctx.fillText("Loading ...", this.currentPageWidth / 2, this.currentPageHeight / 6);
-                    pageWrapper.appendChild(img);
-                }
-                if (this.observer) {
-                    this.observer.observe(pageWrapper);
-                }
-                else {
-                    this.renderPage(idx + 1);
-                }
-            }
-        });
-    }
-    updateResized() {
-        return __awaiter(this, void 0, void 0, function* () {
-            this.div.style.height = this.div.parentElement.style.height;
-            this.div.style.width = this.div.parentElement.style.width;
-            if (this.docWrapper) {
-                this.currentDocMargin = this.app.options.documentViewMargin * this.currentScale / 100;
-                this.currentPageWidth = this.app.verovioOptions.pageWidth * this.currentScale / 100;
-                const docWidth = this.currentPageWidth + 2 * this.currentDocMargin + 2 * this.app.options.documentViewPageBorder;
-                const elementWidth = parseInt(this.div.parentElement.style.width, 10);
-                this.currentDocWidth = Math.max(elementWidth, docWidth);
-                this.docWrapper.style.width = `${this.currentDocWidth}px`;
-                this.currentPageHeight = this.app.verovioOptions.pageHeight * this.currentScale / 100;
-                const docHeight = (this.currentPageHeight + this.currentDocMargin + 2 * this.app.options.documentViewPageBorder) * this.app.pageCount + this.currentDocMargin;
-                const elementHeight = parseInt(this.div.parentElement.style.height, 10);
-                this.currentDocHeight = Math.max(elementHeight, docHeight);
-                this.docWrapper.style.height = `${this.currentDocHeight}px`;
-            }
-        });
-    }
-    updateZoom() {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (this.app.options.documentViewSVG) {
-                yield this.updateResized();
-                for (let idx = 0; idx < this.app.pageCount; idx++) {
-                    let page = this.docWrapper.children[idx];
-                    page.style.height = `${this.currentPageHeight}px`;
-                    page.style.width = `${this.currentPageWidth}px`;
-                    page.style.marginTop = `${this.currentDocMargin}px`;
-                    page.style.marginBottom = `${this.currentDocMargin}px`;
-                    // This is the SVG content of the page
-                    if (page.firstChild && page.firstChild) {
-                        page.firstChild.setAttribute(`height`, `${this.currentPageHeight}px`);
-                        page.firstChild.setAttribute(`width`, `${this.currentPageWidth}px`);
-                    }
-                }
+                this.observer.observe(pageWrapper);
             }
             else {
-                // With canvas have to just reload everything but without redoing the layout
-                yield this.updateLoadData(false, "", false);
+                this.renderPage(idx + 1);
             }
-        });
+        }
+    }
+    async updateResized() {
+        this.div.style.height = this.div.parentElement.style.height;
+        this.div.style.width = this.div.parentElement.style.width;
+        if (this.docWrapper) {
+            this.currentDocMargin = this.app.options.documentViewMargin * this.currentScale / 100;
+            this.currentPageWidth = this.app.verovioOptions.pageWidth * this.currentScale / 100;
+            const docWidth = this.currentPageWidth + 2 * this.currentDocMargin + 2 * this.app.options.documentViewPageBorder;
+            const elementWidth = parseInt(this.div.parentElement.style.width, 10);
+            this.currentDocWidth = Math.max(elementWidth, docWidth);
+            this.docWrapper.style.width = `${this.currentDocWidth}px`;
+            this.currentPageHeight = this.app.verovioOptions.pageHeight * this.currentScale / 100;
+            const docHeight = (this.currentPageHeight + this.currentDocMargin + 2 * this.app.options.documentViewPageBorder) * this.app.pageCount + this.currentDocMargin;
+            const elementHeight = parseInt(this.div.parentElement.style.height, 10);
+            this.currentDocHeight = Math.max(elementHeight, docHeight);
+            this.docWrapper.style.height = `${this.currentDocHeight}px`;
+        }
+    }
+    async updateZoom() {
+        if (this.app.options.documentViewSVG) {
+            await this.updateResized();
+            for (let idx = 0; idx < this.app.pageCount; idx++) {
+                let page = this.docWrapper.children[idx];
+                page.style.height = `${this.currentPageHeight}px`;
+                page.style.width = `${this.currentPageWidth}px`;
+                page.style.marginTop = `${this.currentDocMargin}px`;
+                page.style.marginBottom = `${this.currentDocMargin}px`;
+                // This is the SVG content of the page
+                if (page.firstChild && page.firstChild) {
+                    page.firstChild.setAttribute(`height`, `${this.currentPageHeight}px`);
+                    page.firstChild.setAttribute(`width`, `${this.currentPageWidth}px`);
+                }
+            }
+        }
+        else {
+            // With canvas have to just reload everything but without redoing the layout
+            await this.updateLoadData(false, "", false);
+        }
     }
     ////////////////////////////////////////////////////////////////////////
     // Class-specific methods
@@ -207,39 +188,37 @@ export class DocumentView extends VerovioView {
     ////////////////////////////////////////////////////////////////////////
     // Async worker methods
     ////////////////////////////////////////////////////////////////////////
-    renderPage(pageIndex) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const svg = yield this.verovio.renderToSVG(pageIndex);
-            const page = this.docWrapper.children[pageIndex - 1];
-            // SVG
-            if (this.app.options.documentViewSVG) {
-                const scaleSvg = this.parseAndScaleSVG(svg, this.currentPageHeight, this.currentPageWidth);
-                this.docWrapper.children[pageIndex - 1].appendChild(scaleSvg);
-                // With SVG we need to prune the document
-                clearTimeout(this.pruning);
-                const timerThis = this;
-                this.pruning = setTimeout(function () {
-                    timerThis.pruneDocument();
-                }, 200);
-            }
-            // Canvas
-            else {
-                const canvas = page.firstElementChild;
-                const ctx = canvas.getContext("2d");
-                const domURL = self.URL || self.webkitURL;
-                const img = new Image();
-                const svgBlob = new Blob([`${svg}`], { type: "image/svg+xml" });
-                const svgUrl = domURL.createObjectURL(svgBlob);
-                const originalHeight = this.app.verovioOptions.pageHeight;
-                const originalWidth = this.app.verovioOptions.pageWidth;
-                canvas.height = this.currentPageHeight;
-                canvas.width = this.currentPageWidth;
-                img.onload = function () {
-                    ctx.drawImage(img, 0, 0, originalWidth, originalHeight, 0, 0, canvas.width, canvas.height);
-                };
-                img.src = svgUrl;
-            }
-        });
+    async renderPage(pageIndex) {
+        const svg = await this.verovio.renderToSVG(pageIndex);
+        const page = this.docWrapper.children[pageIndex - 1];
+        // SVG
+        if (this.app.options.documentViewSVG) {
+            const scaleSvg = this.parseAndScaleSVG(svg, this.currentPageHeight, this.currentPageWidth);
+            this.docWrapper.children[pageIndex - 1].appendChild(scaleSvg);
+            // With SVG we need to prune the document
+            clearTimeout(this.pruning);
+            const timerThis = this;
+            this.pruning = setTimeout(function () {
+                timerThis.pruneDocument();
+            }, 200);
+        }
+        // Canvas
+        else {
+            const canvas = page.firstElementChild;
+            const ctx = canvas.getContext("2d");
+            const domURL = self.URL || self.webkitURL;
+            const img = new Image();
+            const svgBlob = new Blob([`${svg}`], { type: "image/svg+xml" });
+            const svgUrl = domURL.createObjectURL(svgBlob);
+            const originalHeight = this.app.verovioOptions.pageHeight;
+            const originalWidth = this.app.verovioOptions.pageWidth;
+            canvas.height = this.currentPageHeight;
+            canvas.width = this.currentPageWidth;
+            img.onload = function () {
+                ctx.drawImage(img, 0, 0, originalWidth, originalHeight, 0, 0, canvas.width, canvas.height);
+            };
+            img.src = svgUrl;
+        }
     }
 }
 //# sourceMappingURL=document-view.js.map

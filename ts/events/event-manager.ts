@@ -5,9 +5,9 @@
 import { randomHex } from '../utils/functions.js';
 
 export class EventManager {
-    parent: Object;
-    cache: Object;
-    appIDAttr: string;
+    private readonly parent: Object;
+    private cache: Object;
+    private appIDAttr: string;
 
     constructor(parent: Object) {
         if (!parent) return;
@@ -16,8 +16,12 @@ export class EventManager {
         this.appIDAttr = 'data-app-el-id';
     }
 
-    // Binds function `fct` to element `el` on event `ev`
-    bind(el: Element, ev: string, fct: Function): void {
+    ////////////////////////////////////////////////////////////////////////
+    // Class-specific methods
+    ////////////////////////////////////////////////////////////////////////
+
+    public bind(el: Element, ev: string, fct: Function): void {
+        // Binds function `fct` to element `el` on event `ev`
         // Assign the element a random ID for the EventManager to reference it by (or get it if we already have one)
         let appID = el.getAttribute(this.appIDAttr) || el.getAttribute('id');
         if (!appID) {
@@ -44,22 +48,22 @@ export class EventManager {
     }
 
     // Unbinds all functions listening to event `ev` on element `el`
-    unbind(el: Element, ev: string): void {
+    public unbind(el: Element, ev: string): void {
         // Get the appID from the object; if it doesn't exist, we haven't bound any events
         const appID = el.getAttribute(this.appIDAttr) || el.getAttribute('id');
         if (!appID) return;
 
         if (appID in this.cache) {
             if (ev in this.cache[appID]) {
-                for (let boundFunct of this.cache[appID][ev]) {
-                    el.removeEventListener(ev, boundFunct);
+                for (let boundFunction of this.cache[appID][ev]) {
+                    el.removeEventListener(ev, boundFunction);
                 }
             }
         }
     }
 
     // Unbinds everything managed by this
-    unbindAll(): void {
+    public unbindAll(): void {
         for (let appID in this.cache) {
             // See if it was a regular ID
             let el = document.getElementById(appID);
@@ -71,8 +75,8 @@ export class EventManager {
             if (!el) continue;
 
             for (let ev in this.cache[appID]) {
-                for (let funct of this.cache[appID][ev]) {
-                    el.removeEventListener(ev, funct);
+                for (let func of this.cache[appID][ev]) {
+                    el.removeEventListener(ev, func);
                 }
             }
         }

@@ -2,15 +2,6 @@
  * The XMLEditorView class implements an code editor, with validation and code completion.
  * It uses the CodeMirror editor package and a ValidatorMessenger
  */
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 import { GenericView } from '../utils/generic-view.js';
 import { autoModeLimit } from '../utils/messages.js';
 import { appendDivTo, appendTextAreaTo } from '../utils/functions.js';
@@ -102,50 +93,46 @@ export class XMLEditorView extends GenericView {
     ////////////////////////////////////////////////////////////////////////
     // Async worker methods
     ////////////////////////////////////////////////////////////////////////
-    validate(text, updateLinting, options) {
-        return __awaiter(this, void 0, void 0, function* () {
-            //console.debug( "XMLEditorView::validate");
-            if (!updateLinting || !options.caller || !text)
-                return;
-            const editor = options.caller;
-            //console.debug( "XMLEditorView::validate", editor );
-            if (!editor.active)
-                return;
-            if (editor.formatting)
-                return;
-            // keep the callback
-            editor.setStatus(Status.Validating);
-            editor.updateLinting = updateLinting;
-            editor.app.startLoading("Validating ...", true);
-            let validation = "[]";
-            if (editor.app.options.enableValidation) {
-                validation = yield editor.validator.validateNG(text);
-            }
-            else {
-                validation = yield editor.validator.check(text);
-            }
-            editor.app.endLoading(true);
-            editor.highlightValidation(text, validation, editor.timestamp);
-        });
+    async validate(text, updateLinting, options) {
+        //console.debug( "XMLEditorView::validate");
+        if (!updateLinting || !options.caller || !text)
+            return;
+        const editor = options.caller;
+        //console.debug( "XMLEditorView::validate", editor );
+        if (!editor.active)
+            return;
+        if (editor.formatting)
+            return;
+        // keep the callback
+        editor.setStatus(Status.Validating);
+        editor.updateLinting = updateLinting;
+        editor.app.startLoading("Validating ...", true);
+        let validation = "[]";
+        if (editor.app.options.enableValidation) {
+            validation = await editor.validator.validateNG(text);
+        }
+        else {
+            validation = await editor.validator.check(text);
+        }
+        editor.app.endLoading(true);
+        editor.highlightValidation(text, validation, editor.timestamp);
     }
-    replaceSchema(schemaFile) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const response = yield fetch(schemaFile);
-                const data = yield response.text();
-                if (this.app.options.enableValidation) {
-                    const res = yield this.validator.setRelaxNGSchema(data);
-                    console.log("New schema loaded", res);
-                }
-                this.rngLoader.setRelaxNGSchema(data);
-                this.CMeditor.options.hintOptions.schemaInfo = this.rngLoader.getTags();
-                return true;
+    async replaceSchema(schemaFile) {
+        try {
+            const response = await fetch(schemaFile);
+            const data = await response.text();
+            if (this.app.options.enableValidation) {
+                const res = await this.validator.setRelaxNGSchema(data);
+                console.log("New schema loaded", res);
             }
-            catch (error) {
-                console.log(error);
-                return false;
-            }
-        });
+            this.rngLoader.setRelaxNGSchema(data);
+            this.CMeditor.options.hintOptions.schemaInfo = this.rngLoader.getTags();
+            return true;
+        }
+        catch (error) {
+            console.log(error);
+            return false;
+        }
     }
     ////////////////////////////////////////////////////////////////////////
     // Class-specific methods

@@ -17,7 +17,7 @@ export interface File {
 }
 
 export class FileStack {
-    stack: Stack;
+    private readonly stack: Stack;
 
     constructor() {
         const cache = window.localStorage.getItem("fileStack");
@@ -33,7 +33,7 @@ export class FileStack {
         //console.debug( this.stack );
     }
 
-    store(filename: string, data: string): void {
+    public store(filename: string, data: string): void {
         let list: Array<{ idx: number, filename: string }> = this.fileList();
         for (let i = 0; i < list.length; i++) {
             // Same filename, check the content
@@ -60,20 +60,20 @@ export class FileStack {
         window.localStorage.setItem("fileStack", JSON.stringify(this.stack));
     }
 
-    load(idx: number): File {
+    public load(idx: number): File {
         let data = window.localStorage.getItem("file-" + idx);
         //let decompressedData = zlib.inflateSync( new Buffer( data, 'base64' ) ).toString();
         let decompressedData = pako.inflate(atob(data), { to: 'string' });
         return { filename: this.stack.filenames[idx], data: decompressedData };
     }
 
-    getLast(): File {
+    public getLast(): File {
         if (this.stack.items > 0) {
             return this.load(this.stack.idx);
         }
     }
 
-    fileList(): Array<{ idx: number, filename: string }> {
+    public fileList(): Array<{ idx: number, filename: string }> {
         let list = new Array<{ idx: number, filename: string }>
         for (let i = 0; i < this.stack.items; i++) {
             let idx = (this.stack.idx + i) % this.stack.maxItems;
@@ -83,7 +83,7 @@ export class FileStack {
         return list;
     }
 
-    reset(): void {
+    public reset(): void {
         let list: Array<{ idx: number, filename: string }> = this.fileList();
         for (let i = 0; i < list.length; i++) {
             window.localStorage.removeItem("file-" + list[i][0]);

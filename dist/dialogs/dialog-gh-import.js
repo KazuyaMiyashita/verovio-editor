@@ -1,15 +1,6 @@
 /**
  * The DialogGhExport class for navigating GitHub and writing a file.
  */
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 import { Dialog } from './dialog.js';
 import { appendDivTo } from '../utils/functions.js';
 export class DialogGhImport extends Dialog {
@@ -80,9 +71,9 @@ export class DialogGhImport extends Dialog {
             this.addCrumb(path[i], i + 1);
     }
     loadingStart(tab) {
-        for (const node of this.tabs.querySelectorAll('.vrv-tab-selector')) {
+        Array.from(this.tabs.querySelectorAll('.vrv-tab-selector')).forEach(node => {
             node.classList.remove("selected");
-        }
+        });
         tab.classList.add("selected");
         this.list.innerHTML = "";
         this.list.style.display = 'none';
@@ -120,125 +111,109 @@ export class DialogGhImport extends Dialog {
     ////////////////////////////////////////////////////////////////////////
     // Async network methods
     ////////////////////////////////////////////////////////////////////////
-    selectFile(e) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const element = e.target;
-            if (element.dataset.type === 'dir') {
-                if (element.dataset.name === '..') {
-                    this.githubManager.selectedPathPop();
-                }
-                else {
-                    this.githubManager.appendToPath(element.dataset.name);
-                }
-                yield this.listFiles();
+    async selectFile(e) {
+        const element = e.target;
+        if (element.dataset.type === 'dir') {
+            if (element.dataset.name === '..') {
+                this.githubManager.selectedPathPop();
             }
             else {
-                const branch = this.githubManager.getSelectedBranchName();
-                const filename = this.githubManager.getPathString() + '/' + element.dataset.name;
-                const contents = yield this.githubManager.getSelectedRepo().getContents(branch, filename, true);
-                this.data = contents.data;
-                this.filename = element.dataset.name;
-                this.ok();
+                this.githubManager.appendToPath(element.dataset.name);
             }
-        });
-    }
-    listFiles() {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (this.githubManager.getSelectedRepo() === null) {
-                this.app.showNotification("Select a repository first");
-                return;
-            }
-            this.loadingStart(this.tabFile);
+            await this.listFiles();
+        }
+        else {
             const branch = this.githubManager.getSelectedBranchName();
-            const path = this.githubManager.getPathString();
-            const contents = yield this.githubManager.getSelectedRepo().getContents(branch, path);
-            contents.data.sort((a, b) => (a.type > b.type) ? 1 : -1);
-            this.loadingEnd();
-            if (this.githubManager.getSelectedPath().length > 1) {
-                this.addItemToList('..', this.iconsFolder, { name: '..', type: 'dir' }, false, this.selectFile);
-            }
-            for (let i = 0; i < contents.data.length; i++) {
-                const name = contents.data[i].name;
-                const type = contents.data[i].type;
-                const icon = (type === 'dir') ? this.iconsFolder : this.iconsFile;
-                this.addItemToList(name, icon, { name: name, type: type }, false, this.selectFile);
-            }
-            this.updateSelectionAndBreadcrumbs();
-        });
+            const filename = this.githubManager.getPathString() + '/' + element.dataset.name;
+            const contents = await this.githubManager.getSelectedRepo().getContents(branch, filename, true);
+            this.data = contents.data;
+            this.filename = element.dataset.name;
+            this.ok();
+        }
     }
-    listUsers() {
-        return __awaiter(this, void 0, void 0, function* () {
-            this.loadingStart(this.tabUser);
-            const orgs = yield this.githubManager.getUser().listOrgs();
-            this.loadingEnd();
-            const userChecked = (this.githubManager.getSelectedAccountName() === this.githubManager.getLogin());
-            this.addItemToList(this.githubManager.getLogin(), this.iconsUser, { login: this.githubManager.getLogin() }, userChecked, this.selectUser);
-            for (let i = 0; i < orgs.data.length; i++) {
-                const login = orgs.data[i].login;
-                const checked = (this.githubManager.getSelectedAccountName() === login);
-                this.addItemToList(login, this.iconsInstitution, { login: login }, checked, this.selectUser);
-            }
-            this.updateSelectionAndBreadcrumbs();
-        });
+    async listFiles() {
+        if (this.githubManager.getSelectedRepo() === null) {
+            this.app.showNotification("Select a repository first");
+            return;
+        }
+        this.loadingStart(this.tabFile);
+        const branch = this.githubManager.getSelectedBranchName();
+        const path = this.githubManager.getPathString();
+        const contents = await this.githubManager.getSelectedRepo().getContents(branch, path);
+        contents.data.sort((a, b) => (a.type > b.type) ? 1 : -1);
+        this.loadingEnd();
+        if (this.githubManager.getSelectedPath().length > 1) {
+            this.addItemToList('..', this.iconsFolder, { name: '..', type: 'dir' }, false, this.selectFile);
+        }
+        for (let i = 0; i < contents.data.length; i++) {
+            const name = contents.data[i].name;
+            const type = contents.data[i].type;
+            const icon = (type === 'dir') ? this.iconsFolder : this.iconsFile;
+            this.addItemToList(name, icon, { name: name, type: type }, false, this.selectFile);
+        }
+        this.updateSelectionAndBreadcrumbs();
     }
-    listRepos() {
-        return __awaiter(this, void 0, void 0, function* () {
-            this.loadingStart(this.tabRepo);
-            let repos;
-            if (this.githubManager.getSelectedOrganization() !== null) {
-                repos = yield this.githubManager.getSelectedOrganization().getRepos();
-            }
-            else {
-                repos = yield this.githubManager.getSelectedUser().listRepos({ type: 'owner' });
-            }
-            repos.data.sort((a, b) => (a.name > b.name) ? 1 : -1);
-            this.loadingEnd();
-            for (let i = 0; i < repos.data.length; i++) {
-                const name = repos.data[i].name;
-                const checked = (this.githubManager.getSelectedRepoName() === name);
-                this.addItemToList(name, this.iconsRepo, { name: name }, checked, this.selectRepo);
-            }
-            this.updateSelectionAndBreadcrumbs();
-        });
+    async listUsers() {
+        this.loadingStart(this.tabUser);
+        const orgs = await this.githubManager.getUser().listOrgs();
+        this.loadingEnd();
+        const userChecked = (this.githubManager.getSelectedAccountName() === this.githubManager.getLogin());
+        this.addItemToList(this.githubManager.getLogin(), this.iconsUser, { login: this.githubManager.getLogin() }, userChecked, this.selectUser);
+        for (let i = 0; i < orgs.data.length; i++) {
+            const login = orgs.data[i].login;
+            const checked = (this.githubManager.getSelectedAccountName() === login);
+            this.addItemToList(login, this.iconsInstitution, { login: login }, checked, this.selectUser);
+        }
+        this.updateSelectionAndBreadcrumbs();
     }
-    listBranches() {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (this.githubManager.getSelectedRepo() === null) {
-                this.app.showNotification("Select a repository first");
-                return;
-            }
-            this.loadingStart(this.tabBranch);
-            const branches = yield this.githubManager.getSelectedRepo().listBranches();
-            branches.data.sort((a, b) => (a.name > b.name) ? 1 : -1);
-            this.loadingEnd();
-            for (let i = 0; i < branches.data.length; i++) {
-                const name = branches.data[i].name;
-                const checked = (this.githubManager.getSelectedBranchName() === name);
-                this.addItemToList(name, this.iconsBranch, { name: name }, checked, this.selectBranch);
-            }
-            this.updateSelectionAndBreadcrumbs();
-        });
+    async listRepos() {
+        this.loadingStart(this.tabRepo);
+        let repos;
+        if (this.githubManager.getSelectedOrganization() !== null) {
+            repos = await this.githubManager.getSelectedOrganization().getRepos();
+        }
+        else {
+            repos = await this.githubManager.getSelectedUser().listRepos({ type: 'owner' });
+        }
+        repos.data.sort((a, b) => (a.name > b.name) ? 1 : -1);
+        this.loadingEnd();
+        for (let i = 0; i < repos.data.length; i++) {
+            const name = repos.data[i].name;
+            const checked = (this.githubManager.getSelectedRepoName() === name);
+            this.addItemToList(name, this.iconsRepo, { name: name }, checked, this.selectRepo);
+        }
+        this.updateSelectionAndBreadcrumbs();
     }
-    selectUser(e) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const element = e.target;
-            yield this.githubManager.selectAccount(element.dataset.login);
-            this.listRepos();
-        });
+    async listBranches() {
+        if (this.githubManager.getSelectedRepo() === null) {
+            this.app.showNotification("Select a repository first");
+            return;
+        }
+        this.loadingStart(this.tabBranch);
+        const branches = await this.githubManager.getSelectedRepo().listBranches();
+        branches.data.sort((a, b) => (a.name > b.name) ? 1 : -1);
+        this.loadingEnd();
+        for (let i = 0; i < branches.data.length; i++) {
+            const name = branches.data[i].name;
+            const checked = (this.githubManager.getSelectedBranchName() === name);
+            this.addItemToList(name, this.iconsBranch, { name: name }, checked, this.selectBranch);
+        }
+        this.updateSelectionAndBreadcrumbs();
     }
-    selectRepo(e) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const element = e.target;
-            yield this.githubManager.selectRepo(element.dataset.name);
-            this.listBranches();
-        });
+    async selectUser(e) {
+        const element = e.target;
+        await this.githubManager.selectAccount(element.dataset.login);
+        this.listRepos();
     }
-    selectBranch(e) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const element = e.target;
-            yield this.githubManager.selectBranch(element.dataset.name);
-            this.listFiles();
-        });
+    async selectRepo(e) {
+        const element = e.target;
+        await this.githubManager.selectRepo(element.dataset.name);
+        this.listBranches();
+    }
+    async selectBranch(e) {
+        const element = e.target;
+        await this.githubManager.selectBranch(element.dataset.name);
+        this.listFiles();
     }
     ////////////////////////////////////////////////////////////////////////
     // Event methods
