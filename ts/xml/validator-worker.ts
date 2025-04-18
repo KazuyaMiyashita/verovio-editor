@@ -7,13 +7,13 @@ importScripts("https://www.verovio.org/javascript/validator/xml-validator-2.10.3
 
 class ValidatorDeferred {
     promise: Promise<unknown>;
-    public reject: ((reason?: any) => void) | undefined;
-    public resolve: ((value: (PromiseLike<unknown> | unknown)) => void) | undefined;
+    public reject!: (reason?: any) => void;
+    public resolve!: (value: (PromiseLike<unknown> | unknown)) => void;
 
     constructor() {
         this.promise = new Promise((resolve, reject) => {
-            this.reject = reject
-            this.resolve = resolve
+            this.reject = reject;
+            this.resolve = resolve;
         });
     }
 }

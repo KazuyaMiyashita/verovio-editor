@@ -6,11 +6,12 @@ let verovioToolkit = {};
 
 
 class VerovioDeferred {
-    promise;
-    reject;
-    resolve;
+    promise: Promise<unknown>;
+    public reject!: (reason?: any) => void;
+    public resolve!: (value: (PromiseLike<unknown> | unknown)) => void;
 
     constructor() {
+        //@ts-ignore
         this.promise = new Promise((resolve, reject) => {
             this.reject = reject;
             this.resolve = resolve;
@@ -21,7 +22,7 @@ class VerovioDeferred {
 const isVerovioModuleReady = new VerovioDeferred();
 
 // Listen for the first message to get the script URL
-addEventListener('message', async function (event) {
+addEventListener('message', function (event) {
     if (event.data.verovioUrl) {
         importScripts(event.data.verovioUrl);
 
