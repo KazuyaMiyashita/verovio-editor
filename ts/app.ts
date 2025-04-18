@@ -512,7 +512,7 @@ export class App {
         }
 
         if (this.viewEditorObj) {
-            this.viewEditorObj.xmlEditorEnabled = false;
+            this.viewEditorObj.setXmlEditorEnabled(false);
             this.viewEditorObj.xmlEditorViewObj.setMode(this.mei.length);
         }
 

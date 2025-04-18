@@ -7,6 +7,9 @@ export class PDFGenerator {
         this.pdf = pdfProxy;
         this.currentScale = scale;
     }
+    ////////////////////////////////////////////////////////////////////////
+    // Async worker methods
+    ////////////////////////////////////////////////////////////////////////
     async generateFile() {
         const currentOptions = await this.verovio.getOptions();
         currentOptions.scale = this.currentScale;

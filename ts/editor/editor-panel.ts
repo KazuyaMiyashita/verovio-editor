@@ -18,57 +18,57 @@ import { appendDivTo } from '../utils/functions.js';
 import { autoModeOff, editedXML } from '../utils/messages.js';
 
 export class EditorPanel extends GenericView {
-    app: App;
-    verovio: VerovioWorkerProxy;
-    validator: ValidatorWorkerProxy;
-    rngLoader: RNGLoader;
-    eventManager: EventManager;
+    public readonly eventManager: EventManager;
+    public readonly xmlEditorViewObj: XMLEditorView;
+    public readonly editorViewObj: EditorView;
 
-    draggingSplitter: boolean;
-    draggingX: number;
-    draggingY: number;
-    splitterX: number;
-    splitterY: number;
-    splitterSize: number;
-    resizeTimer: number;
+    private draggingSplitter: boolean;
+    private draggingX: number;
+    private draggingY: number;
+    private splitterX: number;
+    private splitterY: number;
+    private splitterSize: number;
+    private resizeTimer: number;
 
-    toolbar: HTMLDivElement;
-    toolbarObj: EditorToolbar;
+    private readonly toolbar: HTMLDivElement;
+    private readonly toolbarObj: EditorToolbar;
 
-    hSplit: HTMLDivElement;
+    private readonly hSplit: HTMLDivElement;
 
-    toolPanel: HTMLDivElement;
+    private readonly toolPanel: HTMLDivElement;
 
-    tabGroup: HTMLDivElement;
-    tabGroupObj: TabGroup;
+    private readonly tabGroup: HTMLDivElement;
+    private readonly tabGroupObj: TabGroup;
 
-    vSplit: HTMLDivElement;
+    private readonly vSplit: HTMLDivElement;
 
-    keyboard; HTMLDivElement;
-    keyboardObj: Keyboard;
+    private readonly keyboard; HTMLDivElement;
+    private readonly keyboardObj: Keyboard;
 
-    split: HTMLDivElement;
+    private readonly split: HTMLDivElement;
 
-    scorePanel: HTMLDivElement;
+    private readonly scorePanel: HTMLDivElement;
     //scorePanelObj: EditorScorePanel;
 
-    sectionPanel: HTMLDivElement;
+    private readonly sectionPanel: HTMLDivElement;
     //sectionPanelObj: EditorSectionPanel;
 
-    contentPanel: HTMLDivElement;
-    contentPanelObj: EditorContentPanel;
+    private readonly contentPanel: HTMLDivElement;
+    private readonly contentPanelObj: EditorContentPanel;
 
-    editorView: HTMLDivElement;
-    editorViewObj: EditorView;
+    private readonly editorView: HTMLDivElement;
 
-    splitter: HTMLDivElement;
+    private readonly splitter: HTMLDivElement;
 
-    xmlEditorEnabled: boolean;
-    xmlEditorView: HTMLDivElement;
-    xmlEditorViewObj: XMLEditorView;
+    private xmlEditorEnabled: boolean;
+    private readonly xmlEditorView: HTMLDivElement;
 
-    boundMouseMove: { (event: MouseEvent): void };
-    boundMouseUp: { (event: MouseEvent): void };
+    private readonly verovio: VerovioWorkerProxy;
+    private readonly validator: ValidatorWorkerProxy;
+    private readonly rngLoader: RNGLoader;
+
+    private readonly boundMouseMove: { (event: MouseEvent): void };
+    private readonly boundMouseUp: { (event: MouseEvent): void };
 
     constructor(div: HTMLDivElement, app: App, verovio: VerovioWorkerProxy, validator: ValidatorWorkerProxy, rngLoader: RNGLoader) {
         super(div, app);
@@ -137,10 +137,17 @@ export class EditorPanel extends GenericView {
     }
 
     ////////////////////////////////////////////////////////////////////////
+    // Getters and setters
+    ////////////////////////////////////////////////////////////////////////
+
+    public setXmlEditorEnabled(xmlEditorEnabled: boolean): void { this.xmlEditorEnabled = xmlEditorEnabled }
+    public isXmlEditorEnabled(): boolean { return this.xmlEditorEnabled; }
+
+    ////////////////////////////////////////////////////////////////////////
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
 
-    updateSplitterSize(): void {
+    private updateSplitterSize(): void {
         if (this.app.options.editorSplitterHorizontal) {
             const height = this.split.clientHeight;
             const editorHeight = this.editorView.clientHeight;
@@ -153,7 +160,7 @@ export class EditorPanel extends GenericView {
         }
     }
 
-    updateSize(): boolean {
+    private updateSize(): boolean {
         this.div.style.height = this.div.parentElement.style.height;
         this.div.style.width = this.div.parentElement.style.width;
 
@@ -288,7 +295,7 @@ export class EditorPanel extends GenericView {
         this.updateSize();
     }
 
-    propagateEvent(e: CustomEvent): void {
+    private propagateEvent(e: CustomEvent): void {
         if (this.xmlEditorEnabled) {
             this.xmlEditorViewObj.customEventManager.dispatch(e);
         }

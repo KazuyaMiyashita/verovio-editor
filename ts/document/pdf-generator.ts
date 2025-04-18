@@ -5,9 +5,9 @@
 import { PDFWorkerProxy, VerovioWorkerProxy } from "../utils/worker-proxy.js";
 
 export class PDFGenerator {
-    verovio: VerovioWorkerProxy;
-    pdf: PDFWorkerProxy;
-    currentScale: number;
+    private readonly pdf: PDFWorkerProxy;
+    private readonly currentScale: number;
+    private readonly verovio: VerovioWorkerProxy;
 
     constructor(verovioProxy: VerovioWorkerProxy, pdfProxy: PDFWorkerProxy, scale: number) {
         this.verovio = verovioProxy;
@@ -15,7 +15,11 @@ export class PDFGenerator {
         this.currentScale = scale;
     }
 
-    async generateFile(): Promise<any> {
+    ////////////////////////////////////////////////////////////////////////
+    // Async worker methods
+    ////////////////////////////////////////////////////////////////////////
+
+    public async generateFile(): Promise<any> {
         const currentOptions = await this.verovio.getOptions();
         currentOptions.scale = this.currentScale;
         console.log(currentOptions);
