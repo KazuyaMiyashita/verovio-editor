@@ -3,7 +3,7 @@
  */
 import { App } from '../app.js';
 import { EditorCursorPointer } from '../editor/editor-cursor-pointer.js';
-import { EditorView } from '../editor/editor-view.js';
+import { EditorView as EditorViewObj } from '../editor/editor-view.js';
 import { EventManager } from './event-manager.js';
 import { VerovioWorkerProxy } from '../utils/worker-proxy.js';
 
@@ -18,19 +18,19 @@ class Call {
 }
 
 export class ActionManager {
+    public readonly eventManager: EventManager;
+    
     protected readonly app: App;
-    cursorPointer: EditorCursorPointer;
-    delayedCalls: Call[];
-    eventManager: EventManager;
-    inProgress: boolean;
-    verovio: VerovioWorkerProxy;
-    editorViewObj: EditorView;
+    
+    private inProgress: boolean;
+    
+    private readonly delayedCalls: Call[];
+    private readonly verovio: VerovioWorkerProxy;
+    private readonly editorViewObj: EditorViewObj;
 
-    constructor(view: EditorView, app: App) {
-        // EditorView object
+    constructor(view: EditorViewObj, app: App) {
         this.app = app;
         this.editorViewObj = view;
-        this.cursorPointer = view.cursorPointerObj;
         this.verovio = view.verovio;
 
         this.eventManager = new EventManager(this);
@@ -44,7 +44,7 @@ export class ActionManager {
     // Delayed calls
     ////////////////////////////////////////////////////////////////////////
 
-    async callDelayedCalls(): Promise<any> {
+    private async callDelayedCalls(): Promise<any> {
         //console.debug( this.delayedCalls.length );
         if (this.delayedCalls.length > 0) {
             const call = this.delayedCalls[0];
@@ -57,10 +57,10 @@ export class ActionManager {
     }
 
     ////////////////////////////////////////////////////////////////////////
-    // Generic methods
+    // Async worker methods
     ////////////////////////////////////////////////////////////////////////
 
-    async commit(): Promise<any> {
+    public async commit(): Promise<any> {
         this.inProgress = true;
         const editorAction = { action: 'commit' };
         await this.editorViewObj.verovio.edit(editorAction);
@@ -82,7 +82,7 @@ export class ActionManager {
         }
     }
 
-    async delete(): Promise<any> {
+    public async delete(): Promise<any> {
         let chain = new Array();
         for (const item of this.editorViewObj.getSelection()) {
             if (!["note"].includes(item.element)) continue;
@@ -109,7 +109,7 @@ export class ActionManager {
         //this.editorViewObj.updateMEI();
     }
 
-    async drag(x: number, y: number): Promise<any> {
+    public async drag(x: number, y: number): Promise<any> {
         let chain = new Array();
         for (const item of this.editorViewObj.getSelection()) {
             if (!["note"].includes(item.element)) continue
@@ -136,7 +136,7 @@ export class ActionManager {
         await this.editorViewObj.renderPage(true, false);
     }
 
-    async keyDown(key: number, shiftKey: boolean, ctrlKey: boolean): Promise<any> {
+    public async keyDown(key: number, shiftKey: boolean, ctrlKey: boolean): Promise<any> {
         // keyDown events can 
         if (this.inProgress) {
             this.delayedCalls.push(new Call(this.keyDown, arguments));
@@ -221,39 +221,39 @@ export class ActionManager {
     }
     */
 
-    async formCres(): Promise<any> {
+    public async formCres(): Promise<any> {
         await this.setAttrValue("form", "cres", ["hairpin"]);
     }
 
-    async formDim(): Promise<any> {
+    public async formDim(): Promise<any> {
         await this.setAttrValue("form", "dim", ["hairpin"]);
     }
 
-    async placeAbove(): Promise<any> {
+    public async placeAbove(): Promise<any> {
         await this.setAttrValue("place", "above", ["dir", "dynam", "hairpin", "tempo", "pedal"]);
     }
 
-    async placeBelow(): Promise<any> {
+    public async placeBelow(): Promise<any> {
         await this.setAttrValue("place", "below", ["dir", "dynam", "hairpin", "tempo", "pedal"]);
     }
 
-    async placeAuto(): Promise<any> {
+    public async placeAuto(): Promise<any> {
         await this.setAttrValue("place", "", ["dir", "dynam", "hairpin", "tempo", "pedal"]);
     }
 
-    async stemDirUp(): Promise<any> {
+    public async stemDirUp(): Promise<any> {
         await this.setAttrValue("stem.dir", "up", ["note", "chord"]);
     }
 
-    async stemDirDown(): Promise<any> {
+    public async stemDirDown(): Promise<any> {
         await this.setAttrValue("stem.dir", "down", ["note", "chord"]);
     }
 
-    async stemDirAuto(): Promise<any> {
+    public async stemDirAuto(): Promise<any> {
         await this.setAttrValue("stem.dir", "", ["note", "chord"]);
     }
 
-    async update(): Promise<any> {
+    public async update(): Promise<any> {
         const editorAction = {
             action: 'commit'
         }
@@ -266,7 +266,7 @@ export class ActionManager {
 
     // helper
 
-    async setAttrValue(attribute: string, value: string, elementTypes: Array<string> = []): Promise<any> {
+    public async setAttrValue(attribute: string, value: string, elementTypes: Array<string> = []): Promise<any> {
         let chain = new Array();
         for (const item of this.editorViewObj.getSelection()) {
             if (elementTypes.length > 0 && !elementTypes.includes(item.element)) continue;

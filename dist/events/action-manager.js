@@ -7,10 +7,8 @@ class Call {
 }
 export class ActionManager {
     constructor(view, app) {
-        // EditorView object
         this.app = app;
         this.editorViewObj = view;
-        this.cursorPointer = view.cursorPointerObj;
         this.verovio = view.verovio;
         this.eventManager = new EventManager(this);
         this.inProgress = false;
@@ -31,7 +29,7 @@ export class ActionManager {
         }
     }
     ////////////////////////////////////////////////////////////////////////
-    // Generic methods
+    // Async worker methods
     ////////////////////////////////////////////////////////////////////////
     async commit() {
         this.inProgress = true;

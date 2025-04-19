@@ -13,8 +13,8 @@ export class EventManager {
     ////////////////////////////////////////////////////////////////////////
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
+    // Binds function `fct` to element `el` on event `ev`
     bind(el, ev, fct) {
-        // Binds function `fct` to element `el` on event `ev`
         // Assign the element a random ID for the EventManager to reference it by (or get it if we already have one)
         let appID = el.getAttribute(this.appIDAttr) || el.getAttribute('id');
         if (!appID) {
