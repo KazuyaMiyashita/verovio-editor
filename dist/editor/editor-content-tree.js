@@ -1,12 +1,10 @@
 import { App } from '../app.js';
-import { EventManager } from '../events/event-manager.js';
 import { GenericTree } from '../utils/generic-tree.js';
 import { appendDivTo } from '../utils/functions.js';
 export class EditorContentTree extends GenericTree {
     constructor(div, app, tab) {
         super(div, app);
         this.tab = tab;
-        this.eventManager = new EventManager(this);
         this.breadCrumbsWrapper = appendDivTo(this.div, { class: `vrv-tree-breadcrumbs-wrapper` });
         this.breadCrumbs = appendDivTo(this.breadCrumbsWrapper, { class: `vrv-tree-breadcrumbs` });
     }
@@ -16,6 +14,26 @@ export class EditorContentTree extends GenericTree {
     ////////////////////////////////////////////////////////////////////////
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
+    loadContext(context, ancestors, target) {
+        this.reset();
+        this.fromJson(context);
+        this.traverse((node) => {
+            node.getLabel().style.backgroundImage = `url(${App.iconFor(node.element)})`;
+            if (node.id === target['id']) {
+                this.selectNode(node);
+            }
+            return false;
+        });
+        if (Array.isArray(ancestors)) {
+            this.breadCrumbs.innerHTML = "";
+            for (let i = ancestors.length - 1; i >= 0; i--) {
+                this.addCrumb(ancestors[i]['element'], ancestors[i]['id']);
+            }
+            ;
+        }
+        ;
+        this.breadCrumbsWrapper.scrollLeft = this.breadCrumbsWrapper.scrollWidth;
+    }
     select(element, id) {
         let event = new CustomEvent('onSelect', {
             detail: {
@@ -54,26 +72,6 @@ export class EditorContentTree extends GenericTree {
         const offsetTop = childRect.top - parentRect.top + this.root.getDiv().scrollTop;
         // arbitrary margin
         this.root.getDiv().scrollTo({ top: offsetTop - 50 });
-    }
-    loadContext(context, ancestors, target) {
-        this.reset();
-        this.fromJson(context);
-        this.traverse((node) => {
-            node.getLabel().style.backgroundImage = `url(${App.iconFor(node.element)})`;
-            if (node.id === target['id']) {
-                this.selectNode(node);
-            }
-            return false;
-        });
-        if (Array.isArray(ancestors)) {
-            this.breadCrumbs.innerHTML = "";
-            for (let i = ancestors.length - 1; i >= 0; i--) {
-                this.addCrumb(ancestors[i]['element'], ancestors[i]['id']);
-            }
-            ;
-        }
-        ;
-        this.breadCrumbsWrapper.scrollLeft = this.breadCrumbsWrapper.scrollWidth;
     }
     //////////////////////////////////////////////////////////////////////////
     // Event methods

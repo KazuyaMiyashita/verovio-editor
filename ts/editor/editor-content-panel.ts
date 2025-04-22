@@ -10,13 +10,13 @@ import { Tab } from '../utils/tab-group.js';
 import { appendDivTo, appendSpanTo } from '../utils/functions.js';
 
 export class EditorContentPanel extends GenericView {
-    contentTree: HTMLDivElement;
-    contentTreeObj: EditorContentTree;
-    referencesFrom: HTMLDivElement;
-    referencesFromObj: EditorReferenceList;
-    referencesTo: HTMLDivElement;
-    referencesToObj: EditorReferenceList;
-    tab: Tab
+    private readonly contentTree: HTMLDivElement;
+    private readonly contentTreeObj: EditorContentTree;
+    private readonly referencesFrom: HTMLDivElement;
+    private readonly referencesFromObj: EditorReferenceList;
+    private readonly referencesTo: HTMLDivElement;
+    private readonly referencesToObj: EditorReferenceList;
+    private readonly tab: Tab
 
     constructor(div: HTMLDivElement, app: App, tab: Tab) {
         super(div, app);
@@ -48,7 +48,7 @@ export class EditorContentPanel extends GenericView {
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
 
-    addFieldSet(label: string, flexGrow: number = 1): HTMLDivElement {
+    private addFieldSet(label: string, flexGrow: number = 1): HTMLDivElement {
         let legend = appendDivTo(this.div, { class: `vrv-legend` });
         legend.innerHTML = label;
         let span = appendSpanTo(legend, { class: `icon` }, '▼');
@@ -65,7 +65,7 @@ export class EditorContentPanel extends GenericView {
     // Async worker methods
     ////////////////////////////////////////////////////////////////////////
 
-    async updateContent(id: string): Promise<any> {
+    private async updateContent(id: string): Promise<any> {
         const contextOk = await this.app.verovio.edit({ action: 'context', param: { elementId: `${id}` } });
         if (contextOk) {
             const jsonContext = await this.app.verovio.editInfo();

@@ -1,21 +1,17 @@
 import { App } from '../app.js';
-import { EventManager } from '../events/event-manager.js';
 import { GenericTree, TreeNode } from '../utils/generic-tree.js';
 import { Tab } from '../utils/tab-group.js'
 import { appendDivTo } from '../utils/functions.js';
 
 export class EditorContentTree extends GenericTree {
-    tab: Tab;
-    breadCrumbsWrapper: HTMLDivElement;
-    breadCrumbs: HTMLDivElement;
-    eventManager: EventManager;
+    private readonly tab: Tab;
+    private readonly breadCrumbsWrapper: HTMLDivElement;
+    private readonly breadCrumbs: HTMLDivElement;
 
     constructor(div: HTMLDivElement, app: App, tab: Tab) {
         super(div, app);
 
         this.tab = tab;
-
-        this.eventManager = new EventManager(this);
 
         this.breadCrumbsWrapper = appendDivTo(this.div, { class: `vrv-tree-breadcrumbs-wrapper` });
         this.breadCrumbs = appendDivTo(this.breadCrumbsWrapper, { class: `vrv-tree-breadcrumbs` });
@@ -29,51 +25,7 @@ export class EditorContentTree extends GenericTree {
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
 
-    select(element: string, id: string) {
-        let event = new CustomEvent('onSelect', {
-            detail: {
-                id: id,
-                element: element,
-                caller: this
-            }
-        });
-        this.app.customEventManager.dispatch(event);
-
-    }
-
-    cursorActivity(id: string, activity: string) {
-        let event = new CustomEvent('onCursorActivity', {
-            detail: {
-                id: id,
-                activity: activity,
-                caller: this
-            }
-        });
-        this.app.customEventManager.dispatch(event);
-    }
-
-    addCrumb(element: string, id: string): void {
-        const crumb: HTMLDivElement = appendDivTo(this.breadCrumbs, { class: `vrv-tree-breadcrumb` });
-        crumb.innerHTML = element;
-        crumb.dataset.id = id
-        crumb.dataset.element = element;
-        this.eventManager.bind(crumb, 'click', this.onClick);
-        this.eventManager.bind(crumb, 'mouseover', this.onMouseover);
-        this.eventManager.bind(crumb, 'mouseout', this.onMouseout);
-    }
-
-    selectNode(node: TreeNode): void {
-        node.getLabel().classList.add("target");
-        node.getLabel().classList.add("checked");
-        const parentRect = this.root.getDiv().getBoundingClientRect();
-        const childRect = node.getDiv().getBoundingClientRect();
-        // Calculate offset of the node relative to root
-        const offsetTop = childRect.top - parentRect.top + this.root.getDiv().scrollTop;
-        // arbitrary margin
-        this.root.getDiv().scrollTo({ top: offsetTop - 50 });
-    }
-
-    loadContext(context: Object, ancestors: Object, target: Object): void {
+    public loadContext(context: Object, ancestors: Object, target: Object): void {
         this.reset();
         this.fromJson(context);
 
@@ -92,6 +44,50 @@ export class EditorContentTree extends GenericTree {
             };
         };
         this.breadCrumbsWrapper.scrollLeft = this.breadCrumbsWrapper.scrollWidth;
+    }
+
+    private select(element: string, id: string) {
+        let event = new CustomEvent('onSelect', {
+            detail: {
+                id: id,
+                element: element,
+                caller: this
+            }
+        });
+        this.app.customEventManager.dispatch(event);
+
+    }
+
+    private cursorActivity(id: string, activity: string) {
+        let event = new CustomEvent('onCursorActivity', {
+            detail: {
+                id: id,
+                activity: activity,
+                caller: this
+            }
+        });
+        this.app.customEventManager.dispatch(event);
+    }
+
+    private addCrumb(element: string, id: string): void {
+        const crumb: HTMLDivElement = appendDivTo(this.breadCrumbs, { class: `vrv-tree-breadcrumb` });
+        crumb.innerHTML = element;
+        crumb.dataset.id = id
+        crumb.dataset.element = element;
+        this.eventManager.bind(crumb, 'click', this.onClick);
+        this.eventManager.bind(crumb, 'mouseover', this.onMouseover);
+        this.eventManager.bind(crumb, 'mouseout', this.onMouseout);
+    }
+
+    private selectNode(node: TreeNode): void {
+        node.getLabel().classList.add("target");
+        node.getLabel().classList.add("checked");
+        const parentRect = this.root.getDiv().getBoundingClientRect();
+        const childRect = node.getDiv().getBoundingClientRect();
+        // Calculate offset of the node relative to root
+        const offsetTop = childRect.top - parentRect.top + this.root.getDiv().scrollTop;
+        // arbitrary margin
+        this.root.getDiv().scrollTo({ top: offsetTop - 50 });
     }
 
     //////////////////////////////////////////////////////////////////////////

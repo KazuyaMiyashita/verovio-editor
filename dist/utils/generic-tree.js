@@ -1,3 +1,4 @@
+import { EventManager } from '../events/event-manager.js';
 import { GenericView } from './generic-view.js';
 import { appendDivTo } from './functions.js';
 ////////////////////////////////////////////////////////////////////////
@@ -17,6 +18,7 @@ export class GenericTree extends GenericView {
         this.root = null;
         this.hiddenRoot = false;
         this.setDisplayFlex();
+        this.eventManager = new EventManager(this);
     }
     ////////////////////////////////////////////////////////////////////////
     // Getters and setters
@@ -138,20 +140,4 @@ export class TreeNode {
         });
     }
 }
-/*
-
-Get Score
-Mdiv / Score / ScoreDef
-	Page children without system + Score child
-
-GetSection
-Section / Ending
-	System children without div, measure, scoreDef, pb, sb, expansion
-
-GetContext
-Find element in page / find element in doc
-	SB, PB, DIV, MEASURE, SCOREDEF
-
-
-*/ 
 //# sourceMappingURL=generic-tree.js.map

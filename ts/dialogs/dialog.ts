@@ -11,7 +11,7 @@ import { appendDetailsTo, appendDivTo, appendSummaryTo, insertDivBefore } from '
 export class Dialog {
     protected readonly app: App;
     protected readonly eventManager: EventManager;
-    protected readonly  div: HTMLDivElement;
+    protected readonly div: HTMLDivElement;
     protected readonly options: Dialog.Options;
 
     protected readonly box: HTMLDivElement;
