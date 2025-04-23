@@ -113,7 +113,7 @@ export class DialogGhImport extends Dialog {
         this.breadCrumbs.style.display = 'flex';
         for (let i = 0; i < path.length; i++) this.addCrumb(path[i], i + 1);
     }
-    
+
     private loadingStart(tab: HTMLDivElement): void {
         Array.from(this.tabs.querySelectorAll('.vrv-tab-selector')).forEach(node => {
             node.classList.remove("selected");
@@ -207,7 +207,7 @@ export class DialogGhImport extends Dialog {
 
         this.updateSelectionAndBreadcrumbs();
     }
-    
+
     private async listUsers(): Promise<any> {
         this.loadingStart(this.tabUser);
         const orgs = await this.githubManager.getUser().listOrgs();

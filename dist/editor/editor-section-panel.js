@@ -2,10 +2,9 @@
  * The EditorPanel class implements a panel with both Verovio and XML views.
  */
 import { EditorContentTree } from './editor-content-tree.js';
-import { EditorReferenceList } from './editor-references-list.js';
 import { GenericView } from '../utils/generic-view.js';
 import { appendDivTo } from '../utils/functions.js';
-export class EditorContentPanel extends GenericView {
+export class EditorSectionPanel extends GenericView {
     constructor(div, app, tab) {
         super(div, app);
         this.setDisplayFlex();
@@ -14,15 +13,6 @@ export class EditorContentPanel extends GenericView {
         this.contentTree = appendDivTo(treeFieldSet, { class: `vrv-field-set-panel` });
         this.contentTreeObj = new EditorContentTree(this.contentTree, this.app, this.tab);
         this.contentTreeObj.setHiddenRoot(true);
-        this.customEventManager.addToPropagationList(this.contentTreeObj.customEventManager);
-        let attributeFieldSet = this.addFieldSet("Attributes", 2);
-        let referencesFromFieldSet = this.addFieldSet("Referencing elements");
-        this.referencesFrom = appendDivTo(referencesFromFieldSet, { class: `vrv-field-set-panel` });
-        this.referencesFromObj = new EditorReferenceList(this.referencesFrom, this.app, this.tab);
-        this.customEventManager.addToPropagationList(this.referencesFromObj.customEventManager);
-        let referencesToFieldSet = this.addFieldSet("Referenced elements");
-        this.referencesTo = appendDivTo(referencesToFieldSet, { class: `vrv-field-set-panel` });
-        this.referencesToObj = new EditorReferenceList(this.referencesTo, this.app, this.tab);
         this.customEventManager.addToPropagationList(this.contentTreeObj.customEventManager);
     }
     ////////////////////////////////////////////////////////////////////////
@@ -37,8 +27,6 @@ export class EditorContentPanel extends GenericView {
             const jsonContext = await this.app.verovio.editInfo();
             console.log(jsonContext);
             this.contentTreeObj.loadContext(jsonContext['context'], jsonContext['ancestors'], jsonContext['object']);
-            this.referencesFromObj.loadList(jsonContext['referringElements'], EditorReferenceList.Direction.From);
-            this.referencesToObj.loadList(jsonContext['referencedElements'], EditorReferenceList.Direction.To);
         }
     }
     ////////////////////////////////////////////////////////////////////////
@@ -51,4 +39,4 @@ export class EditorContentPanel extends GenericView {
         return true;
     }
 }
-//# sourceMappingURL=editor-content-panel.js.map
+//# sourceMappingURL=editor-section-panel.js.map

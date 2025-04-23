@@ -140,10 +140,8 @@ export class Dialog {
 // Merged namespace
 ////////////////////////////////////////////////////////////////////////
 
-export namespace Dialog
-{
-    export enum Type
-    {
+export namespace Dialog {
+    export enum Type {
         Msg,
         OKCancel,
     }

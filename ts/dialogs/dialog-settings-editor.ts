@@ -8,7 +8,7 @@ import { appendDivTo, appendOptionTo, appendSelectTo } from '../utils/functions.
 
 export class DialogSettingsEditor extends Dialog {
     protected reload: boolean;
-    
+
     protected readonly fields: HTMLDivElement;
     protected readonly appOptions: App.Options;
     protected readonly verovioVersion: HTMLSelectElement;
@@ -54,7 +54,7 @@ export class DialogSettingsEditor extends Dialog {
         super.ok();
     }
 
-    override reset(): void { 
+    override reset(): void {
         super.ok();
     }
 }

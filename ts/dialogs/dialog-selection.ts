@@ -8,7 +8,7 @@ import { appendDivTo, appendInputTo } from '../utils/functions.js';
 
 export class DialogSelection extends Dialog {
     protected selection: Object;
-    
+
     protected readonly fields: HTMLDivElement;
     protected readonly selectMeasureRange: HTMLInputElement;
     protected readonly selectStart: HTMLInputElement;
@@ -48,7 +48,7 @@ export class DialogSelection extends Dialog {
     // Getters and setters
     ////////////////////////////////////////////////////////////////////////
 
-    public getSelection(): Object { return this.selection;  }
+    public getSelection(): Object { return this.selection; }
 
     ////////////////////////////////////////////////////////////////////////
     // Overriding methods
@@ -65,7 +65,7 @@ export class DialogSelection extends Dialog {
         super.ok();
     }
 
-    override reset(): void { 
+    override reset(): void {
         this.selection = {};
         super.ok();
     }

@@ -5,7 +5,7 @@
 import { App } from '../app.js';
 import { Dialog } from './dialog.js';
 import { appendDivTo } from '../utils/functions.js';
-import { changelogUrl, libraries, licenseUrl  } from '../utils/messages.js';
+import { changelogUrl, libraries, licenseUrl } from '../utils/messages.js';
 
 export class DialogAbout extends Dialog {
 

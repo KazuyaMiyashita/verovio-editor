@@ -20,7 +20,7 @@ export class EditorReferenceList extends GenericView {
 
         this.listWrapper = appendDivTo(this.div, { class: `vrv-reference-list-wrapper` });
     }
-    
+
     ////////////////////////////////////////////////////////////////////////
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////

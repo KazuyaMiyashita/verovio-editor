@@ -28,7 +28,7 @@ export class DialogExport extends Dialog {
         };
 
         this.fields = appendDivTo(this.content, { class: `vrv-dialog-form` });
- 
+
         const basicLabel = appendDivTo(this.fields, { class: `vrv-dialog-label` });
         basicLabel.innerHTML = "MEI Basic";
         this.basicInput = appendInputTo(this.fields, { class: `vrv-dialog-input`, type: `checkbox` });
@@ -59,7 +59,7 @@ export class DialogExport extends Dialog {
         super.ok();
     }
 
-    override reset(): void { 
+    override reset(): void {
         super.ok();
     }
 }

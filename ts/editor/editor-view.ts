@@ -19,7 +19,7 @@ interface SelectedItem {
 };
 
 export class EditorView extends ResponsiveView {
-    public readonly  cursorPointerObj: EditorCursorPointer;
+    public readonly cursorPointerObj: EditorCursorPointer;
     public readonly actionManager: ActionManager;
 
     private readonly midiPlayerElement: MidiPlayerElement;
@@ -201,7 +201,7 @@ export class EditorView extends ResponsiveView {
         this.selectedItems.push(item);
         this.highlightSelected();
     }
-    
+
     public getClosestMEIElement(node: SVGElement, elementType: string = null): SVGElement {
         if (!node) {
             return null;
@@ -216,7 +216,7 @@ export class EditorView extends ResponsiveView {
             return node;
         }
     }
-    
+
     private createOverlay(): void {
         // Copy wrapper HTML to overlay
         this.svgOverlay.innerHTML = this.svgWrapper.innerHTML;
@@ -338,7 +338,7 @@ export class EditorView extends ResponsiveView {
 
         this.clearSelection();
         if (e.detail.id === "[unspecified]") return false;
-        
+
         this.select(e.detail.element, e.detail.id);
         return true;
     }

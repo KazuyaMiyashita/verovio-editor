@@ -48,19 +48,6 @@ export class EditorContentPanel extends GenericView {
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
 
-    private addFieldSet(label: string, flexGrow: number = 1): HTMLDivElement {
-        let legend = appendDivTo(this.div, { class: `vrv-legend` });
-        legend.innerHTML = label;
-        let span = appendSpanTo(legend, { class: `icon` }, '▼');
-        let fieldSet = appendDivTo(this.div, { class: `vrv-field-set` });
-        if (flexGrow !== 1) fieldSet.style.flexGrow = `${flexGrow}`;
-        span.addEventListener("click", () => {
-            legend.classList.toggle("toggled");
-            fieldSet.classList.toggle("toggled");
-        });
-        return fieldSet;
-    }
-
     ////////////////////////////////////////////////////////////////////////
     // Async worker methods
     ////////////////////////////////////////////////////////////////////////
@@ -69,6 +56,7 @@ export class EditorContentPanel extends GenericView {
         const contextOk = await this.app.verovio.edit({ action: 'context', param: { elementId: `${id}` } });
         if (contextOk) {
             const jsonContext = await this.app.verovio.editInfo();
+            console.log(jsonContext);
             this.contentTreeObj.loadContext(jsonContext['context'], jsonContext['ancestors'], jsonContext['object']);
             this.referencesFromObj.loadList(jsonContext['referringElements'], EditorReferenceList.Direction.From);
             this.referencesToObj.loadList(jsonContext['referencedElements'], EditorReferenceList.Direction.To);

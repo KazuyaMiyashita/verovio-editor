@@ -6,7 +6,7 @@
 
 import { App } from '../app.js';
 import { CustomEventManager } from '../events/custom-event-manager.js';
-import { randomHex } from '../utils/functions.js';
+import { appendDivTo, appendSpanTo, randomHex } from '../utils/functions.js';
 
 export class GenericView {
     public readonly customEventManager: CustomEventManager;
@@ -61,7 +61,20 @@ export class GenericView {
         // Nothing at this level
     }
 
-    protected setDisplayFlex(): void { this.display = 'flex';  }
+    protected setDisplayFlex(): void { this.display = 'flex'; }
+    
+    protected addFieldSet(label: string, flexGrow: number = 1): HTMLDivElement {
+        let legend = appendDivTo(this.div, { class: `vrv-legend` });
+        legend.innerHTML = label;
+        let span = appendSpanTo(legend, { class: `icon` }, '▼');
+        let fieldSet = appendDivTo(this.div, { class: `vrv-field-set` });
+        if (flexGrow !== 1) fieldSet.style.flexGrow = `${flexGrow}`;
+        span.addEventListener("click", () => {
+            legend.classList.toggle("toggled");
+            fieldSet.classList.toggle("toggled");
+        });
+        return fieldSet;
+    }
 
     ////////////////////////////////////////////////////////////////////////
     // Custom event methods

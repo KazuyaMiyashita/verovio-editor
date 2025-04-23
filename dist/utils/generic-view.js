@@ -4,7 +4,7 @@
  * It should not be instantiated directly but only through inherited classes.
  */
 import { CustomEventManager } from '../events/custom-event-manager.js';
-import { randomHex } from '../utils/functions.js';
+import { appendDivTo, appendSpanTo, randomHex } from '../utils/functions.js';
 export class GenericView {
     constructor(div, app) {
         // Root element in which verovio-ui is created
@@ -39,6 +39,19 @@ export class GenericView {
         // Nothing at this level
     }
     setDisplayFlex() { this.display = 'flex'; }
+    addFieldSet(label, flexGrow = 1) {
+        let legend = appendDivTo(this.div, { class: `vrv-legend` });
+        legend.innerHTML = label;
+        let span = appendSpanTo(legend, { class: `icon` }, '▼');
+        let fieldSet = appendDivTo(this.div, { class: `vrv-field-set` });
+        if (flexGrow !== 1)
+            fieldSet.style.flexGrow = `${flexGrow}`;
+        span.addEventListener("click", () => {
+            legend.classList.toggle("toggled");
+            fieldSet.classList.toggle("toggled");
+        });
+        return fieldSet;
+    }
     ////////////////////////////////////////////////////////////////////////
     // Custom event methods
     ////////////////////////////////////////////////////////////////////////

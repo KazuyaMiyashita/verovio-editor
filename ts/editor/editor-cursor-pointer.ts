@@ -12,7 +12,7 @@ export class EditorCursorPointer {
     private pixPerPix: number;
     private viewTop: number;
     private viewLeft: number;
-    
+
     private lastEvent: MouseEvent;
     private scrollTop: number;
     private scrollLeft: number;
@@ -56,11 +56,11 @@ export class EditorCursorPointer {
     ////////////////////////////////////////////////////////////////////////
 
     setLastEvent(lastEvent: MouseEvent): void { this.lastEvent = lastEvent; }
-    
+
     getLastEvent(): MouseEvent { return this.lastEvent; }
-    
+
     setScrollTop(scrollTop: number): void { this.scrollTop = scrollTop; }
-    
+
     setScrollLeft(scrollLeft: number): void { this.scrollLeft = scrollLeft; }
 
     ////////////////////////////////////////////////////////////////////////
