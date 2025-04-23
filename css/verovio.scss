@@ -1105,14 +1105,17 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
             color: $text-color;
             user-select: none;
         }
+
         .vrv-node-label.target {
             background-color: $background-extra-light;
         }
+
         .vrv-node-label.checked::after {
             content: url(../icons/editor/star-red.png);
             vertical-align: middle;
             margin-left: 6px;
         }
+
         .vrv-node-label.checked:hover::after {
             content: url(../icons/editor/star.png);
         }
@@ -1155,7 +1158,6 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
             background: $background-light;
 
             .vrv-tree-breadcrumb {
-                @extend .vrv-clickable;
                 justify-content: center;
                 align-items: center;
                 min-height: $node-height;
@@ -1164,8 +1166,12 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
                 display: flex;
             }
 
+            .vrv-tree-breadcrumb:not(:first-child) {
+                @extend .vrv-clickable;
+            }
+
             .vrv-tree-breadcrumb:first-child {
-                padding-left: 8px;
+                padding-left: 4px;
                 padding-right: 4px;
             }
 
@@ -1180,14 +1186,10 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
     // Reference List
     ////////////////////////////////////////////////////////////////////////
 
-    //$node-height: 22px;
-    //$node-indent: 16px;
-    //$node-margin: 4px;
-    //$node-label-padding: 4px 6px;
-
     .vrv-reference-list-wrapper {
         overflow-y: auto;
         height: 100%;
+
         .vrv-reference-list-item {
             @extend .vrv-clickable;
             padding: $node-label-padding;
@@ -1202,12 +1204,12 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
     ////////////////////////////////////////////////////////////////////////
     // MEI Element
     ///////////////////////////////////////////////////////////////////////
-    
+
     .vrv-mei-element {
         background-repeat: no-repeat;
         background-position: 6px center;
     }
-    
+
     .vrv-mei-element:before {
         content: attr(data-before);
     }

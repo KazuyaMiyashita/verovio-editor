@@ -29,6 +29,9 @@ export class EditorContentTree extends GenericTree {
         this.reset();
         this.fromJson(context);
 
+        this.breadCrumbs.innerHTML = "";
+        let rootCrumb = appendDivTo(this.breadCrumbs, { class: `vrv-tree-breadcrumb` });
+
         this.traverse((node) => {
             node.getLabel().style.backgroundImage = `url(${App.iconFor(node.element)})`;
             if (node.id === target['id']) {
@@ -38,7 +41,6 @@ export class EditorContentTree extends GenericTree {
         });
 
         if (Array.isArray(ancestors)) {
-            this.breadCrumbs.innerHTML = "";
             for (let i = ancestors.length - 1; i >= 0; i--) {
                 this.addCrumb(ancestors[i]['element'], ancestors[i]['id']);
             };
