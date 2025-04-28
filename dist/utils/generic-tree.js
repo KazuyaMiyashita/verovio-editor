@@ -1,17 +1,6 @@
 import { EventManager } from '../events/event-manager.js';
 import { GenericView } from './generic-view.js';
 import { appendDivTo } from './functions.js';
-////////////////////////////////////////////////////////////////////////
-// Function for recursively build the tree
-////////////////////////////////////////////////////////////////////////
-function buildTree(nodeData) {
-    const { id = null, element, attributes = {}, children = [], isTextNode = false, isLeaf = false } = nodeData;
-    const node = new TreeNode(id, element, attributes, [], isTextNode, isLeaf);
-    if (Array.isArray(children)) {
-        node.setChildren(children.map(buildTree));
-    }
-    return node;
-}
 export class GenericTree extends GenericView {
     constructor(div, app) {
         super(div, app);
@@ -53,9 +42,28 @@ export class GenericTree extends GenericView {
     fromJson(json) {
         if (!json || !json.element)
             throw new Error("Invalid JSON data: Missing 'element' property");
-        this.root = buildTree(json);
+        this.root = this.buildTreeFromJson(json);
         this.rootElement = appendDivTo(this.div, { class: `vrv-tree-root` });
         this.root.html(this.rootElement, this, this.hiddenRoot);
+    }
+    fromXml(xmlString) {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(xmlString, "application/xml");
+        // Check for parser error
+        const parserError = doc.querySelector("parsererror");
+        if (parserError)
+            throw new Error("Invalid XML: " + parserError.textContent);
+        const rootElement = doc.documentElement;
+        this.root = this.buildTreeFromElement(rootElement);
+        this.rootElement = appendDivTo(this.div, { class: `vrv-tree-root` });
+        this.root.html(this.rootElement, this, this.hiddenRoot);
+    }
+    toXml() {
+        if (!this.root)
+            throw new Error("Tree is empty");
+        const xmlElement = this.toXmlElement();
+        const serializer = new XMLSerializer();
+        return serializer.serializeToString(xmlElement);
     }
     // Generic depth-first traversal method
     traverse(callback) {
@@ -70,6 +78,75 @@ export class GenericTree extends GenericView {
             return false;
         };
         visit(this.root);
+    }
+    // Generic finder function
+    findSubtree(node, predicate) {
+        if (predicate(node)) {
+            return node;
+        }
+        if (Array.isArray(node['children'])) {
+            for (const child of node['children']) {
+                const result = this.findSubtree(child, predicate);
+                if (result)
+                    return result;
+            }
+        }
+        return null;
+    }
+    buildTreeFromJson(nodeData) {
+        const { id = null, element, attributes = {}, children = [], isTextNode = false, isLeaf = false } = nodeData;
+        const node = new TreeNode(id, element, attributes, [], isTextNode, isLeaf);
+        if (Array.isArray(children)) {
+            node.setChildren(children.map((child) => this.buildTreeFromJson(child)));
+        }
+        return node;
+    }
+    buildTreeFromElement(element) {
+        var _a;
+        const attributes = {};
+        for (let attr of Array.from(element.attributes)) {
+            attributes[attr.name] = attr.value;
+        }
+        const children = [];
+        for (let node of Array.from(element.childNodes)) {
+            if (node.nodeType === Node.ELEMENT_NODE) {
+                children.push(this.buildTreeFromElement(node));
+            }
+            else if (node.nodeType === Node.TEXT_NODE) {
+                const textContent = (_a = node.textContent) === null || _a === void 0 ? void 0 : _a.trim();
+                if (textContent) {
+                    children.push(new TreeNode(null, "#text", { textContent }, [], true, true));
+                }
+            }
+        }
+        const id = attributes["xml:id"] || null;
+        return new TreeNode(id, element.tagName, attributes, children, false, children.length === 0);
+    }
+    toXmlElement() {
+        const doc = document.implementation.createDocument(null, "", null);
+        return this.nodeToElement(this.root, doc);
+    }
+    nodeToElement(node, doc) {
+        if (node.isTextNode) {
+            // Text nodes aren't real Elements; handled in parent
+            throw new Error("Cannot create an Element from a text node directly.");
+        }
+        const el = doc.createElement(node.element);
+        for (const [key, value] of Object.entries(node.attributes)) {
+            if (key !== "textContent") {
+                el.setAttribute(key, value);
+            }
+        }
+        for (const child of node.getChildren()) {
+            if (child.isTextNode) {
+                const textNode = doc.createTextNode(child.attributes["textContent"] || "");
+                el.appendChild(textNode);
+            }
+            else {
+                el.appendChild(this.nodeToElement(child, doc));
+            }
+        }
+        return el;
     }
     ////////////////////////////////////////////////////////////////////////
     // Events methods

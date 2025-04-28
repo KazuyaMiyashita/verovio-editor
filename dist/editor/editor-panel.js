@@ -3,7 +3,7 @@
  */
 import { Dialog } from '../dialogs/dialog.js';
 import { EditorContentPanel } from './editor-content-panel.js';
-import { EditorSectionPanel } from './editor-section-panel.js';
+import { EditorScorePanel } from './editor-score-panel.js';
 import { EditorToolbar } from '../toolbars/editor-toolbar.js';
 import { EditorView } from './editor-view.js';
 import { EventManager } from '../events/event-manager.js';
@@ -29,10 +29,9 @@ export class EditorPanel extends GenericView {
         this.tabGroupObj = new TabGroup(this.tabGroup, this.app);
         //this.customEventManager.addToPropagationList(this.tabGroupObj.customEventManager);
         let tabScoreObj = this.tabGroupObj.addTab("Score");
-        let tabSectionObj = this.tabGroupObj.addTab("Sections");
-        this.sectionPanel = appendDivTo(tabSectionObj.getDiv(), { class: `vrv-tab-content-panel` });
-        this.sectionPanelObj = new EditorSectionPanel(this.sectionPanel, this.app, tabSectionObj);
-        tabSectionObj.customEventManager.addToPropagationList(this.sectionPanelObj.customEventManager);
+        this.scorePanel = appendDivTo(tabScoreObj.getDiv(), { class: `vrv-tab-content-panel` });
+        this.scorePanelObj = new EditorScorePanel(this.scorePanel, this.app, tabScoreObj);
+        tabScoreObj.customEventManager.addToPropagationList(this.scorePanelObj.customEventManager);
         let tabContentObj = this.tabGroupObj.addTab("Content");
         this.tabGroupObj.select(tabContentObj.id);
         this.contentPanel = appendDivTo(tabContentObj.getDiv(), { class: `vrv-tab-content-panel` });

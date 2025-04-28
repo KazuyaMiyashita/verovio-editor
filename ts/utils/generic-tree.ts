@@ -6,27 +6,6 @@ import { GenericView } from './generic-view.js';
 
 import { appendDivTo } from './functions.js';
 
-////////////////////////////////////////////////////////////////////////
-// Function for recursively build the tree
-////////////////////////////////////////////////////////////////////////
-
-function buildTree(nodeData: any): TreeNode {
-    const {
-        id = null,
-        element,
-        attributes = {},
-        children = [],
-        isTextNode = false,
-        isLeaf = false
-    } = nodeData;
-
-    const node = new TreeNode(id, element, attributes, [], isTextNode, isLeaf);
-    if (Array.isArray(children)) {
-        node.setChildren(children.map(buildTree));
-    }
-    return node;
-}
-
 export class GenericTree extends GenericView {
     public readonly eventManager: EventManager;
 
@@ -81,9 +60,31 @@ export class GenericTree extends GenericView {
     protected fromJson(json: any): void {
         if (!json || !json.element) throw new Error("Invalid JSON data: Missing 'element' property");
 
-        this.root = buildTree(json);
+        this.root = this.buildTreeFromJson(json);
         this.rootElement = appendDivTo(this.div, { class: `vrv-tree-root` });
         this.root.html(this.rootElement, this, this.hiddenRoot);
+    }
+
+    protected fromXml(xmlString: string): void {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(xmlString, "application/xml");
+
+        // Check for parser error
+        const parserError = doc.querySelector("parsererror");
+        if (parserError) throw new Error("Invalid XML: " + parserError.textContent);
+
+        const rootElement = doc.documentElement;
+        this.root = this.buildTreeFromElement(rootElement);
+        this.rootElement = appendDivTo(this.div, { class: `vrv-tree-root` });
+        this.root.html(this.rootElement, this, this.hiddenRoot);
+    }
+
+    protected toXml(): string {
+        if (!this.root) throw new Error("Tree is empty");
+
+        const xmlElement = this.toXmlElement();
+        const serializer = new XMLSerializer();
+        return serializer.serializeToString(xmlElement);
     }
 
     // Generic depth-first traversal method
@@ -98,6 +99,107 @@ export class GenericTree extends GenericView {
             return false;
         };
         visit(this.root);
+    }
+
+    // Generic finder function
+    protected findSubtree(node: Object, predicate: (node: Object) => boolean): Object | null {
+        if (predicate(node)) {
+            return node;
+        }
+
+        if (Array.isArray(node['children'])) {
+            for (const child of node['children']) {
+                const result = this.findSubtree(child, predicate);
+                if (result) return result;
+            }
+        }
+
+        return null;
+    }
+
+    private buildTreeFromJson(nodeData: any): TreeNode {
+        const {
+            id = null,
+            element,
+            attributes = {},
+            children = [],
+            isTextNode = false,
+            isLeaf = false
+        } = nodeData;
+
+        const node = new TreeNode(id, element, attributes, [], isTextNode, isLeaf);
+        if (Array.isArray(children)) {
+            node.setChildren(children.map((child: any) => this.buildTreeFromJson(child)));
+        }
+        return node;
+    }
+
+    private buildTreeFromElement(element: Element): TreeNode {
+        const attributes: Record<string, string> = {};
+        for (let attr of Array.from(element.attributes)) {
+            attributes[attr.name] = attr.value;
+        }
+
+        const children: TreeNode[] = [];
+        for (let node of Array.from(element.childNodes)) {
+            if (node.nodeType === Node.ELEMENT_NODE) {
+                children.push(this.buildTreeFromElement(node as Element));
+            } else if (node.nodeType === Node.TEXT_NODE) {
+                const textContent = node.textContent?.trim();
+                if (textContent) {
+                    children.push(new TreeNode(
+                        null,
+                        "#text",
+                        { textContent },
+                        [],
+                        true,
+                        true
+                    ));
+                }
+            }
+        }
+
+        const id = attributes["xml:id"] || null;
+
+        return new TreeNode(
+            id,
+            element.tagName,
+            attributes,
+            children,
+            false,
+            children.length === 0
+        );
+    }
+
+    private toXmlElement(): Element {
+        const doc = document.implementation.createDocument(null, "", null);
+        return this.nodeToElement(this.root, doc);
+    }
+
+    private nodeToElement(node: TreeNode, doc: Document): Element {
+        if (node.isTextNode) {
+            // Text nodes aren't real Elements; handled in parent
+            throw new Error("Cannot create an Element from a text node directly.");
+        }
+
+        const el = doc.createElement(node.element);
+
+        for (const [key, value] of Object.entries(node.attributes)) {
+            if (key !== "textContent") {
+                el.setAttribute(key, value);
+            }
+        }
+
+        for (const child of node.getChildren()) {
+            if (child.isTextNode) {
+                const textNode = doc.createTextNode(child.attributes["textContent"] || "");
+                el.appendChild(textNode);
+            } else {
+                el.appendChild(this.nodeToElement(child, doc));
+            }
+        }
+
+        return el;
     }
 
     ////////////////////////////////////////////////////////////////////////
@@ -150,11 +252,11 @@ export class TreeNode {
     ////////////////////////////////////////////////////////////////////////
 
     public getDiv(): HTMLDivElement { return this.div; }
-    
+
     public getLabel(): HTMLDivElement { return this.label; }
-    
+
     public getChildren(): TreeNode[] { return this.children; }
-    public setChildren(children: TreeNode[]) { this.children = children;  }
+    public setChildren(children: TreeNode[]) { this.children = children; }
 
     ////////////////////////////////////////////////////////////////////////
     // Class-specific methods

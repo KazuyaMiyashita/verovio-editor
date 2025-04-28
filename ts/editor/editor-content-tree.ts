@@ -30,7 +30,8 @@ export class EditorContentTree extends GenericTree {
         this.fromJson(context);
 
         this.breadCrumbs.innerHTML = "";
-        let rootCrumb = appendDivTo(this.breadCrumbs, { class: `vrv-tree-breadcrumb` });
+        // root crumb
+        appendDivTo(this.breadCrumbs, { class: `vrv-tree-breadcrumb` });
 
         this.traverse((node) => {
             node.getLabel().style.backgroundImage = `url(${App.iconFor(node.element)})`;

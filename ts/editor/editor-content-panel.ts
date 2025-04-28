@@ -25,8 +25,8 @@ export class EditorContentPanel extends GenericView {
 
         this.tab = tab;
 
-        let treeFieldSet = this.addFieldSet("Element context", 3);
-        this.contentTree = appendDivTo(treeFieldSet, { class: `vrv-field-set-panel`});
+        let treeFieldSet = this.addFieldSet("Content tree", 3);
+        this.contentTree = appendDivTo(treeFieldSet, { class: `vrv-field-set-panel` });
         this.contentTreeObj = new EditorContentTree(this.contentTree, this.app, this.tab);
         this.contentTreeObj.setHiddenRoot(true);
         this.customEventManager.addToPropagationList(this.contentTreeObj.customEventManager);
@@ -34,12 +34,12 @@ export class EditorContentPanel extends GenericView {
         let attributeFieldSet = this.addFieldSet("Attributes", 2);
 
         let referencesFromFieldSet = this.addFieldSet("Referencing elements");
-        this.referencesFrom = appendDivTo(referencesFromFieldSet, { class: `vrv-field-set-panel`});
+        this.referencesFrom = appendDivTo(referencesFromFieldSet, { class: `vrv-field-set-panel` });
         this.referencesFromObj = new EditorReferenceList(this.referencesFrom, this.app, this.tab);
         this.customEventManager.addToPropagationList(this.referencesFromObj.customEventManager);
 
         let referencesToFieldSet = this.addFieldSet("Referenced elements");
-        this.referencesTo = appendDivTo(referencesToFieldSet, { class: `vrv-field-set-panel`});
+        this.referencesTo = appendDivTo(referencesToFieldSet, { class: `vrv-field-set-panel` });
         this.referencesToObj = new EditorReferenceList(this.referencesTo, this.app, this.tab);
         this.customEventManager.addToPropagationList(this.contentTreeObj.customEventManager);
     }

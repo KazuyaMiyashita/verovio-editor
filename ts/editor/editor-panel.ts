@@ -5,7 +5,7 @@
 import { App } from '../app.js';
 import { Dialog } from '../dialogs/dialog.js';
 import { EditorContentPanel } from './editor-content-panel.js';
-import { EditorSectionPanel } from './editor-section-panel.js';
+import { EditorScorePanel } from './editor-score-panel.js';
 import { EditorToolbar } from '../toolbars/editor-toolbar.js';
 import { EditorView } from './editor-view.js';
 import { EventManager } from '../events/event-manager.js';
@@ -49,10 +49,7 @@ export class EditorPanel extends GenericView {
     private readonly split: HTMLDivElement;
 
     private readonly scorePanel: HTMLDivElement;
-    //scorePanelObj: EditorScorePanel;
-
-    private readonly sectionPanel: HTMLDivElement;
-    sectionPanelObj: EditorSectionPanel;
+    scorePanelObj: EditorScorePanel;
 
     private readonly contentPanel: HTMLDivElement;
     private readonly contentPanelObj: EditorContentPanel;
@@ -93,11 +90,9 @@ export class EditorPanel extends GenericView {
 
         let tabScoreObj = this.tabGroupObj.addTab("Score");
 
-        let tabSectionObj = this.tabGroupObj.addTab("Sections");
-
-        this.sectionPanel = appendDivTo(tabSectionObj.getDiv(), { class: `vrv-tab-content-panel` });
-        this.sectionPanelObj = new EditorSectionPanel(this.sectionPanel, this.app, tabSectionObj);
-        tabSectionObj.customEventManager.addToPropagationList(this.sectionPanelObj.customEventManager);
+        this.scorePanel = appendDivTo(tabScoreObj.getDiv(), { class: `vrv-tab-content-panel` });
+        this.scorePanelObj = new EditorScorePanel(this.scorePanel, this.app, tabScoreObj);
+        tabScoreObj.customEventManager.addToPropagationList(this.scorePanelObj.customEventManager);
 
         let tabContentObj = this.tabGroupObj.addTab("Content");
 

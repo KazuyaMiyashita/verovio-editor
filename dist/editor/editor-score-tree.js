@@ -1,7 +1,7 @@
 import { App } from '../app.js';
 import { GenericTree } from '../utils/generic-tree.js';
 import { appendDivTo } from '../utils/functions.js';
-export class EditorContentTree extends GenericTree {
+export class EditorScoreTree extends GenericTree {
     constructor(div, app, tab) {
         super(div, app);
         this.tab = tab;
@@ -14,27 +14,28 @@ export class EditorContentTree extends GenericTree {
     ////////////////////////////////////////////////////////////////////////
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
-    loadContext(context, ancestors, target) {
+    loadContext(context) {
         this.reset();
+        //const scoreSubtree = this.findSubtree(context, node => node['element'] === "score");
         this.fromJson(context);
         this.breadCrumbs.innerHTML = "";
         // root crumb
         appendDivTo(this.breadCrumbs, { class: `vrv-tree-breadcrumb` });
         this.traverse((node) => {
             node.getLabel().style.backgroundImage = `url(${App.iconFor(node.element)})`;
-            if (node.id === target['id']) {
-                this.selectNode(node);
-            }
+            //if (node.id === target['id']) {
+            //    this.selectNode(node);
+            //}
             return false;
         });
+        /*
         if (Array.isArray(ancestors)) {
             for (let i = ancestors.length - 1; i >= 0; i--) {
                 this.addCrumb(ancestors[i]['element'], ancestors[i]['id']);
-            }
-            ;
-        }
-        ;
+            };
+        };
         this.breadCrumbsWrapper.scrollLeft = this.breadCrumbsWrapper.scrollWidth;
+        */
     }
     select(element, id) {
         let event = new CustomEvent('onSelect', {
@@ -103,4 +104,4 @@ export class EditorContentTree extends GenericTree {
         }
     }
 }
-//# sourceMappingURL=editor-content-tree.js.map
+//# sourceMappingURL=editor-score-tree.js.map

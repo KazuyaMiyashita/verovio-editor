@@ -1,7 +1,7 @@
 /**
  * The EditorPanel class implements a panel with both Verovio and XML views.
  */
-import { EditorScoreTree } from './editor-section-tree.js';
+import { EditorScoreTree } from './editor-score-tree.js';
 import { GenericView } from '../utils/generic-view.js';
 import { appendDivTo } from '../utils/functions.js';
 export class EditorScorePanel extends GenericView {
@@ -9,7 +9,7 @@ export class EditorScorePanel extends GenericView {
         super(div, app);
         this.setDisplayFlex();
         this.tab = tab;
-        let treeFieldSet = this.addFieldSet("Section and endings", 3);
+        let treeFieldSet = this.addFieldSet("Score structure", 3);
         this.sectionTree = appendDivTo(treeFieldSet, { class: `vrv-field-set-panel` });
         this.sectionTreeObj = new EditorScoreTree(this.sectionTree, this.app, this.tab);
         this.sectionTreeObj.setHiddenRoot(true);
@@ -39,4 +39,4 @@ export class EditorScorePanel extends GenericView {
         return true;
     }
 }
-//# sourceMappingURL=editor-section-panel.js.map
+//# sourceMappingURL=editor-score-panel.js.map

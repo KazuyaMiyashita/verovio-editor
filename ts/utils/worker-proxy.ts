@@ -81,6 +81,7 @@ export class VerovioWorkerProxy extends WorkerProxy {
     getDefaultOptions: Function;
     getElementAttr: Function;
     getElementsAtTime: Function;
+    getLog: Function;
     getOptions: Function;
     getMEI: Function;
     getPageCount: Function;
