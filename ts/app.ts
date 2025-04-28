@@ -323,14 +323,14 @@ export class App {
     ////////////////////////////////////////////////////////////////////////
 
     public getView(): GenericView { return this.view; }
-    
+
     public getToolbarView(): VerovioView { return this.toolbarView; }
 
     public getMidiPlayer(): MidiPlayer { return this.midiPlayer; }
-    
+
     public getPageCount(): number { return this.pageCount; }
     public setPageCount(pageCount: number): void { this.pageCount = pageCount; }
-    
+
     public getCurrentZoomIndex(): number { return this.currentZoomIndex; }
 
     ////////////////////////////////////////////////////////////////////////
@@ -377,7 +377,7 @@ export class App {
         this.notificationStack.push(message);
         if (this.notificationStack.length < 2) this.pushNotification();
     }
-    
+
     public destroy(): void {
         this.eventManager.unbindAll();
     }
@@ -669,7 +669,7 @@ export class App {
 
     prevPage(e: MouseEvent): void {
         if (this.toolbarView.getCurrentPage() > 1) {
-            this.toolbarView.setCurrentPage(this.toolbarView.getCurrentPage() -  1);
+            this.toolbarView.setCurrentPage(this.toolbarView.getCurrentPage() - 1);
             this.startLoading("Loading content ...", true);
             let event = new CustomEvent('onPage');
             this.customEventManager.dispatch(event);
@@ -678,7 +678,7 @@ export class App {
 
     nextPage(e: MouseEvent): void {
         if (this.toolbarView.getCurrentPage() < this.pageCount) {
-            this.toolbarView.setCurrentPage(this.toolbarView.getCurrentPage() +  1);
+            this.toolbarView.setCurrentPage(this.toolbarView.getCurrentPage() + 1);
             this.startLoading("Loading content ...", true);
             let event = new CustomEvent('onPage');
             this.customEventManager.dispatch(event);
@@ -687,7 +687,7 @@ export class App {
 
     zoomOut(e: MouseEvent): void {
         if (this.toolbarView.getCurrentZoomIndex() > 0) {
-            this.toolbarView.setCurrentZoomIndex(this.toolbarView.getCurrentZoomIndex() -  1);
+            this.toolbarView.setCurrentZoomIndex(this.toolbarView.getCurrentZoomIndex() - 1);
             this.startLoading("Adjusting size ...", true);
             let event = new CustomEvent('onZoom');
             this.customEventManager.dispatch(event);
@@ -696,7 +696,7 @@ export class App {
 
     zoomIn(e: MouseEvent): void {
         if (this.toolbarView.getCurrentZoomIndex() < this.zoomLevels.length - 1) {
-            this.toolbarView.setCurrentZoomIndex(this.toolbarView.getCurrentZoomIndex() +  1);
+            this.toolbarView.setCurrentZoomIndex(this.toolbarView.getCurrentZoomIndex() + 1);
             this.startLoading("Adjusting size ...", true);
             let event = new CustomEvent('onZoom');
             this.customEventManager.dispatch(event);
@@ -932,7 +932,7 @@ export namespace App {
     }
 
     export function iconFor(element: string): string {
-        const elements: string[] = ["accid", "annot", "app", "arpeg", "artic", "beam", "beamSpan", "beatRpt", "bracketSpan", "breath", "bTrem", "caesura", "choice", "chord", "clef", "cpMark", "custos", "dir", "dynam", "f", "fb", "fermata", "fing", "fTrem", "gliss", "graceGrp", "hairpin", "halfmRpt", "harm", "keySig", "layer", "lb", "lv", "mdiv", "measure", "meterSig", "mordent", "mRest", "mRpt", "mRpt2", "mSpace", "multiRest", "multiRpt", "note", "octave", "ornam", "pb", "pedal", "phrase", "reh", "rend", "repeatMark", "rest", "sb","scoreDef", "section", "slur", "staff", "syl", "symbol", "tempo", "text", "tie", "trill", "tuplet", "tupletSpan", "turn", "verse"]
+        const elements: string[] = ["accid", "annot", "app", "arpeg", "artic", "beam", "beamSpan", "beatRpt", "bracketSpan", "breath", "bTrem", "caesura", "choice", "chord", "clef", "cpMark", "custos", "dir", "dynam", "ending", "f", "fb", "fermata", "fing", "fTrem", "gliss", "graceGrp", "hairpin", "halfmRpt", "harm", "keySig", "layer", "layerDef", "lb", "lv", "mdiv", "measure", "meterSig", "mordent", "mRest", "mRpt", "mRpt2", "mSpace", "multiRest", "multiRpt", "note", "octave", "ornam", "pb", "pedal", "phrase", "reh", "rend", "repeatMark", "rest", "sb", "score", "scoreDef", "section", "slur", "staff", "staffDef", "syl", "symbol", "tempo", "text", "tie", "trill", "tuplet", "tupletSpan", "turn", "verse"]
         if (!elements.includes(element)) {
             element = "missing";
         }
