@@ -7,6 +7,7 @@ importScripts("https://www.verovio.org/javascript/pdfkit/source.js");
 importScripts("https://www.verovio.org/javascript/pdfkit/Leipzig-ttf.js");
 class PDFDeferred {
     constructor() {
+        // @ts-ignore
         this.promise = new Promise((resolve, reject) => {
             this.reject = reject;
             this.resolve = resolve;

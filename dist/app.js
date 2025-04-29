@@ -58,8 +58,10 @@ export class App {
             // Editorial is empty by default
             editorial: {},
             // The default schema (latest MEI release by default)
-            schemaDefault: 'https://music-encoding.org/schema/5.1/mei-all.rng',
-            schema: 'https://music-encoding.org/schema/5.1/mei-all.rng',
+            //schemaDefault: 'https://music-encoding.org/schema/5.1/mei-all.rng',
+            schemaDefault: './junkyard/mei-all.rng.xml',
+            //schema: 'https://music-encoding.org/schema/5.1/mei-all.rng',
+            schema: './junkyard/mei-all.rng.xml',
             defaultView: 'responsive',
             isSafari: false
         }, options);

@@ -153,9 +153,12 @@ export class EditorView extends ResponsiveView {
             console.debug("Cannot find node with dragging position");
             return;
         }
-        let x = parseInt(positionNode.getAttribute('x'));
-        let y = parseInt(positionNode.getAttribute('y'));
-        this.addToSelection(node.classList[0], node.id, x, y);
+        const match = positionNode.getAttribute('transform').match(/translate\(\s*([^\s,]+)[,\s]+([^\s\)]+)\)/);
+        if (match) {
+            let x = parseInt(match[1]);
+            let y = parseInt(match[2]);
+            this.addToSelection(node.classList[0], node.id, x, y);
+        }
     }
     addToSelection(element, id, x = null, y = null) {
         let item = {
