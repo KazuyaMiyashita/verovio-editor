@@ -518,6 +518,8 @@
     color: white;
     font-size: 16px;
     font-family: Helvetica Neue, Helvetica, Arial, sans-serif; }
+  .vrv-wrapper select.vrv-form-input, .vrv-wrapper .vrv-attribute-list-wrapper .vrv-attribute-table .vrv-attribute-item select.vrv-attribute-value, .vrv-wrapper .vrv-dialog-form select.vrv-dialog-input {
+    appearance: none; }
   .vrv-wrapper .vrv-keyboard-navigator {
     padding: 2px;
     width: 32px;
@@ -673,15 +675,28 @@
   .vrv-wrapper .vrv-attribute-list-wrapper {
     overflow-y: auto;
     height: 100%; }
+    .vrv-wrapper .vrv-attribute-list-wrapper input {
+      box-sizing: border-box;
+      width: 100%;
+      background-color: #6f6f6f;
+      padding: 5px; }
     .vrv-wrapper .vrv-attribute-list-wrapper .vrv-attribute-table {
       width: 100%; }
       .vrv-wrapper .vrv-attribute-list-wrapper .vrv-attribute-table .vrv-attribute-item .vrv-attribute-name,
       .vrv-wrapper .vrv-attribute-list-wrapper .vrv-attribute-table .vrv-attribute-item .vrv-attribute-value {
+        padding: 1px;
         min-height: 22px;
         background-color: #565656;
         color: white;
-        user-select: none;
-        margin-bottom: 1px; }
+        user-select: none; }
+        .vrv-wrapper .vrv-attribute-list-wrapper .vrv-attribute-table .vrv-attribute-item .vrv-attribute-name input,
+        .vrv-wrapper .vrv-attribute-list-wrapper .vrv-attribute-table .vrv-attribute-item .vrv-attribute-name select,
+        .vrv-wrapper .vrv-attribute-list-wrapper .vrv-attribute-table .vrv-attribute-item .vrv-attribute-value input,
+        .vrv-wrapper .vrv-attribute-list-wrapper .vrv-attribute-table .vrv-attribute-item .vrv-attribute-value select {
+          box-sizing: border-box;
+          width: 100%; }
+      .vrv-wrapper .vrv-attribute-list-wrapper .vrv-attribute-table .vrv-attribute-item .vrv-attribute-name {
+        padding-left: 6px; }
   .vrv-wrapper .vrv-reference-list-wrapper {
     overflow-y: auto;
     height: 100%; }

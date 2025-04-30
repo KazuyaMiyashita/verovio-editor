@@ -34,7 +34,7 @@ export class EditorContentPanel extends GenericView {
         this.contentTreeObj.setHiddenRoot(true);
         this.customEventManager.addToPropagationList(this.contentTreeObj.customEventManager);
 
-        let attributeFieldSet = this.addFieldSet("Attributes", 3);
+        let attributeFieldSet = this.addFieldSet("Attributes or text", 3);
         this.attributeList = appendDivTo(attributeFieldSet, { class: `vrv-field-set-panel` });
         this.attributeListObj = new EditorAttributeList(this.attributeList, this.app);
         this.customEventManager.addToPropagationList(this.attributeListObj.customEventManager);

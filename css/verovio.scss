@@ -933,6 +933,10 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
         font-family: $font-family;
     }
 
+    select.vrv-form-input {
+        appearance: none;
+    }
+
     ////////////////////////////////////////////////////////////////////////
     // Keyboard
     ////////////////////////////////////////////////////////////////////////
@@ -1194,6 +1198,13 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
         overflow-y: auto;
         height: 100%;
 
+        input {
+            box-sizing: border-box;
+            width: 100%;
+            background-color: $background-extra-light;
+            padding: 5px;
+        }
+
         .vrv-attribute-table {
             width: 100%;
 
@@ -1201,11 +1212,21 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
 
                 .vrv-attribute-name,
                 .vrv-attribute-value {
+                    padding: 1px;
                     min-height: $node-height;
                     background-color: $background-light;
                     color: $text-color;
                     user-select: none;
-                    margin-bottom: 1px;
+
+                    input,
+                    select {
+                        box-sizing: border-box;
+                        width: 100%;
+                    }
+                }
+
+                .vrv-attribute-name {
+                    padding-left: 6px;
                 }
 
                 .vrv-attribute-value {
