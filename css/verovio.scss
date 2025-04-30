@@ -902,16 +902,11 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
         }
 
         .vrv-dialog-input {
-            background-color: $background;
+            @extend .vrv-form-input;
             padding: 4px 8px;
             margin: 4px 0px;
-            border: 1px solid $background-border;
-            border-radius: 2px;
             box-sizing: border-box;
             resize: vertical;
-            color: $text-color;
-            font-size: 16px;
-            font-family: $font-family;
         }
 
         .vrv-dialog-input[type=checkbox] {
@@ -927,6 +922,15 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
             accent-color: $primary;
             background: $primary;
         }
+    }
+
+    .vrv-form-input {
+        background-color: $background;
+        border: 1px solid $background-border;
+        border-radius: 2px;
+        color: $text-color;
+        font-size: 16px;
+        font-family: $font-family;
     }
 
     ////////////////////////////////////////////////////////////////////////
@@ -1207,19 +1211,7 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
                 .vrv-attribute-value {
                     //width: 50%;
 
-                    .vrv-input {
-                        background-color: $background;
-                        //padding: 4px 8px;
-                        //margin: 4px 0px;
-                        border: 1px solid $background-border;
-                        border-radius: 2px;
-                        box-sizing: border-box;
-                        resize: vertical;
-                        color: $text-color;
-                        font-size: 16px;
-                        font-family: $font-family;
-                        width: 100%;
-                    }
+                    @extend .vrv-form-input;
                 }
 
             }

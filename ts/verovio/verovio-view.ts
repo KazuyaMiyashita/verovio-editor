@@ -11,7 +11,7 @@ import { VerovioWorkerProxy } from '../utils/worker-proxy.js';
 
 export class VerovioView extends GenericView {
     public readonly verovio: VerovioWorkerProxy;
-    
+
     protected currentPage: number;
     protected currentZoomIndex: number;
     protected currentScale: number;

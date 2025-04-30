@@ -499,16 +499,10 @@
     .vrv-wrapper .vrv-dialog-form .vrv-dialog-label:hover .vrv-tooltip-label {
       display: block; }
     .vrv-wrapper .vrv-dialog-form .vrv-dialog-input {
-      background-color: #3c3c3c;
       padding: 4px 8px;
       margin: 4px 0px;
-      border: 1px solid #565656;
-      border-radius: 2px;
       box-sizing: border-box;
-      resize: vertical;
-      color: white;
-      font-size: 16px;
-      font-family: Helvetica Neue, Helvetica, Arial, sans-serif; }
+      resize: vertical; }
     .vrv-wrapper .vrv-dialog-form .vrv-dialog-input[type=checkbox] {
       justify-self: left;
       padding-top: 6px; }
@@ -517,6 +511,13 @@
     .vrv-wrapper .vrv-dialog-form .vrv-dialog-input.non-default {
       accent-color: #8B0000;
       background: #8B0000; }
+  .vrv-wrapper .vrv-form-input, .vrv-wrapper .vrv-attribute-list-wrapper .vrv-attribute-table .vrv-attribute-item .vrv-attribute-value, .vrv-wrapper .vrv-dialog-form .vrv-dialog-input {
+    background-color: #3c3c3c;
+    border: 1px solid #565656;
+    border-radius: 2px;
+    color: white;
+    font-size: 16px;
+    font-family: Helvetica Neue, Helvetica, Arial, sans-serif; }
   .vrv-wrapper .vrv-keyboard-navigator {
     padding: 2px;
     width: 32px;
@@ -681,16 +682,6 @@
         color: white;
         user-select: none;
         margin-bottom: 1px; }
-      .vrv-wrapper .vrv-attribute-list-wrapper .vrv-attribute-table .vrv-attribute-item .vrv-attribute-value .vrv-input {
-        background-color: #3c3c3c;
-        border: 1px solid #565656;
-        border-radius: 2px;
-        box-sizing: border-box;
-        resize: vertical;
-        color: white;
-        font-size: 16px;
-        font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
-        width: 100%; }
   .vrv-wrapper .vrv-reference-list-wrapper {
     overflow-y: auto;
     height: 100%; }

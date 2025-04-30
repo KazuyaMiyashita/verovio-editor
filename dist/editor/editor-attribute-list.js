@@ -22,7 +22,7 @@ export class EditorAttributeList extends GenericView {
         }
     }
     loadText(text) {
-        let textInput = appendInputTo(this.listWrapper, {});
+        let textInput = appendInputTo(this.listWrapper, { class: `vrv-form-input` });
         textInput.value = text;
     }
     loadAttributes(attributes) {
@@ -35,7 +35,7 @@ export class EditorAttributeList extends GenericView {
             let attValue = appendTdTo(tr, { class: `vrv-attribute-value` });
             let values = new Array();
             values.push(value.toString());
-            let input = appendSelectTo(attValue, { class: `vrv-input` });
+            let input = appendSelectTo(attValue, { class: `vrv-form-input` });
             for (const v in values) {
                 let optionVal = appendOptionTo(input, { value: `${values[v]}` });
                 optionVal.innerText = values[v];
