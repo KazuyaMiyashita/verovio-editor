@@ -23,19 +23,8 @@ export class EditorScoreTree extends GenericTree {
         appendDivTo(this.breadCrumbs, { class: `vrv-tree-breadcrumb` });
         this.traverse((node) => {
             node.getLabel().style.backgroundImage = `url(${App.iconFor(node.element)})`;
-            //if (node.id === target['id']) {
-            //    this.selectNode(node);
-            //}
             return false;
         });
-        /*
-        if (Array.isArray(ancestors)) {
-            for (let i = ancestors.length - 1; i >= 0; i--) {
-                this.addCrumb(ancestors[i]['element'], ancestors[i]['id']);
-            };
-        };
-        this.breadCrumbsWrapper.scrollLeft = this.breadCrumbsWrapper.scrollWidth;
-        */
     }
     select(element, id) {
         let event = new CustomEvent('onSelect', {
@@ -66,16 +55,6 @@ export class EditorScoreTree extends GenericTree {
         this.eventManager.bind(crumb, 'mouseover', this.onMouseover);
         this.eventManager.bind(crumb, 'mouseout', this.onMouseout);
     }
-    selectNode(node) {
-        node.getLabel().classList.add("target");
-        node.getLabel().classList.add("checked");
-        const parentRect = this.root.getDiv().getBoundingClientRect();
-        const childRect = node.getDiv().getBoundingClientRect();
-        // Calculate offset of the node relative to root
-        const offsetTop = childRect.top - parentRect.top + this.root.getDiv().scrollTop;
-        // arbitrary margin
-        this.root.getDiv().scrollTo({ top: offsetTop - 50 });
-    }
     //////////////////////////////////////////////////////////////////////////
     // Event methods
     //////////////////////////////////////////////////////////////////////////
@@ -85,8 +64,8 @@ export class EditorScoreTree extends GenericTree {
             if (element.classList.contains("open")) {
                 this.collapseNode(element.dataset.id);
             }
-            else if (element.dataset.id) {
-                this.select(element.dataset.element, element.dataset.id);
+            else {
+                this.expandNode(element.dataset.id);
             }
         }
         e.stopPropagation();

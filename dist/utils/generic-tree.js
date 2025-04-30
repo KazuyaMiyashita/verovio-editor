@@ -33,7 +33,21 @@ export class GenericTree extends GenericView {
                 node.getDiv().classList.toggle("open");
                 const children = node.getDiv().querySelector('.vrv-node-children');
                 if (children)
-                    children.remove();
+                    children.style.display = 'none';
+                return true;
+            }
+            return false;
+        });
+    }
+    expandNode(id) {
+        this.traverse((node) => {
+            if (node.id === id) {
+                if (node.getDiv().classList.contains("open"))
+                    return true;
+                node.getDiv().classList.toggle("open");
+                const children = node.getDiv().querySelector('.vrv-node-children');
+                if (children)
+                    children.style.display = 'block';
                 return true;
             }
             return false;

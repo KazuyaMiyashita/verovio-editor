@@ -180,17 +180,20 @@ export class EditorView extends ResponsiveView {
         if (node.classList.contains('note') || node.classList.contains('rest')) {
             positionNode = node.querySelector('use');
         }
-
         if (!positionNode) {
             console.debug("Cannot find node with dragging position")
             return;
         }
-        const match = positionNode.getAttribute('transform').match(/translate\(\s*([^\s,]+)[,\s]+([^\s\)]+)\)/);
-        if (match) {
-            let x = parseInt(match[1]);
-            let y = parseInt(match[2]);
-            this.addToSelection(node.classList[0], node.id, x, y);
+        let x = null;
+        let y = null;
+        if (positionNode.hasAttribute('transform')) {
+            const match = positionNode.getAttribute('transform').match(/translate\(\s*([^\s,]+)[,\s]+([^\s\)]+)\)/);
+            if (match) {
+                x = parseInt(match[1]);
+                y = parseInt(match[2]);
+            }
         }
+        this.addToSelection(node.classList[0], node.id, x, y);
     }
 
     public addToSelection(element: string, id: string, x: number = null, y: number = null): void {

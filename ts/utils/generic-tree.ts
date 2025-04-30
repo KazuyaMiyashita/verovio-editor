@@ -49,15 +49,28 @@ export class GenericTree extends GenericView {
             if (node.id === id) {
                 if (!node.getDiv().classList.contains("open")) return true;
                 node.getDiv().classList.toggle("open");
-                const children = node.getDiv().querySelector('.vrv-node-children');
-                if (children) children.remove();
+                const children = node.getDiv().querySelector('.vrv-node-children') as HTMLElement;
+                if (children) children.style.display = 'none';
                 return true;
             }
             return false;
         });
     }
 
-    protected fromJson(json: any): void {
+    protected expandNode(id: string) {
+        this.traverse((node) => {
+            if (node.id === id) {
+                if (node.getDiv().classList.contains("open")) return true;
+                node.getDiv().classList.toggle("open");
+                const children = node.getDiv().querySelector('.vrv-node-children') as HTMLElement;
+                if (children) children.style.display = 'block';
+                return true;
+            }
+            return false;
+        });
+    }
+
+    protected fromJson(json: GenericTree.Object): void {
         if (!json || !json.element) throw new Error("Invalid JSON data: Missing 'element' property");
 
         this.root = this.buildTreeFromJson(json);
@@ -295,5 +308,21 @@ export class TreeNode {
             let node = appendDivTo(children, { class: `vrv-tree-node` });
             child.html(node, tree);
         });
+    }
+}
+
+////////////////////////////////////////////////////////////////////////
+// Merged namespace
+////////////////////////////////////////////////////////////////////////
+
+export namespace GenericTree {
+
+    export interface Object {
+        element: string;
+        id: string;
+        children?: Object[];
+        attributes?: Record<string, string>;
+        text?: string;
+        isLeaf: boolean;
     }
 }

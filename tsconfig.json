@@ -6,8 +6,6 @@
   },
   "include": [
     "ts/*.ts",
-    "ts/xml/*.ts",
-    "ts/verovio/*.ts",
-    "ts/document/*.ts"
+    "ts/*/*.ts"
   ]
 }

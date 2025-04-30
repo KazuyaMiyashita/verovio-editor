@@ -25,9 +25,9 @@ export class EditorContentTree extends GenericTree {
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
 
-    public loadContext(context: Object, ancestors: Object, target: Object): void {
+    public loadContext(context: EditorContentTree.Content): void {
         this.reset();
-        this.fromJson(context);
+        this.fromJson(context.context);
 
         this.breadCrumbs.innerHTML = "";
         // root crumb
@@ -35,17 +35,16 @@ export class EditorContentTree extends GenericTree {
 
         this.traverse((node) => {
             node.getLabel().style.backgroundImage = `url(${App.iconFor(node.element)})`;
-            if (node.id === target['id']) {
+            if (node.id === context.object.id) {
                 this.selectNode(node);
             }
             return false;
         });
 
-        if (Array.isArray(ancestors)) {
-            for (let i = ancestors.length - 1; i >= 0; i--) {
-                this.addCrumb(ancestors[i]['element'], ancestors[i]['id']);
-            };
-        };
+        context.ancestors.slice().reverse().forEach(ancestor => {
+            this.addCrumb(ancestor.element, ancestor.id);
+        });
+
         this.breadCrumbsWrapper.scrollLeft = this.breadCrumbsWrapper.scrollWidth;
     }
 
@@ -103,7 +102,7 @@ export class EditorContentTree extends GenericTree {
             if (element.classList.contains("open")) {
                 this.collapseNode(element.dataset.id);
             }
-            else if (element.dataset.id) {
+            else {
                 this.select(element.dataset.element, element.dataset.id);
             }
         }
@@ -126,3 +125,23 @@ export class EditorContentTree extends GenericTree {
         }
     }
 }
+
+////////////////////////////////////////////////////////////////////////
+// Merged namespace
+////////////////////////////////////////////////////////////////////////
+
+export namespace EditorContentTree {
+
+    export interface ReferenceObject extends GenericTree.Object {
+        referenceAttribute: string;
+    }
+
+    export interface Content {
+        ancestors: GenericTree.Object[];
+        context: GenericTree.Object;
+        object: GenericTree.Object;
+        referencedElements: ReferenceObject[];
+        referringElements: ReferenceObject[];
+    }
+}
+

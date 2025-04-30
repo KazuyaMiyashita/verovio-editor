@@ -39,6 +39,15 @@ export function appendSpanTo(parent, options, text = "") {
 export function appendSummaryTo(parent, options) {
     return appendHTMLElementTo(parent, options, 'summary');
 }
+export function appendTableTo(parent, options) {
+    return appendHTMLElementTo(parent, options, 'table');
+}
+export function appendTdTo(parent, options) {
+    return appendHTMLElementTo(parent, options, 'td');
+}
+export function appendTrTo(parent, options) {
+    return appendHTMLElementTo(parent, options, 'tr');
+}
 export function appendTextAreaTo(parent, options) {
     return appendHTMLElementTo(parent, options, 'textarea');
 }

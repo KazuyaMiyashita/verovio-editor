@@ -14,26 +14,22 @@ export class EditorContentTree extends GenericTree {
     ////////////////////////////////////////////////////////////////////////
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
-    loadContext(context, ancestors, target) {
+    loadContext(context) {
         this.reset();
-        this.fromJson(context);
+        this.fromJson(context.context);
         this.breadCrumbs.innerHTML = "";
         // root crumb
         appendDivTo(this.breadCrumbs, { class: `vrv-tree-breadcrumb` });
         this.traverse((node) => {
             node.getLabel().style.backgroundImage = `url(${App.iconFor(node.element)})`;
-            if (node.id === target['id']) {
+            if (node.id === context.object.id) {
                 this.selectNode(node);
             }
             return false;
         });
-        if (Array.isArray(ancestors)) {
-            for (let i = ancestors.length - 1; i >= 0; i--) {
-                this.addCrumb(ancestors[i]['element'], ancestors[i]['id']);
-            }
-            ;
-        }
-        ;
+        context.ancestors.slice().reverse().forEach(ancestor => {
+            this.addCrumb(ancestor.element, ancestor.id);
+        });
         this.breadCrumbsWrapper.scrollLeft = this.breadCrumbsWrapper.scrollWidth;
     }
     select(element, id) {
@@ -84,7 +80,7 @@ export class EditorContentTree extends GenericTree {
             if (element.classList.contains("open")) {
                 this.collapseNode(element.dataset.id);
             }
-            else if (element.dataset.id) {
+            else {
                 this.select(element.dataset.element, element.dataset.id);
             }
         }

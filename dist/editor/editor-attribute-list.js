@@ -1,30 +1,45 @@
-import { App } from '../app.js';
 import { EventManager } from '../events/event-manager.js';
 import { GenericView } from '../utils/generic-view.js';
-import { appendDivTo } from '../utils/functions.js';
-export class EditorReferenceList extends GenericView {
-    constructor(div, app, tab) {
+import { appendDivTo, appendOptionTo, appendSelectTo, appendTableTo, appendTrTo, appendTdTo, appendInputTo } from '../utils/functions.js';
+export class EditorAttributeList extends GenericView {
+    constructor(div, app) {
         super(div, app);
         this.setDisplayFlex();
-        this.tab = tab;
         this.eventManager = new EventManager(this);
-        this.listWrapper = appendDivTo(this.div, { class: `vrv-reference-list-wrapper` });
+        this.listWrapper = appendDivTo(this.div, { class: `vrv-attribute-list-wrapper` });
     }
     ////////////////////////////////////////////////////////////////////////
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
-    loadList(references, direction) {
+    loadAttributesOrText(object) {
         this.listWrapper.innerHTML = "";
         this.eventManager.unbindAll();
-        references.forEach(reference => {
-            let item = appendDivTo(this.listWrapper, { class: `vrv-reference-list-item vrv-mei-element` });
-            item.style.backgroundImage = `url(${App.iconFor(reference.element)})`;
-            item.innerHTML = `${reference['element']} @ ${reference.referenceAttribute}`;
-            item.dataset.id = reference.id;
-            item.dataset.element = reference.element;
-            this.eventManager.bind(item, "click", this.onClick);
-            this.eventManager.bind(item, "mouseover", this.onMouseover);
-            this.eventManager.bind(item, "mouseout", this.onMouseout);
+        if (object.text) {
+            this.loadText(object.text);
+        }
+        else {
+            this.loadAttributes(object.attributes);
+        }
+    }
+    loadText(text) {
+        let textInput = appendInputTo(this.listWrapper, {});
+        textInput.value = text;
+    }
+    loadAttributes(attributes) {
+        let filter = appendDivTo(this.listWrapper, { class: `vrv-attribute-filter` });
+        let table = appendTableTo(this.listWrapper, { class: `vrv-attribute-table` });
+        Object.entries(attributes).forEach(([name, value]) => {
+            let tr = appendTrTo(table, { class: `vrv-attribute-item` });
+            let attName = appendTdTo(tr, { class: `vrv-attribute-name` });
+            attName.innerHTML = name;
+            let attValue = appendTdTo(tr, { class: `vrv-attribute-value` });
+            let values = new Array();
+            values.push(value.toString());
+            let input = appendSelectTo(attValue, { class: `vrv-input` });
+            for (const v in values) {
+                let optionVal = appendOptionTo(input, { value: `${values[v]}` });
+                optionVal.innerText = values[v];
+            }
         });
     }
     ////////////////////////////////////////////////////////////////////////
@@ -75,14 +90,4 @@ export class EditorReferenceList extends GenericView {
         }
     }
 }
-////////////////////////////////////////////////////////////////////////
-// Merged namespace
-////////////////////////////////////////////////////////////////////////
-(function (EditorReferenceList) {
-    let Direction;
-    (function (Direction) {
-        Direction[Direction["From"] = 0] = "From";
-        Direction[Direction["To"] = 1] = "To";
-    })(Direction = EditorReferenceList.Direction || (EditorReferenceList.Direction = {}));
-})(EditorReferenceList || (EditorReferenceList = {}));
-//# sourceMappingURL=editor-references-list.js.map
+//# sourceMappingURL=editor-attribute-list.js.map

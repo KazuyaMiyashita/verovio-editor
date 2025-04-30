@@ -43,7 +43,7 @@ export function appendSelectTo(parent: HTMLElement, options: object): HTMLSelect
     return <HTMLSelectElement>appendHTMLElementTo(parent, options, 'select');
 }
 
-export function appendSpanTo(parent: HTMLElement, options: object, text: string = "") : HTMLSpanElement {
+export function appendSpanTo(parent: HTMLElement, options: object, text: string = ""): HTMLSpanElement {
     let span = appendHTMLElementTo(parent, options, 'span');
     span.innerHTML = text;
     return <HTMLSpanElement>span;
@@ -51,6 +51,18 @@ export function appendSpanTo(parent: HTMLElement, options: object, text: string 
 
 export function appendSummaryTo(parent: HTMLElement, options: object): HTMLElement {
     return <HTMLElement>appendHTMLElementTo(parent, options, 'summary');
+}
+
+export function appendTableTo(parent: HTMLElement, options: object): HTMLTableElement {
+    return <HTMLTableElement>appendHTMLElementTo(parent, options, 'table');
+}
+
+export function appendTdTo(parent: HTMLTableRowElement, options: object): HTMLTableCellElement {
+    return <HTMLTableCellElement>appendHTMLElementTo(parent, options, 'td');
+}
+
+export function appendTrTo(parent: HTMLTableElement, options: object): HTMLTableRowElement {
+    return <HTMLTableRowElement>appendHTMLElementTo(parent, options, 'tr');
 }
 
 export function appendTextAreaTo(parent: HTMLElement, options: object): HTMLTextAreaElement {

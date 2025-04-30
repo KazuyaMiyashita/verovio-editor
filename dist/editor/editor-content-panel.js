@@ -1,6 +1,7 @@
 /**
  * The EditorPanel class implements a panel with both Verovio and XML views.
  */
+import { EditorAttributeList } from './editor-attribute-list.js';
 import { EditorContentTree } from './editor-content-tree.js';
 import { EditorReferenceList } from './editor-references-list.js';
 import { GenericView } from '../utils/generic-view.js';
@@ -15,7 +16,10 @@ export class EditorContentPanel extends GenericView {
         this.contentTreeObj = new EditorContentTree(this.contentTree, this.app, this.tab);
         this.contentTreeObj.setHiddenRoot(true);
         this.customEventManager.addToPropagationList(this.contentTreeObj.customEventManager);
-        let attributeFieldSet = this.addFieldSet("Attributes", 2);
+        let attributeFieldSet = this.addFieldSet("Attributes", 3);
+        this.attributeList = appendDivTo(attributeFieldSet, { class: `vrv-field-set-panel` });
+        this.attributeListObj = new EditorAttributeList(this.attributeList, this.app);
+        this.customEventManager.addToPropagationList(this.attributeListObj.customEventManager);
         let referencesFromFieldSet = this.addFieldSet("Referencing elements");
         this.referencesFrom = appendDivTo(referencesFromFieldSet, { class: `vrv-field-set-panel` });
         this.referencesFromObj = new EditorReferenceList(this.referencesFrom, this.app, this.tab);
@@ -34,11 +38,12 @@ export class EditorContentPanel extends GenericView {
     async updateContent(id) {
         const contextOk = await this.app.verovio.edit({ action: 'context', param: { elementId: `${id}` } });
         if (contextOk) {
-            const jsonContext = await this.app.verovio.editInfo();
-            console.log(jsonContext);
-            this.contentTreeObj.loadContext(jsonContext['context'], jsonContext['ancestors'], jsonContext['object']);
-            this.referencesFromObj.loadList(jsonContext['referringElements'], EditorReferenceList.Direction.From);
-            this.referencesToObj.loadList(jsonContext['referencedElements'], EditorReferenceList.Direction.To);
+            const jsonContent = await this.app.verovio.editInfo();
+            console.log(jsonContent);
+            this.contentTreeObj.loadContext(jsonContent);
+            this.attributeListObj.loadAttributesOrText(jsonContent.object);
+            this.referencesFromObj.loadList(jsonContent.referringElements, EditorReferenceList.Direction.From);
+            this.referencesToObj.loadList(jsonContent.referencedElements, EditorReferenceList.Direction.To);
         }
     }
     ////////////////////////////////////////////////////////////////////////

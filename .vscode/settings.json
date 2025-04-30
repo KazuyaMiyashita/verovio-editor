@@ -23,6 +23,7 @@
         "nonmatchingbracket",
         "notehead",
         "ornam",
+        "parsererror",
         "relaxng",
         "schematypens",
         "SCOREDEF",
