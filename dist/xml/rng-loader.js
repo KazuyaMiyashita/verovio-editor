@@ -80,7 +80,7 @@ export class RNGLoader {
     /**
      * Collect the text from all the <value/> elements.
      */
-    getAttributeValues(defs, stack, rng, values) {
+    getAttributeValues(defs, stack, rng, values, types) {
         "use strict";
         let text;
         if (this.isRng(rng, "value")) {
@@ -89,10 +89,13 @@ export class RNGLoader {
                 values.push(text);
             }
         }
+        else if (this.isRng(rng, "data")) {
+            types.push(rng.getAttribute("type"));
+        }
         else {
             const funcThis = this;
             this.recurseRng(defs, stack, rng, function (e) {
-                funcThis.getAttributeValues(defs, stack, e, values);
+                funcThis.getAttributeValues(defs, stack, e, values, types);
             });
         }
     }
@@ -135,6 +138,7 @@ export class RNGLoader {
         "use strict";
         let names = new Array;
         let values = new Array;
+        let types = new Array;
         if (this.isRng(rng, "element")) {
             names = this.getNames(rng);
             names.map(function (name) {
@@ -144,7 +148,7 @@ export class RNGLoader {
             });
         }
         else if (this.isRng(rng, "attribute")) {
-            this.getAttributeValues(defs, stack, rng, values);
+            this.getAttributeValues(defs, stack, rng, values, types);
             names = this.getNames(rng);
             if (values.length === 0) {
                 values = null;
@@ -155,6 +159,9 @@ export class RNGLoader {
                 }
                 else {
                     def.attrs[name] = values;
+                }
+                if (types && types.length > 0) {
+                    def.types[name] = types[0];
                 }
             });
         }
@@ -191,7 +198,7 @@ export class RNGLoader {
         "use strict";
         let child, names, element;
         if (this.isRng(rng, "element")) {
-            element = { attrs: {}, children: [] };
+            element = { attrs: {}, children: [], types: {} };
             child = rng.firstElementChild;
             while (child) {
                 this.defineElement(defs, [], child, element);

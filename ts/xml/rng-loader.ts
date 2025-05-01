@@ -37,7 +37,7 @@ export class RNGLoader {
     // Getters and setters
     //////////////////////////////////////////////////////////////////////////////
 
-    public getTags(): Object { return this.tags;  }
+    public getTags(): Object { return this.tags; }
 
     //////////////////////////////////////////////////////////////////////////////
     // schemaInfoCreator
@@ -99,7 +99,7 @@ export class RNGLoader {
     /**
      * Collect the text from all the <value/> elements.
      */
-    private getAttributeValues(defs: Map<string, Element>, stack: Array<string>, rng: Element, values): void {
+    private getAttributeValues(defs: Map<string, Element>, stack: Array<string>, rng: Element, values, types): void {
         "use strict";
         let text;
         if (this.isRng(rng, "value")) {
@@ -107,10 +107,13 @@ export class RNGLoader {
             if (values.indexOf(text) === -1) {
                 values.push(text);
             }
+        }
+        else if (this.isRng(rng, "data")) {
+            types.push(rng.getAttribute("type"));
         } else {
             const funcThis = this;
             this.recurseRng(defs, stack, rng, function (e) {
-                funcThis.getAttributeValues(defs, stack, e, values);
+                funcThis.getAttributeValues(defs, stack, e, values, types);
             });
         }
     }
@@ -156,6 +159,7 @@ export class RNGLoader {
         "use strict";
         let names: Array<string> = new Array<string>;
         let values: Array<string> = new Array<string>;
+        let types: Array<string> = new Array<string>;
         if (this.isRng(rng, "element")) {
             names = this.getNames(rng);
             names.map(function (name) {
@@ -164,7 +168,7 @@ export class RNGLoader {
                 }
             });
         } else if (this.isRng(rng, "attribute")) {
-            this.getAttributeValues(defs, stack, rng, values);
+            this.getAttributeValues(defs, stack, rng, values, types);
             names = this.getNames(rng);
             if (values.length === 0) {
                 values = null;
@@ -174,6 +178,9 @@ export class RNGLoader {
                     def.attrs[name] = def.attrs[name].concat(values);
                 } else {
                     def.attrs[name] = values;
+                }
+                if (types && types.length > 0) {
+                    def.types[name] = types[0];
                 }
             });
         } else if (this.isRng(rng, "text")) {
@@ -214,7 +221,7 @@ export class RNGLoader {
             names,
             element;
         if (this.isRng(rng, "element")) {
-            element = { attrs: {}, children: [] };
+            element = { attrs: {}, children: [], types: {} };
             child = rng.firstElementChild;
             while (child) {
                 this.defineElement(defs, [], child, element);
