@@ -7,10 +7,11 @@ import { EditorReferenceList } from './editor-references-list.js';
 import { GenericView } from '../utils/generic-view.js';
 import { appendDivTo } from '../utils/functions.js';
 export class EditorContentPanel extends GenericView {
-    constructor(div, app, tab) {
+    constructor(div, app, tab, actionManager) {
         super(div, app);
         this.setDisplayFlex();
         this.tab = tab;
+        this.actionManager = actionManager;
         let treeFieldSet = this.addFieldSet("Content tree", 3);
         this.contentTree = appendDivTo(treeFieldSet, { class: `vrv-field-set-panel` });
         this.contentTreeObj = new EditorContentTree(this.contentTree, this.app, this.tab);
@@ -18,7 +19,7 @@ export class EditorContentPanel extends GenericView {
         this.customEventManager.addToPropagationList(this.contentTreeObj.customEventManager);
         let attributeFieldSet = this.addFieldSet("Attributes or text", 3);
         this.attributeList = appendDivTo(attributeFieldSet, { class: `vrv-field-set-panel` });
-        this.attributeListObj = new EditorAttributeList(this.attributeList, this.app);
+        this.attributeListObj = new EditorAttributeList(this.attributeList, this.app, this.actionManager);
         this.customEventManager.addToPropagationList(this.attributeListObj.customEventManager);
         let referencesFromFieldSet = this.addFieldSet("Referencing elements");
         this.referencesFrom = appendDivTo(referencesFromFieldSet, { class: `vrv-field-set-panel` });

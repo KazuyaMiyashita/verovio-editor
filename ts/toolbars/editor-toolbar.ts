@@ -13,7 +13,7 @@ import { appendDivTo, appendSpanTo } from '../utils/functions.js';
 
 export class EditorToolbar extends Toolbar {
     private selectedElementType: string;
-    
+
     private readonly panel: EditorPanel;
 
     private readonly layoutControls: HTMLDivElement;

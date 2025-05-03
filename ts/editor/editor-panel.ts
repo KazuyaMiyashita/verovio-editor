@@ -84,6 +84,20 @@ export class EditorPanel extends GenericView {
         this.hSplit = appendDivTo(this.div, { class: `vrv-h-split` });
         this.toolPanel = appendDivTo(this.hSplit, { class: `vrv-editor-tool-panel` });
 
+        this.vSplit = appendDivTo(this.hSplit, { class: `vrv-v-split` });
+        this.split = appendDivTo(this.vSplit, { class: `vrv-split` });
+
+        this.keyboard = appendDivTo(this.vSplit, { class: `vrv-keyboard-panel` });
+        this.keyboardObj = new Keyboard(this.keyboard, this.app);
+
+        let orientation = (this.app.options.editorSplitterHorizontal) ? "vertical" : "horizontal";
+        this.split.classList.add(orientation);
+
+        this.editorView = appendDivTo(this.split, { class: `vrv-view`, style: `` });
+        this.editorViewObj = new EditorView(this.editorView, this.app, this.verovio);
+        this.customEventManager.addToPropagationList(this.editorViewObj.customEventManager);
+        this.toolbarObj.bindEvents(this.editorViewObj.actionManager);
+
         this.tabGroup = appendDivTo(this.toolPanel, { class: `vrv-tab-group` });
         this.tabGroupObj = new TabGroup(this.tabGroup, this.app);
         //this.customEventManager.addToPropagationList(this.tabGroupObj.customEventManager);
@@ -99,22 +113,8 @@ export class EditorPanel extends GenericView {
         this.tabGroupObj.select(tabContentObj.id);
 
         this.contentPanel = appendDivTo(tabContentObj.getDiv(), { class: `vrv-tab-content-panel` });
-        this.contentPanelObj = new EditorContentPanel(this.contentPanel, this.app, tabContentObj);
+        this.contentPanelObj = new EditorContentPanel(this.contentPanel, this.app, tabContentObj, this.editorViewObj.actionManager);
         tabContentObj.customEventManager.addToPropagationList(this.contentPanelObj.customEventManager);
-
-        this.vSplit = appendDivTo(this.hSplit, { class: `vrv-v-split` });
-        this.split = appendDivTo(this.vSplit, { class: `vrv-split` });
-
-        this.keyboard = appendDivTo(this.vSplit, { class: `vrv-keyboard-panel` });
-        this.keyboardObj = new Keyboard(this.keyboard, this.app);
-
-        let orientation = (this.app.options.editorSplitterHorizontal) ? "vertical" : "horizontal";
-        this.split.classList.add(orientation);
-
-        this.editorView = appendDivTo(this.split, { class: `vrv-view`, style: `` });
-        this.editorViewObj = new EditorView(this.editorView, this.app, this.verovio);
-        this.customEventManager.addToPropagationList(this.editorViewObj.customEventManager);
-        this.toolbarObj.bindEvents(this.editorViewObj.actionManager);
 
         this.splitter = appendDivTo(this.split, { class: `` });
         this.eventManager.bind(this.splitter, 'mousedown', this.onDragInit);

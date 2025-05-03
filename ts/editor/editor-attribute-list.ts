@@ -1,3 +1,4 @@
+import { ActionManager } from '../events/action-manager.js';
 import { App } from '../app.js';
 import { EventManager } from '../events/event-manager.js';
 import { GenericTree } from '../utils/generic-tree.js';
@@ -10,23 +11,29 @@ export class EditorAttributeList extends GenericView {
     private listWrapper: HTMLDivElement;
 
     private element: string;
+    private elementId: string;
     private attributes: Object;
     private attributesBasic: Object;
     private types: Object;
 
-    private readonly patternMap: Array<[RegExp, (cell: HTMLTableCellElement, value: string) => void]> = [
+    private actionManager: ActionManager;
+
+    private readonly patternMap: Array<[RegExp, (cell: HTMLTableCellElement, value: string) => HTMLSelectElement | HTMLInputElement]> = [
         [/^.*@pname$/, this.customAllPname]
     ];
 
-    constructor(div: HTMLDivElement, app: App) {
+    constructor(div: HTMLDivElement, app: App, actionManager: ActionManager) {
         super(div, app);
         this.setDisplayFlex();
+
+        this.actionManager = actionManager;
 
         this.eventManager = new EventManager(this);
 
         this.listWrapper = appendDivTo(this.div, { class: `vrv-attribute-list-wrapper` });
 
         this.element = "";
+        this.elementId = "";
         this.attributes = {};
         this.attributesBasic = {};
         this.types = {};
@@ -50,8 +57,8 @@ export class EditorAttributeList extends GenericView {
         }
         else {
             this.element = object.element;
+            this.elementId = object.id;
             let tags = this.app.rngLoader.getTags()[object.element];
-            console.log(tags);
             if (tags) {
                 this.attributes = tags.attrs;
                 this.types = tags.types;
@@ -117,42 +124,55 @@ export class EditorAttributeList extends GenericView {
         let valueCell = appendTdTo(attRow, { class: `vrv-attribute-value` });
 
         let custom = this.findCustomOptionMethod(`${this.element}@${name}`);
+        let selectOrInput;
         if (custom) {
-            custom.call(this, valueCell, value);
+            selectOrInput = custom.call(this, valueCell, value);
         }
         else if (this.attributes[name]) {
-            this.attributeOption(valueCell, name, value);
+            selectOrInput = this.attributeOption(valueCell, name, value);
         }
         else if (this.types[name]) {
-            this.attributeNumber(valueCell, name, value);
+            selectOrInput = this.attributeNumber(valueCell, name, value);
         }
         else {
-            let text = appendInputTo(valueCell, { class: `vrv-form-input` });
-            text.value = value;
+            selectOrInput = appendInputTo(valueCell, { class: `vrv-form-input` });
+            selectOrInput.value = value;
+        }
+        if (selectOrInput instanceof HTMLSelectElement) {
+            let select = selectOrInput as HTMLSelectElement;
+            select.dataset.attName = name;
+            this.eventManager.bind(select, 'change', this.onSelectChange);
+
+        }
+        else if (selectOrInput instanceof HTMLInputElement) {
+            let input = selectOrInput as HTMLInputElement;
+            input.dataset.attName = name;
+            this.eventManager.bind(input, 'input', this.onInputInput);
         }
     }
 
-    private attributeNumber(cell: HTMLTableCellElement, name: string, value: string): void {
-        console.log(this.types[name], name, value);
+    private attributeNumber(cell: HTMLTableCellElement, name: string, value: string): HTMLInputElement {
+        let input: HTMLInputElement;
         if (this.types[name] === "positiveInteger") {
-            let input = appendInputTo(cell, { class: `vrv-form-input`, type: `number`, step: `1`, min: "1" });
+            input = appendInputTo(cell, { class: `vrv-form-input`, type: `number`, step: `1`, min: "1" });
             input.value = <string>value;
         }
         else if (this.types[name] === "nonNegativeInteger") {
-            let input = appendInputTo(cell, { class: `vrv-form-input`, type: `number`, step: `1`, min: "0" });
+            input = appendInputTo(cell, { class: `vrv-form-input`, type: `number`, step: `1`, min: "0" });
             input.value = <string>value;
         }
         else if (this.types[name] === "decimal") {
-            let input = appendInputTo(cell, { class: `vrv-form-input`, type: `number`, step: `0.01` });
+            input = appendInputTo(cell, { class: `vrv-form-input`, type: `number`, step: `0.1` });
             input.value = <string>value;
         }
         else {
-            let text = appendInputTo(cell, { class: `vrv-form-input` });
-            text.value = value;
+            input = appendInputTo(cell, { class: `vrv-form-input` });
+            input.value = value;
         }
+        return input;
     }
 
-    private attributeOption(cell: HTMLTableCellElement, name: string, value: string): void {
+    private attributeOption(cell: HTMLTableCellElement, name: string, value: string): HTMLSelectElement {
         let values = this.attributes[name];
         let valuesBasic = this.attributesBasic[name];
         if (!valuesBasic) valuesBasic = values;
@@ -161,18 +181,19 @@ export class EditorAttributeList extends GenericView {
             values = values.filter(value => !valuesBasic.includes(value));
             hasGroup = true;
         }
-        let input = appendSelectTo(cell, { class: `vrv-form-input` });
+        let select = appendSelectTo(cell, { class: `vrv-form-input` });
 
         if (hasGroup) {
-            this.addOptions(input, [], value);
-            let basicGroup = appendOptGroupTo(input, { label: "MEI-basic" });
+            this.addOptions(select, [], value);
+            let basicGroup = appendOptGroupTo(select, { label: "MEI-basic" });
             this.addOptions(basicGroup, valuesBasic, value, false);
-            let allGroup = appendOptGroupTo(input, { label: "MEI-all" });
+            let allGroup = appendOptGroupTo(select, { label: "MEI-all" });
             this.addOptions(allGroup, values, value, false);
         }
         else {
-            this.addOptions(input, values, value);
+            this.addOptions(select, values, value);
         }
+        return select;
     }
 
     private addOptions(parent: HTMLElement, values: string[], selected: string, addEmpty: boolean = true): void {
@@ -193,13 +214,13 @@ export class EditorAttributeList extends GenericView {
                 return method;
             }
         }
-        console.log(input);
         return undefined;
     }
 
-    private customAllPname(cell: HTMLTableCellElement, value: string): void {
-        let input = appendSelectTo(cell, { class: `vrv-form-input` });
-        this.addOptions(input, ["c", "d", "e", "f", "g", "a", "b"], value);
+    private customAllPname(cell: HTMLTableCellElement, value: string): HTMLSelectElement {
+        let select = appendSelectTo(cell, { class: `vrv-form-input` });
+        this.addOptions(select, ["c", "d", "e", "f", "g", "a", "b"], value);
+        return select;
     }
 
     private addShowMore(tbody: HTMLElement, label: string) {
@@ -240,6 +261,11 @@ export class EditorAttributeList extends GenericView {
         this.app.customEventManager.dispatch(event);
     }
 
+    private editAttributeValue(name: string, value: string) {
+        this.actionManager.setAttrValue(name, value, this.elementId);
+        this.actionManager.commit(this);
+    }
+
     //////////////////////////////////////////////////////////////////////////
     // Event methods
     //////////////////////////////////////////////////////////////////////////
@@ -248,6 +274,13 @@ export class EditorAttributeList extends GenericView {
         const element: HTMLElement = e.target as HTMLElement;
         if (element.dataset.id) {
             this.select(element.dataset.element, element.dataset.id);
+        }
+    }
+
+    onInputInput(e: InputEvent) {
+        const element: HTMLInputElement = e.target as HTMLInputElement;
+        if (element.dataset.attName) {
+            this.editAttributeValue(element.dataset.attName, element.value);
         }
     }
 
@@ -262,6 +295,13 @@ export class EditorAttributeList extends GenericView {
         const element: HTMLElement = e.target as HTMLElement;
         if (element.dataset.id) {
             this.cursorActivity(element.dataset.id, 'mouseout');
+        }
+    }
+
+    onSelectChange(e: Event) {
+        const element: HTMLSelectElement = e.target as HTMLSelectElement;
+        if (element.dataset.attName) {
+            this.editAttributeValue(element.dataset.attName, element.value);
         }
     }
 

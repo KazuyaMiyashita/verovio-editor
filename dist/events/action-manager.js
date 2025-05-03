@@ -156,31 +156,42 @@ export class ActionManager {
     }
     */
     async formCres() {
-        await this.setAttrValue("form", "cres", ["hairpin"]);
+        await this.setAttrValueForTypes("form", "cres", ["hairpin"]);
     }
     async formDim() {
-        await this.setAttrValue("form", "dim", ["hairpin"]);
+        await this.setAttrValueForTypes("form", "dim", ["hairpin"]);
     }
     async placeAbove() {
-        await this.setAttrValue("place", "above", ["dir", "dynam", "hairpin", "tempo", "pedal"]);
+        await this.setAttrValueForTypes("place", "above", ["dir", "dynam", "hairpin", "tempo", "pedal"]);
     }
     async placeBelow() {
-        await this.setAttrValue("place", "below", ["dir", "dynam", "hairpin", "tempo", "pedal"]);
+        await this.setAttrValueForTypes("place", "below", ["dir", "dynam", "hairpin", "tempo", "pedal"]);
     }
     async placeAuto() {
-        await this.setAttrValue("place", "", ["dir", "dynam", "hairpin", "tempo", "pedal"]);
+        await this.setAttrValueForTypes("place", "", ["dir", "dynam", "hairpin", "tempo", "pedal"]);
     }
     async stemDirUp() {
-        await this.setAttrValue("stem.dir", "up", ["note", "chord"]);
+        await this.setAttrValueForTypes("stem.dir", "up", ["note", "chord"]);
     }
     async stemDirDown() {
-        await this.setAttrValue("stem.dir", "down", ["note", "chord"]);
+        await this.setAttrValueForTypes("stem.dir", "down", ["note", "chord"]);
     }
     async stemDirAuto() {
-        await this.setAttrValue("stem.dir", "", ["note", "chord"]);
+        await this.setAttrValueForTypes("stem.dir", "", ["note", "chord"]);
     }
     // helper
-    async setAttrValue(attribute, value, elementTypes = []) {
+    async setAttrValue(attribute, value, id) {
+        const editorAction = {
+            action: 'set',
+            param: {
+                elementId: id,
+                attribute: attribute,
+                value: value
+            }
+        };
+        await this.editorViewObj.verovio.edit(editorAction);
+    }
+    async setAttrValueForTypes(attribute, value, elementTypes = []) {
         let chain = new Array();
         for (const item of this.editorViewObj.getSelection()) {
             if (elementTypes.length > 0 && !elementTypes.includes(item.element))

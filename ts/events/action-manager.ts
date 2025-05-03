@@ -189,40 +189,52 @@ export class ActionManager {
     */
 
     public async formCres(): Promise<any> {
-        await this.setAttrValue("form", "cres", ["hairpin"]);
+        await this.setAttrValueForTypes("form", "cres", ["hairpin"]);
     }
 
     public async formDim(): Promise<any> {
-        await this.setAttrValue("form", "dim", ["hairpin"]);
+        await this.setAttrValueForTypes("form", "dim", ["hairpin"]);
     }
 
     public async placeAbove(): Promise<any> {
-        await this.setAttrValue("place", "above", ["dir", "dynam", "hairpin", "tempo", "pedal"]);
+        await this.setAttrValueForTypes("place", "above", ["dir", "dynam", "hairpin", "tempo", "pedal"]);
     }
 
     public async placeBelow(): Promise<any> {
-        await this.setAttrValue("place", "below", ["dir", "dynam", "hairpin", "tempo", "pedal"]);
+        await this.setAttrValueForTypes("place", "below", ["dir", "dynam", "hairpin", "tempo", "pedal"]);
     }
 
     public async placeAuto(): Promise<any> {
-        await this.setAttrValue("place", "", ["dir", "dynam", "hairpin", "tempo", "pedal"]);
+        await this.setAttrValueForTypes("place", "", ["dir", "dynam", "hairpin", "tempo", "pedal"]);
     }
 
     public async stemDirUp(): Promise<any> {
-        await this.setAttrValue("stem.dir", "up", ["note", "chord"]);
+        await this.setAttrValueForTypes("stem.dir", "up", ["note", "chord"]);
     }
 
     public async stemDirDown(): Promise<any> {
-        await this.setAttrValue("stem.dir", "down", ["note", "chord"]);
+        await this.setAttrValueForTypes("stem.dir", "down", ["note", "chord"]);
     }
 
     public async stemDirAuto(): Promise<any> {
-        await this.setAttrValue("stem.dir", "", ["note", "chord"]);
+        await this.setAttrValueForTypes("stem.dir", "", ["note", "chord"]);
     }
 
     // helper
 
-    public async setAttrValue(attribute: string, value: string, elementTypes: Array<string> = []): Promise<any> {
+    public async setAttrValue(attribute: string, value: string, id: string): Promise<any> {
+        const editorAction = {
+            action: 'set',
+            param: {
+                elementId: id,
+                attribute: attribute,
+                value: value
+            }
+        };
+        await this.editorViewObj.verovio.edit(editorAction);
+    }
+
+    public async setAttrValueForTypes(attribute: string, value: string, elementTypes: Array<string> = []): Promise<any> {
         let chain = new Array();
         for (const item of this.editorViewObj.getSelection()) {
             if (elementTypes.length > 0 && !elementTypes.includes(item.element)) continue;
