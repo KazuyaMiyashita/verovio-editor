@@ -18,6 +18,7 @@ export class VerovioView extends GenericView {
     protected boundMouseMove: { (event: MouseEvent): void };
     protected boundMouseUp: { (event: MouseEvent): void };
     protected boundKeyDown: { (event: KeyboardEvent): void };
+    protected boundKeyUp: { (event: KeyboardEvent): void };
     protected boundResize: { (event: Event): void };
 
     protected readonly eventManager: EventManager;
@@ -66,6 +67,7 @@ export class VerovioView extends GenericView {
     // Necessary for how ES6 "this" works inside events
     private bindListeners(): void {
         this.boundKeyDown = (e: KeyboardEvent) => this.keyDownListener(e);
+        this.boundKeyUp = (e: KeyboardEvent) => this.keyUpListener(e);
         this.boundMouseMove = (e: MouseEvent) => this.mouseMoveListener(e);
         this.boundMouseUp = (e: MouseEvent) => this.mouseUpListener(e);
         this.boundResize = (e: Event) => this.resizeComponents(e);
@@ -140,6 +142,8 @@ export class VerovioView extends GenericView {
     ////////////////////////////////////////////////////////////////////////
 
     keyDownListener(e: KeyboardEvent): void { }
+
+    keyUpListener(e: KeyboardEvent): void { }
 
     mouseMoveListener(e: MouseEvent): void { }
 

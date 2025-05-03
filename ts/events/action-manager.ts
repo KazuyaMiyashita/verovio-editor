@@ -2,86 +2,55 @@
  * The ActionManager action class
  */
 import { App } from '../app.js';
-import { EditorCursorPointer } from '../editor/editor-cursor-pointer.js';
 import { EditorView as EditorViewObj } from '../editor/editor-view.js';
 import { EventManager } from './event-manager.js';
-import { VerovioWorkerProxy } from '../utils/worker-proxy.js';
+import { GenericView } from '../utils/generic-view.js';
 
-class Call {
-    method: Function;
-    args: IArguments;
-
-    constructor(method: Function, args: IArguments) {
-        this.method = method;
-        this.args = args;
-    }
-}
 
 export class ActionManager {
     public readonly eventManager: EventManager;
-    
+
     protected readonly app: App;
-    
+
     private inProgress: boolean;
-    
-    private readonly delayedCalls: Call[];
-    private readonly verovio: VerovioWorkerProxy;
     private readonly editorViewObj: EditorViewObj;
 
     constructor(view: EditorViewObj, app: App) {
         this.app = app;
         this.editorViewObj = view;
-        this.verovio = view.verovio;
 
         this.eventManager = new EventManager(this);
 
         this.inProgress = false;
-
-        this.delayedCalls = [];
-    }
-
-    ////////////////////////////////////////////////////////////////////////
-    // Delayed calls
-    ////////////////////////////////////////////////////////////////////////
-
-    private async callDelayedCalls(): Promise<any> {
-        //console.debug( this.delayedCalls.length );
-        if (this.delayedCalls.length > 0) {
-            const call = this.delayedCalls[0];
-            this.delayedCalls.shift();
-            await call.method.apply(this, call.args);
-        }
-        else {
-            await this.commit();
-        }
     }
 
     ////////////////////////////////////////////////////////////////////////
     // Async worker methods
     ////////////////////////////////////////////////////////////////////////
 
-    public async commit(): Promise<any> {
-        this.inProgress = true;
+    public async commit(caller: GenericView): Promise<any> {
         const editorAction = { action: 'commit' };
-        await this.editorViewObj.verovio.edit(editorAction);
 
-        // WIP disable redo layout
-        //await this.view.verovio.redoLayout();
-        this.app.setPageCount(await this.verovio.getPageCount());
-        if (this.editorViewObj.getCurrentPage() > this.app.getPageCount()) {
-            this.editorViewObj.setCurrentPage(this.app.getPageCount());
-        }
+        await this.editorViewObj.verovio.edit(editorAction);
         await this.editorViewObj.renderPage(true);
 
-        //this.view.updateMEI();
         this.inProgress = false;
 
-        // Check that nothing was added in-between
-        if (this.delayedCalls.length > 0) {
-            await this.callDelayedCalls();
+        let id = "";
+        if (this.editorViewObj.hasSelection()) {
+            id = this.editorViewObj.getSelection()[0].id;
         }
+
+        let event = new CustomEvent('onEditData', {
+            detail: {
+                id: id,
+                caller: caller
+            }
+        });
+        this.app.customEventManager.dispatch(event);
     }
 
+    /*
     public async delete(): Promise<any> {
         let chain = new Array();
         for (const item of this.editorViewObj.getSelection()) {
@@ -108,6 +77,7 @@ export class ActionManager {
         await this.editorViewObj.renderPage(true);
         //this.editorViewObj.updateMEI();
     }
+    */
 
     public async drag(x: number, y: number): Promise<any> {
         let chain = new Array();
@@ -137,13 +107,6 @@ export class ActionManager {
     }
 
     public async keyDown(key: number, shiftKey: boolean, ctrlKey: boolean): Promise<any> {
-        // keyDown events can 
-        if (this.inProgress) {
-            this.delayedCalls.push(new Call(this.keyDown, arguments));
-            return;
-        }
-        this.inProgress = true;
-
         let chain = new Array();
         for (const item of this.editorViewObj.getSelection()) {
             if (!["note"].includes(item.element)) continue;
@@ -159,24 +122,28 @@ export class ActionManager {
             chain.push(editorAction);
         }
 
-        if (chain.length === 0) {
-            this.inProgress = false;
-            return;
+        // actually nothing to do
+        if (chain.length === 0) return;
+
+        if (this.inProgress) {
+            await this.editorViewObj.verovio.redoPagePitchPosLayout();
+            await this.editorViewObj.renderPage(true, false);
         }
 
+        this.inProgress = true;
         const editorAction = {
             action: 'chain',
             param: chain
         }
 
         await this.editorViewObj.verovio.edit(editorAction);
-        
-        // WIP disable redo layout
-        //await this.view.verovio.redoPagePitchPosLayout();
-        //await this.view.renderPage(true, false);
+    }
 
-        this.inProgress = false;
-        await this.callDelayedCalls();
+    public async keyUp(key: number, shiftKey: boolean, ctrlKey: boolean): Promise<any> {
+        // actually nothing to do
+        if (!this.inProgress) return;
+
+        this.commit(this.editorViewObj);
     }
 
     ////////////////////////////////////////////////////////////////////////
@@ -251,17 +218,6 @@ export class ActionManager {
 
     public async stemDirAuto(): Promise<any> {
         await this.setAttrValue("stem.dir", "", ["note", "chord"]);
-    }
-
-    public async update(): Promise<any> {
-        const editorAction = {
-            action: 'commit'
-        }
-
-        await this.editorViewObj.verovio.edit(editorAction);
-        //await this.editorViewObj.updateLoadData();
-        //this.editorViewObj.updateMEI();
-        await this.editorViewObj.renderPage(true);
     }
 
     // helper

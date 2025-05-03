@@ -11,9 +11,9 @@ import { appendDivTo, appendSpanTo, randomHex } from '../utils/functions.js';
 export class GenericView {
     public readonly customEventManager: CustomEventManager;
     public readonly id: string;
-    
+
     protected active: boolean;
-    
+
     protected readonly app: App;
     protected readonly div: HTMLDivElement;
 
@@ -62,7 +62,7 @@ export class GenericView {
     }
 
     protected setDisplayFlex(): void { this.display = 'flex'; }
-    
+
     protected addFieldSet(label: string, flexGrow: number = 1): HTMLDivElement {
         let legend = appendDivTo(this.div, { class: `vrv-legend` });
         legend.innerHTML = label;

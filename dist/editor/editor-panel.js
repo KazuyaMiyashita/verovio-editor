@@ -180,6 +180,12 @@ export class EditorPanel extends GenericView {
         //console.debug("EditorPanel::onStartLoading");
         this.propagateEvent(e);
     }
+    onEditData(e) {
+        if (!super.onEditData(e))
+            return false;
+        //console.debug("EditorPanel::onEditData");
+        this.propagateEvent(e);
+    }
     onEndLoading(e) {
         if (!super.onEndLoading(e))
             return false;

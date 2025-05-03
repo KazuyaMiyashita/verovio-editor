@@ -55,5 +55,11 @@ export class EditorContentPanel extends GenericView {
         this.updateContent(e.detail.id);
         return true;
     }
+    onEditData(e) {
+        if (!super.onEditData(e))
+            return false;
+        this.updateContent(e.detail.id);
+        return true;
+    }
 }
 //# sourceMappingURL=editor-content-panel.js.map

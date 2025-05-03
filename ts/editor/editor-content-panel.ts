@@ -80,6 +80,12 @@ export class EditorContentPanel extends GenericView {
         return true;
     }
 
+    override onEditData(e: CustomEvent): boolean {
+        if (!super.onEditData(e)) return false;
+        this.updateContent(e.detail.id);
+        return true;
+    }
+
     ////////////////////////////////////////////////////////////////////////
     // Event methods
     ////////////////////////////////////////////////////////////////////////

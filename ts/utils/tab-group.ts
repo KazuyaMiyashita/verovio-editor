@@ -88,6 +88,12 @@ export class TabGroup extends GenericView {
         return true;
     }
 
+    override onEditData(e: CustomEvent): boolean {
+        if (!super.onEditData(e)) return false;
+        this.selectedTab.customEventManager.dispatch(e);
+        return true;
+    }
+
     override onLoadData(e: CustomEvent): boolean {
         if (!super.onLoadData(e)) return false;
         this.selectedTab.customEventManager.dispatch(e);
@@ -105,11 +111,11 @@ export class TabGroup extends GenericView {
             tab.customEventManager.dispatch(e);
         });
     }
-        
+
     ////////////////////////////////////////////////////////////////////////
     // Event methods
     ////////////////////////////////////////////////////////////////////////
-    
+
     onSelectTab(e: MouseEvent): void {
         const element: HTMLElement = e.target as HTMLElement;
         this.select(element.dataset.tab);

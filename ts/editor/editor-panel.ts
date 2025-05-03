@@ -275,6 +275,12 @@ export class EditorPanel extends GenericView {
         this.propagateEvent(e);
     }
 
+    override onEditData(e: CustomEvent): boolean {
+        if (!super.onEditData(e)) return false;
+        //console.debug("EditorPanel::onEditData");
+        this.propagateEvent(e);
+    }
+
     override onEndLoading(e: CustomEvent): boolean {
         if (!super.onEndLoading(e)) return false;
         //console.debug("EditorPanel::onEndLoading");

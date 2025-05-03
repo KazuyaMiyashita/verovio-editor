@@ -359,7 +359,18 @@ export class EditorView extends ResponsiveView {
             this.actionManager.keyDown(e.keyCode, e.shiftKey, e.ctrlKey);
         }
         else if (e.keyCode === 8 || e.keyCode === 46) {
-            this.actionManager.delete();
+            //this.actionManager.delete();
+        }
+        e.preventDefault();
+    }
+
+    keyUpListener(e: KeyboardEvent): void {
+        // For now only up and down arrows
+        if (e.keyCode === 38 || e.keyCode === 40) {
+            this.actionManager.keyUp(e.keyCode, e.shiftKey, e.ctrlKey);
+        }
+        else if (e.keyCode === 8 || e.keyCode === 46) {
+            //this.actionManager.delete();
         }
         e.preventDefault();
     }
@@ -413,6 +424,7 @@ export class EditorView extends ResponsiveView {
 
     mouseEnterListener(e: MouseEvent): void {
         document.addEventListener('keydown', this.boundKeyDown);
+        document.addEventListener('keyup', this.boundKeyUp);
         //console.debug( "Hey!" );
     }
 
@@ -422,6 +434,7 @@ export class EditorView extends ResponsiveView {
         document.removeEventListener('mousemove', this.boundMouseMove);
         document.removeEventListener('touchmove', this.boundMouseMove);
         document.removeEventListener('keydown', this.boundKeyDown);
+        document.removeEventListener('keyup', this.boundKeyUp);
     }
 
     mouseMoveListener(e: MouseEvent): void {
@@ -460,8 +473,7 @@ export class EditorView extends ResponsiveView {
             // Since we are waiting to trigger the mousemove events, we also need to delay the mouseup
             setTimeout(function () {
                 timerThis.clearSelection();
-                timerThis.actionManager.update();
-
+                timerThis.actionManager.commit(this);
             }, 80);
 
         }

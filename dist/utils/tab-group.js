@@ -70,6 +70,12 @@ export class TabGroup extends GenericView {
         this.dispatchToAll(e);
         return true;
     }
+    onEditData(e) {
+        if (!super.onEditData(e))
+            return false;
+        this.selectedTab.customEventManager.dispatch(e);
+        return true;
+    }
     onLoadData(e) {
         if (!super.onLoadData(e))
             return false;
