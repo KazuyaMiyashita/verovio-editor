@@ -2,7 +2,7 @@ import { App } from '../app.js';
 import { EventManager } from '../events/event-manager.js';
 import { GenericTree } from '../utils/generic-tree.js';
 import { GenericView } from '../utils/generic-view.js';
-import { appendDivTo, appendOptionTo, appendSelectTo, appendTableTo, appendTrTo, appendTdTo, appendInputTo, appendOptGroupTo } from '../utils/functions.js';
+import { appendDivTo, appendOptionTo, appendSelectTo, appendTableTo, appendTrTo, appendTdTo, appendInputTo, appendOptGroupTo, appendTBodyTo, appendSpanTo } from '../utils/functions.js';
 
 export class EditorAttributeList extends GenericView {
     public readonly eventManager: EventManager;
@@ -75,24 +75,43 @@ export class EditorAttributeList extends GenericView {
 
         let table = appendTableTo(this.listWrapper, { class: `vrv-attribute-table` });
 
-        Object.entries(attributes).forEach(([name, value]) => {
-            this.loadAttribute(table, name, value);
-        });
+        let tBodyUsed = appendTBodyTo(table, {});
+        if (Object.entries(attributes).length > 0) {
+            Object.entries(attributes).forEach(([name, value]) => {
+                this.loadAttribute(tBodyUsed, name, value);
+            });
+            this.addShowMore(tBodyUsed, "Show more ...");
+        }
+        else {
+            this.addShowMore(tBodyUsed, "None set - show unset ...");
+        }
 
         let usedAttributes = Object.keys(attributes);
         let unusedAttributes = Object.keys(this.attributesBasic).filter(value => !usedAttributes.includes(value));
-        unusedAttributes.forEach(name => {
-            this.loadAttribute(table, name, "");
-        })
+        if (unusedAttributes.length > 0) {
+            let tBodyBasic = appendTBodyTo(table, {});
+            tBodyBasic.style.display = 'none';
+            unusedAttributes.forEach(name => {
+                this.loadAttribute(tBodyBasic, name, "");
+            })
+            this.addShowMore(tBodyBasic, "Show all ...");
+
+        }
+
         usedAttributes = usedAttributes.concat(unusedAttributes);
         unusedAttributes = Object.keys(this.attributes).filter(value => !usedAttributes.includes(value));
-        unusedAttributes.forEach(name => {
-            this.loadAttribute(table, name, "");
-        })
+        if (unusedAttributes.length > 0) {
+            let tBodyAll = appendTBodyTo(table, {});
+            tBodyAll.style.display = 'none';
+            unusedAttributes.forEach(name => {
+                this.loadAttribute(tBodyAll, name, "");
+            })
+            this.addShowMore(tBodyAll, "");
+        }
     }
 
-    private loadAttribute(table: HTMLTableElement, name: string, value: string): void {
-        let attRow = appendTrTo(table, { class: `vrv-attribute-item` });
+    private loadAttribute(tbody: HTMLElement, name: string, value: string): void {
+        let attRow = appendTrTo(tbody, { class: `vrv-attribute-item` });
         let nameCell = appendTdTo(attRow, { class: `vrv-attribute-name` });
         nameCell.innerHTML = name;
         let valueCell = appendTdTo(attRow, { class: `vrv-attribute-value` });
@@ -183,6 +202,13 @@ export class EditorAttributeList extends GenericView {
         this.addOptions(input, ["c", "d", "e", "f", "g", "a", "b"], value);
     }
 
+    private addShowMore(tbody: HTMLElement, label: string) {
+        let row = appendTrTo(tbody, {});
+        let cell = appendTdTo(row, { colspan: "2", class: `vrv-show-more` });
+        let span = appendSpanTo(cell, {}, label);
+        this.eventManager.bind(span, 'click', this.onShowMore);
+    }
+
     ////////////////////////////////////////////////////////////////////////
     // Custom event methods
     ////////////////////////////////////////////////////////////////////////
@@ -236,6 +262,17 @@ export class EditorAttributeList extends GenericView {
         const element: HTMLElement = e.target as HTMLElement;
         if (element.dataset.id) {
             this.cursorActivity(element.dataset.id, 'mouseout');
+        }
+    }
+
+    onShowMore(e: MouseEvent) {
+        const element: HTMLElement = e.target as HTMLElement;
+        const thisTbody = element.closest('tbody');
+        const nextTbody = thisTbody.nextElementSibling as HTMLElement;
+
+        if (nextTbody) {
+            nextTbody.style.display = 'table-row-group';
+            element.style.display = 'none';
         }
     }
 }

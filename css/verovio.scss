@@ -1230,12 +1230,28 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
                 }
 
                 .vrv-attribute-value {
-                    //width: 50%;
-
                     @extend .vrv-form-input;
                 }
 
             }
+
+            .vrv-show-more {
+                text-align: right;
+
+                span {
+                    user-select: none;
+                    color: $text-color;
+                }
+
+                span:hover {
+                    cursor: pointer;
+                }
+            }
+        }
+
+        // Hide the last row (show-more) of the last tbody
+        .vrv-attribute-table tbody:last-child tr:last-child {
+            display: none;
         }
     }
 

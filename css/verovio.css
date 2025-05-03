@@ -695,13 +695,17 @@
         .vrv-wrapper .vrv-attribute-list-wrapper .vrv-attribute-table .vrv-attribute-item .vrv-attribute-value select {
           box-sizing: border-box;
           width: 100%; }
-          .vrv-wrapper .vrv-attribute-list-wrapper .vrv-attribute-table .vrv-attribute-item .vrv-attribute-name input option,
-          .vrv-wrapper .vrv-attribute-list-wrapper .vrv-attribute-table .vrv-attribute-item .vrv-attribute-name select option,
-          .vrv-wrapper .vrv-attribute-list-wrapper .vrv-attribute-table .vrv-attribute-item .vrv-attribute-value input option,
-          .vrv-wrapper .vrv-attribute-list-wrapper .vrv-attribute-table .vrv-attribute-item .vrv-attribute-value select option {
-            background-color: firebrick; }
       .vrv-wrapper .vrv-attribute-list-wrapper .vrv-attribute-table .vrv-attribute-item .vrv-attribute-name {
         padding-left: 6px; }
+      .vrv-wrapper .vrv-attribute-list-wrapper .vrv-attribute-table .vrv-show-more {
+        text-align: right; }
+        .vrv-wrapper .vrv-attribute-list-wrapper .vrv-attribute-table .vrv-show-more span {
+          user-select: none;
+          color: white; }
+        .vrv-wrapper .vrv-attribute-list-wrapper .vrv-attribute-table .vrv-show-more span:hover {
+          cursor: pointer; }
+    .vrv-wrapper .vrv-attribute-list-wrapper .vrv-attribute-table tbody:last-child tr:last-child {
+      display: none; }
   .vrv-wrapper .vrv-reference-list-wrapper {
     overflow-y: auto;
     height: 100%; }
