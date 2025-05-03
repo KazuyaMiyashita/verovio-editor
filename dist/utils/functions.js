@@ -28,6 +28,9 @@ export function appendLinkTo(parent, options) {
 export function appendOptionTo(parent, options) {
     return appendHTMLElementTo(parent, options, 'option');
 }
+export function appendOptGroupTo(parent, options) {
+    return appendHTMLElementTo(parent, options, 'optgroup');
+}
 export function appendSelectTo(parent, options) {
     return appendHTMLElementTo(parent, options, 'select');
 }
@@ -41,6 +44,9 @@ export function appendSummaryTo(parent, options) {
 }
 export function appendTableTo(parent, options) {
     return appendHTMLElementTo(parent, options, 'table');
+}
+export function appendTBodyTo(parent, options) {
+    return appendHTMLElementTo(parent, options, 'tbody');
 }
 export function appendTdTo(parent, options) {
     return appendHTMLElementTo(parent, options, 'td');

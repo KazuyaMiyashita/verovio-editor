@@ -35,8 +35,12 @@ export function appendLinkTo(parent: HTMLElement, options: object): HTMLLinkElem
     return <HTMLLinkElement>appendHTMLElementTo(parent, options, 'link');
 }
 
-export function appendOptionTo(parent: HTMLSelectElement, options: object): HTMLOptionElement {
+export function appendOptionTo(parent: HTMLElement, options: object): HTMLOptionElement {
     return <HTMLOptionElement>appendHTMLElementTo(parent, options, 'option');
+}
+
+export function appendOptGroupTo(parent: HTMLSelectElement, options: object): HTMLOptGroupElement {
+    return <HTMLOptGroupElement>appendHTMLElementTo(parent, options, 'optgroup');
 }
 
 export function appendSelectTo(parent: HTMLElement, options: object): HTMLSelectElement {
@@ -57,11 +61,15 @@ export function appendTableTo(parent: HTMLElement, options: object): HTMLTableEl
     return <HTMLTableElement>appendHTMLElementTo(parent, options, 'table');
 }
 
+export function appendTBodyTo(parent: HTMLElement, options: object): HTMLElement {
+    return <HTMLElement>appendHTMLElementTo(parent, options, 'tbody');
+}
+
 export function appendTdTo(parent: HTMLTableRowElement, options: object): HTMLTableCellElement {
     return <HTMLTableCellElement>appendHTMLElementTo(parent, options, 'td');
 }
 
-export function appendTrTo(parent: HTMLTableElement, options: object): HTMLTableRowElement {
+export function appendTrTo(parent: HTMLElement, options: object): HTMLTableRowElement {
     return <HTMLTableRowElement>appendHTMLElementTo(parent, options, 'tr');
 }
 

@@ -62,6 +62,7 @@ export class App {
             //schemaDefault: './local/mei-all.rng',
             schema: 'https://music-encoding.org/schema/5.1/mei-all.rng',
             //schema: './local/mei-all.rng',
+            schemaBasic: 'https://music-encoding.org/schema/5.1/mei-basic.rng',
             defaultView: 'responsive',
             isSafari: false
         }, options);
@@ -165,6 +166,7 @@ export class App {
             const validatorWorker = new Worker(validatorWorkerURL);
             this.validator = new ValidatorWorkerProxy(validatorWorker);
             this.rngLoader = new RNGLoader();
+            this.rngLoaderBasic = new RNGLoader();
         }
         // Set to true when everything is loaded
         this.appIsLoaded = false;
@@ -195,6 +197,10 @@ export class App {
                         console.log("Schema loaded", res);
                     }
                     this.rngLoader.setRelaxNGSchema(data);
+                    const responseBasic = await fetch(this.options.schemaBasic);
+                    const dataBasic = await responseBasic.text();
+                    console.log(this.options.schemaBasic);
+                    this.rngLoaderBasic.setRelaxNGSchema(dataBasic);
                     this.endLoading();
                     this.createInterfaceAndLoadData();
                 });

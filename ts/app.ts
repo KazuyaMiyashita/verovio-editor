@@ -56,6 +56,7 @@ export class App {
     public readonly verovio: VerovioWorkerProxy;
     public readonly validator: ValidatorWorkerProxy;
     public readonly rngLoader: RNGLoader;
+    public readonly rngLoaderBasic: RNGLoader;
 
     public readonly verovioOptions: VerovioView.Options;
 
@@ -141,6 +142,7 @@ export class App {
             //schemaDefault: './local/mei-all.rng',
             schema: 'https://music-encoding.org/schema/5.1/mei-all.rng',
             //schema: './local/mei-all.rng',
+            schemaBasic: 'https://music-encoding.org/schema/5.1/mei-basic.rng',
 
             defaultView: 'responsive',
 
@@ -274,6 +276,7 @@ export class App {
             const validatorWorker = new Worker(validatorWorkerURL);
             this.validator = new ValidatorWorkerProxy(validatorWorker);
             this.rngLoader = new RNGLoader();
+            this.rngLoaderBasic = new RNGLoader();
         }
 
         // Set to true when everything is loaded
@@ -310,6 +313,12 @@ export class App {
                         console.log("Schema loaded", res);
                     }
                     this.rngLoader.setRelaxNGSchema(data);
+
+                    const responseBasic = await fetch(this.options.schemaBasic);
+                    const dataBasic = await responseBasic.text();
+                    console.log(this.options.schemaBasic);
+                    this.rngLoaderBasic.setRelaxNGSchema(dataBasic);
+
                     this.endLoading();
                     this.createInterfaceAndLoadData();
                 });
@@ -921,6 +930,7 @@ export namespace App {
         responsiveZoom: number;
         schemaDefault: string;
         schema: string;
+        schemaBasic: string;
         verovioVersion: string;
     }
 

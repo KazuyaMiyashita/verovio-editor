@@ -675,7 +675,7 @@
   .vrv-wrapper .vrv-attribute-list-wrapper {
     overflow-y: auto;
     height: 100%; }
-    .vrv-wrapper .vrv-attribute-list-wrapper input {
+    .vrv-wrapper .vrv-attribute-list-wrapper > input {
       box-sizing: border-box;
       width: 100%;
       background-color: #6f6f6f;
@@ -695,6 +695,11 @@
         .vrv-wrapper .vrv-attribute-list-wrapper .vrv-attribute-table .vrv-attribute-item .vrv-attribute-value select {
           box-sizing: border-box;
           width: 100%; }
+          .vrv-wrapper .vrv-attribute-list-wrapper .vrv-attribute-table .vrv-attribute-item .vrv-attribute-name input option,
+          .vrv-wrapper .vrv-attribute-list-wrapper .vrv-attribute-table .vrv-attribute-item .vrv-attribute-name select option,
+          .vrv-wrapper .vrv-attribute-list-wrapper .vrv-attribute-table .vrv-attribute-item .vrv-attribute-value input option,
+          .vrv-wrapper .vrv-attribute-list-wrapper .vrv-attribute-table .vrv-attribute-item .vrv-attribute-value select option {
+            background-color: firebrick; }
       .vrv-wrapper .vrv-attribute-list-wrapper .vrv-attribute-table .vrv-attribute-item .vrv-attribute-name {
         padding-left: 6px; }
   .vrv-wrapper .vrv-reference-list-wrapper {
