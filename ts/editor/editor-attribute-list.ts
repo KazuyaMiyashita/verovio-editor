@@ -53,6 +53,7 @@ export class EditorAttributeList extends GenericView {
         this.types = {};
 
         if (object.text) {
+            this.elementId = object.id;
             this.loadText(object.text);
         }
         else {
@@ -75,6 +76,8 @@ export class EditorAttributeList extends GenericView {
     private loadText(text: string) {
         let textInput = appendInputTo(this.listWrapper, { class: `vrv-form-input` });
         textInput.value = text;
+        textInput.dataset.attName = "text";
+        this.eventManager.bind(textInput, 'input', this.onInputInput);
     }
 
     private loadAttributes(attributes: Record<string, string>): void {
@@ -262,6 +265,7 @@ export class EditorAttributeList extends GenericView {
     }
 
     private editAttributeValue(name: string, value: string) {
+        console.log(this.elementId, name, value);
         this.actionManager.setAttrValue(name, value, this.elementId);
         this.actionManager.commit(this);
     }
