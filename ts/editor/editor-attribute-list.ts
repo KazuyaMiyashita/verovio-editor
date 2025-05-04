@@ -10,6 +10,7 @@ export class EditorAttributeList extends GenericView {
     public readonly eventManager: EventManager;
 
     private listWrapper: HTMLDivElement;
+    private listWrapperChild: HTMLElement;
 
     private element: string;
     private elementId: string;
@@ -34,6 +35,7 @@ export class EditorAttributeList extends GenericView {
         this.eventManager = new EventManager(this);
 
         this.listWrapper = appendDivTo(this.div, { class: `vrv-attribute-list-wrapper` });
+        this.listWrapperChild = undefined;
 
         this.element = "";
         this.elementId = "";
@@ -49,6 +51,7 @@ export class EditorAttributeList extends GenericView {
     public loadAttributesOrText(object: GenericTree.Object): void {
         this.listWrapper.innerHTML = "";
         this.eventManager.unbindAll();
+        if (this.listWrapperChild) this.listWrapperChild.remove();
 
         this.element = "";
         this.attributes = {};
@@ -81,12 +84,14 @@ export class EditorAttributeList extends GenericView {
         textInput.value = text;
         textInput.dataset.attName = "text";
         this.eventManager.bind(textInput, 'input', this.onInputInput);
+        this.listWrapperChild = textInput;
     }
 
     private loadAttributes(attributes: Record<string, string>): void {
         let filter = appendDivTo(this.listWrapper, { class: `vrv-attribute-filter` });
 
         let table = appendTableTo(this.listWrapper, { class: `vrv-attribute-table` });
+        this.listWrapperChild = table;
 
         let tBodyUsed = appendTBodyTo(table, {});
         if (Object.entries(attributes).length > 0) {

@@ -59,6 +59,7 @@ export class EventManager {
                     el.removeEventListener(ev, boundFunction);
                 }
             }
+            delete this.cache[appID]
         }
     }
 
@@ -80,5 +81,6 @@ export class EventManager {
                 }
             }
         }
+        this.cache = {};
     }
 }

@@ -46,6 +46,7 @@ export class EventManager {
                     el.removeEventListener(ev, boundFunction);
                 }
             }
+            delete this.cache[appID];
         }
     }
     // Unbinds everything managed by this
@@ -65,6 +66,7 @@ export class EventManager {
                 }
             }
         }
+        this.cache = {};
     }
 }
 //# sourceMappingURL=event-manager.js.map
