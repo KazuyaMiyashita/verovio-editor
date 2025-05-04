@@ -173,7 +173,7 @@ export class App {
         this.appIsLoaded = false;
         // Use to avoid saving config when resetting the app
         this.appReset = false;
-        this.mei = "";
+        this.inputData = "";
         this.filename = "untitled.xml";
         const last = this.fileStack.getLast();
         if (last) {
@@ -282,7 +282,7 @@ export class App {
         }
         this.appIsLoaded = true;
         this.endLoading();
-        if (this.mei) {
+        if (this.inputData) {
             this.loadMEI(false);
         }
     }
@@ -352,16 +352,16 @@ export class App {
         xHttp.open("GET", `${this.host}${filter}`, true);
         xHttp.send();
     }
-    loadData(mei, filename = "untitled.xml", convert = false, onlyIfEmpty = false) {
-        if (this.mei.length != 0) {
+    loadData(data, filename = "untitled.xml", convert = false, onlyIfEmpty = false) {
+        if (this.inputData.length != 0) {
             // This is useful for loading the app with a default file but not if one exists
             if (onlyIfEmpty)
                 return;
-            this.fileStack.store(this.filename, this.mei);
+            this.fileStack.store(this.filename, this.inputData);
             if (this.toolbarObj !== null)
                 this.toolbarObj.updateRecent();
         }
-        this.mei = mei;
+        this.inputData = data;
         this.filename = filename;
         if (this.appIsLoaded) {
             this.loadMEI(convert);
@@ -390,12 +390,12 @@ export class App {
         this.startLoading("Loading the MEI data ...");
         if (convert) {
             console.log("Converting to MEI");
-            await this.verovio.loadData(this.mei);
-            this.mei = await this.verovio.getMEI({});
+            await this.verovio.loadData(this.inputData);
+            this.inputData = await this.verovio.getMEI({});
         }
         if (this.viewEditorObj) {
             this.viewEditorObj.setXmlEditorEnabled(false);
-            this.viewEditorObj.xmlEditorViewObj.setMode(this.mei.length);
+            this.viewEditorObj.xmlEditorViewObj.setMode(this.inputData.length);
         }
         await this.checkSchema();
         let event = new CustomEvent('onLoadData', {
@@ -403,7 +403,7 @@ export class App {
                 currentId: this.clientId,
                 caller: this.view,
                 lightEndLoading: false,
-                mei: this.mei
+                mei: this.inputData
             }
         });
         this.view.customEventManager.dispatch(event);
@@ -418,11 +418,11 @@ export class App {
         if (!this.options.enableEditor)
             return;
         const hasSchema = /<\?xml-model.*schematypens=\"http?:\/\/relaxng\.org\/ns\/structure\/1\.0\"/;
-        const hasSchemaMatch = hasSchema.exec(this.mei);
+        const hasSchemaMatch = hasSchema.exec(this.inputData);
         if (!hasSchemaMatch)
             return;
         const schema = /<\?xml-model.*href="([^"]*).*/;
-        const schemaMatch = schema.exec(this.mei);
+        const schemaMatch = schema.exec(this.inputData);
         if (schemaMatch && schemaMatch[1] !== this.currentSchema) {
             this.currentSchema = this.options.schemaDefault;
             const dlg = new Dialog(this.dialogDiv, this, "Different Schema in the file", { icon: "warning", type: Dialog.Type.Msg });
@@ -498,7 +498,7 @@ export class App {
         delete this.options['selection'];
         delete this.options['editorial'];
         window.localStorage.setItem("options", JSON.stringify(this.options));
-        this.fileStack.store(this.filename, this.mei);
+        this.fileStack.store(this.filename, this.inputData);
     }
     onResize(e) {
         clearTimeout(this.resizeTimer);
@@ -594,7 +594,12 @@ export class App {
         this.generateMIDI();
     }
     async fileCopyToClipboard(e) {
-        this.fileCopy.value = this.mei;
+        const dlg = new DialogExport(this.dialogDiv, this, "Select MEI export parameters");
+        const dlgRes = await dlg.show();
+        if (dlgRes === 0)
+            return;
+        const mei = await this.verovio.getMEI(dlg.getExportOptions());
+        this.fileCopy.value = mei;
         this.fileCopy.select();
         document.execCommand('copy');
         this.showNotification("MEI copied to clipboard");
