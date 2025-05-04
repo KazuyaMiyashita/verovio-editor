@@ -19,7 +19,7 @@ export class EditorContentPanel extends GenericView {
         this.customEventManager.addToPropagationList(this.contentTreeObj.customEventManager);
         let attributeFieldSet = this.addFieldSet("Attributes or text", 3);
         this.attributeList = appendDivTo(attributeFieldSet, { class: `vrv-field-set-panel` });
-        this.attributeListObj = new EditorAttributeList(this.attributeList, this.app, this.actionManager);
+        this.attributeListObj = new EditorAttributeList(this.attributeList, this.app, this.tab, this.actionManager);
         this.customEventManager.addToPropagationList(this.attributeListObj.customEventManager);
         let referencesFromFieldSet = this.addFieldSet("Referencing elements");
         this.referencesFrom = appendDivTo(referencesFromFieldSet, { class: `vrv-field-set-panel` });

@@ -73,6 +73,8 @@ export class TabGroup extends GenericView {
     onEditData(e) {
         if (!super.onEditData(e))
             return false;
+        if (this.selectedTab === e.detail.caller)
+            return false;
         this.selectedTab.customEventManager.dispatch(e);
         return true;
     }
@@ -84,6 +86,8 @@ export class TabGroup extends GenericView {
     }
     onSelect(e) {
         if (!super.onSelect(e))
+            return false;
+        if (this.selectedTab === e.detail.caller)
             return false;
         this.selectedTab.customEventManager.dispatch(e);
         return true;

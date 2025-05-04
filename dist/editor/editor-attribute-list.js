@@ -2,12 +2,13 @@ import { EventManager } from '../events/event-manager.js';
 import { GenericView } from '../utils/generic-view.js';
 import { appendDivTo, appendOptionTo, appendSelectTo, appendTableTo, appendTrTo, appendTdTo, appendInputTo, appendOptGroupTo, appendTBodyTo, appendSpanTo } from '../utils/functions.js';
 export class EditorAttributeList extends GenericView {
-    constructor(div, app, actionManager) {
+    constructor(div, app, tab, actionManager) {
         super(div, app);
         this.patternMap = [
             [/^.*@pname$/, this.customAllPname]
         ];
         this.setDisplayFlex();
+        this.tab = tab;
         this.actionManager = actionManager;
         this.eventManager = new EventManager(this);
         this.listWrapper = appendDivTo(this.div, { class: `vrv-attribute-list-wrapper` });
@@ -220,7 +221,7 @@ export class EditorAttributeList extends GenericView {
     editAttributeValue(name, value) {
         console.log(this.elementId, name, value);
         this.actionManager.setAttrValue(name, value, this.elementId);
-        this.actionManager.commit(this);
+        this.actionManager.commit(this.tab);
     }
     //////////////////////////////////////////////////////////////////////////
     // Event methods

@@ -3,6 +3,7 @@ import { App } from '../app.js';
 import { EventManager } from '../events/event-manager.js';
 import { GenericTree } from '../utils/generic-tree.js';
 import { GenericView } from '../utils/generic-view.js';
+import { Tab } from '../utils/tab-group.js';
 import { appendDivTo, appendOptionTo, appendSelectTo, appendTableTo, appendTrTo, appendTdTo, appendInputTo, appendOptGroupTo, appendTBodyTo, appendSpanTo } from '../utils/functions.js';
 
 export class EditorAttributeList extends GenericView {
@@ -16,16 +17,18 @@ export class EditorAttributeList extends GenericView {
     private attributesBasic: Object;
     private types: Object;
 
-    private actionManager: ActionManager;
+    private readonly tab: Tab;
+    private readonly actionManager: ActionManager;
 
     private readonly patternMap: Array<[RegExp, (cell: HTMLTableCellElement, value: string) => HTMLSelectElement | HTMLInputElement]> = [
         [/^.*@pname$/, this.customAllPname]
     ];
 
-    constructor(div: HTMLDivElement, app: App, actionManager: ActionManager) {
+    constructor(div: HTMLDivElement, app: App, tab: Tab, actionManager: ActionManager) {
         super(div, app);
         this.setDisplayFlex();
 
+        this.tab = tab;
         this.actionManager = actionManager;
 
         this.eventManager = new EventManager(this);
@@ -267,7 +270,7 @@ export class EditorAttributeList extends GenericView {
     private editAttributeValue(name: string, value: string) {
         console.log(this.elementId, name, value);
         this.actionManager.setAttrValue(name, value, this.elementId);
-        this.actionManager.commit(this);
+        this.actionManager.commit(this.tab);
     }
 
     //////////////////////////////////////////////////////////////////////////

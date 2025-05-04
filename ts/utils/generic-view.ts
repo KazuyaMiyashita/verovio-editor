@@ -102,6 +102,7 @@ export class GenericView {
 
     onEditData(e: CustomEvent): boolean {
         if (!this.active) return false;
+        if (this === e.detail.caller) return false;
         //console.debug("GenericView::onEditData");
         return true;
     }

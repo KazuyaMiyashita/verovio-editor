@@ -76,6 +76,8 @@ export class GenericView {
     onEditData(e) {
         if (!this.active)
             return false;
+        if (this === e.detail.caller)
+            return false;
         //console.debug("GenericView::onEditData");
         return true;
     }
