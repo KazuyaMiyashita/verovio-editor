@@ -19,7 +19,7 @@
 .vrv-toggleable.toggled, .vrv-wrapper .vrv-toolbar .toggled.vrv-btn, .vrv-wrapper .vrv-editor-toolbar .toggled.vrv-btn, .vrv-wrapper .vrv-toolbar .toggled.vrv-btn-icon-large, .vrv-wrapper .vrv-editor-toolbar .toggled.vrv-btn-icon-large, .vrv-wrapper .vrv-toolbar .toggled.vrv-btn-text, .vrv-wrapper .vrv-editor-toolbar .toggled.vrv-btn-text, .vrv-wrapper .vrv-toolbar .vrv-menu-content .toggled.vrv-menu-text, .vrv-wrapper .vrv-editor-toolbar .vrv-menu-content .toggled.vrv-menu-text, .vrv-wrapper .vrv-toolbar .vrv-menu-content .toggled.vrv-submenu-text, .vrv-wrapper .vrv-editor-toolbar .vrv-menu-content .toggled.vrv-submenu-text, .vrv-wrapper .vrv-toolbar .toggled.vrv-btn-icon, .vrv-wrapper .vrv-editor-toolbar .toggled.vrv-btn-icon, .vrv-wrapper .vrv-toolbar .toggled.vrv-btn-icon-left, .vrv-wrapper .vrv-editor-toolbar .toggled.vrv-btn-icon-left, .vrv-wrapper .vrv-toolbar .toggled.vrv-menu-icon-left, .vrv-wrapper .vrv-editor-toolbar .toggled.vrv-menu-icon-left {
   background-color: #232323; }
 
-.vrv-disableable.disabled, .vrv-wrapper .vrv-dialog .vrv-dialog-box .disabled.vrv-dialog-btn, .vrv-wrapper .vrv-toolbar .disabled.vrv-btn, .vrv-wrapper .vrv-editor-toolbar .disabled.vrv-btn, .vrv-wrapper .vrv-toolbar .disabled.vrv-btn-icon-large, .vrv-wrapper .vrv-editor-toolbar .disabled.vrv-btn-icon-large, .vrv-wrapper .vrv-toolbar .disabled.vrv-btn-text, .vrv-wrapper .vrv-editor-toolbar .disabled.vrv-btn-text, .vrv-wrapper .vrv-toolbar .vrv-menu-content .disabled.vrv-menu-text, .vrv-wrapper .vrv-editor-toolbar .vrv-menu-content .disabled.vrv-menu-text, .vrv-wrapper .vrv-toolbar .vrv-menu-content .disabled.vrv-submenu-text, .vrv-wrapper .vrv-editor-toolbar .vrv-menu-content .disabled.vrv-submenu-text, .vrv-wrapper .vrv-toolbar .disabled.vrv-btn-icon, .vrv-wrapper .vrv-editor-toolbar .disabled.vrv-btn-icon, .vrv-wrapper .vrv-toolbar .disabled.vrv-btn-icon-left, .vrv-wrapper .vrv-editor-toolbar .disabled.vrv-btn-icon-left, .vrv-wrapper .vrv-toolbar .disabled.vrv-menu-icon-left, .vrv-wrapper .vrv-editor-toolbar .disabled.vrv-menu-icon-left {
+.vrv-disableable.disabled, .vrv-wrapper .disabled.vrv-form-input, .vrv-wrapper .vrv-attribute-list-wrapper .vrv-attribute-table .vrv-attribute-item .disabled.vrv-attribute-value, .vrv-wrapper .vrv-dialog-form .disabled.vrv-dialog-input, .vrv-wrapper .vrv-dialog .vrv-dialog-box .disabled.vrv-dialog-btn, .vrv-wrapper .vrv-toolbar .disabled.vrv-btn, .vrv-wrapper .vrv-editor-toolbar .disabled.vrv-btn, .vrv-wrapper .vrv-toolbar .disabled.vrv-btn-icon-large, .vrv-wrapper .vrv-editor-toolbar .disabled.vrv-btn-icon-large, .vrv-wrapper .vrv-toolbar .disabled.vrv-btn-text, .vrv-wrapper .vrv-editor-toolbar .disabled.vrv-btn-text, .vrv-wrapper .vrv-toolbar .vrv-menu-content .disabled.vrv-menu-text, .vrv-wrapper .vrv-editor-toolbar .vrv-menu-content .disabled.vrv-menu-text, .vrv-wrapper .vrv-toolbar .vrv-menu-content .disabled.vrv-submenu-text, .vrv-wrapper .vrv-editor-toolbar .vrv-menu-content .disabled.vrv-submenu-text, .vrv-wrapper .vrv-toolbar .disabled.vrv-btn-icon, .vrv-wrapper .vrv-editor-toolbar .disabled.vrv-btn-icon, .vrv-wrapper .vrv-toolbar .disabled.vrv-btn-icon-left, .vrv-wrapper .vrv-editor-toolbar .disabled.vrv-btn-icon-left, .vrv-wrapper .vrv-toolbar .disabled.vrv-menu-icon-left, .vrv-wrapper .vrv-editor-toolbar .disabled.vrv-menu-icon-left {
   opacity: 0.5;
   pointer-events: none; }
 
@@ -702,6 +702,12 @@
         .vrv-wrapper .vrv-attribute-list-wrapper .vrv-attribute-table .vrv-show-more span {
           user-select: none;
           color: white; }
+        .vrv-wrapper .vrv-attribute-list-wrapper .vrv-attribute-table .vrv-show-more span.close.more::after {
+          content: "Show more ..."; }
+        .vrv-wrapper .vrv-attribute-list-wrapper .vrv-attribute-table .vrv-show-more span.close.all::after {
+          content: "Show all ..."; }
+        .vrv-wrapper .vrv-attribute-list-wrapper .vrv-attribute-table .vrv-show-more span:not(close)::after {
+          content: "Show less"; }
         .vrv-wrapper .vrv-attribute-list-wrapper .vrv-attribute-table .vrv-show-more span:hover {
           cursor: pointer; }
     .vrv-wrapper .vrv-attribute-list-wrapper .vrv-attribute-table tbody:last-child tr:last-child {

@@ -235,6 +235,7 @@ export class ActionManager {
     }
 
     public async setAttrValueForTypes(attribute: string, value: string, elementTypes: Array<string> = []): Promise<any> {
+        /*
         let chain = new Array();
         for (const item of this.editorViewObj.getSelection()) {
             if (elementTypes.length > 0 && !elementTypes.includes(item.element)) continue;
@@ -263,5 +264,6 @@ export class ActionManager {
         //await this.view.verovio.redoLayout();
         await this.editorViewObj.renderPage(true);
         //this.editorViewObj.updateMEI();
+        */
     }
 }

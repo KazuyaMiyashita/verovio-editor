@@ -21,8 +21,17 @@ export class EditorAttributeList extends GenericView {
     private readonly tab: Tab;
     private readonly actionManager: ActionManager;
 
-    private readonly patternMap: Array<[RegExp, (cell: HTMLTableCellElement, value: string) => HTMLSelectElement | HTMLInputElement]> = [
+    private readonly customMethodsMap: Array<[RegExp, (cell: HTMLTableCellElement, value: string) => HTMLSelectElement | HTMLInputElement]> = [
         [/^.*@pname$/, this.customAllPname]
+    ];
+
+    private static readonly readOnlyAttributes: RegExp[] = [
+        /.*@xml:id/,
+        /.*@startid/,
+        /.*@endid/,
+        /.*@plist/,
+        /.*@copyof/,
+        /[staff|layer]@n$/,
     ];
 
     constructor(div: HTMLDivElement, app: App, tab: Tab, actionManager: ActionManager) {
@@ -75,6 +84,8 @@ export class EditorAttributeList extends GenericView {
                 this.attributesBasic = tagsBasic.attrs;
             }
 
+            // The xml:id is not in the attribute list
+            object.attributes['xml:id'] = object.id;
             this.loadAttributes(object.attributes);
         }
     }
@@ -94,15 +105,11 @@ export class EditorAttributeList extends GenericView {
         this.listWrapperChild = table;
 
         let tBodyUsed = appendTBodyTo(table, {});
-        if (Object.entries(attributes).length > 0) {
-            Object.entries(attributes).forEach(([name, value]) => {
-                this.loadAttribute(tBodyUsed, name, value);
-            });
-            this.addShowMore(tBodyUsed, "Show more ...");
-        }
-        else {
-            this.addShowMore(tBodyUsed, "None set - show unset ...");
-        }
+        Object.entries(attributes).forEach(([name, value]) => {
+            this.loadAttribute(tBodyUsed, name, value);
+        });
+        this.addShowMore(tBodyUsed, true);
+
 
         let usedAttributes = Object.keys(attributes);
         let unusedAttributes = Object.keys(this.attributesBasic).filter(value => !usedAttributes.includes(value));
@@ -112,7 +119,7 @@ export class EditorAttributeList extends GenericView {
             unusedAttributes.forEach(name => {
                 this.loadAttribute(tBodyBasic, name, "");
             })
-            this.addShowMore(tBodyBasic, "Show all ...");
+            this.addShowMore(tBodyBasic, false);
 
         }
 
@@ -124,7 +131,7 @@ export class EditorAttributeList extends GenericView {
             unusedAttributes.forEach(name => {
                 this.loadAttribute(tBodyAll, name, "");
             })
-            this.addShowMore(tBodyAll, "");
+            this.addShowMore(tBodyAll, false);
         }
     }
 
@@ -134,7 +141,8 @@ export class EditorAttributeList extends GenericView {
         nameCell.innerHTML = name;
         let valueCell = appendTdTo(attRow, { class: `vrv-attribute-value` });
 
-        let custom = this.findCustomOptionMethod(`${this.element}@${name}`);
+        const elementAttributePattern = `${this.element}@${name}`;
+        let custom = this.findCustomOptionMethod(elementAttributePattern);
         let selectOrInput;
         if (custom) {
             selectOrInput = custom.call(this, valueCell, value);
@@ -160,6 +168,7 @@ export class EditorAttributeList extends GenericView {
             input.dataset.attName = name;
             this.eventManager.bind(input, 'input', this.onInputInput);
         }
+        if (this.isReadOnly(elementAttributePattern)) selectOrInput.classList.add("disabled");
     }
 
     private attributeNumber(cell: HTMLTableCellElement, name: string, value: string): HTMLInputElement {
@@ -220,12 +229,19 @@ export class EditorAttributeList extends GenericView {
     }
 
     private findCustomOptionMethod(input: string): Function {
-        for (const [pattern, method] of this.patternMap) {
+        for (const [pattern, method] of this.customMethodsMap) {
             if (pattern.test(input)) {
                 return method;
             }
         }
         return undefined;
+    }
+
+    private isReadOnly(input: string): boolean {
+        for (const pattern of EditorAttributeList.readOnlyAttributes) {
+            if (pattern.test(input)) return true;
+        }
+        return false
     }
 
     private customAllPname(cell: HTMLTableCellElement, value: string): HTMLSelectElement {
@@ -234,10 +250,10 @@ export class EditorAttributeList extends GenericView {
         return select;
     }
 
-    private addShowMore(tbody: HTMLElement, label: string) {
+    private addShowMore(tbody: HTMLElement, more: boolean) {
         let row = appendTrTo(tbody, {});
         let cell = appendTdTo(row, { colspan: "2", class: `vrv-show-more` });
-        let span = appendSpanTo(cell, {}, label);
+        let span = appendSpanTo(cell, { class: `close ${(more) ? "more" : "all"}` });
         this.eventManager.bind(span, 'click', this.onShowMore);
     }
 
@@ -323,8 +339,8 @@ export class EditorAttributeList extends GenericView {
         const nextTbody = thisTbody.nextElementSibling as HTMLElement;
 
         if (nextTbody) {
-            nextTbody.style.display = 'table-row-group';
-            element.style.display = 'none';
+            nextTbody.style.display = (nextTbody.style.display === 'none') ? 'table-row-group' : 'none';
+            element.classList.toggle("close");
         }
     }
 }

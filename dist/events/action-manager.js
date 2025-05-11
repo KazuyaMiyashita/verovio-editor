@@ -192,10 +192,10 @@ export class ActionManager {
         await this.editorViewObj.verovio.edit(editorAction);
     }
     async setAttrValueForTypes(attribute, value, elementTypes = []) {
+        /*
         let chain = new Array();
         for (const item of this.editorViewObj.getSelection()) {
-            if (elementTypes.length > 0 && !elementTypes.includes(item.element))
-                continue;
+            if (elementTypes.length > 0 && !elementTypes.includes(item.element)) continue;
             const editorAction = {
                 action: 'set',
                 param: {
@@ -206,18 +206,22 @@ export class ActionManager {
             };
             chain.push(editorAction);
         }
-        if (chain.length === 0)
-            return;
+
+        if (chain.length === 0) return;
+
         chain.push({ action: 'commit' });
+
         const editorAction = {
             action: 'chain',
             param: chain
-        };
+        }
         await this.editorViewObj.verovio.edit(editorAction);
+
         // WIP disable redo layout
         //await this.view.verovio.redoLayout();
         await this.editorViewObj.renderPage(true);
         //this.editorViewObj.updateMEI();
+        */
     }
 }
 //# sourceMappingURL=action-manager.js.map

@@ -4,7 +4,7 @@ import { appendDivTo, appendOptionTo, appendSelectTo, appendTableTo, appendTrTo,
 export class EditorAttributeList extends GenericView {
     constructor(div, app, tab, actionManager) {
         super(div, app);
-        this.patternMap = [
+        this.customMethodsMap = [
             [/^.*@pname$/, this.customAllPname]
         ];
         this.setDisplayFlex();
@@ -47,6 +47,8 @@ export class EditorAttributeList extends GenericView {
             if (tagsBasic) {
                 this.attributesBasic = tagsBasic.attrs;
             }
+            // The xml:id is not in the attribute list
+            object.attributes['xml:id'] = object.id;
             this.loadAttributes(object.attributes);
         }
     }
@@ -62,15 +64,10 @@ export class EditorAttributeList extends GenericView {
         let table = appendTableTo(this.listWrapper, { class: `vrv-attribute-table` });
         this.listWrapperChild = table;
         let tBodyUsed = appendTBodyTo(table, {});
-        if (Object.entries(attributes).length > 0) {
-            Object.entries(attributes).forEach(([name, value]) => {
-                this.loadAttribute(tBodyUsed, name, value);
-            });
-            this.addShowMore(tBodyUsed, "Show more ...");
-        }
-        else {
-            this.addShowMore(tBodyUsed, "None set - show unset ...");
-        }
+        Object.entries(attributes).forEach(([name, value]) => {
+            this.loadAttribute(tBodyUsed, name, value);
+        });
+        this.addShowMore(tBodyUsed, true);
         let usedAttributes = Object.keys(attributes);
         let unusedAttributes = Object.keys(this.attributesBasic).filter(value => !usedAttributes.includes(value));
         if (unusedAttributes.length > 0) {
@@ -79,7 +76,7 @@ export class EditorAttributeList extends GenericView {
             unusedAttributes.forEach(name => {
                 this.loadAttribute(tBodyBasic, name, "");
             });
-            this.addShowMore(tBodyBasic, "Show all ...");
+            this.addShowMore(tBodyBasic, false);
         }
         usedAttributes = usedAttributes.concat(unusedAttributes);
         unusedAttributes = Object.keys(this.attributes).filter(value => !usedAttributes.includes(value));
@@ -89,7 +86,7 @@ export class EditorAttributeList extends GenericView {
             unusedAttributes.forEach(name => {
                 this.loadAttribute(tBodyAll, name, "");
             });
-            this.addShowMore(tBodyAll, "");
+            this.addShowMore(tBodyAll, false);
         }
     }
     loadAttribute(tbody, name, value) {
@@ -97,7 +94,8 @@ export class EditorAttributeList extends GenericView {
         let nameCell = appendTdTo(attRow, { class: `vrv-attribute-name` });
         nameCell.innerHTML = name;
         let valueCell = appendTdTo(attRow, { class: `vrv-attribute-value` });
-        let custom = this.findCustomOptionMethod(`${this.element}@${name}`);
+        const elementAttributePattern = `${this.element}@${name}`;
+        let custom = this.findCustomOptionMethod(elementAttributePattern);
         let selectOrInput;
         if (custom) {
             selectOrInput = custom.call(this, valueCell, value);
@@ -122,6 +120,8 @@ export class EditorAttributeList extends GenericView {
             input.dataset.attName = name;
             this.eventManager.bind(input, 'input', this.onInputInput);
         }
+        if (this.isReadOnly(elementAttributePattern))
+            selectOrInput.classList.add("disabled");
     }
     attributeNumber(cell, name, value) {
         let input;
@@ -179,22 +179,29 @@ export class EditorAttributeList extends GenericView {
         });
     }
     findCustomOptionMethod(input) {
-        for (const [pattern, method] of this.patternMap) {
+        for (const [pattern, method] of this.customMethodsMap) {
             if (pattern.test(input)) {
                 return method;
             }
         }
         return undefined;
     }
+    isReadOnly(input) {
+        for (const pattern of EditorAttributeList.readOnlyAttributes) {
+            if (pattern.test(input))
+                return true;
+        }
+        return false;
+    }
     customAllPname(cell, value) {
         let select = appendSelectTo(cell, { class: `vrv-form-input` });
         this.addOptions(select, ["c", "d", "e", "f", "g", "a", "b"], value);
         return select;
     }
-    addShowMore(tbody, label) {
+    addShowMore(tbody, more) {
         let row = appendTrTo(tbody, {});
         let cell = appendTdTo(row, { colspan: "2", class: `vrv-show-more` });
-        let span = appendSpanTo(cell, {}, label);
+        let span = appendSpanTo(cell, { class: `close ${(more) ? "more" : "all"}` });
         this.eventManager.bind(span, 'click', this.onShowMore);
     }
     ////////////////////////////////////////////////////////////////////////
@@ -266,9 +273,17 @@ export class EditorAttributeList extends GenericView {
         const thisTbody = element.closest('tbody');
         const nextTbody = thisTbody.nextElementSibling;
         if (nextTbody) {
-            nextTbody.style.display = 'table-row-group';
-            element.style.display = 'none';
+            nextTbody.style.display = (nextTbody.style.display === 'none') ? 'table-row-group' : 'none';
+            element.classList.toggle("close");
         }
     }
 }
+EditorAttributeList.readOnlyAttributes = [
+    /.*@xml:id/,
+    /.*@startid/,
+    /.*@endid/,
+    /.*@plist/,
+    /.*@copyof/,
+    /[staff|layer]@n$/,
+];
 //# sourceMappingURL=editor-attribute-list.js.map

@@ -925,6 +925,7 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
     }
 
     .vrv-form-input {
+        @extend .vrv-disableable;
         background-color: $background;
         border: 1px solid $background-border;
         border-radius: 2px;
@@ -1241,6 +1242,18 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
                 span {
                     user-select: none;
                     color: $text-color;
+                }
+
+                span.close.more::after {
+                    content: "Show more ...";
+                }
+
+                span.close.all::after {
+                    content: "Show all ...";
+                }
+
+                span:not(close)::after {
+                    content: "Show less";
                 }
 
                 span:hover {
