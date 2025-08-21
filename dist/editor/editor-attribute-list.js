@@ -18,6 +18,7 @@ export class EditorAttributeList extends GenericView {
         this.attributes = {};
         this.attributesBasic = {};
         this.types = {};
+        this.editedText = false;
     }
     ////////////////////////////////////////////////////////////////////////
     // Class-specific methods
@@ -57,6 +58,7 @@ export class EditorAttributeList extends GenericView {
         textInput.value = text;
         textInput.dataset.attName = "text";
         this.eventManager.bind(textInput, 'input', this.onInputInput);
+        this.eventManager.bind(textInput, 'blur', this.onInputBlur);
         this.listWrapperChild = textInput;
     }
     loadAttributes(attributes) {
@@ -230,10 +232,15 @@ export class EditorAttributeList extends GenericView {
         });
         this.app.customEventManager.dispatch(event);
     }
-    editAttributeValue(name, value) {
+    editAttributeValue(name, value, commit) {
         console.log(this.elementId, name, value);
         this.actionManager.setAttrValue(name, value, this.elementId);
-        this.actionManager.commit(this.tab);
+        if (commit) {
+            this.actionManager.commit(this.tab);
+        }
+        else {
+            this.actionManager.editRefresh();
+        }
     }
     //////////////////////////////////////////////////////////////////////////
     // Event methods
@@ -247,8 +254,20 @@ export class EditorAttributeList extends GenericView {
     onInputInput(e) {
         const element = e.target;
         if (element.dataset.attName) {
-            this.editAttributeValue(element.dataset.attName, element.value);
+            // For text postpone commit to on blur
+            if (element.dataset.attName == 'text') {
+                this.editedText = true;
+                this.editAttributeValue(element.dataset.attName, element.value, false);
+            }
+            else {
+                this.editAttributeValue(element.dataset.attName, element.value, true);
+            }
         }
+    }
+    onInputBlur(e) {
+        if (this.editedText)
+            this.actionManager.commit(this.tab);
+        this.editedText = false;
     }
     onMouseover(e) {
         const element = e.target;
@@ -265,7 +284,7 @@ export class EditorAttributeList extends GenericView {
     onSelectChange(e) {
         const element = e.target;
         if (element.dataset.attName) {
-            this.editAttributeValue(element.dataset.attName, element.value);
+            this.editAttributeValue(element.dataset.attName, element.value, true);
         }
     }
     onShowMore(e) {

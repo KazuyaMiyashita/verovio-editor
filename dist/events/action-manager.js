@@ -26,6 +26,10 @@ export class ActionManager {
         });
         this.app.customEventManager.dispatch(event);
     }
+    async editRefresh() {
+        await this.editorViewObj.verovio.redoPagePitchPosLayout();
+        await this.editorViewObj.renderPage(true, false);
+    }
     /*
     public async delete(): Promise<any> {
         let chain = new Array();
@@ -76,8 +80,7 @@ export class ActionManager {
             param: chain
         };
         await this.editorViewObj.verovio.edit(editorAction);
-        await this.editorViewObj.verovio.redoPagePitchPosLayout();
-        await this.editorViewObj.renderPage(true, false);
+        await this.editRefresh();
     }
     async keyDown(key, shiftKey, ctrlKey) {
         let chain = new Array();

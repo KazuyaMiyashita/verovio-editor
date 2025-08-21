@@ -168,7 +168,7 @@ export class EditorView extends ResponsiveView {
     }
 
     public hasSelection(): boolean {
-        return (this.scrollListener.length > 0);
+        return (this.selectedItems.length > 0);
     }
 
     public getSelection(): Array<SelectedItem> {

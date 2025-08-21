@@ -139,7 +139,7 @@ export class EditorView extends ResponsiveView {
         this.selectedItems = [];
     }
     hasSelection() {
-        return (this.scrollListener.length > 0);
+        return (this.selectedItems.length > 0);
     }
     getSelection() {
         return this.selectedItems;

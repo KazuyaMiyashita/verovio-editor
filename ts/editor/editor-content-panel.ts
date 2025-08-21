@@ -65,7 +65,7 @@ export class EditorContentPanel extends GenericView {
         const contextOk = await this.app.verovio.edit({ action: 'context', param: { elementId: `${id}` } });
         if (contextOk) {
             const jsonContent = await this.app.verovio.editInfo() as EditorContentTree.Content;
-            console.log(jsonContent);
+            //console.log(jsonContent);
             this.contentTreeObj.loadContext(jsonContent);
             this.attributeListObj.loadAttributesOrText(jsonContent.object);
             this.referencesFromObj.loadList(jsonContent.referringElements, EditorReferenceList.Direction.From);
