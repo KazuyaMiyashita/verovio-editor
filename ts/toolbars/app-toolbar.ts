@@ -258,14 +258,14 @@ export class AppToolbar extends Toolbar {
     // Getters and setters
     ////////////////////////////////////////////////////////////////////////
 
-    public getMidiPlayerSubToolbar(): HTMLDivElement { return this.midiPlayerSubToolbar;  }
+    public getMidiPlayerSubToolbar(): HTMLDivElement { return this.midiPlayerSubToolbar; }
 
     ////////////////////////////////////////////////////////////////////////
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
 
     public updateRecent(): void {
-        this.subSubMenu.innerHTML = "";
+        this.subSubMenu.textContent = "";
 
         let fileList: Array<{ idx: number, filename: string }> = this.app.fileStack.fileList();
         for (let i = 0; i < fileList.length; i++) {
@@ -283,8 +283,8 @@ export class AppToolbar extends Toolbar {
         this.updateToolbarBtnEnabled(this.zoomIn, ((this.app.getPageCount() > 0) && (this.app.getToolbarView().getCurrentZoomIndex() < this.app.zoomLevels.length - 1)));
 
         let isResponsive = ((this.app.getView() instanceof ResponsiveView) && !(this.app.getView() instanceof EditorPanel));
-        let isEditor = (this.app.getView()  instanceof EditorPanel);
-        let isDocument = (this.app.getView()  instanceof DocumentView);
+        let isEditor = (this.app.getView() instanceof EditorPanel);
+        let isDocument = (this.app.getView() instanceof DocumentView);
 
         const hasSelection = (this.app.options.selection && Object.keys(this.app.options.selection).length !== 0);
 

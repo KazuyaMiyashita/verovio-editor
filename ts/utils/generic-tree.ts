@@ -277,7 +277,7 @@ export class TreeNode {
 
     public reset(): void {
         this.children.forEach(child => child.reset());
-        this.div.innerHTML = "";
+        this.div.textContent = "";
     }
 
     public html(div: HTMLDivElement, tree: GenericTree, hideLabel: boolean = false) {
@@ -301,7 +301,7 @@ export class TreeNode {
         if (this.attributes && this.attributes['n']) {
             labelStr += ` ${this.attributes['n']}`
         }
-        this.label.innerHTML = labelStr;
+        this.label.textContent = labelStr;
         //let cb = appendInputTo(this.label, { type: `checkbox` });
         let children = appendDivTo(this.div, { class: `vrv-node-children` });
         this.children.forEach(child => {

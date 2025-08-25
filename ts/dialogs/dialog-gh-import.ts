@@ -55,19 +55,19 @@ export class DialogGhImport extends Dialog {
         this.tabs = appendDivTo(tabGroup, { class: `vrv-tab-selectors` });
 
         this.tabUser = appendDivTo(this.tabs, { class: `vrv-tab-selector active`, dataset: { tab: `user` } });
-        this.tabUser.innerHTML = 'User / Organizations';
+        this.tabUser.textContent = 'User / Organizations';
         this.eventManager.bind(this.tabUser, 'click', this.selectTab);
 
         this.tabRepo = appendDivTo(this.tabs, { class: `vrv-tab-selector`, dataset: { tab: `rep` } });
-        this.tabRepo.innerHTML = 'Repositories';
+        this.tabRepo.textContent = 'Repositories';
         this.eventManager.bind(this.tabRepo, 'click', this.selectTab);
 
         this.tabBranch = appendDivTo(this.tabs, { class: `vrv-tab-selector`, dataset: { tab: `branch` } });
-        this.tabBranch.innerHTML = 'Branches';
+        this.tabBranch.textContent = 'Branches';
         this.eventManager.bind(this.tabBranch, 'click', this.selectTab);
 
         this.tabFile = appendDivTo(this.tabs, { class: `vrv-tab-selector`, dataset: { tab: `file` } });
-        this.tabFile.innerHTML = 'Files';
+        this.tabFile.textContent = 'Files';
         this.eventManager.bind(this.tabFile, 'click', this.selectTab);
 
         this.loading = appendDivTo(this.content, { class: `vrv-dialog-gh-loading` });
@@ -101,9 +101,9 @@ export class DialogGhImport extends Dialog {
 
     protected updateSelectionAndBreadcrumbs(): void {
         this.selection.style.display = 'none';
-        this.selection.innerHTML = '';
+        this.selection.textContent = '';
         this.selection.style.display = 'none';
-        this.breadCrumbs.innerHTML = '';
+        this.breadCrumbs.textContent = '';
         const icon: string = (this.githubManager.getSelectedOrganization() !== null) ? this.iconsInstitution : this.iconsUser;
         if (!this.addSelection(this.githubManager.getSelectedAccountName(), icon)) return;
         if (!this.addSelection(this.githubManager.getSelectedRepoName(), this.iconsRepo)) return;
@@ -120,13 +120,13 @@ export class DialogGhImport extends Dialog {
         });
         tab.classList.add("selected");
 
-        this.list.innerHTML = "";
+        this.list.textContent = "";
         this.list.style.display = 'none';
         this.loading.style.display = 'block';
     }
 
     private loadingEnd(): void {
-        this.list.innerHTML = "";
+        this.list.textContent = "";
         this.list.style.display = 'flex';
         this.loading.style.display = 'none';
     }
@@ -145,13 +145,13 @@ export class DialogGhImport extends Dialog {
         if (name === '') return false;
         this.selection.style.display = 'flex';
         const selection: HTMLDivElement = appendDivTo(this.selection, { class: `vrv-dialog-gh-selection-item`, style: { backgroundImage: `url(${icon})` } });
-        selection.innerHTML = name;
+        selection.textContent = name;
         return true;
     }
 
     private addCrumb(name: string, value: number): void {
         const crumb: HTMLDivElement = appendDivTo(this.breadCrumbs, { class: `vrv-path-breadcrumbs` });
-        crumb.innerHTML = name;
+        crumb.textContent = name;
         crumb.dataset.value = value.toString();
         this.eventManager.bind(crumb, 'click', this.selectCrumb);
     }

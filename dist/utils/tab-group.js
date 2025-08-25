@@ -9,7 +9,7 @@ export class TabGroup extends GenericView {
     constructor(div, app) {
         super(div, app);
         // Remove previous content
-        this.div.innerHTML = "";
+        this.div.textContent = "";
         this.tabSelectors = appendDivTo(this.div, { class: `vrv-tab-selectors` });
         this.tabs = new Array();
         this.selectedTab = null;
@@ -110,7 +110,7 @@ export class Tab extends GenericView {
         super(div, app);
         this.tabGroupObj = tabGroup;
         this.tabSelector = appendDivTo(tabGroup.tabSelectors, { class: `vrv-tab-selector`, dataset: { tab: `${this.id}` } });
-        this.tabSelector.innerHTML = label;
+        this.tabSelector.textContent = label;
         tabGroup.eventManager.bind(this.tabSelector, 'click', tabGroup.onSelectTab);
     }
     ////////////////////////////////////////////////////////////////////////

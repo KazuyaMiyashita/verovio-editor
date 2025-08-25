@@ -61,7 +61,7 @@ export class EditorAttributeList extends GenericView {
     ////////////////////////////////////////////////////////////////////////
 
     public loadAttributesOrText(object: GenericTree.Object): void {
-        this.listWrapper.innerHTML = "";
+        this.listWrapper.textContent = "";
         this.eventManager.unbindAll();
         if (this.listWrapperChild) this.listWrapperChild.remove();
 
@@ -142,7 +142,7 @@ export class EditorAttributeList extends GenericView {
     private loadAttribute(tbody: HTMLElement, name: string, value: string): void {
         let attRow = appendTrTo(tbody, { class: `vrv-attribute-item` });
         let nameCell = appendTdTo(attRow, { class: `vrv-attribute-name` });
-        nameCell.innerHTML = name;
+        nameCell.textContent = name;
         let valueCell = appendTdTo(attRow, { class: `vrv-attribute-value` });
 
         const elementAttributePattern = `${this.element}@${name}`;

@@ -10,7 +10,7 @@ export class Keyboard {
         let iconsRight = `${app.host}/icons/keyboard/right.png`;
         this.div = div;
         // Remove previous content
-        this.div.innerHTML = "";
+        this.div.textContent = "";
         this.app = app;
         this.midiPlayerElement = appendMidiPlayerTo(this.div, {});
         this.midiPlayerElement.setAttribute('src', midiScale);
@@ -29,7 +29,7 @@ export class Keyboard {
         this.octaveNumbers = [0, 1, 2, 3, 4, 5, 6, 7, 8];
         this.octaveNumbers.forEach(octave => {
             let oct = appendDivTo(this.octaves, { class: `vrv-keyboard-octave` });
-            oct.innerHTML = `C${octave}`;
+            oct.textContent = `C${octave}`;
             let midi = (octave + 1) * 12;
             let c2 = appendDivTo(this.keys, { class: `vrv-keyboard-key white`, 'data-midi': `${midi++}` });
             let c2s = appendDivTo(this.keys, { class: `vrv-keyboard-key black`, 'data-midi': `${midi++}` });

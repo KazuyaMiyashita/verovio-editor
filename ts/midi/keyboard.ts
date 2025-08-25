@@ -30,7 +30,7 @@ export class Keyboard {
 
         this.div = div;
         // Remove previous content
-        this.div.innerHTML = "";
+        this.div.textContent = "";
 
         this.app = app;
         this.midiPlayerElement = appendMidiPlayerTo(this.div, {});
@@ -56,7 +56,7 @@ export class Keyboard {
         this.octaveNumbers = [0, 1, 2, 3, 4, 5, 6, 7, 8];
         this.octaveNumbers.forEach(octave => {
             let oct = appendDivTo(this.octaves, { class: `vrv-keyboard-octave` });
-            oct.innerHTML = `C${octave}`;
+            oct.textContent = `C${octave}`;
 
             let midi = (octave + 1) * 12;
             let c2 = appendDivTo(this.keys, { class: `vrv-keyboard-key white`, 'data-midi': `${midi++}` });
@@ -98,7 +98,7 @@ export class Keyboard {
         setTimeout(() => {
             this.midiPlayerElement.stop();
         }, 500);
-          
+
     }
 
     ////////////////////////////////////////////////////////////////////////
@@ -109,7 +109,7 @@ export class Keyboard {
         this.boundKeyDown = (e: KeyboardEvent) => this.keyDownListener(e);
         this.boundKeyUp = (e: KeyboardEvent) => this.keyUpListener(e);
     }
-    
+
     private activateLower() {
         if (this.currentOctave <= 1) return;
         this.currentOctave--;
@@ -126,7 +126,7 @@ export class Keyboard {
         this.keys.querySelectorAll('.vrv-keyboard-key').forEach(element => element.classList.remove('selected'));
         this.octaves.querySelectorAll('.vrv-keyboard-octave').forEach(element => element.classList.remove('selected'));
 
-        
+
         let key = this.keys.children[(this.currentOctave - 1) * 12];
         this.letters.forEach(letter => {
             if (key) {

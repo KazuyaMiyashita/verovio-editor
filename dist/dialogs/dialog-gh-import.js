@@ -19,16 +19,16 @@ export class DialogGhImport extends Dialog {
         let tabGroup = appendDivTo(this.content, { class: `vrv-tab-group` });
         this.tabs = appendDivTo(tabGroup, { class: `vrv-tab-selectors` });
         this.tabUser = appendDivTo(this.tabs, { class: `vrv-tab-selector active`, dataset: { tab: `user` } });
-        this.tabUser.innerHTML = 'User / Organizations';
+        this.tabUser.textContent = 'User / Organizations';
         this.eventManager.bind(this.tabUser, 'click', this.selectTab);
         this.tabRepo = appendDivTo(this.tabs, { class: `vrv-tab-selector`, dataset: { tab: `rep` } });
-        this.tabRepo.innerHTML = 'Repositories';
+        this.tabRepo.textContent = 'Repositories';
         this.eventManager.bind(this.tabRepo, 'click', this.selectTab);
         this.tabBranch = appendDivTo(this.tabs, { class: `vrv-tab-selector`, dataset: { tab: `branch` } });
-        this.tabBranch.innerHTML = 'Branches';
+        this.tabBranch.textContent = 'Branches';
         this.eventManager.bind(this.tabBranch, 'click', this.selectTab);
         this.tabFile = appendDivTo(this.tabs, { class: `vrv-tab-selector`, dataset: { tab: `file` } });
-        this.tabFile.innerHTML = 'Files';
+        this.tabFile.textContent = 'Files';
         this.eventManager.bind(this.tabFile, 'click', this.selectTab);
         this.loading = appendDivTo(this.content, { class: `vrv-dialog-gh-loading` });
         this.list = appendDivTo(this.content, { class: `vrv-dialog-gh-list` });
@@ -53,9 +53,9 @@ export class DialogGhImport extends Dialog {
     ////////////////////////////////////////////////////////////////////////
     updateSelectionAndBreadcrumbs() {
         this.selection.style.display = 'none';
-        this.selection.innerHTML = '';
+        this.selection.textContent = '';
         this.selection.style.display = 'none';
-        this.breadCrumbs.innerHTML = '';
+        this.breadCrumbs.textContent = '';
         const icon = (this.githubManager.getSelectedOrganization() !== null) ? this.iconsInstitution : this.iconsUser;
         if (!this.addSelection(this.githubManager.getSelectedAccountName(), icon))
             return;
@@ -75,12 +75,12 @@ export class DialogGhImport extends Dialog {
             node.classList.remove("selected");
         });
         tab.classList.add("selected");
-        this.list.innerHTML = "";
+        this.list.textContent = "";
         this.list.style.display = 'none';
         this.loading.style.display = 'block';
     }
     loadingEnd() {
-        this.list.innerHTML = "";
+        this.list.textContent = "";
         this.list.style.display = 'flex';
         this.loading.style.display = 'none';
     }
@@ -99,12 +99,12 @@ export class DialogGhImport extends Dialog {
             return false;
         this.selection.style.display = 'flex';
         const selection = appendDivTo(this.selection, { class: `vrv-dialog-gh-selection-item`, style: { backgroundImage: `url(${icon})` } });
-        selection.innerHTML = name;
+        selection.textContent = name;
         return true;
     }
     addCrumb(name, value) {
         const crumb = appendDivTo(this.breadCrumbs, { class: `vrv-path-breadcrumbs` });
-        crumb.innerHTML = name;
+        crumb.textContent = name;
         crumb.dataset.value = value.toString();
         this.eventManager.bind(crumb, 'click', this.selectCrumb);
     }

@@ -36,7 +36,7 @@ export class Dialog {
 
         this.div = div;
         // Remove previous content
-        this.div.innerHTML = "";
+        this.div.textContent = "";
 
         this.app = app;
 
@@ -53,7 +53,7 @@ export class Dialog {
         this.icon.classList.add(this.options.icon);
 
         const titleDiv = appendDivTo(this.top, { class: `vrv-dialog-title` });
-        titleDiv.innerHTML = title;
+        titleDiv.textContent = title;
         this.close = appendDivTo(this.top, { class: `vrv-dialog-close` });
 
         // The content of the dialog

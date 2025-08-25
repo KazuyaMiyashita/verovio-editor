@@ -49,7 +49,7 @@ export function appendSelectTo(parent: HTMLElement, options: object): HTMLSelect
 
 export function appendSpanTo(parent: HTMLElement, options: object, text: string = ""): HTMLSpanElement {
     let span = appendHTMLElementTo(parent, options, 'span');
-    span.innerHTML = text;
+    span.textContent = text;
     return <HTMLSpanElement>span;
 }
 

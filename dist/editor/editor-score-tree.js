@@ -18,7 +18,7 @@ export class EditorScoreTree extends GenericTree {
         this.reset();
         //const scoreSubtree = this.findSubtree(context, node => node['element'] === "score");
         this.fromJson(context);
-        this.breadCrumbs.innerHTML = "";
+        this.breadCrumbs.textContent = "";
         // root crumb
         appendDivTo(this.breadCrumbs, { class: `vrv-tree-breadcrumb` });
         this.traverse((node) => {
@@ -48,7 +48,7 @@ export class EditorScoreTree extends GenericTree {
     }
     addCrumb(element, id) {
         const crumb = appendDivTo(this.breadCrumbs, { class: `vrv-tree-breadcrumb` });
-        crumb.innerHTML = element;
+        crumb.textContent = element;
         crumb.dataset.id = id;
         crumb.dataset.element = element;
         this.eventManager.bind(crumb, 'click', this.onClick);

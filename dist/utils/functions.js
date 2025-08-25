@@ -36,7 +36,7 @@ export function appendSelectTo(parent, options) {
 }
 export function appendSpanTo(parent, options, text = "") {
     let span = appendHTMLElementTo(parent, options, 'span');
-    span.innerHTML = text;
+    span.textContent = text;
     return span;
 }
 export function appendSummaryTo(parent, options) {

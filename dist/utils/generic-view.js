@@ -41,7 +41,7 @@ export class GenericView {
     setDisplayFlex() { this.display = 'flex'; }
     addFieldSet(label, flexGrow = 1) {
         let legend = appendDivTo(this.div, { class: `vrv-legend` });
-        legend.innerHTML = label;
+        legend.textContent = label;
         let span = appendSpanTo(legend, { class: `icon` }, '▼');
         let fieldSet = appendDivTo(this.div, { class: `vrv-field-set` });
         if (flexGrow !== 1)

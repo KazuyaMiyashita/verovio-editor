@@ -29,7 +29,7 @@ export class DialogSettingsEditor extends Dialog {
         ["latest", "develop"].forEach(version => {
             let option = appendOptionTo(this.verovioVersion, {});
             option.value = version;
-            option.innerHTML = version;
+            option.textContent = version;
             if (appOptions.verovioVersion === version) option.selected = true;
         })
 

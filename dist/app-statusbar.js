@@ -20,7 +20,7 @@ export class AppStatusbar extends GenericView {
         if (!super.onEndLoading(e))
             return false;
         //console.debug("AppStatusbar::onEndLoading");
-        this.statusText.innerHTML = "Completed";
+        this.statusText.textContent = "Completed";
         return true;
     }
     onStartLoading(e) {
@@ -28,7 +28,7 @@ export class AppStatusbar extends GenericView {
             return false;
         //console.debug("AppStatusbar:onStartLoading");
         let msg = (e.detail.light) ? e.detail.msg : "In progress ...";
-        this.statusText.innerHTML = msg;
+        this.statusText.textContent = msg;
         return true;
     }
 }

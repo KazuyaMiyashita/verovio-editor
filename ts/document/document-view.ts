@@ -221,11 +221,11 @@ export class DocumentView extends VerovioView {
             let page = <HTMLElement>this.docWrapper.children[idx];
             if (idx < this.observer.lastPageIn - this.observer.pruningMargin) {
                 delete page.dataset.loaded;
-                page.innerHTML = '';
+                page.textContent = '';
             }
             if (idx > this.observer.lastPageIn + this.observer.pruningMargin) {
                 delete page.dataset.loaded;
-                page.innerHTML = '';
+                page.textContent = '';
             }
         }
     }

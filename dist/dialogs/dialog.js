@@ -15,7 +15,7 @@ export class Dialog {
         }, options);
         this.div = div;
         // Remove previous content
-        this.div.innerHTML = "";
+        this.div.textContent = "";
         this.app = app;
         this.eventManager = new EventManager(this);
         this.bindListeners(); // Document/Window-scoped events
@@ -26,7 +26,7 @@ export class Dialog {
         this.icon = appendDivTo(this.top, { class: `vrv-dialog-icon` });
         this.icon.classList.add(this.options.icon);
         const titleDiv = appendDivTo(this.top, { class: `vrv-dialog-title` });
-        titleDiv.innerHTML = title;
+        titleDiv.textContent = title;
         this.close = appendDivTo(this.top, { class: `vrv-dialog-close` });
         // The content of the dialog
         this.content = appendDivTo(this.box, { class: `vrv-dialog-content` });

@@ -196,7 +196,7 @@ export class TreeNode {
     ////////////////////////////////////////////////////////////////////////
     reset() {
         this.children.forEach(child => child.reset());
-        this.div.innerHTML = "";
+        this.div.textContent = "";
     }
     html(div, tree, hideLabel = false) {
         this.div = div;
@@ -222,7 +222,7 @@ export class TreeNode {
         if (this.attributes && this.attributes['n']) {
             labelStr += ` ${this.attributes['n']}`;
         }
-        this.label.innerHTML = labelStr;
+        this.label.textContent = labelStr;
         //let cb = appendInputTo(this.label, { type: `checkbox` });
         let children = appendDivTo(this.div, { class: `vrv-node-children` });
         this.children.forEach(child => {

@@ -173,7 +173,7 @@ export class AppToolbar extends Toolbar {
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
     updateRecent() {
-        this.subSubMenu.innerHTML = "";
+        this.subSubMenu.textContent = "";
         let fileList = this.app.fileStack.fileList();
         for (let i = 0; i < fileList.length; i++) {
             const entry = appendDivTo(this.subSubMenu, { class: `vrv-menu-text`, 'data-before': fileList[i].filename });

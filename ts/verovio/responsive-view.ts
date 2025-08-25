@@ -159,7 +159,7 @@ export class ResponsiveView extends VerovioView {
         };
         this.midiIds = [];
     }
-    
+
     protected updateSVGDimensions(): void {
         this.svgWrapper.style.height = this.div.style.height;
         this.svgWrapper.style.width = this.div.style.width;

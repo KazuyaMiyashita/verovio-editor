@@ -358,7 +358,7 @@ export class App {
             this.loader.style.display = `flex`;
             this.loadingCount++;
         }
-        this.loaderText.innerHTML = msg;
+        this.loaderText.textContent = msg;
         let event = new CustomEvent('onStartLoading', {
             detail: {
                 light: light,
@@ -514,7 +514,7 @@ export class App {
     }
 
     private pushNotification() {
-        this.notification.innerHTML = this.notificationStack[0];
+        this.notification.textContent = this.notificationStack[0];
         this.notification.classList.remove("disabled");
 
         const timerThis = this;

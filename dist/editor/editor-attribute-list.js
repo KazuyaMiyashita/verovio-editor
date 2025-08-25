@@ -24,7 +24,7 @@ export class EditorAttributeList extends GenericView {
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
     loadAttributesOrText(object) {
-        this.listWrapper.innerHTML = "";
+        this.listWrapper.textContent = "";
         this.eventManager.unbindAll();
         if (this.listWrapperChild)
             this.listWrapperChild.remove();
@@ -94,7 +94,7 @@ export class EditorAttributeList extends GenericView {
     loadAttribute(tbody, name, value) {
         let attRow = appendTrTo(tbody, { class: `vrv-attribute-item` });
         let nameCell = appendTdTo(attRow, { class: `vrv-attribute-name` });
-        nameCell.innerHTML = name;
+        nameCell.textContent = name;
         let valueCell = appendTdTo(attRow, { class: `vrv-attribute-value` });
         const elementAttributePattern = `${this.element}@${name}`;
         let custom = this.findCustomOptionMethod(elementAttributePattern);

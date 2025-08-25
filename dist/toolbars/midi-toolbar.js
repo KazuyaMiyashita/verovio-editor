@@ -47,8 +47,8 @@ export class MidiToolbar extends Toolbar {
     // Class specific methods
     ////////////////////////////////////////////////////////////////////////
     updateProgressBar() {
-        this.midiTotalTime.innerHTML = this.midiPlayer.getTotalTimeStr();
-        this.midiCurrentTime.innerHTML = this.midiPlayer.getCurrentTimeStr();
+        this.midiTotalTime.textContent = this.midiPlayer.getTotalTimeStr();
+        this.midiCurrentTime.textContent = this.midiPlayer.getCurrentTimeStr();
         let percent = (this.midiPlayer.getTotalTime()) ? (this.midiPlayer.getCurrentTime() / this.midiPlayer.getTotalTime() * 100) : 0;
         this.midiBarPercent.style.width = `${percent}%`;
     }

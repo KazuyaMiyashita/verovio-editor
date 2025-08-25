@@ -29,7 +29,7 @@ export class EditorContentTree extends GenericTree {
         this.reset();
         this.fromJson(context.context);
 
-        this.breadCrumbs.innerHTML = "";
+        this.breadCrumbs.textContent = "";
         // root crumb
         appendDivTo(this.breadCrumbs, { class: `vrv-tree-breadcrumb` });
 
@@ -73,7 +73,7 @@ export class EditorContentTree extends GenericTree {
 
     private addCrumb(element: string, id: string): void {
         const crumb: HTMLDivElement = appendDivTo(this.breadCrumbs, { class: `vrv-tree-breadcrumb` });
-        crumb.innerHTML = element;
+        crumb.textContent = element;
         crumb.dataset.id = id
         crumb.dataset.element = element;
         this.eventManager.bind(crumb, 'click', this.onClick);

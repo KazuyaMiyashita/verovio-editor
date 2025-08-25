@@ -14,12 +14,12 @@ export class EditorReferenceList extends GenericView {
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
     loadList(references, direction) {
-        this.listWrapper.innerHTML = "";
+        this.listWrapper.textContent = "";
         this.eventManager.unbindAll();
         references.forEach(reference => {
             let item = appendDivTo(this.listWrapper, { class: `vrv-reference-list-item vrv-mei-element` });
             item.style.backgroundImage = `url(${App.iconFor(reference.element)})`;
-            item.innerHTML = `${reference['element']} @ ${reference.referenceAttribute}`;
+            item.textContent = `${reference['element']} @ ${reference.referenceAttribute}`;
             item.dataset.id = reference.id;
             item.dataset.element = reference.element;
             this.eventManager.bind(item, "click", this.onClick);
