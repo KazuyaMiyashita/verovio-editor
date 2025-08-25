@@ -24,6 +24,9 @@ export class EditorToolbar extends Toolbar {
     private readonly notes: HTMLDivElement;
     private readonly controlEvents: HTMLDivElement;
 
+    private readonly undo: HTMLDivElement;
+    private readonly redo: HTMLDivElement;
+
     private readonly controlEventControls: HTMLDivElement;
     private readonly placeAbove: HTMLDivElement;
     private readonly placeBelow: HTMLDivElement;
@@ -44,6 +47,9 @@ export class EditorToolbar extends Toolbar {
         let editorXml = `${app.host}/icons/toolbar/editor-xml.png`;
         let editorXmlValidate = `${app.host}/icons/toolbar/validate.png`;
         let editorXmlForce = `${app.host}/icons/toolbar/force.png`;
+
+        let undo = `${app.host}/icons/editor/undo.png`;
+        let redo = `${app.host}/icons/editor/redo.png`;
 
         let editorStemDirUp = `${app.host}/icons/editor/stem-dir-up.png`;
         let editorStemDirDown = `${app.host}/icons/editor/stem-dir-down.png`;
@@ -72,6 +78,10 @@ export class EditorToolbar extends Toolbar {
         appendSpanTo(this.xmlEditorValidate, { class: `vrv-tooltip` }, "Validate and refresh rendering ('Shift-Ctrl-V')");
         this.xmlEditorForce = appendDivTo(this.layoutControls, { class: `vrv-btn-icon-large`, style: { backgroundImage: `url(${editorXmlForce})` } });
         appendSpanTo(this.xmlEditorForce, { class: `vrv-tooltip` }, "By-pass XML validation and force reload");
+
+        appendDivTo(this.div, { class: `vrv-h-separator` });
+        this.undo = appendDivTo(this.div, { class: `vrv-btn-icon-large`, style: { backgroundImage: `url(${undo})` } });
+        this.redo = appendDivTo(this.div, { class: `vrv-btn-icon-large`, style: { backgroundImage: `url(${redo})` } });
 
         appendDivTo(this.div, { class: `vrv-h-separator` });
         this.notes = appendDivTo(this.div, { class: `vrv-btn-text`, 'data-before': `Notes` });
@@ -113,6 +123,9 @@ export class EditorToolbar extends Toolbar {
     ////////////////////////////////////////////////////////////////////////
 
     public bindEvents(actionManager: ActionManager): void {
+        actionManager.eventManager.bind(this.undo, 'click', actionManager.undo);
+        actionManager.eventManager.bind(this.redo, 'click', actionManager.redo);
+
         actionManager.eventManager.bind(this.formCres, 'click', actionManager.formCres);
         actionManager.eventManager.bind(this.formDim, 'click', actionManager.formDim);
 
@@ -146,6 +159,8 @@ export class EditorToolbar extends Toolbar {
         this.updateToolbarBtnDisplay(this.xmlEditorValidate, (isToggled && !isAutoMode));
         this.updateToolbarBtnDisplay(this.xmlEditorForce, isToggled);
         // update enabled status
+        this.updateToolbarBtnEnabled(this.undo, this.panel.editorViewObj.actionManager.canUndo());
+        this.updateToolbarBtnEnabled(this.redo, this.panel.editorViewObj.actionManager.canRedo());
         this.updateToolbarBtnEnabled(this.xmlEditorEnable, true);
         this.updateToolbarBtnEnabled(this.xmlEditorOrientation, isToggled);
         this.updateToolbarBtnEnabled(this.xmlEditorValidate, isToggled);
@@ -209,6 +224,9 @@ export class EditorToolbar extends Toolbar {
         this.updateToolbarBtnEnabled(this.xmlEditorEnable, false);
         this.updateToolbarBtnEnabled(this.xmlEditorValidate, false);
         this.updateToolbarBtnEnabled(this.xmlEditorForce, false);
+
+        this.updateToolbarBtnEnabled(this.undo, false);
+        this.updateToolbarBtnEnabled(this.redo, false);
 
         return true;
     }

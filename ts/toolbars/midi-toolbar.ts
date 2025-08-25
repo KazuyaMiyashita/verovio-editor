@@ -14,7 +14,7 @@ export class MidiToolbar extends Toolbar {
     private pageDragStart: number;
     private barDragStart: number;
     private barWidth: number;
-    
+
     private readonly midiControls: HTMLDivElement;
     private readonly play: HTMLDivElement;
     private readonly pause: HTMLDivElement;

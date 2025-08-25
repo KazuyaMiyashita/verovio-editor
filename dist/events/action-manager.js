@@ -5,13 +5,23 @@ export class ActionManager {
         this.editorViewObj = view;
         this.eventManager = new EventManager(this);
         this.inProgress = false;
+        this.canUndoCache = false;
+        this.canRedoCache = false;
     }
+    ////////////////////////////////////////////////////////////////////////
+    // Getter methods
+    ////////////////////////////////////////////////////////////////////////
+    canUndo() { return this.canUndoCache; }
+    canRedo() { return this.canRedoCache; }
     ////////////////////////////////////////////////////////////////////////
     // Async worker methods
     ////////////////////////////////////////////////////////////////////////
     async commit(caller) {
         const editorAction = { action: 'commit' };
         await this.editorViewObj.verovio.edit(editorAction);
+        const info = await this.editorViewObj.verovio.editInfo();
+        this.canUndoCache = info['canUndo'];
+        this.canRedoCache = info['canRedo'];
         await this.editorViewObj.renderPage(true);
         this.inProgress = false;
         let id = "";
@@ -102,8 +112,7 @@ export class ActionManager {
         if (chain.length === 0)
             return;
         if (this.inProgress) {
-            await this.editorViewObj.verovio.redoPagePitchPosLayout();
-            await this.editorViewObj.renderPage(true, false);
+            await this.editRefresh();
         }
         this.inProgress = true;
         const editorAction = {
@@ -181,6 +190,24 @@ export class ActionManager {
     }
     async stemDirAuto() {
         await this.setAttrValueForTypes("stem.dir", "", ["note", "chord"]);
+    }
+    async undo() {
+        this.app.startLoading("Undoing ...", true);
+        const editorAction = { action: 'undo' };
+        await this.editorViewObj.verovio.edit(editorAction);
+        const info = await this.editorViewObj.verovio.editInfo();
+        this.canUndoCache = info['canUndo'];
+        this.canRedoCache = info['canRedo'];
+        await this.editorViewObj.renderPage(true);
+    }
+    async redo() {
+        this.app.startLoading("Redoing ...", true);
+        const editorAction = { action: 'redo' };
+        await this.editorViewObj.verovio.edit(editorAction);
+        const info = await this.editorViewObj.verovio.editInfo();
+        this.canUndoCache = info['canUndo'];
+        this.canRedoCache = info['canRedo'];
+        await this.editorViewObj.renderPage(true);
     }
     // helper
     async setAttrValue(attribute, value, id) {

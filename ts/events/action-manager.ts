@@ -2,7 +2,7 @@
  * The ActionManager action class
  */
 import { App } from '../app.js';
-import { EditorView as EditorViewObj } from '../editor/editor-view.js';
+import { EditorView } from '../editor/editor-view.js';
 import { EventManager } from './event-manager.js';
 import { GenericView } from '../utils/generic-view.js';
 
@@ -13,16 +13,27 @@ export class ActionManager {
     protected readonly app: App;
 
     private inProgress: boolean;
-    private readonly editorViewObj: EditorViewObj;
+    private readonly editorViewObj: EditorView;
+    private canUndoCache: boolean;
+    private canRedoCache: boolean;
 
-    constructor(view: EditorViewObj, app: App) {
+    constructor(view: EditorView, app: App) {
         this.app = app;
         this.editorViewObj = view;
 
         this.eventManager = new EventManager(this);
 
         this.inProgress = false;
+        this.canUndoCache = false;
+        this.canRedoCache = false;
     }
+
+    ////////////////////////////////////////////////////////////////////////
+    // Getter methods
+    ////////////////////////////////////////////////////////////////////////
+
+    public canUndo(): boolean { return this.canUndoCache; }
+    public canRedo(): boolean { return this.canRedoCache; }
 
     ////////////////////////////////////////////////////////////////////////
     // Async worker methods
@@ -32,6 +43,9 @@ export class ActionManager {
         const editorAction = { action: 'commit' };
 
         await this.editorViewObj.verovio.edit(editorAction);
+        const info = await this.editorViewObj.verovio.editInfo();
+        this.canUndoCache = info['canUndo'];
+        this.canRedoCache = info['canRedo'];
         await this.editorViewObj.renderPage(true);
 
         this.inProgress = false;
@@ -130,8 +144,7 @@ export class ActionManager {
         if (chain.length === 0) return;
 
         if (this.inProgress) {
-            await this.editorViewObj.verovio.redoPagePitchPosLayout();
-            await this.editorViewObj.renderPage(true, false);
+            await this.editRefresh();
         }
 
         this.inProgress = true;
@@ -222,6 +235,26 @@ export class ActionManager {
 
     public async stemDirAuto(): Promise<any> {
         await this.setAttrValueForTypes("stem.dir", "", ["note", "chord"]);
+    }
+
+    public async undo(): Promise<any> {
+        this.app.startLoading("Undoing ...", true);
+        const editorAction = { action: 'undo' }
+        await this.editorViewObj.verovio.edit(editorAction);
+        const info = await this.editorViewObj.verovio.editInfo();
+        this.canUndoCache = info['canUndo'];
+        this.canRedoCache = info['canRedo'];
+        await this.editorViewObj.renderPage(true);
+    }
+
+    public async redo(): Promise<any> {
+        this.app.startLoading("Redoing ...", true);
+        const editorAction = { action: 'redo' }
+        await this.editorViewObj.verovio.edit(editorAction);
+        const info = await this.editorViewObj.verovio.editInfo();
+        this.canUndoCache = info['canUndo'];
+        this.canRedoCache = info['canRedo'];
+        await this.editorViewObj.renderPage(true);
     }
 
     // helper
