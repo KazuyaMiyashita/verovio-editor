@@ -2,7 +2,7 @@
  * The DialogSettingsEditor class for the editor settings.
  */
 import { Dialog } from './dialog.js';
-import { appendDivTo, appendOptionTo, appendSelectTo } from '../utils/functions.js';
+import { appendDivTo, appendInputTo, appendOptionTo, appendSelectTo } from '../utils/functions.js';
 export class DialogSettingsEditor extends Dialog {
     constructor(div, app, title, options, appOptions) {
         super(div, app, title, options);
@@ -20,6 +20,11 @@ export class DialogSettingsEditor extends Dialog {
             if (appOptions.verovioVersion === version)
                 option.selected = true;
         });
+        const labelDevFeatures = appendDivTo(this.fields, { class: `vrv-dialog-label` });
+        labelDevFeatures.innerHTML = "Development features";
+        this.devFeatures = appendInputTo(this.fields, { class: `vrv-dialog-input`, type: `checkbox` });
+        if (appOptions.devFeatures === true)
+            this.devFeatures.checked = true;
     }
     ////////////////////////////////////////////////////////////////////////
     // Getters and setters
@@ -34,6 +39,10 @@ export class DialogSettingsEditor extends Dialog {
             this.reload = true;
         }
         this.appOptions.verovioVersion = this.verovioVersion.value;
+        if (this.devFeatures.checked !== this.appOptions.devFeatures) {
+            this.reload = true;
+        }
+        this.appOptions.devFeatures = this.devFeatures.checked;
         super.ok();
     }
     reset() {

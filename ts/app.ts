@@ -937,6 +937,7 @@ export namespace App {
         schema: string;
         schemaBasic: string;
         verovioVersion: string;
+        devFeatures: boolean;
     }
 
     export interface MEIExportOptions {

@@ -164,10 +164,12 @@ export class EditorPanel extends GenericView {
         this.div.style.height = this.div.parentElement.style.height;
         this.div.style.width = this.div.parentElement.style.width;
 
-        //this.toolPanel.style.display = 'none';
-        //this.keyboard.style.display = 'none';
-        this.toolPanel.style.display = this.xmlEditorEnabled ? 'none' : 'block';
-        this.keyboard.style.display = this.xmlEditorEnabled ? 'none' : 'flex';
+        this.toolPanel.style.display = 'none';
+        this.keyboard.style.display = 'none';
+        if (this.app.options.devFeatures) {
+            this.toolPanel.style.display = this.xmlEditorEnabled ? 'none' : 'block';
+            this.keyboard.style.display = this.xmlEditorEnabled ? 'none' : 'flex';
+        }
 
         // Force the toolbar to be displayed when re-activate because the it does not have received the event yet
         this.toolbar.style.display = 'block';
