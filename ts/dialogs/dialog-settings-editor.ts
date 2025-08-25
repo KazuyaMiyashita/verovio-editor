@@ -24,8 +24,7 @@ export class DialogSettingsEditor extends Dialog {
 
         this.fields = appendDivTo(this.content, { class: `vrv-dialog-form` });
 
-        const labelVerovioVersion = appendDivTo(this.fields, { class: `vrv-dialog-label` });
-        labelVerovioVersion.innerHTML = "Verovio version";
+        this.appendLabel(this.fields, "Verovio version");
         this.verovioVersion = appendSelectTo(this.fields, { class: `vrv-dialog-input` });
         ["latest", "develop"].forEach(version => {
             let option = appendOptionTo(this.verovioVersion, {});
@@ -34,8 +33,7 @@ export class DialogSettingsEditor extends Dialog {
             if (appOptions.verovioVersion === version) option.selected = true;
         })
 
-        const labelDevFeatures = appendDivTo(this.fields, { class: `vrv-dialog-label` });
-        labelDevFeatures.innerHTML = "Development features";
+        this.appendLabel(this.fields, "Development features");
         this.devFeatures = appendInputTo(this.fields, { class: `vrv-dialog-input`, type: `checkbox` });
         if (appOptions.devFeatures === true) this.devFeatures.checked = true;
 

@@ -29,16 +29,13 @@ export class DialogExport extends Dialog {
 
         this.fields = appendDivTo(this.content, { class: `vrv-dialog-form` });
 
-        const basicLabel = appendDivTo(this.fields, { class: `vrv-dialog-label` });
-        basicLabel.innerHTML = "MEI Basic";
+        this.appendLabel(this.fields, "MEI Basic");
         this.basicInput = appendInputTo(this.fields, { class: `vrv-dialog-input`, type: `checkbox` });
 
-        const removeIdsLabel = appendDivTo(this.fields, { class: `vrv-dialog-label` });
-        removeIdsLabel.innerHTML = "Remove IDs";
+        this.appendLabel(this.fields, "Remove IDs");
         this.removeIdsInput = appendInputTo(this.fields, { class: `vrv-dialog-input`, type: `checkbox` });
 
-        const ignoreHeaderLabel = appendDivTo(this.fields, { class: `vrv-dialog-label` });
-        ignoreHeaderLabel.innerHTML = "Ignore MEI Header";
+        this.appendLabel(this.fields, "Ignore MEI Header");
         this.ignoreHeaderInput = appendInputTo(this.fields, { class: `vrv-dialog-input`, type: `checkbox` });
     }
 

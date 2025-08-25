@@ -92,6 +92,14 @@ export class Dialog {
         else if (e.keyCode === 13)
             this.ok(); // enter
     }
+    ////////////////////////////////////////////////////////////////////////
+    // UI helper
+    ////////////////////////////////////////////////////////////////////////
+    appendLabel(parent, text) {
+        const label = appendDivTo(parent, { class: 'vrv-dialog-label' });
+        label.textContent = text;
+        return label;
+    }
 }
 ////////////////////////////////////////////////////////////////////////
 // Merged namespace

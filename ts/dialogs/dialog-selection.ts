@@ -21,18 +21,15 @@ export class DialogSelection extends Dialog {
 
         this.fields = appendDivTo(this.content, { class: `vrv-dialog-form` });
 
-        const labelMeasureRange = appendDivTo(this.fields, { class: `vrv-dialog-label` });
-        labelMeasureRange.innerHTML = "Measure range";
+        this.appendLabel(this.fields, "Measure range");
         this.selectMeasureRange = appendInputTo(this.fields, { class: `vrv-dialog-input` });
         this.selectMeasureRange.placeholder = "Measure range (e.g., '2-10')";
 
-        const labelStart = appendDivTo(this.fields, { class: `vrv-dialog-label` });
-        labelStart.innerHTML = "Start";
+        this.appendLabel(this.fields, "Start");
         this.selectStart = appendInputTo(this.fields, { class: `vrv-dialog-input` });
         this.selectStart.placeholder = "Start measure xml:id";
 
-        const labelEnd = appendDivTo(this.fields, { class: `vrv-dialog-label` });
-        labelEnd.innerHTML = "End";
+        this.appendLabel(this.fields, "End");
         this.selectEnd = appendInputTo(this.fields, { class: `vrv-dialog-input` });
         this.selectEnd.placeholder = "End measure xml:id";
 

@@ -24,14 +24,12 @@ export class DialogGhExport extends DialogGhImport {
 
         this.fields = appendDivTo(this.content, { class: `vrv-dialog-form`, style: { 'display': `none` } });
 
-        const labelFile = appendDivTo(this.fields, { class: `vrv-dialog-label` });
-        labelFile.innerHTML = "Filename";
+        this.appendLabel(this.fields, "Filename");
         this.inputFile = appendInputTo(this.fields, { class: `vrv-dialog-input` });
         this.inputFile.placeholder = "Name of an existing or of a new file";
         this.eventManager.bind(this.inputFile, 'input', this.enableOk);
 
-        const labelMessage = appendDivTo(this.fields, { class: `vrv-dialog-label` });
-        labelMessage.innerHTML = "Commit message";
+        this.appendLabel(this.fields, "Commit message");
         this.inputMessage = appendTextAreaTo(this.fields, { class: `vrv-dialog-input` });
         this.inputMessage.placeholder = "The commit message to be sent to GitHub";
         this.eventManager.bind(this.inputMessage, 'input', this.enableOk);

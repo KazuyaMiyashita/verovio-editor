@@ -134,6 +134,16 @@ export class Dialog {
         if (e.keyCode === 27) this.cancel(); // esc
         else if (e.keyCode === 13) this.ok(); // enter
     }
+
+    ////////////////////////////////////////////////////////////////////////
+    // UI helper
+    ////////////////////////////////////////////////////////////////////////
+
+    protected appendLabel(parent: HTMLDivElement, text: string): HTMLDivElement {
+        const label = appendDivTo(parent, { class: 'vrv-dialog-label' });
+        label.textContent = text;
+        return label;
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////
