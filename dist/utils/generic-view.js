@@ -74,9 +74,10 @@ export class GenericView {
         return true;
     }
     onEditData(e) {
+        var _a;
         if (!this.active)
             return false;
-        if (this === e.detail.caller)
+        if (((_a = e.detail) === null || _a === void 0 ? void 0 : _a.caller) && this === e.detail.caller)
             return false;
         //console.debug("GenericView::onEditData");
         return true;
