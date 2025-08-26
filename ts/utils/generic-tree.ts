@@ -52,13 +52,20 @@ export class GenericTree extends GenericView {
     }
 
     public isInFocus(node: TreeNode) {
-        if (this.focusId.length === 0 || this.id === this.focusId) return true;
+        if (!this.hasFocus() || this.id === this.focusId) return true;
         for (const child of node['children']) if (child.id === this.focusId) return true;
         return false;
     }
 
+    public hasFocus(): boolean { return (this.focusId.length > 0); }
+
     public isAncestorOfFocus(node: TreeNode) {
         return (this.isAncestorOf(node, this.focusId) !== null);
+    }
+
+    public isDescendantOfFocus(node: TreeNode) {
+        const focusNode = this.findInSubtree(this.root, (node: TreeNode) => node.id === this.focusId);
+        return (this.isAncestorOf(focusNode, node.id) !== null);
     }
 
     public isAncestorOf(node: TreeNode, id: string): TreeNode | null {
@@ -372,8 +379,9 @@ export class TreeNode {
 
         this.div = div;
         if (this.isLeaf) this.div.classList.add("leaf");
-        // If the maximum display depth is being reached, do not mark them as open
-        if (this.children.length > 0 && depth < tree.getDisplayDepth()) this.div.classList.add("open");
+        // If the maximum display depth is being reached, or the node is not in the focus subtree, do not mark them as open
+        const isInFocusSubtree = (!tree.hasFocus() || tree.isAncestorOfFocus(this) || tree.isDescendantOfFocus(this));
+        if (this.children.length > 0 && depth < tree.getDisplayDepth() && isInFocusSubtree) this.div.classList.add("open");
         // Pass the id and element for the onClick
         this.div.dataset.id = this.id;
         this.div.dataset.element = this.element;
@@ -404,8 +412,8 @@ export class TreeNode {
         //let cb = appendInputTo(this.label, { type: `checkbox` });
         let children = appendDivTo(this.div, { class: `vrv-node-children` });
 
-        // We have reached our maximum display depth
-        if (depth >= tree.getDisplayDepth()) return;
+        // We have reached our maximum display depth, or the node is not in the focus subtree
+        if (depth >= tree.getDisplayDepth() || !isInFocusSubtree) return;
 
         this.children.forEach(child => {
             let node = appendDivTo(children, { class: `vrv-tree-node` });
