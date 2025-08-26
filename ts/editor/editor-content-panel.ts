@@ -8,7 +8,7 @@ import { EditorContentTree } from './editor-content-tree.js';
 import { EditorReferenceList } from './editor-references-list.js';
 import { GenericView } from '../utils/generic-view.js';
 import { Tab } from '../utils/tab-group.js';
-import { appendDivTo, appendSpanTo } from '../utils/functions.js';
+import { appendDivTo } from '../utils/functions.js';
 import { ActionManager } from '../events/action-manager.js';
 
 export class EditorContentPanel extends GenericView {
@@ -34,7 +34,7 @@ export class EditorContentPanel extends GenericView {
         let treeFieldSet = this.addFieldSet("Content tree", 3);
         this.contentTree = appendDivTo(treeFieldSet, { class: `vrv-field-set-panel` });
         this.contentTreeObj = new EditorContentTree(this.contentTree, this.app, this.tab);
-        this.contentTreeObj.setHiddenRoot(true);
+        this.contentTreeObj.setBreadCrumbs();
         this.customEventManager.addToPropagationList(this.contentTreeObj.customEventManager);
 
         let attributeFieldSet = this.addFieldSet("Attributes or text", 3);

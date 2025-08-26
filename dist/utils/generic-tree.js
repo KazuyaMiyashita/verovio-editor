@@ -1,22 +1,77 @@
+import { App } from '../app.js';
 import { EventManager } from '../events/event-manager.js';
 import { GenericView } from './generic-view.js';
 import { appendDivTo } from './functions.js';
 export class GenericTree extends GenericView {
     constructor(div, app) {
         super(div, app);
+        this.breadCrumbsWrapper = appendDivTo(this.div, { class: `vrv-tree-breadcrumbs-wrapper` });
+        // hidden by default
+        this.breadCrumbsWrapper.style.display = 'none';
+        this.breadCrumbs = appendDivTo(this.breadCrumbsWrapper, { class: `vrv-tree-breadcrumbs` });
+        this.clearCrumbs();
         this.root = null;
-        this.hiddenRoot = false;
+        this.useBreadCrumbs = false;
         this.setDisplayFlex();
+        this.focusId = "";
+        this.displayDepth = 2;
         this.eventManager = new EventManager(this);
     }
     ////////////////////////////////////////////////////////////////////////
     // Getters and setters
     ////////////////////////////////////////////////////////////////////////
-    hasHiddenRoot() { return this.hiddenRoot; }
-    setHiddenRoot(hiddenRoot) { this.hiddenRoot = hiddenRoot; }
+    hasBreadCrumbs() { return this.useBreadCrumbs; }
+    setBreadCrumbs() {
+        this.useBreadCrumbs = true;
+        this.breadCrumbsWrapper.style.display = 'block';
+    }
+    isInFocus(node) {
+        if (this.focusId.length === 0 || this.id === this.focusId)
+            return true;
+        for (const child of node['children']) {
+            if (child.id === this.focusId)
+                return true;
+        }
+        return false;
+    }
+    isAncestorOfFocus(node) {
+        return (this.isAncestorOf(node, this.focusId) !== null);
+    }
+    isAncestorOf(node, id) {
+        return this.findSubtree(node, (node) => node.id === id);
+    }
+    getDisplayDepth() { return this.displayDepth; }
+    getFocusId() { return this.focusId; }
     ////////////////////////////////////////////////////////////////////////
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
+    applyFocus(id) {
+        this.eventManager.unbindAll();
+        this.rootElement.remove();
+        this.rootElement = appendDivTo(this.div, { class: `vrv-tree-root` });
+        this.clearCrumbs();
+        this.focusId = id;
+        // We we select the root (from the crumb) reset to ""
+        if (this.root.id === id)
+            this.focusId = "";
+        // Rebuild the html tree
+        this.root.html(this.rootElement, this, 0, this.useBreadCrumbs);
+        this.breadCrumbsWrapper.scrollLeft = this.breadCrumbsWrapper.scrollWidth;
+    }
+    addCrumb(element, id) {
+        const crumb = appendDivTo(this.breadCrumbs, { class: `vrv-tree-breadcrumb` });
+        crumb.textContent = element;
+        crumb.dataset.id = id;
+        crumb.dataset.element = element;
+        this.eventManager.bind(crumb, 'click', this.onClick);
+        this.eventManager.bind(crumb, 'mouseover', this.onMouseover);
+        this.eventManager.bind(crumb, 'mouseout', this.onMouseout);
+    }
+    clearCrumbs() {
+        // Reset the crumbs
+        this.breadCrumbs.textContent = "";
+        appendDivTo(this.breadCrumbs, { class: `vrv-tree-breadcrumb` });
+    }
     reset() {
         this.eventManager.unbindAll();
         if (this.root) {
@@ -58,7 +113,7 @@ export class GenericTree extends GenericView {
             throw new Error("Invalid JSON data: Missing 'element' property");
         this.root = this.buildTreeFromJson(json);
         this.rootElement = appendDivTo(this.div, { class: `vrv-tree-root` });
-        this.root.html(this.rootElement, this, this.hiddenRoot);
+        this.root.html(this.rootElement, this, 0, this.useBreadCrumbs);
     }
     fromXml(xmlString) {
         const parser = new DOMParser();
@@ -70,7 +125,7 @@ export class GenericTree extends GenericView {
         const rootElement = doc.documentElement;
         this.root = this.buildTreeFromElement(rootElement);
         this.rootElement = appendDivTo(this.div, { class: `vrv-tree-root` });
-        this.root.html(this.rootElement, this, this.hiddenRoot);
+        this.root.html(this.rootElement, this, 0, this.useBreadCrumbs);
     }
     toXml() {
         if (!this.root)
@@ -198,18 +253,33 @@ export class TreeNode {
         this.children.forEach(child => child.reset());
         this.div.textContent = "";
     }
-    html(div, tree, hideLabel = false) {
+    html(div, tree, depth, hideLabel = false) {
+        // There is a focus on an element. All ancestor be it will be displayed as bread crumbs
+        if ((depth === 0) && !tree.isInFocus(this)) {
+            tree.addCrumb(this.element, this.id);
+            this.children.forEach(child => {
+                // Display in the tree only ancestors of the focus elements
+                if (tree.isAncestorOfFocus(child)) {
+                    child.html(div, tree, depth, true);
+                }
+            });
+            return;
+        }
         this.div = div;
         if (this.isLeaf)
             this.div.classList.add("leaf");
-        if (this.children.length > 0)
+        // If the maximum display depth is being reached, do not mark them as open
+        if (this.children.length > 0 && depth < tree.getDisplayDepth())
             this.div.classList.add("open");
         // Pass the id and element for the onClick
         this.div.dataset.id = this.id;
         this.div.dataset.element = this.element;
         this.label = appendDivTo(this.div, { class: `vrv-mei-element vrv-node-label` });
-        if (hideLabel)
+        if (hideLabel) {
             this.label.style.display = 'none';
+            // This the label is hidden we want it as a bread crumb
+            tree.addCrumb(this.element, this.id);
+        }
         else {
             // Copy the dataset because both the node and the label fire an event
             this.label.dataset.id = this.div.dataset.id;
@@ -217,6 +287,11 @@ export class TreeNode {
             tree.eventManager.bind(this.div, "click", tree.onClick);
             tree.eventManager.bind(this.div, "mouseover", tree.onMouseover);
             tree.eventManager.bind(this.div, "mouseout", tree.onMouseout);
+            this.label.style.backgroundImage = `url(${App.iconFor(this.element)})`;
+            if (tree.getFocusId() === this.id) {
+                this.label.classList.add("target");
+                this.label.classList.add("checked");
+            }
         }
         let labelStr = this.element;
         if (this.attributes && this.attributes['n']) {
@@ -225,9 +300,12 @@ export class TreeNode {
         this.label.textContent = labelStr;
         //let cb = appendInputTo(this.label, { type: `checkbox` });
         let children = appendDivTo(this.div, { class: `vrv-node-children` });
+        // We have reached our maximum display depth
+        if (depth >= tree.getDisplayDepth())
+            return;
         this.children.forEach(child => {
             let node = appendDivTo(children, { class: `vrv-tree-node` });
-            child.html(node, tree);
+            child.html(node, tree, depth + 1);
         });
     }
 }

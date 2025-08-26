@@ -1,12 +1,8 @@
-import { App } from '../app.js';
 import { GenericTree } from '../utils/generic-tree.js';
-import { appendDivTo } from '../utils/functions.js';
 export class EditorContentTree extends GenericTree {
     constructor(div, app, tab) {
         super(div, app);
         this.tab = tab;
-        this.breadCrumbsWrapper = appendDivTo(this.div, { class: `vrv-tree-breadcrumbs-wrapper` });
-        this.breadCrumbs = appendDivTo(this.breadCrumbsWrapper, { class: `vrv-tree-breadcrumbs` });
     }
     ////////////////////////////////////////////////////////////////////////
     // Custom event methods
@@ -17,16 +13,15 @@ export class EditorContentTree extends GenericTree {
     loadContext(context) {
         this.reset();
         this.fromJson(context.context);
-        this.breadCrumbs.textContent = "";
-        // root crumb
-        appendDivTo(this.breadCrumbs, { class: `vrv-tree-breadcrumb` });
+        // Dedicated method also to adjust the scrolling in the tree
         this.traverse((node) => {
-            node.getLabel().style.backgroundImage = `url(${App.iconFor(node.element)})`;
             if (node.id === context.object.id) {
                 this.selectNode(node);
             }
             return false;
         });
+        // The content tree manages the bread crumb separately, and not with Tree::m_focusId
+        this.clearCrumbs();
         context.ancestors.slice().reverse().forEach(ancestor => {
             this.addCrumb(ancestor.element, ancestor.id);
         });
@@ -51,15 +46,6 @@ export class EditorContentTree extends GenericTree {
             }
         });
         this.app.customEventManager.dispatch(event);
-    }
-    addCrumb(element, id) {
-        const crumb = appendDivTo(this.breadCrumbs, { class: `vrv-tree-breadcrumb` });
-        crumb.textContent = element;
-        crumb.dataset.id = id;
-        crumb.dataset.element = element;
-        this.eventManager.bind(crumb, 'click', this.onClick);
-        this.eventManager.bind(crumb, 'mouseover', this.onMouseover);
-        this.eventManager.bind(crumb, 'mouseout', this.onMouseout);
     }
     selectNode(node) {
         node.getLabel().classList.add("target");

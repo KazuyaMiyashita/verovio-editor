@@ -1,20 +1,14 @@
 import { App } from '../app.js';
 import { GenericTree, TreeNode } from '../utils/generic-tree.js';
 import { Tab } from '../utils/tab-group.js'
-import { appendDivTo } from '../utils/functions.js';
 
 export class EditorContentTree extends GenericTree {
     private readonly tab: Tab;
-    private readonly breadCrumbsWrapper: HTMLDivElement;
-    private readonly breadCrumbs: HTMLDivElement;
 
     constructor(div: HTMLDivElement, app: App, tab: Tab) {
         super(div, app);
 
         this.tab = tab;
-
-        this.breadCrumbsWrapper = appendDivTo(this.div, { class: `vrv-tree-breadcrumbs-wrapper` });
-        this.breadCrumbs = appendDivTo(this.breadCrumbsWrapper, { class: `vrv-tree-breadcrumbs` });
     }
 
     ////////////////////////////////////////////////////////////////////////
@@ -29,22 +23,19 @@ export class EditorContentTree extends GenericTree {
         this.reset();
         this.fromJson(context.context);
 
-        this.breadCrumbs.textContent = "";
-        // root crumb
-        appendDivTo(this.breadCrumbs, { class: `vrv-tree-breadcrumb` });
-
+        // Dedicated method also to adjust the scrolling in the tree
         this.traverse((node) => {
-            node.getLabel().style.backgroundImage = `url(${App.iconFor(node.element)})`;
             if (node.id === context.object.id) {
                 this.selectNode(node);
             }
             return false;
         });
 
+        // The content tree manages the bread crumb separately, and not with Tree::m_focusId
+        this.clearCrumbs();
         context.ancestors.slice().reverse().forEach(ancestor => {
             this.addCrumb(ancestor.element, ancestor.id);
         });
-
         this.breadCrumbsWrapper.scrollLeft = this.breadCrumbsWrapper.scrollWidth;
     }
 
@@ -69,16 +60,6 @@ export class EditorContentTree extends GenericTree {
             }
         });
         this.app.customEventManager.dispatch(event);
-    }
-
-    private addCrumb(element: string, id: string): void {
-        const crumb: HTMLDivElement = appendDivTo(this.breadCrumbs, { class: `vrv-tree-breadcrumb` });
-        crumb.textContent = element;
-        crumb.dataset.id = id
-        crumb.dataset.element = element;
-        this.eventManager.bind(crumb, 'click', this.onClick);
-        this.eventManager.bind(crumb, 'mouseover', this.onMouseover);
-        this.eventManager.bind(crumb, 'mouseout', this.onMouseout);
     }
 
     private selectNode(node: TreeNode): void {

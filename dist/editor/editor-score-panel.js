@@ -12,7 +12,7 @@ export class EditorScorePanel extends GenericView {
         let treeFieldSet = this.addFieldSet("Score structure", 3);
         this.sectionTree = appendDivTo(treeFieldSet, { class: `vrv-field-set-panel` });
         this.sectionTreeObj = new EditorScoreTree(this.sectionTree, this.app, this.tab);
-        this.sectionTreeObj.setHiddenRoot(true);
+        this.sectionTreeObj.setBreadCrumbs();
         this.customEventManager.addToPropagationList(this.sectionTreeObj.customEventManager);
     }
     ////////////////////////////////////////////////////////////////////////
