@@ -79,9 +79,12 @@ export class EditorToolbar extends Toolbar {
         this.xmlEditorForce = appendDivTo(this.layoutControls, { class: `vrv-btn-icon-large`, style: { backgroundImage: `url(${editorXmlForce})` } });
         appendSpanTo(this.xmlEditorForce, { class: `vrv-tooltip` }, "By-pass XML validation and force reload");
 
+        // Undo and redo
         appendDivTo(this.div, { class: `vrv-h-separator` });
         this.undo = appendDivTo(this.div, { class: `vrv-btn-icon-large`, style: { backgroundImage: `url(${undo})` } });
+        appendSpanTo(this.undo, { class: `vrv-tooltip` }, "Undo ('Shift-Ctrl-V')");
         this.redo = appendDivTo(this.div, { class: `vrv-btn-icon-large`, style: { backgroundImage: `url(${redo})` } });
+        appendSpanTo(this.redo, { class: `vrv-tooltip` }, "Redo ('Shift-Ctrl-V')");
 
         appendDivTo(this.div, { class: `vrv-h-separator` });
         this.notes = appendDivTo(this.div, { class: `vrv-btn-text`, 'data-before': `Notes` });
