@@ -53,9 +53,7 @@ export class GenericTree extends GenericView {
 
     public isInFocus(node: TreeNode) {
         if (this.focusId.length === 0 || this.id === this.focusId) return true;
-        for (const child of node['children']) {
-            if (child.id === this.focusId) return true;
-        }
+        for (const child of node['children']) if (child.id === this.focusId) return true;
         return false;
     }
 
@@ -64,7 +62,7 @@ export class GenericTree extends GenericView {
     }
 
     public isAncestorOf(node: TreeNode, id: string): TreeNode | null {
-        return this.findSubtree(node, (node: TreeNode) => node.id === id);
+        return this.findInSubtree(node, (node: TreeNode) => node.id === id);
     }
 
     public getDisplayDepth(): number { return this.displayDepth; }
@@ -169,7 +167,10 @@ export class GenericTree extends GenericView {
         return serializer.serializeToString(xmlElement);
     }
 
-    // Generic depth-first traversal method
+    ////////////////////////////////////////////////////////////////////////
+    // Methods to traverse the tree and find nodes (from a specific node)
+    ////////////////////////////////////////////////////////////////////////
+
     protected traverse(callback: (node: TreeNode) => boolean | void): void {
         const visit = (node: TreeNode): boolean => {
             if (callback(node)) {
@@ -183,21 +184,24 @@ export class GenericTree extends GenericView {
         visit(this.root);
     }
 
-    // Generic finder function
-    protected findSubtree(node: TreeNode, predicate: (node: TreeNode) => boolean): TreeNode | null {
+    protected findInSubtree(node: TreeNode, predicate: (node: TreeNode) => boolean): TreeNode | null {
         if (predicate(node)) {
             return node;
         }
 
         if (Array.isArray(node['children'])) {
             for (const child of node['children']) {
-                const result = this.findSubtree(child, predicate);
+                const result = this.findInSubtree(child, predicate);
                 if (result) return result;
             }
         }
 
         return null;
     }
+
+    ////////////////////////////////////////////////////////////////////////
+    // Methods to build or output trees
+    ////////////////////////////////////////////////////////////////////////
 
     private buildTreeFromJson(nodeData: any): TreeNode {
         const {

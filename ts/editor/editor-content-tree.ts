@@ -48,7 +48,6 @@ export class EditorContentTree extends GenericTree {
             }
         });
         this.app.customEventManager.dispatch(event);
-
     }
 
     private cursorActivity(id: string, activity: string) {

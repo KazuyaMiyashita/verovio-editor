@@ -28,17 +28,16 @@ export class GenericTree extends GenericView {
     isInFocus(node) {
         if (this.focusId.length === 0 || this.id === this.focusId)
             return true;
-        for (const child of node['children']) {
+        for (const child of node['children'])
             if (child.id === this.focusId)
                 return true;
-        }
         return false;
     }
     isAncestorOfFocus(node) {
         return (this.isAncestorOf(node, this.focusId) !== null);
     }
     isAncestorOf(node, id) {
-        return this.findSubtree(node, (node) => node.id === id);
+        return this.findInSubtree(node, (node) => node.id === id);
     }
     getDisplayDepth() { return this.displayDepth; }
     getFocusId() { return this.focusId; }
@@ -134,7 +133,9 @@ export class GenericTree extends GenericView {
         const serializer = new XMLSerializer();
         return serializer.serializeToString(xmlElement);
     }
-    // Generic depth-first traversal method
+    ////////////////////////////////////////////////////////////////////////
+    // Methods to traverse the tree and find nodes (from a specific node)
+    ////////////////////////////////////////////////////////////////////////
     traverse(callback) {
         const visit = (node) => {
             if (callback(node)) {
@@ -148,20 +149,22 @@ export class GenericTree extends GenericView {
         };
         visit(this.root);
     }
-    // Generic finder function
-    findSubtree(node, predicate) {
+    findInSubtree(node, predicate) {
         if (predicate(node)) {
             return node;
         }
         if (Array.isArray(node['children'])) {
             for (const child of node['children']) {
-                const result = this.findSubtree(child, predicate);
+                const result = this.findInSubtree(child, predicate);
                 if (result)
                     return result;
             }
         }
         return null;
     }
+    ////////////////////////////////////////////////////////////////////////
+    // Methods to build or output trees
+    ////////////////////////////////////////////////////////////////////////
     buildTreeFromJson(nodeData) {
         const { id = null, element, attributes = {}, children = [], isTextNode = false, isLeaf = false } = nodeData;
         const node = new TreeNode(id, element, attributes, [], isTextNode, isLeaf);
