@@ -67,6 +67,12 @@ export class TabGroup extends GenericView {
         this.selectedTab.select();
     }
 
+    public resetTabs(): void {
+        this.tabs.forEach(tab => {
+            tab.loaded = false;
+        });
+    }
+
     ////////////////////////////////////////////////////////////////////////
     // Custom event methods
     ////////////////////////////////////////////////////////////////////////
@@ -95,8 +101,15 @@ export class TabGroup extends GenericView {
         return true;
     }
 
+    override onEndLoading(e: CustomEvent): boolean {
+        if (!super.onEndLoading(e)) return false;
+        this.dispatchToAll(e);
+        return true;
+    }
+
     override onLoadData(e: CustomEvent): boolean {
         if (!super.onLoadData(e)) return false;
+        this.resetTabs();
         this.selectedTab.customEventManager.dispatch(e);
         return true;
     }
@@ -128,12 +141,14 @@ export class TabGroup extends GenericView {
 export class Tab extends GenericView {
     private tabGroupObj: TabGroup;
     private tabSelector: HTMLDivElement;
+    public loaded: boolean;
 
     constructor(div: HTMLDivElement, app: App, tabGroup: TabGroup, label: string) {
         super(div, app);
         this.tabGroupObj = tabGroup;
         this.tabSelector = appendDivTo(tabGroup.tabSelectors, { class: `vrv-tab-selector`, dataset: { tab: `${this.id}` } });
         this.tabSelector.textContent = label;
+        this.loaded = false;
         tabGroup.eventManager.bind(this.tabSelector, 'click', tabGroup.onSelectTab);
     }
 

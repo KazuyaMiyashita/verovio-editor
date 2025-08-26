@@ -35,22 +35,31 @@ export class EditorScorePanel extends GenericView {
     // Async worker methods
     ////////////////////////////////////////////////////////////////////////
 
-    private async updateContent(id: string): Promise<any> {
+    private async updateContent(): Promise<any> {
+        this.sectionTreeObj.resetFocus();
         const contextOk = await this.app.verovio.edit({ action: 'context', param: { document: 'scores' } });
         if (contextOk) {
             const jsonContext = await this.app.verovio.editInfo();
-            console.log(jsonContext);
             this.sectionTreeObj.loadContext(jsonContext);
         }
+        this.tab.loaded = true;
     }
 
     ////////////////////////////////////////////////////////////////////////
     // Custom event methods
     ////////////////////////////////////////////////////////////////////////
 
-    override onSelect(e: CustomEvent): boolean {
-        if (!super.onSelect(e)) return false;
-        this.updateContent(e.detail.id);
+    override onActivate(e: CustomEvent): boolean {
+        if (!super.onActivate(e)) return false;
+        // Make sure the data is loaded into Verovio 
+        if (this.app.getPageCount() > 0 && !this.tab.loaded) this.updateContent();
+        return true;
+    }
+
+    override onEndLoading(e: CustomEvent): boolean {
+        if (!super.onEndLoading(e)) return false;
+        // Make sure the data is loaded into Verovio 
+        if (this.app.getPageCount() > 0 && !this.tab.loaded) this.updateContent();
         return true;
     }
 

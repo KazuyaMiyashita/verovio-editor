@@ -72,6 +72,8 @@ export class GenericTree extends GenericView {
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
 
+    public resetFocus(): void { this.focusId = ""; }
+
     public applyFocus(id: string): void {
         this.eventManager.unbindAll();
         this.rootElement.remove();
@@ -108,6 +110,7 @@ export class GenericTree extends GenericView {
             this.root.reset();
             this.rootElement.remove();
         }
+        this.clearCrumbs();
         this.root = null;
     }
 
@@ -350,7 +353,7 @@ export class TreeNode {
 
     public reset(): void {
         this.children.forEach(child => child.reset());
-        this.div.textContent = "";
+        if (this.div) this.div.textContent = "";
     }
 
     public html(div: HTMLDivElement, tree: GenericTree, depth: number, hideLabel: boolean = false) {

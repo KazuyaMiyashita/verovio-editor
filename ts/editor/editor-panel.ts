@@ -408,6 +408,7 @@ export class EditorPanel extends GenericView {
         this.customEventManager.dispatch(event);
         // We enabled the XML editor, update its data
         if (this.xmlEditorEnabled) {
+            this.tabGroupObj.resetTabs();
             const mei = await this.verovio.getMEI({});
             event = new CustomEvent('onLoadData', {
                 detail: {

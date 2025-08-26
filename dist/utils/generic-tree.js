@@ -44,6 +44,7 @@ export class GenericTree extends GenericView {
     ////////////////////////////////////////////////////////////////////////
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
+    resetFocus() { this.focusId = ""; }
     applyFocus(id) {
         this.eventManager.unbindAll();
         this.rootElement.remove();
@@ -77,6 +78,7 @@ export class GenericTree extends GenericView {
             this.root.reset();
             this.rootElement.remove();
         }
+        this.clearCrumbs();
         this.root = null;
     }
     collapseNode(id) {
@@ -254,7 +256,8 @@ export class TreeNode {
     ////////////////////////////////////////////////////////////////////////
     reset() {
         this.children.forEach(child => child.reset());
-        this.div.textContent = "";
+        if (this.div)
+            this.div.textContent = "";
     }
     html(div, tree, depth, hideLabel = false) {
         // There is a focus on an element. All ancestor be it will be displayed as bread crumbs

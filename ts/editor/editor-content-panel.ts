@@ -65,26 +65,42 @@ export class EditorContentPanel extends GenericView {
         const contextOk = await this.app.verovio.edit({ action: 'context', param: { elementId: `${id}` } });
         if (contextOk) {
             const jsonContent = await this.app.verovio.editInfo() as EditorContentTree.Content;
-            //console.log(jsonContent);
             this.contentTreeObj.loadContext(jsonContent);
-            this.attributeListObj.loadAttributesOrText(jsonContent.object);
-            this.referencesFromObj.loadList(jsonContent.referringElements, EditorReferenceList.Direction.From);
-            this.referencesToObj.loadList(jsonContent.referencedElements, EditorReferenceList.Direction.To);
+            if (id !== "") {
+                this.attributeListObj.loadAttributesOrText(jsonContent.object);
+                this.referencesFromObj.loadList(jsonContent.referringElements, EditorReferenceList.Direction.From);
+                this.referencesToObj.loadList(jsonContent.referencedElements, EditorReferenceList.Direction.To);
+            }
         }
+        this.tab.loaded = true;
     }
 
     ////////////////////////////////////////////////////////////////////////
     // Custom event methods
     ////////////////////////////////////////////////////////////////////////
 
-    override onSelect(e: CustomEvent): boolean {
-        if (!super.onSelect(e)) return false;
-        this.updateContent(e.detail.id);
+    override onActivate(e: CustomEvent): boolean {
+        if (!super.onActivate(e)) return false;
+        // Make sure the data is loaded into Verovio 
+        if (this.app.getPageCount() > 0 && !this.tab.loaded) this.updateContent("");
         return true;
     }
 
     override onEditData(e: CustomEvent): boolean {
         if (!super.onEditData(e)) return false;
+        this.updateContent(e.detail.id);
+        return true;
+    }
+
+    override onEndLoading(e: CustomEvent): boolean {
+        if (!super.onEndLoading(e)) return false;
+        // Make sure the data is loaded into Verovio 
+        if (this.app.getPageCount() > 0 && !this.tab.loaded) this.updateContent("");
+        return true;
+    }
+
+    override onSelect(e: CustomEvent): boolean {
+        if (!super.onSelect(e)) return false;
         this.updateContent(e.detail.id);
         return true;
     }
