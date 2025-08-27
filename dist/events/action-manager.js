@@ -20,8 +20,8 @@ export class ActionManager {
         const editorAction = { action: 'commit' };
         await this.editorViewObj.verovio.edit(editorAction);
         const info = await this.editorViewObj.verovio.editInfo();
-        this.canUndoCache = info['canUndo'];
-        this.canRedoCache = info['canRedo'];
+        this.canUndoCache = info.canUndo;
+        this.canRedoCache = info.canRedo;
         await this.editorViewObj.renderPage(true);
         this.inProgress = false;
         let id = "";
@@ -196,8 +196,8 @@ export class ActionManager {
         const editorAction = { action: 'undo' };
         await this.editorViewObj.verovio.edit(editorAction);
         const info = await this.editorViewObj.verovio.editInfo();
-        this.canUndoCache = info['canUndo'];
-        this.canRedoCache = info['canRedo'];
+        this.canUndoCache = info.canUndo;
+        this.canRedoCache = info.canRedo;
         await this.editorViewObj.renderPage(true);
     }
     async redo() {
@@ -205,8 +205,8 @@ export class ActionManager {
         const editorAction = { action: 'redo' };
         await this.editorViewObj.verovio.edit(editorAction);
         const info = await this.editorViewObj.verovio.editInfo();
-        this.canUndoCache = info['canUndo'];
-        this.canRedoCache = info['canRedo'];
+        this.canUndoCache = info.canUndo;
+        this.canRedoCache = info.canRedo;
         await this.editorViewObj.renderPage(true);
     }
     // helper

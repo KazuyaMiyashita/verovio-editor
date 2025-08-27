@@ -181,4 +181,10 @@ export namespace VerovioView {
         scale: number;
         xmlIdSeed: number;
     }
+
+    export interface EditInfo {
+        chainedId: string;
+        canUndo: boolean;
+        canRedo: boolean;
+    }
 };

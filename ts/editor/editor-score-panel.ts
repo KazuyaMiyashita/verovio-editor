@@ -5,6 +5,7 @@
 import { App } from '../app.js';
 import { EditorScoreTree } from './editor-score-tree.js';
 import { GenericView } from '../utils/generic-view.js';
+import { GenericTree } from '../utils/generic-tree.js';
 import { Tab } from '../utils/tab-group.js';
 import { appendDivTo } from '../utils/functions.js';
 
@@ -39,7 +40,7 @@ export class EditorScorePanel extends GenericView {
         this.sectionTreeObj.resetFocus();
         const contextOk = await this.app.verovio.edit({ action: 'context', param: { document: 'scores' } });
         if (contextOk) {
-            const jsonContext = await this.app.verovio.editInfo();
+            const jsonContext = await this.app.verovio.editInfo() as GenericTree.Object;
             this.sectionTreeObj.loadContext(jsonContext);
         }
         this.tab.loaded = true;

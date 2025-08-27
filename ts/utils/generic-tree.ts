@@ -386,6 +386,7 @@ export class TreeNode {
         this.div.dataset.id = this.id;
         this.div.dataset.element = this.element;
         this.label = appendDivTo(this.div, { class: `vrv-mei-element vrv-node-label` });
+
         if (hideLabel) {
             this.label.style.display = 'none';
             // This the label is hidden we want it as a bread crumb
@@ -404,6 +405,7 @@ export class TreeNode {
                 this.label.classList.add("checked");
             }
         }
+
         let labelStr = this.element;
         if (this.attributes && this.attributes['n']) {
             labelStr += ` ${this.attributes['n']}`

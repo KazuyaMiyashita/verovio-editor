@@ -5,6 +5,7 @@ import { App } from '../app.js';
 import { EditorView } from '../editor/editor-view.js';
 import { EventManager } from './event-manager.js';
 import { GenericView } from '../utils/generic-view.js';
+import { VerovioView } from '../verovio/verovio-view.js';
 
 
 export class ActionManager {
@@ -43,9 +44,9 @@ export class ActionManager {
         const editorAction = { action: 'commit' };
 
         await this.editorViewObj.verovio.edit(editorAction);
-        const info = await this.editorViewObj.verovio.editInfo();
-        this.canUndoCache = info['canUndo'];
-        this.canRedoCache = info['canRedo'];
+        const info = await this.editorViewObj.verovio.editInfo() as VerovioView.EditInfo;
+        this.canUndoCache = info.canUndo;
+        this.canRedoCache = info.canRedo;
         await this.editorViewObj.renderPage(true);
 
         this.inProgress = false;
@@ -241,9 +242,9 @@ export class ActionManager {
         this.app.startLoading("Undoing ...", true);
         const editorAction = { action: 'undo' }
         await this.editorViewObj.verovio.edit(editorAction);
-        const info = await this.editorViewObj.verovio.editInfo();
-        this.canUndoCache = info['canUndo'];
-        this.canRedoCache = info['canRedo'];
+        const info = await this.editorViewObj.verovio.editInfo() as VerovioView.EditInfo;
+        this.canUndoCache = info.canUndo;
+        this.canRedoCache = info.canRedo;
         await this.editorViewObj.renderPage(true);
     }
 
@@ -251,9 +252,9 @@ export class ActionManager {
         this.app.startLoading("Redoing ...", true);
         const editorAction = { action: 'redo' }
         await this.editorViewObj.verovio.edit(editorAction);
-        const info = await this.editorViewObj.verovio.editInfo();
-        this.canUndoCache = info['canUndo'];
-        this.canRedoCache = info['canRedo'];
+        const info = await this.editorViewObj.verovio.editInfo() as VerovioView.EditInfo;
+        this.canUndoCache = info.canUndo;
+        this.canRedoCache = info.canRedo;
         await this.editorViewObj.renderPage(true);
     }
 

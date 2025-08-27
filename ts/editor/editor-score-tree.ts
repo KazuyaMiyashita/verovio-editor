@@ -1,5 +1,5 @@
 import { App } from '../app.js';
-import { GenericTree, TreeNode } from '../utils/generic-tree.js';
+import { GenericTree } from '../utils/generic-tree.js';
 import { Tab } from '../utils/tab-group.js'
 
 export class EditorScoreTree extends GenericTree {
