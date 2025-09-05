@@ -233,6 +233,9 @@ export class GenericTree extends GenericView {
     onClick(e) {
         // This need to be overridden
     }
+    onContextmenu(e) {
+        // This need to be overridden
+    }
     onMouseover(e) {
         // This need to be overridden
     }
@@ -299,6 +302,7 @@ export class TreeNode {
             tree.eventManager.bind(this.div, "click", tree.onClick);
             tree.eventManager.bind(this.div, "mouseover", tree.onMouseover);
             tree.eventManager.bind(this.div, "mouseout", tree.onMouseout);
+            tree.eventManager.bind(this.div, "contextmenu", tree.onContextmenu);
             this.label.style.backgroundImage = `url(${App.iconFor(this.element)})`;
             if (tree.getFocusId() === this.id) {
                 this.label.classList.add("target");

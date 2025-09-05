@@ -89,6 +89,10 @@ export class EditorContentTree extends GenericTree {
         e.stopPropagation();
     }
 
+    override onContextmenu(e: PointerEvent): void {
+        this.app.contextMenuObj.show(e);
+    }
+
     override onMouseover(e: MouseEvent): void {
         const element: HTMLElement = e.target as HTMLElement;
         if (element.dataset.id) {

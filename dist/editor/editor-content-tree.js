@@ -72,6 +72,9 @@ export class EditorContentTree extends GenericTree {
         }
         e.stopPropagation();
     }
+    onContextmenu(e) {
+        this.app.contextMenuObj.show(e);
+    }
     onMouseover(e) {
         const element = e.target;
         if (element.dataset.id) {

@@ -26,6 +26,7 @@ import { RNGLoader } from './xml/rng-loader.js';
 import { PDFWorkerProxy, VerovioWorkerProxy, ValidatorWorkerProxy } from './utils/worker-proxy.js';
 import { appendAnchorTo, appendDivTo, appendInputTo, appendLinkTo, appendTextAreaTo } from './utils/functions.js';
 import { aboutMsg, reloadMsg, resetMsg, version } from './utils/messages.js';
+import { ContextMenu } from './toolbars/context-menu.js';
 const filter = '/svg/filter.xml';
 const host = (window.location.hostname == "localhost") ? `http://${window.location.host}` : "https://editor.verovio.org";
 export class App {
@@ -114,6 +115,9 @@ export class App {
         this.wrapper = appendDivTo(this.div, { class: `vrv-wrapper` });
         // Create notification div
         this.notification = appendDivTo(this.wrapper, { class: `vrv-notification disabled` });
+        // Create right menu div
+        this.contextUnderlay = appendDivTo(this.wrapper, { class: `vrv-context-underlay` });
+        this.contextMenu = appendDivTo(this.wrapper, { class: `vrv-context-menu` });
         // Create a dialog div
         this.dialogDiv = appendDivTo(this.wrapper, { class: `vrv-dialog` });
         // Create a toolbar div
@@ -334,6 +338,9 @@ export class App {
         this.midiToolbarObj = new MidiToolbar(this.toolbar, this);
         this.midiPlayer = new MidiPlayer(this.midiToolbarObj);
         this.customEventManager.addToPropagationList(this.midiToolbarObj.customEventManager);
+        this.contextMenuObj = new ContextMenu(this.contextMenu, this, this.contextUnderlay);
+        this.customEventManager.addToPropagationList(this.contextMenuObj.customEventManager);
+        this.div.addEventListener('contextmenu', (e => e.preventDefault()));
     }
     createStatusbar() {
         if (!this.options.enableStatusbar)

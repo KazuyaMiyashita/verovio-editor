@@ -15,6 +15,7 @@ export class VerovioView extends GenericView {
     protected currentPage: number;
     protected currentZoomIndex: number;
     protected currentScale: number;
+    protected boundContextMenu: { (event: PointerEvent): void };
     protected boundMouseMove: { (event: MouseEvent): void };
     protected boundMouseUp: { (event: MouseEvent): void };
     protected boundKeyDown: { (event: KeyboardEvent): void };
@@ -66,6 +67,7 @@ export class VerovioView extends GenericView {
 
     // Necessary for how ES6 "this" works inside events
     private bindListeners(): void {
+        this.boundContextMenu = (e: PointerEvent) => this.contextMenuListener(e);
         this.boundKeyDown = (e: KeyboardEvent) => this.keyDownListener(e);
         this.boundKeyUp = (e: KeyboardEvent) => this.keyUpListener(e);
         this.boundMouseMove = (e: MouseEvent) => this.mouseMoveListener(e);
@@ -81,6 +83,7 @@ export class VerovioView extends GenericView {
         // Called to unsubscribe from all events. Probably a good idea to call this if the object is deleted.
         this.eventManager.unbindAll();
 
+        document.removeEventListener('contextmenu', this.contextMenuListener);
         document.removeEventListener('mousemove', this.boundMouseMove);
         document.removeEventListener('mouseup', this.boundMouseUp);
         document.removeEventListener('touchmove', this.boundMouseMove);
@@ -140,6 +143,8 @@ export class VerovioView extends GenericView {
     ////////////////////////////////////////////////////////////////////////
     // Event listeners
     ////////////////////////////////////////////////////////////////////////
+
+    contextMenuListener(e: PointerEvent): void { }
 
     keyDownListener(e: KeyboardEvent): void { }
 

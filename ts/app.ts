@@ -30,6 +30,7 @@ import { VerovioView } from './verovio/verovio-view.js';
 
 import { appendAnchorTo, appendDivTo, appendInputTo, appendLinkTo, appendTextAreaTo } from './utils/functions.js';
 import { aboutMsg, reloadMsg, resetMsg, version } from './utils/messages.js';
+import { ContextMenu } from './toolbars/context-menu.js';
 
 const filter = '/svg/filter.xml';
 const host = (window.location.hostname == "localhost") ? `http://${window.location.host}` : "https://editor.verovio.org";
@@ -70,6 +71,7 @@ export class App {
 
     private loadingCount: number;
     public toolbarObj: AppToolbar;
+    public contextMenuObj: ContextMenu;
     private statusbarObj: AppStatusbar;
     private midiToolbarObj: MidiToolbar;
     private resizeTimer: number;
@@ -89,6 +91,8 @@ export class App {
     private fileCopy: HTMLTextAreaElement;
     private wrapper: HTMLDivElement;
     private notification: HTMLDivElement;
+    private contextUnderlay: HTMLDivElement;
+    private contextMenu: HTMLDivElement;
     private toolbar: HTMLDivElement;
     private views: HTMLDivElement;
     private loader: HTMLDivElement;
@@ -209,6 +213,10 @@ export class App {
 
         // Create notification div
         this.notification = appendDivTo(this.wrapper, { class: `vrv-notification disabled` });
+
+        // Create right menu div
+        this.contextUnderlay = appendDivTo(this.wrapper, { class: `vrv-context-underlay` });
+        this.contextMenu = appendDivTo(this.wrapper, { class: `vrv-context-menu` });
 
         // Create a dialog div
         this.dialogDiv = appendDivTo(this.wrapper, { class: `vrv-dialog` });
@@ -476,6 +484,10 @@ export class App {
         this.midiToolbarObj = new MidiToolbar(this.toolbar, this);
         this.midiPlayer = new MidiPlayer(this.midiToolbarObj);
         this.customEventManager.addToPropagationList(this.midiToolbarObj.customEventManager);
+
+        this.contextMenuObj = new ContextMenu(this.contextMenu, this, this.contextUnderlay);
+        this.customEventManager.addToPropagationList(this.contextMenuObj.customEventManager);
+        this.div.addEventListener('contextmenu', (e => e.preventDefault()));
     }
 
     private createStatusbar(): void {

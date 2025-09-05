@@ -28,6 +28,7 @@ export class EditorView extends ResponsiveView {
         this.lastNote = { midiPitch: 0, oct: "", pname: "" };
         // EditorAction
         this.actionManager = new ActionManager(this, app);
+        this.app.contextMenuObj.setActionManager(this.actionManager);
         this.selectedItems = [];
     }
     ////////////////////////////////////////////////////////////////////////
@@ -303,6 +304,10 @@ export class EditorView extends ResponsiveView {
     ////////////////////////////////////////////////////////////////////////
     // Event listeners
     ////////////////////////////////////////////////////////////////////////
+    contextMenuListener(e) {
+        this.app.contextMenuObj.show(e);
+        e.preventDefault();
+    }
     keyDownListener(e) {
         // For now only up and down arrows
         if (e.keyCode === 38 || e.keyCode === 40) {
@@ -364,11 +369,13 @@ export class EditorView extends ResponsiveView {
     }
     ;
     mouseEnterListener(e) {
+        document.addEventListener('contextmenu', this.boundContextMenu);
         document.addEventListener('keydown', this.boundKeyDown);
         document.addEventListener('keyup', this.boundKeyUp);
         //console.debug( "Hey!" );
     }
     mouseLeaveListener(e) {
+        document.removeEventListener('contextmenu', this.boundContextMenu);
         document.removeEventListener('mouseup', this.boundMouseUp);
         document.removeEventListener('touchend', this.boundMouseUp);
         document.removeEventListener('mousemove', this.boundMouseMove);
