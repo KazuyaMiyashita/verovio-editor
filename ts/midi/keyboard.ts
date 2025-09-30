@@ -3,12 +3,14 @@
  */
 
 import { App } from '../app.js';
+import { ActionManager } from '../events/action-manager.js';
 import { EventManager } from '../events/event-manager.js';
 import { appendDivTo, appendMidiPlayerTo, MidiPlayerElement } from '../utils/functions.js';
 import { midiScale } from './midi-scale.js'
 
 export class Keyboard {
     private currentOctave: number;
+    private actionManager: ActionManager;
 
     private boundKeyUp: { (event: KeyboardEvent): void };
     private boundKeyDown: { (event: KeyboardEvent): void };
@@ -78,6 +80,14 @@ export class Keyboard {
 
         this.currentOctave = 3;
         this.activate();
+    }
+
+    ////////////////////////////////////////////////////////////////////////
+    // Getters and setters
+    ////////////////////////////////////////////////////////////////////////
+
+    public setActionManager(actionManager: ActionManager): void {
+        this.actionManager = actionManager;
     }
 
     ////////////////////////////////////////////////////////////////////////
@@ -182,7 +192,7 @@ export class Keyboard {
         let target = <HTMLElement>e.target;
         target.classList.add("active");
         if (target.dataset.midi) {
-            this.playNoteSound(target.dataset.midi)
+            this.playNoteSound(target.dataset.midi);
         }
         e.preventDefault();
     }
