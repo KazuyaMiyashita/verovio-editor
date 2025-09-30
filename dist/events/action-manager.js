@@ -130,6 +130,38 @@ export class ActionManager {
     ////////////////////////////////////////////////////////////////////////
     // Element specific methods
     ////////////////////////////////////////////////////////////////////////
+    async insert(elementName, insertMode) {
+        if (!this.editorViewObj.hasSelection())
+            return;
+        let chain = new Array();
+        chain.push({
+            action: 'insert',
+            param: {
+                elementName: elementName,
+                elementId: this.editorViewObj.getSelection()[0].id,
+                insertMode: insertMode
+            }
+        });
+        console.log(chain);
+        /*
+        chain.push({
+            action: 'drag',
+            param: {
+                elementId: "[chained-id]",
+                x: x,
+                y: y
+            }
+        });
+        */
+        //chain.push({ action: 'commit' });
+        //console.debug( chain );
+        const editorAction = {
+            action: 'chain',
+            param: chain
+        };
+        await this.editorViewObj.verovio.edit(editorAction);
+        await this.commit(this.editorViewObj);
+    }
     /*
     async insertNote(x: number, y: number): Promise<any> {
         if (!this.cursorPointer.inputMode) return;

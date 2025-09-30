@@ -10,21 +10,6 @@ export class ContextMenu extends GenericView {
         this.underlay = underlay;
         // One of the little quirks of writing in ES6, bind events
         this.eventManager = new EventManager(this);
-        this.eventManager.bind(this.div, 'click', this.hide);
-        const fileMenu = appendDivTo(this.div, { class: `vrv-menu prout` });
-        const fileMenuContent = appendDivTo(fileMenu, { class: `vrv-menu-content` });
-        const fileImport = appendDivTo(fileMenuContent, { class: `vrv-menu-text`, 'data-before': `Import MEI file` });
-        this.app.eventManager.bind(fileImport, 'click', this.app.fileImport);
-        appendDivTo(fileMenuContent, { class: `vrv-v-separator` });
-        const helpAbout = appendDivTo(fileMenuContent, { class: `vrv-menu-text`, 'data-before': `About the application` });
-        const help2 = appendDivTo(fileMenuContent, { class: `vrv-menu-text`, 'data-before': `About this application` });
-        const fileRecentSubMenu = appendDivTo(fileMenuContent, { class: `vrv-submenu` });
-        const fileRecent = appendDivTo(fileRecentSubMenu, { class: `vrv-submenu-text`, 'data-before': `Recent files` });
-        const subSubMenu = appendDivTo(fileRecentSubMenu, { class: `vrv-submenu-content` });
-        ["test1", "test2"].forEach(item => {
-            const entry = appendDivTo(subSubMenu, { class: `vrv-menu-text`, 'data-before': item });
-        });
-        this.eventManager.bind(this.underlay, 'click', this.onDismiss);
     }
     ////////////////////////////////////////////////////////////////////////
     // Getters and setters
@@ -49,8 +34,51 @@ export class ContextMenu extends GenericView {
         this.hide();
     }
     buildFor(id) {
-        //this.actionManager
-        this.app.rngLoader;
+        this.eventManager.unbindAll();
+        this.eventManager.bind(this.div, 'click', this.hide);
+        this.eventManager.bind(this.underlay, 'click', this.onDismiss);
+        const contextMenu = appendDivTo(this.div, { class: `vrv-menu` });
+        const contextMenuContent = appendDivTo(contextMenu, { class: `vrv-menu-content` });
+        const insertBeforeSubMenu = appendDivTo(contextMenuContent, { class: `vrv-submenu` });
+        appendDivTo(insertBeforeSubMenu, { class: `vrv-submenu-text`, 'data-before': `Insert before` });
+        let subMenu = appendDivTo(insertBeforeSubMenu, { class: `vrv-submenu-content` });
+        ["note", "rest"].forEach(item => {
+            const entry = appendDivTo(subMenu, { class: `vrv-menu-text`, 'data-before': item });
+            entry.dataset.elementName = item;
+            entry.dataset.insertMode = "insertBefore";
+            this.eventManager.bind(entry, 'click', this.insertNote);
+        });
+        const insertAfterSubMenu = appendDivTo(contextMenuContent, { class: `vrv-submenu` });
+        appendDivTo(insertAfterSubMenu, { class: `vrv-submenu-text`, 'data-before': `Insert after` });
+        subMenu = appendDivTo(insertAfterSubMenu, { class: `vrv-submenu-content` });
+        ["note", "rest"].forEach(item => {
+            const entry = appendDivTo(subMenu, { class: `vrv-menu-text`, 'data-before': item });
+            entry.dataset.elementName = item;
+            entry.dataset.insertMode = "insertAfter";
+            this.eventManager.bind(entry, 'click', this.insertNote);
+        });
+        const appendChildMenu = appendDivTo(contextMenuContent, { class: `vrv-submenu` });
+        appendDivTo(appendChildMenu, { class: `vrv-submenu-text`, 'data-before': `Append child` });
+        subMenu = appendDivTo(appendChildMenu, { class: `vrv-submenu-content` });
+        ["note", "rest"].forEach(item => {
+            const entry = appendDivTo(subMenu, { class: `vrv-menu-text`, 'data-before': item });
+            entry.dataset.elementName = item;
+            entry.dataset.insertMode = "appendChild";
+            this.eventManager.bind(entry, 'click', this.insertNote);
+        });
+        /*
+        const fileImport = appendDivTo(contextMenuContent, { class: `vrv-menu-text`, 'data-before': `Import MEI file` });
+        this.eventManager.bind(fileImport, 'click', this.insertNote);
+        appendDivTo(contextMenuContent, { class: `vrv-v-separator` });
+
+        const helpAbout = appendDivTo(contextMenuContent, { class: `vrv-menu-text`, 'data-before': `About the application` });
+
+        const help2 = appendDivTo(contextMenuContent, { class: `vrv-menu-text`, 'data-before': `About this application` });
+        */
+    }
+    insertNote(e) {
+        const element = e.target;
+        this.actionManager.insert(element.dataset.elementName, element.dataset.insertMode);
     }
 }
 //# sourceMappingURL=context-menu.js.map

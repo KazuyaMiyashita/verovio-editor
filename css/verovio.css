@@ -247,6 +247,7 @@
         background: url(../icons/toolbar/submenu.png) no-repeat;
         background-position: center right;
         padding-right: 20px;
+        margin-right: 10px;
         width: calc(100% - 30px); }
       .vrv-wrapper .vrv-context-menu .vrv-menu-content .vrv-submenu-content, .vrv-wrapper .vrv-toolbar .vrv-menu-content .vrv-context-menu .vrv-submenu-content .vrv-submenu-content, .vrv-wrapper .vrv-editor-toolbar .vrv-menu-content .vrv-context-menu .vrv-submenu-content .vrv-submenu-content {
         margin-top: 0px;
@@ -355,6 +356,7 @@
         background: url(../icons/toolbar/submenu.png) no-repeat;
         background-position: center right;
         padding-right: 20px;
+        margin-right: 10px;
         width: calc(100% - 30px); }
       .vrv-wrapper .vrv-toolbar .vrv-menu-content .vrv-submenu-content, .vrv-wrapper .vrv-editor-toolbar .vrv-menu-content .vrv-submenu-content, .vrv-wrapper .vrv-context-menu .vrv-menu-content .vrv-toolbar .vrv-submenu-content .vrv-submenu-content, .vrv-wrapper .vrv-context-menu .vrv-menu-content .vrv-editor-toolbar .vrv-submenu-content .vrv-submenu-content {
         margin-top: 0px;

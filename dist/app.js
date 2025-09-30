@@ -64,7 +64,7 @@ export class App {
             schema: 'https://music-encoding.org/schema/5.1/mei-all.rng',
             //schema: './local/mei-all.rng',
             schemaBasic: 'https://music-encoding.org/schema/5.1/mei-basic.rng',
-            //schemaBasic: './local/mei-all.rng',
+            //schemaBasic: './local/mei-basic.rng',
             defaultView: 'responsive',
             isSafari: false
         }, options);
