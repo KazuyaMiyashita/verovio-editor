@@ -1,8 +1,8 @@
 /**
  * The Worker for XML validation.
  */
-//importScripts("https://www.verovio.org/javascript/validator/xml-validator-2.10.3.js");
-importScripts("http://localhost:8002/xml-validator-2.10.3.js");
+importScripts("https://www.verovio.org/javascript/validator/xml-validator-2.10.3.js");
+//importScripts("http://localhost:8002/xml-validator-2.10.3.js");
 class ValidatorDeferred {
     constructor() {
         //@ts-ignore
