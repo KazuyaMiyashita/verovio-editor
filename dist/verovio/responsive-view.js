@@ -96,6 +96,22 @@ export class ResponsiveView extends VerovioView {
         //const animateStart = document.getElementById( "highlighting-start" );
         let vrvTime = time;
         let elementsAtTime = await this.app.verovio.getElementsAtTime(vrvTime);
+        if (this.app.getMidiPlayer().getExpansionMap() && !this.app.getMidiPlayer().getExpansionMap().empty) {
+            const toBaseId = (id) => {
+                const expansion = this.app.getMidiPlayer().getExpansionMap()[id];
+                return (expansion && expansion.length > 0) ? expansion[0] : id;
+            };
+            if (elementsAtTime.notes)
+                elementsAtTime.notes = elementsAtTime.notes.map((id) => toBaseId(id));
+            if (elementsAtTime.chords)
+                elementsAtTime.chords = elementsAtTime.chords.map((id) => toBaseId(id));
+            if (elementsAtTime.rests)
+                elementsAtTime.rests = elementsAtTime.rests.map((id) => toBaseId(id));
+            if (elementsAtTime.measure) {
+                elementsAtTime.measure = toBaseId(elementsAtTime.measure);
+                elementsAtTime.page = await this.app.verovio.getPageWithElement(elementsAtTime.measure);
+            }
+        }
         if (Object.keys(elementsAtTime).length === 0 || elementsAtTime.page === 0) {
             //console.debug( "Nothing returned by getElementsAtTime" );
             return;

@@ -392,6 +392,8 @@ export class App {
     // Async worker methods
     ////////////////////////////////////////////////////////////////////////
     async playMEI() {
+        const expansionMap = await this.verovio.renderToExpansionMap();
+        this.midiPlayer.setExpansionMap(expansionMap);
         const base64midi = await this.verovio.renderToMIDI();
         const midiFile = 'data:audio/midi;base64,' + base64midi;
         this.midiPlayer.playFile(midiFile);

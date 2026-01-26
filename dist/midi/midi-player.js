@@ -20,6 +20,7 @@ export class MidiPlayer {
         this.progressBarTimer = null;
         // A view responding to midiUpdate and midiStop
         this.view = null;
+        this.expansionMap = {};
     }
     ////////////////////////////////////////////////////////////////////////
     // Getters and setters
@@ -31,6 +32,8 @@ export class MidiPlayer {
     getTotalTime() { return this.totalTime; }
     getTotalTimeStr() { return this.totalTimeStr; }
     setView(view) { this.view = view; }
+    setExpansionMap(expansionMap) { this.expansionMap = expansionMap || {}; }
+    getExpansionMap() { return this.expansionMap; }
     ////////////////////////////////////////////////////////////////////////
     // Public method to be called by the user
     ////////////////////////////////////////////////////////////////////////

@@ -11,7 +11,7 @@ import { appendDivTo } from '../utils/functions.js';
 
 export class ResponsiveView extends VerovioView {
     protected svgWrapper: HTMLDivElement;
-    protected midiIds: Array<number>;
+    protected midiIds: Array<string>;
 
     constructor(div: HTMLDivElement, app: App, verovio: VerovioWorkerProxy) {
         super(div, app, verovio)
@@ -119,7 +119,22 @@ export class ResponsiveView extends VerovioView {
         //const animateStart = document.getElementById( "highlighting-start" );
 
         let vrvTime = time;
-        let elementsAtTime = await this.app.verovio.getElementsAtTime(vrvTime);
+        let elementsAtTime = await this.app.verovio.getElementsAtTime(vrvTime) as VerovioView.ElementsAtTime;
+
+        if (this.app.getMidiPlayer().getExpansionMap() && !this.app.getMidiPlayer().getExpansionMap().empty) {
+            const toBaseId = (id: string): string => {
+                const expansion = this.app.getMidiPlayer().getExpansionMap()[id];
+                return (expansion && expansion.length > 0) ? expansion[0] : id;
+            };
+
+            if (elementsAtTime.notes) elementsAtTime.notes = elementsAtTime.notes.map((id) => toBaseId(id));
+            if (elementsAtTime.chords) elementsAtTime.chords = elementsAtTime.chords.map((id) => toBaseId(id));
+            if (elementsAtTime.rests) elementsAtTime.rests = elementsAtTime.rests.map((id) => toBaseId(id));
+            if (elementsAtTime.measure) {
+                elementsAtTime.measure = toBaseId(elementsAtTime.measure);
+                elementsAtTime.page = await this.app.verovio.getPageWithElement(elementsAtTime.measure);
+            }
+        }
         if (Object.keys(elementsAtTime).length === 0 || elementsAtTime.page === 0) {
             //console.debug( "Nothing returned by getElementsAtTime" );
             return;

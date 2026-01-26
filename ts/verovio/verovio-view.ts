@@ -192,4 +192,12 @@ export namespace VerovioView {
         canUndo: boolean;
         canRedo: boolean;
     }
+
+    export interface ElementsAtTime {
+        page: number;
+        measure: string;
+        notes: Array<string>;
+        rests: Array<string>;
+        chords: Array<string>;
+    }
 };
