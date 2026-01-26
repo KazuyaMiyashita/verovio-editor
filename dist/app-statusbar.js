@@ -9,10 +9,14 @@ export class AppStatusbar extends GenericView {
         super(div, app);
         this.active = true;
         this.statusText = appendDivTo(this.div, { class: `vrv-status-text` });
+        this.versionText = appendDivTo(this.div, { class: `vrv-status-version` });
     }
     ////////////////////////////////////////////////////////////////////////
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
+    setVerovioVersion(version) {
+        this.versionText.textContent = version ? `Verovio ${version}` : "";
+    }
     ////////////////////////////////////////////////////////////////////////
     // Custom event methods
     ////////////////////////////////////////////////////////////////////////

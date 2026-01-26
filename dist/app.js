@@ -166,6 +166,7 @@ export class App {
             };
         this.pageCount = 0;
         this.currentZoomIndex = 4;
+        this.verovioRuntimeVersion = "";
         if (this.options.enableEditor) {
             const validatorWorkerURL = this.getWorkerURL(`${this.host}/dist/xml/validator-worker.js`);
             const validatorWorker = new Worker(validatorWorkerURL);
@@ -189,6 +190,7 @@ export class App {
         this.verovio.onRuntimeInitialized().then(async () => {
             const version = await this.verovio.getVersion();
             console.log(version);
+            this.verovioRuntimeVersion = version;
             this.endLoading();
             if (this.options.enableEditor) {
                 this.startLoading("Loading the XML validator ...");
@@ -347,6 +349,7 @@ export class App {
             return;
         this.statusbarObj = new AppStatusbar(this.statusbar, this);
         this.customEventManager.addToPropagationList(this.statusbarObj.customEventManager);
+        this.statusbarObj.setVerovioVersion(this.verovioRuntimeVersion);
     }
     createFilter() {
         const filterDiv = appendDivTo(this.div, { class: `vrv-filter` });

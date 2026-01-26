@@ -78,6 +78,7 @@ export class App {
     private appIsLoaded: boolean;
     private appReset: boolean;
     private filename: string;
+    private verovioRuntimeVersion: string;
 
     private viewDocumentObj: DocumentView;
     private viewEditorObj: EditorPanel;
@@ -279,6 +280,7 @@ export class App {
 
         this.pageCount = 0;
         this.currentZoomIndex = 4;
+        this.verovioRuntimeVersion = "";
 
         if (this.options.enableEditor) {
             const validatorWorkerURL = this.getWorkerURL(`${this.host}/dist/xml/validator-worker.js`);
@@ -307,6 +309,7 @@ export class App {
         this.verovio.onRuntimeInitialized().then(async () => {
             const version = await this.verovio.getVersion();
             console.log(version);
+            this.verovioRuntimeVersion = version;
 
             this.endLoading();
 
@@ -495,6 +498,7 @@ export class App {
 
         this.statusbarObj = new AppStatusbar(this.statusbar, this);
         this.customEventManager.addToPropagationList(this.statusbarObj.customEventManager);
+        this.statusbarObj.setVerovioVersion(this.verovioRuntimeVersion);
     }
 
     private createFilter(): void {

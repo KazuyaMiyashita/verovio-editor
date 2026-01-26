@@ -390,9 +390,16 @@
     position: relative;
     background: #3c3c3c;
     min-height: 20px;
-    color: white; }
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center; }
     .vrv-wrapper .vrv-statusbar .vrv-status-text {
       padding: 3px 3px 0px 5px;
+      text-decoration: none;
+      font-size: 14px; }
+    .vrv-wrapper .vrv-statusbar .vrv-status-version {
+      padding: 3px 5px 0px 3px;
       text-decoration: none;
       font-size: 14px; }
   .vrv-wrapper .vrv-notification {

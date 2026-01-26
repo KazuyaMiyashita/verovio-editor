@@ -607,9 +607,18 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
         background: $background;
         min-height: $statusbar-height;
         color: $text-color;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
 
         .vrv-status-text {
             padding: 3px 3px 0px 5px;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .vrv-status-version {
+            padding: 3px 5px 0px 3px;
             text-decoration: none;
             font-size: 14px;
         }

@@ -9,6 +9,7 @@ import { appendDivTo } from './utils/functions.js';
 
 export class AppStatusbar extends GenericView {
     private statusText: HTMLDivElement;
+    private versionText: HTMLDivElement;
 
     constructor(div: HTMLDivElement, app: App) {
         super(div, app);
@@ -16,11 +17,16 @@ export class AppStatusbar extends GenericView {
         this.active = true;
 
         this.statusText = appendDivTo(this.div, { class: `vrv-status-text` });
+        this.versionText = appendDivTo(this.div, { class: `vrv-status-version` });
     }
 
     ////////////////////////////////////////////////////////////////////////
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
+
+    public setVerovioVersion(version: string): void {
+        this.versionText.textContent = version ? `Verovio ${version}` : "";
+    }
 
     ////////////////////////////////////////////////////////////////////////
     // Custom event methods
