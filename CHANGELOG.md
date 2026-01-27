@@ -1,3 +1,15 @@
+# 1.4.6
+* Fix MIDI playback to use expansion map
+
+# 1.4.5
+* Fix editor overlay
+
+# 1.4.4
+* Add CMME input menu
+
+# 1.4.3
+* Use local version for some external packages
+
 # 1.4.2
 * Hide the settings menu in the Verovio App
 
