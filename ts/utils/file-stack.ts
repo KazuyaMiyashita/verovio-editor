@@ -68,7 +68,7 @@ export class FileStack {
     }
 
     public getLast(): File {
-        if (this.stack.items > 0) {
+        if (pako !== undefined && this.stack.items > 0) {
             return this.load(this.stack.idx);
         }
     }

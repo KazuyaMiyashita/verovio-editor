@@ -46,7 +46,7 @@ export class FileStack {
         return { filename: this.stack.filenames[idx], data: decompressedData };
     }
     getLast() {
-        if (this.stack.items > 0) {
+        if (pako !== undefined && this.stack.items > 0) {
             return this.load(this.stack.idx);
         }
     }
