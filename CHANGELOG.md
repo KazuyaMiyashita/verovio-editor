@@ -1,5 +1,6 @@
-# 1.4.6
+# 1.5.0
 * Fix MIDI playback to use expansion map
+* Code refactoring
 
 # 1.4.5
 * Fix editor overlay
