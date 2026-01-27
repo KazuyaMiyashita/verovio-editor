@@ -54,6 +54,7 @@ export class App {
             enableResponsive: true,
             enableStatusbar: true,
             enableValidation: true,
+            showDevFeatures: false,
             // Selection is empty by default
             selection: {},
             // Editorial is empty by default
@@ -86,6 +87,13 @@ export class App {
             else {
                 this.options = Object.assign(this.options, jsonStoredOptions);
             }
+        }
+        const storedShowDevFeatures = localStorage.getItem("showDevFeatures");
+        if (storedShowDevFeatures !== null) {
+            this.options.showDevFeatures = (storedShowDevFeatures === 'true');
+        }
+        else {
+            this.options.devFeatures = false;
         }
         this.fileStack = new FileStack();
         if (options.appReset)
@@ -509,6 +517,7 @@ export class App {
         // Do not store selection and editorial
         delete this.options['selection'];
         delete this.options['editorial'];
+        delete this.options['showDevFeatures'];
         window.localStorage.setItem("options", JSON.stringify(this.options));
         this.fileStack.store(this.filename, this.inputData);
     }

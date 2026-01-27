@@ -12,7 +12,7 @@ export class DialogSettingsEditor extends Dialog {
     protected readonly fields: HTMLDivElement;
     protected readonly appOptions: App.Options;
     protected readonly verovioVersion: HTMLSelectElement;
-    protected readonly devFeatures: HTMLInputElement;
+    protected readonly devFeatures: HTMLInputElement | null;
 
     constructor(div: HTMLDivElement, app: App, title: string, options: Dialog.Options, appOptions: App.Options) {
         super(div, app, title, options);
@@ -34,9 +34,12 @@ export class DialogSettingsEditor extends Dialog {
             if (appOptions.verovioVersion === version[0]) option.selected = true;
         })
 
-        this.appendLabel(this.fields, "Development features");
-        this.devFeatures = appendInputTo(this.fields, { class: `vrv-dialog-input`, type: `checkbox` });
-        if (appOptions.devFeatures === true) this.devFeatures.checked = true;
+        this.devFeatures = null;
+        if (appOptions.showDevFeatures) {
+            this.appendLabel(this.fields, "Development features");
+            this.devFeatures = appendInputTo(this.fields, { class: `vrv-dialog-input`, type: `checkbox` });
+            if (appOptions.devFeatures === true) this.devFeatures.checked = true;
+        }
 
     }
 
@@ -57,10 +60,12 @@ export class DialogSettingsEditor extends Dialog {
             this.reload = true;
         }
         this.appOptions.verovioVersion = this.verovioVersion.value;
-        if (this.devFeatures.checked !== this.appOptions.devFeatures) {
-            this.reload = true;
+        if (this.devFeatures) {
+            if (this.devFeatures.checked !== this.appOptions.devFeatures) {
+                this.reload = true;
+            }
+            this.appOptions.devFeatures = this.devFeatures.checked;
         }
-        this.appOptions.devFeatures = this.devFeatures.checked;
 
         super.ok();
     }

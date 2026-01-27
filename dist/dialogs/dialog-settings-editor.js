@@ -19,10 +19,13 @@ export class DialogSettingsEditor extends Dialog {
             if (appOptions.verovioVersion === version[0])
                 option.selected = true;
         });
-        this.appendLabel(this.fields, "Development features");
-        this.devFeatures = appendInputTo(this.fields, { class: `vrv-dialog-input`, type: `checkbox` });
-        if (appOptions.devFeatures === true)
-            this.devFeatures.checked = true;
+        this.devFeatures = null;
+        if (appOptions.showDevFeatures) {
+            this.appendLabel(this.fields, "Development features");
+            this.devFeatures = appendInputTo(this.fields, { class: `vrv-dialog-input`, type: `checkbox` });
+            if (appOptions.devFeatures === true)
+                this.devFeatures.checked = true;
+        }
     }
     ////////////////////////////////////////////////////////////////////////
     // Getters and setters
@@ -37,10 +40,12 @@ export class DialogSettingsEditor extends Dialog {
             this.reload = true;
         }
         this.appOptions.verovioVersion = this.verovioVersion.value;
-        if (this.devFeatures.checked !== this.appOptions.devFeatures) {
-            this.reload = true;
+        if (this.devFeatures) {
+            if (this.devFeatures.checked !== this.appOptions.devFeatures) {
+                this.reload = true;
+            }
+            this.appOptions.devFeatures = this.devFeatures.checked;
         }
-        this.appOptions.devFeatures = this.devFeatures.checked;
         super.ok();
     }
     reset() {
