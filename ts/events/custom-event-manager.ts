@@ -55,19 +55,15 @@ export class CustomEventManager {
     */
 
   public dispatch(event: Event) {
-    for (let objId of this.cache.keys()) {
-      const bindings: Map<string, Function> = this.cache.get(objId);
-      for (let ev of bindings.keys()) {
-        if (event.type === ev) {
-          let fct: Function = bindings.get(ev);
-          const o = this.objs.get(objId);
-          o[fct.name](event);
-        }
+    for (const [objId, bindings] of this.cache) {
+      const fct = bindings.get(event.type);
+      if (fct) {
+        const o = this.objs.get(objId);
+        fct.call(o, event);
       }
     }
-    for (let obj in this.propagationList) {
-      //console.debug(this.propagationList[obj]);
-      this.propagationList[obj]["dispatch"](event);
+    for (const manager of this.propagationList) {
+      manager.dispatch(event);
     }
   }
 }

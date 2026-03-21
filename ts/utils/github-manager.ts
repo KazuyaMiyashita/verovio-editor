@@ -4,23 +4,19 @@
 
 import { App } from "../app.js";
 
-declare global {
-  const GitHub;
-}
-
 export class GitHubManager {
   private name: string;
   private login: string;
-  private user: any; // GitHub::User object
-  private selectedUser: any; // GitHub::User object
-  private selectedOrganization: any; // GitHub::Organization object
+  private user: GitHubApi.User;
+  private selectedUser: GitHubApi.User;
+  private selectedOrganization: GitHubApi.Organization;
   private selectedAccountName: string;
   private selectedBranchName: string;
-  private selectedRepo: any; // GitHub::Repository object
+  private selectedRepo: GitHubApi.Repository;
   private selectedRepoName: string;
   private selectedPath: Array<string>;
 
-  private gh: any; // GitHub object
+  private gh: GitHubApi.GitHub;
 
   private readonly app: App;
 
@@ -60,28 +56,28 @@ export class GitHubManager {
     return this.login;
   }
 
-  public getUser(): any {
+  public getUser(): GitHubApi.User {
     return this.user;
   }
 
-  public getSelectedUser(): any {
+  public getSelectedUser(): GitHubApi.User {
     return this.selectedUser;
   }
 
-  public getSelectedOrganization(): any {
+  public getSelectedOrganization(): GitHubApi.Organization {
     return this.selectedOrganization;
   }
 
-  public getSelectedAccountName(): string {
-    return this.selectedAccountName;
+  public getSelectedRepo(): GitHubApi.Repository {
+    return this.selectedRepo;
   }
 
   public getSelectedBranchName(): string {
     return this.selectedBranchName;
   }
 
-  public getSelectedRepo(): any {
-    return this.selectedRepo;
+  public getSelectedAccountName(): string {
+    return this.selectedAccountName;
   }
 
   public getSelectedRepoName(): string {
@@ -142,9 +138,9 @@ export class GitHubManager {
   // Async network methods
   ////////////////////////////////////////////////////////////////////////
 
-  public async writeFile(filename: string, commitMsg: string): Promise<any> {
+  public async writeFile(filename: string, commitMsg: string): Promise<void> {
     try {
-      let mei = this.app.verovio.getMEI({});
+      let mei = await this.app.verovio.getMEI({});
       await this.selectedRepo.writeFile(
         this.selectedBranchName,
         filename,
@@ -159,7 +155,7 @@ export class GitHubManager {
     }
   }
 
-  public async selectAccount(login: string): Promise<any> {
+  public async selectAccount(login: string): Promise<void> {
     if (login === this.login) {
       this.selectedOrganization = null;
       this.selectedUser = this.gh.getUser();
@@ -175,7 +171,7 @@ export class GitHubManager {
     this.storeSelection();
   }
 
-  public async selectBranch(name: string): Promise<any> {
+  public async selectBranch(name: string): Promise<void> {
     if (name === "") return;
 
     // Only need to check the name, but make sure it exists?
@@ -184,7 +180,7 @@ export class GitHubManager {
     this.storeSelection();
   }
 
-  public async selectRepo(name: string): Promise<any> {
+  public async selectRepo(name: string): Promise<void> {
     if (name === "") return;
 
     try {
@@ -199,7 +195,7 @@ export class GitHubManager {
     }
   }
 
-  private async initUser(): Promise<any> {
+  private async initUser(): Promise<void> {
     this.user = this.gh.getUser();
     const profile = await this.user.getProfile();
     this.login = profile.data.login;

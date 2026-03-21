@@ -630,7 +630,7 @@ export class App {
   // Async worker methods
   ////////////////////////////////////////////////////////////////////////
 
-  public async playMEI(): Promise<any> {
+  public async playMEI(): Promise<void> {
     const expansionMap = await this.verovio.renderToExpansionMap();
     this.midiPlayer.setExpansionMap(expansionMap);
     const base64midi = await this.verovio.renderToMIDI();
@@ -638,7 +638,7 @@ export class App {
     this.midiPlayer.playFile(midiFile);
   }
 
-  private async loadMEI(convert: boolean): Promise<any> {
+  private async loadMEI(convert: boolean): Promise<void> {
     this.startLoading("Loading the MEI data ...");
 
     if (convert) {
@@ -666,13 +666,13 @@ export class App {
     this.view.customEventManager.dispatch(event);
   }
 
-  private async applySelection(): Promise<any> {
+  private async applySelection(): Promise<void> {
     let selection = this.options.selection;
     if (!selection || Object.keys(selection).length === 0) selection = {};
     await this.verovio.select(selection);
   }
 
-  private async checkSchema(): Promise<any> {
+  private async checkSchema(): Promise<void> {
     if (!this.options.enableEditor) return;
     const hasSchema =
       /<\?xml-model.*schematypens=\"http?:\/\/relaxng\.org\/ns\/structure\/1\.0\"/;
@@ -695,7 +695,7 @@ export class App {
     }
   }
 
-  private async generatePDF(): Promise<any> {
+  private async generatePDF(): Promise<void> {
     if (!this.pdf) {
       const pdfWorkerURL = this.getWorkerURL(
         `${this.host}/dist/document/pdf-worker.js`,
@@ -718,7 +718,7 @@ export class App {
     this.output.click();
   }
 
-  private async generateMIDI(): Promise<any> {
+  private async generateMIDI(): Promise<void> {
     const midiOutputStr = await this.verovio.renderToMIDI();
 
     this.endLoading();
@@ -728,7 +728,7 @@ export class App {
     this.output.click();
   }
 
-  private async generateMEI(options: App.MEIExportOptions): Promise<any> {
+  private async generateMEI(options: App.MEIExportOptions): Promise<void> {
     const meiOutputStr = await this.verovio.getMEI(options);
     this.endLoading();
     this.output.href =
@@ -861,7 +861,7 @@ export class App {
   // Async event methods
   ////////////////////////////////////////////////////////////////////////
 
-  async fileImport(e: MouseEvent): Promise<any> {
+  async fileImport(e: MouseEvent): Promise<void> {
     const element = e.target as HTMLElement;
     if (element.dataset.ext === "MEI") this.input.accept = ".xml, .mei";
     else if (element.dataset.ext === "MusicXML")
@@ -873,7 +873,7 @@ export class App {
     this.input.click();
   }
 
-  async fileInput(e: InputEvent): Promise<any> {
+  async fileInput(e: InputEvent): Promise<void> {
     const element = e.target as HTMLInputElement;
     let file = element.files[0];
     if (!file) return;
@@ -888,7 +888,7 @@ export class App {
     reader.readAsText(file);
   }
 
-  async fileExport(e: Event): Promise<any> {
+  async fileExport(e: Event): Promise<void> {
     const dlg = new DialogExport(
       this.dialogDiv,
       this,
@@ -900,17 +900,17 @@ export class App {
     this.generateMEI(dlg.getExportOptions());
   }
 
-  async fileExportPDF(e: Event): Promise<any> {
+  async fileExportPDF(e: Event): Promise<void> {
     this.startLoading("Generating PDF file ...");
     this.generatePDF();
   }
 
-  async fileExportMIDI(e: Event): Promise<any> {
+  async fileExportMIDI(e: Event): Promise<void> {
     this.startLoading("Generating MIDI file ...");
     this.generateMIDI();
   }
 
-  async fileCopyToClipboard(e: Event): Promise<any> {
+  async fileCopyToClipboard(e: Event): Promise<void> {
     const dlg = new DialogExport(
       this.dialogDiv,
       this,
@@ -925,14 +925,14 @@ export class App {
     this.showNotification("MEI copied to clipboard");
   }
 
-  async fileLoadRecent(e: Event): Promise<any> {
+  async fileLoadRecent(e: Event): Promise<void> {
     const element = e.target as HTMLElement;
     //console.log( e.target.dataset.idx );
     let file = this.fileStack.load(Number(element.dataset.idx));
     this.loadData(file.data, file.filename);
   }
 
-  async fileSelection(e: Event): Promise<any> {
+  async fileSelection(e: Event): Promise<void> {
     const dlg = new DialogSelection(
       this.dialogDiv,
       this,
@@ -955,7 +955,7 @@ export class App {
     }
   }
 
-  async githubImport(e: Event): Promise<any> {
+  async githubImport(e: Event): Promise<void> {
     const dlg = new DialogGhImport(
       this.dialogDiv,
       this,
@@ -969,7 +969,7 @@ export class App {
     }
   }
 
-  async githubExport(e: Event): Promise<any> {
+  async githubExport(e: Event): Promise<void> {
     const dlg = new DialogGhExport(
       this.dialogDiv,
       this,
@@ -982,7 +982,7 @@ export class App {
     }
   }
 
-  async settingsEditor(e: Event): Promise<any> {
+  async settingsEditor(e: Event): Promise<void> {
     const dlg = new DialogSettingsEditor(
       this.dialogDiv,
       this,
@@ -1005,7 +1005,7 @@ export class App {
     }
   }
 
-  async settingsVerovio(e: Event): Promise<any> {
+  async settingsVerovio(e: Event): Promise<void> {
     const dlg = new DialogSettingsVerovio(
       this.dialogDiv,
       this,
@@ -1029,7 +1029,7 @@ export class App {
     }
   }
 
-  async helpAbout(e: Event): Promise<any> {
+  async helpAbout(e: Event): Promise<void> {
     const dlg = new DialogAbout(this.dialogDiv, this, "About this application");
     const vrvVersion = await this.verovio.getVersion();
     dlg.setContent(marked.parse(aboutMsg + `\n\nVerovio: ${vrvVersion}`));
@@ -1037,7 +1037,7 @@ export class App {
     await dlg.show();
   }
 
-  async helpReset(e: Event): Promise<any> {
+  async helpReset(e: Event): Promise<void> {
     const dlg = new Dialog(this.dialogDiv, this, "Reset to default", {
       okLabel: "Yes",
       icon: "question",
@@ -1050,7 +1050,7 @@ export class App {
     location.reload();
   }
 
-  async setView(e: Event): Promise<any> {
+  async setView(e: Event): Promise<void> {
     const element = e.target as HTMLElement;
 
     if (this.midiPlayer && this.midiPlayer.isPlaying()) {

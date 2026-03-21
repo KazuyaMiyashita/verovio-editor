@@ -43,7 +43,7 @@ export class ActionManager {
   // Async worker methods
   ////////////////////////////////////////////////////////////////////////
 
-  public async commit(caller: GenericView): Promise<any> {
+  public async commit(caller: GenericView): Promise<void> {
     const editorAction = { action: "commit" };
 
     await this.editorViewObj.verovio.edit(editorAction);
@@ -75,7 +75,7 @@ export class ActionManager {
   }
 
   /*
-    public async delete(): Promise<any> {
+    public async delete(): Promise<void> {
         let chain = new Array();
         for (const item of this.editorViewObj.getSelection()) {
             if (!["note"].includes(item.element)) continue;
@@ -103,7 +103,7 @@ export class ActionManager {
     }
     */
 
-  public async drag(x: number, y: number): Promise<any> {
+  public async drag(x: number, y: number): Promise<void> {
     let chain = new Array();
     for (const item of this.editorViewObj.getSelection()) {
       if (!["note"].includes(item.element)) continue;
@@ -133,7 +133,7 @@ export class ActionManager {
     key: number,
     shiftKey: boolean,
     ctrlKey: boolean,
-  ): Promise<any> {
+  ): Promise<void> {
     let chain = new Array();
     for (const item of this.editorViewObj.getSelection()) {
       if (!["note"].includes(item.element)) continue;
@@ -169,7 +169,7 @@ export class ActionManager {
     key: number,
     shiftKey: boolean,
     ctrlKey: boolean,
-  ): Promise<any> {
+  ): Promise<void> {
     // actually nothing to do
     if (!this.inProgress) return;
 
@@ -180,7 +180,7 @@ export class ActionManager {
   // Element specific methods
   ////////////////////////////////////////////////////////////////////////
 
-  async insert(elementName: string, insertMode: string): Promise<any> {
+  async insert(elementName: string, insertMode: string): Promise<void> {
     if (!this.editorViewObj.hasSelection()) return;
 
     let chain = new Array();
@@ -220,7 +220,7 @@ export class ActionManager {
   }
 
   /*
-    async insertNote(x: number, y: number): Promise<any> {
+    async insertNote(x: number, y: number): Promise<void> {
         if (!this.cursorPointer.inputMode) return;
 
         let chain = new Array();
@@ -257,15 +257,15 @@ export class ActionManager {
     }
     */
 
-  public async formCres(): Promise<any> {
+  public async formCres(): Promise<void> {
     await this.setAttrValueForTypes("form", "cres", ["hairpin"]);
   }
 
-  public async formDim(): Promise<any> {
+  public async formDim(): Promise<void> {
     await this.setAttrValueForTypes("form", "dim", ["hairpin"]);
   }
 
-  public async placeAbove(): Promise<any> {
+  public async placeAbove(): Promise<void> {
     await this.setAttrValueForTypes("place", "above", [
       "dir",
       "dynam",
@@ -275,7 +275,7 @@ export class ActionManager {
     ]);
   }
 
-  public async placeBelow(): Promise<any> {
+  public async placeBelow(): Promise<void> {
     await this.setAttrValueForTypes("place", "below", [
       "dir",
       "dynam",
@@ -285,7 +285,7 @@ export class ActionManager {
     ]);
   }
 
-  public async placeAuto(): Promise<any> {
+  public async placeAuto(): Promise<void> {
     await this.setAttrValueForTypes("place", "", [
       "dir",
       "dynam",
@@ -295,19 +295,19 @@ export class ActionManager {
     ]);
   }
 
-  public async stemDirUp(): Promise<any> {
+  public async stemDirUp(): Promise<void> {
     await this.setAttrValueForTypes("stem.dir", "up", ["note", "chord"]);
   }
 
-  public async stemDirDown(): Promise<any> {
+  public async stemDirDown(): Promise<void> {
     await this.setAttrValueForTypes("stem.dir", "down", ["note", "chord"]);
   }
 
-  public async stemDirAuto(): Promise<any> {
+  public async stemDirAuto(): Promise<void> {
     await this.setAttrValueForTypes("stem.dir", "", ["note", "chord"]);
   }
 
-  public async undo(): Promise<any> {
+  public async undo(): Promise<void> {
     this.app.startLoading("Undoing ...", true);
     const editorAction = { action: "undo" };
     await this.editorViewObj.verovio.edit(editorAction);
@@ -318,7 +318,7 @@ export class ActionManager {
     await this.editorViewObj.renderPage(true);
   }
 
-  public async redo(): Promise<any> {
+  public async redo(): Promise<void> {
     this.app.startLoading("Redoing ...", true);
     const editorAction = { action: "redo" };
     await this.editorViewObj.verovio.edit(editorAction);
@@ -335,7 +335,7 @@ export class ActionManager {
     attribute: string,
     value: string,
     id: string,
-  ): Promise<any> {
+  ): Promise<void> {
     const editorAction = {
       action: "set",
       param: {
@@ -351,7 +351,7 @@ export class ActionManager {
     attribute: string,
     value: string,
     elementTypes: Array<string> = [],
-  ): Promise<any> {
+  ): Promise<void> {
     /*
         let chain = new Array();
         for (const item of this.editorViewObj.getSelection()) {

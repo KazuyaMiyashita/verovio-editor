@@ -145,10 +145,10 @@ export class EditorView extends ResponsiveView {
     this.addToSelection(element, id);
   }
 
-  private async playNoteSound(): Promise<any> {
-    const attr = await this.app.verovio.getElementAttr(
+  private async playNoteSound(): Promise<void> {
+    const attr = (await this.app.verovio.getElementAttr(
       this.selectedItems[0].id,
-    );
+    )) as EditorView.NoteAttributes;
     if (!attr.pname || !attr.oct) return;
     if (this.lastNote.pname === attr.pname && this.lastNote.oct === attr.oct)
       return;
@@ -570,3 +570,13 @@ export class EditorView extends ResponsiveView {
     this.svgWrapper.scrollLeft = element.scrollLeft;
   }
 }
+
+export namespace EditorView {
+  export interface NoteAttributes {
+    pname?: string;
+    oct?: string;
+    accid?: string;
+    midiPitch?: number;
+  }
+}
+

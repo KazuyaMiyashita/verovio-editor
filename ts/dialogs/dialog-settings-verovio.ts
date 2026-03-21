@@ -100,11 +100,11 @@ export class DialogSettingsVerovio extends Dialog {
   public async loadOptions() {
     // Get object describing the available options
     const availableOptions: AvailableOptions =
-      await this.verovio.getAvailableOptions();
+      (await this.verovio.getAvailableOptions()) as AvailableOptions;
     console.log(availableOptions);
     // Get the default and current options
-    this.defaultOptions = await this.verovio.getDefaultOptions();
-    this.currentOptions = await this.verovio.getOptions();
+    this.defaultOptions = (await this.verovio.getDefaultOptions()) as Options;
+    this.currentOptions = (await this.verovio.getOptions()) as Options;
 
     // Map for shorter tab names
     let tabNames = {

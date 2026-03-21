@@ -5,11 +5,11 @@
 import { randomHex } from "../utils/functions.js";
 
 export class EventManager {
-  private readonly parent: Object;
-  private cache: Object;
+  private readonly parent: any;
+  private cache: Record<string, Record<string, Function[]>>;
   private appIDAttr: string;
 
-  constructor(parent: Object) {
+  constructor(parent: any) {
     if (!parent) return;
     this.parent = parent;
     this.cache = {};
@@ -38,7 +38,7 @@ export class EventManager {
     const elEvObj = elObj[ev];
 
     // Bind the function to the parent
-    const boundFct = fct.bind(this.parent);
+    const boundFct = fct.bind(this.parent) as (this: any, ev: Event) => any;
     elEvObj.push(boundFct);
 
     // Add the listener
@@ -52,9 +52,9 @@ export class EventManager {
     if (!appID) return;
 
     if (appID in this.cache) {
-      if (ev in this.cache[appID]) {
-        for (let boundFunction of this.cache[appID][ev]) {
-          el.removeEventListener(ev, boundFunction);
+      if (this.cache[appID][ev]) {
+        for (const boundFunction of this.cache[appID][ev]) {
+          el.removeEventListener(ev, boundFunction as EventListener);
         }
       }
       delete this.cache[appID];
@@ -63,7 +63,7 @@ export class EventManager {
 
   // Unbinds everything managed by this
   public unbindAll(): void {
-    for (let appID in this.cache) {
+    for (const appID in this.cache) {
       // See if it was a regular ID
       let el = document.getElementById(appID);
 
@@ -73,9 +73,9 @@ export class EventManager {
       // If the element's been deleted/doesn't exist, abandon
       if (!el) continue;
 
-      for (let ev in this.cache[appID]) {
-        for (let func of this.cache[appID][ev]) {
-          el.removeEventListener(ev, func);
+      for (const ev in this.cache[appID]) {
+        for (const func of this.cache[appID][ev]) {
+          el.removeEventListener(ev, func as EventListener);
         }
       }
     }

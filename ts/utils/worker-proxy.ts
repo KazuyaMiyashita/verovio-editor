@@ -54,9 +54,9 @@ export class WorkerProxy {
 }
 
 export class PDFWorkerProxy extends WorkerProxy {
-  addPage: Function;
-  end: Function;
-  start: Function;
+  addPage: (svg: string) => Promise<void>;
+  end: () => Promise<string>;
+  start: (options?: object) => Promise<void>;
 
   constructor(worker: Worker) {
     super(worker);
@@ -64,13 +64,13 @@ export class PDFWorkerProxy extends WorkerProxy {
 }
 
 export class ValidatorWorkerProxy extends WorkerProxy {
-  check: Function;
-  validate: Function;
-  validateNG: Function;
-  setRelaxNGSchema: Function;
-  setSchema: Function;
+  check: (mei: string) => Promise<string>;
+  validate: (mei: string) => Promise<string>;
+  validateNG: (mei: string) => Promise<string>;
+  setRelaxNGSchema: (schema: string) => Promise<boolean>;
+  setSchema: (schema: string) => Promise<boolean>;
 
-  onRuntimeInitialized: Function;
+  onRuntimeInitialized: () => Promise<void>;
 
   constructor(worker: Worker) {
     super(worker);
@@ -78,26 +78,27 @@ export class ValidatorWorkerProxy extends WorkerProxy {
 }
 
 export class VerovioWorkerProxy extends WorkerProxy {
-  edit: Function;
-  editInfo: Function;
-  getAvailableOptions: Function;
-  getDefaultOptions: Function;
-  getElementAttr: Function;
-  getElementsAtTime: Function;
-  getLog: Function;
-  getOptions: Function;
-  getMEI: Function;
-  getPageCount: Function;
-  getPageWithElement: Function;
-  loadData: Function;
-  redoLayout: Function;
-  redoPagePitchPosLayout: Function;
-  renderToExpansionMap: Function;
-  renderToMIDI: Function;
-  renderToSVG: Function;
-  select: Function;
-  setOptions: Function;
-  getVersion: Function;
+  edit: (args: object) => Promise<boolean>;
+  editInfo: () => Promise<object>;
+  getAvailableOptions: () => Promise<object>;
+  getDefaultOptions: () => Promise<object>;
+  getElementAttr: (id: string) => Promise<object>;
+  getElementsAtTime: (time: number) => Promise<object>;
+  getLog: () => Promise<string>;
+  getOptions: () => Promise<object>;
+  getMEI: (options: object) => Promise<string>;
+  getPageCount: () => Promise<number>;
+  getPageWithElement: (id: string) => Promise<number>;
+  loadData: (data: string) => Promise<boolean>;
+  redoLayout: (options?: object) => Promise<void>;
+  redoPagePitchPosLayout: () => Promise<void>;
+  renderToExpansionMap: () => Promise<Record<string, string[]>>;
+  renderToMIDI: () => Promise<string>;
+  renderToSVG: (page: number) => Promise<string>;
+  select: (selection: object) => Promise<boolean>;
+  setOptions: (options: object) => Promise<boolean>;
+  getVersion: () => Promise<string>;
+
 
   onRuntimeInitialized: Function;
 
