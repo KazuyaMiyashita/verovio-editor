@@ -51,7 +51,7 @@ export class ActionManager {
         await this.editorViewObj.renderPage(true, false);
     }
     /*
-      public async delete(): Promise<any> {
+      public async delete(): Promise<void> {
           let chain = new Array();
           for (const item of this.editorViewObj.getSelection()) {
               if (!["note"].includes(item.element)) continue;
@@ -173,7 +173,7 @@ export class ActionManager {
         await this.commit(this.editorViewObj);
     }
     /*
-      async insertNote(x: number, y: number): Promise<any> {
+      async insertNote(x: number, y: number): Promise<void> {
           if (!this.cursorPointer.inputMode) return;
   
           let chain = new Array();

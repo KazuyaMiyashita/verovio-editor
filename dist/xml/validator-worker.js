@@ -8,14 +8,13 @@ class ValidatorDeferred {
     reject;
     resolve;
     constructor() {
-        //@ts-ignore
         this.promise = new Promise((resolve, reject) => {
             this.reject = reject;
             this.resolve = resolve;
         });
     }
 }
-let methods = {
+const methods = {
     check: null,
     setSchema: null,
     validate: null,
@@ -24,19 +23,13 @@ let methods = {
 };
 // Global deferred Promise that can be resolved when Module is initialized
 const isValidatorModuleReady = new ValidatorDeferred();
-//@ts-ignore
 Module.onRuntimeInitialized = function () {
-    //@ts-ignore
     methods.check = Module.cwrap("check", "string", ["string"]);
-    //@ts-ignore
     methods.setSchema = Module.cwrap("set_schema", "bool", ["string"]);
-    //@ts-ignore
     methods.validate = Module.cwrap("validate", "string", ["string"]);
-    //@ts-ignore
     methods.setRelaxNGSchema = Module.cwrap("set_relaxNG_schema", "bool", [
         "string",
     ]);
-    //@ts-ignore
     methods.validateNG = Module.cwrap("validate_NG", "string", ["string"]);
     isValidatorModuleReady.resolve(null);
 };

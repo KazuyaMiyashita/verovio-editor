@@ -4,15 +4,15 @@
 export class GitHubManager {
     name;
     login;
-    user; // GitHub::User object
-    selectedUser; // GitHub::User object
-    selectedOrganization; // GitHub::Organization object
+    user;
+    selectedUser;
+    selectedOrganization;
     selectedAccountName;
     selectedBranchName;
-    selectedRepo; // GitHub::Repository object
+    selectedRepo;
     selectedRepoName;
     selectedPath;
-    gh; // GitHub object
+    gh;
     app;
     constructor(app) {
         this.app = app;
@@ -54,14 +54,14 @@ export class GitHubManager {
     getSelectedOrganization() {
         return this.selectedOrganization;
     }
-    getSelectedAccountName() {
-        return this.selectedAccountName;
+    getSelectedRepo() {
+        return this.selectedRepo;
     }
     getSelectedBranchName() {
         return this.selectedBranchName;
     }
-    getSelectedRepo() {
-        return this.selectedRepo;
+    getSelectedAccountName() {
+        return this.selectedAccountName;
     }
     getSelectedRepoName() {
         return this.selectedRepoName;
@@ -110,7 +110,7 @@ export class GitHubManager {
     ////////////////////////////////////////////////////////////////////////
     async writeFile(filename, commitMsg) {
         try {
-            let mei = this.app.verovio.getMEI({});
+            let mei = await this.app.verovio.getMEI({});
             await this.selectedRepo.writeFile(this.selectedBranchName, filename, mei, commitMsg, {});
             this.app.showNotification("File was successfully pushed to GitHub");
         }

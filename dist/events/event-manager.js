@@ -44,8 +44,8 @@ export class EventManager {
         if (!appID)
             return;
         if (appID in this.cache) {
-            if (ev in this.cache[appID]) {
-                for (let boundFunction of this.cache[appID][ev]) {
+            if (this.cache[appID][ev]) {
+                for (const boundFunction of this.cache[appID][ev]) {
                     el.removeEventListener(ev, boundFunction);
                 }
             }
@@ -54,7 +54,7 @@ export class EventManager {
     }
     // Unbinds everything managed by this
     unbindAll() {
-        for (let appID in this.cache) {
+        for (const appID in this.cache) {
             // See if it was a regular ID
             let el = document.getElementById(appID);
             // Then try the local ID
@@ -63,8 +63,8 @@ export class EventManager {
             // If the element's been deleted/doesn't exist, abandon
             if (!el)
                 continue;
-            for (let ev in this.cache[appID]) {
-                for (let func of this.cache[appID][ev]) {
+            for (const ev in this.cache[appID]) {
+                for (const func of this.cache[appID][ev]) {
                     el.removeEventListener(ev, func);
                 }
             }

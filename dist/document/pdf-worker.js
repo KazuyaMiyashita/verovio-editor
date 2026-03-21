@@ -10,7 +10,6 @@ class PDFDeferred {
     reject;
     resolve;
     constructor() {
-        // @ts-ignore
         this.promise = new Promise((resolve, reject) => {
             this.reject = reject;
             this.resolve = resolve;
@@ -43,7 +42,6 @@ let fontCallback = function (family, bold, italic, fontOptions) {
     }
 };
 const options = { fontCallback: fontCallback };
-//@ts-ignore
 let vrvFontBuffer = Uint8Array.from(atob(LeipzigTTF), (c) => c.charCodeAt(0));
 // Variables that will be instantiated through start()
 let outString = "";
@@ -58,7 +56,6 @@ addEventListener("message", function (event) {
     //const fn = methods[method || null];
     let result;
     if (method === "start") {
-        //@ts-ignore
         doc = new PDFDocument({
             useCSS: true,
             compress: true,
@@ -66,8 +63,7 @@ addEventListener("message", function (event) {
             layout: pdfOrientation,
         });
         outString = "";
-        //@ts-ignore
-        const outStream = blobStream();
+        outStream = blobStream();
         doc.pipe(outStream);
         doc.registerFont("Leipzig", vrvFontBuffer);
         // The deferred promised that will be resolved through end() via on('finish')
@@ -78,7 +74,7 @@ addEventListener("message", function (event) {
             reader.readAsDataURL(streamBlob);
             reader.onloadend = function () {
                 outString = reader.result;
-                docEnd.resolve();
+                docEnd.resolve(null);
                 return;
             };
         });
@@ -99,7 +95,6 @@ addEventListener("message", function (event) {
     }
     else if (method === "addPage") {
         doc.addPage({ size: pdfFormat, layout: pdfOrientation });
-        // @ts-ignore
         SVGtoPDF(doc, args[0], 0, 0, options);
     }
     else {

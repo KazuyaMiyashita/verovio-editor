@@ -14,7 +14,7 @@ export class PDFGenerator {
     // Async worker methods
     ////////////////////////////////////////////////////////////////////////
     async generateFile() {
-        const currentOptions = await this.verovio.getOptions();
+        const currentOptions = (await this.verovio.getOptions());
         currentOptions.scale = this.currentScale;
         console.log(currentOptions);
         const pdfOptions = {

@@ -96,7 +96,7 @@ export class EditorView extends ResponsiveView {
         this.addToSelection(element, id);
     }
     async playNoteSound() {
-        const attr = await this.app.verovio.getElementAttr(this.selectedItems[0].id);
+        const attr = (await this.app.verovio.getElementAttr(this.selectedItems[0].id));
         if (!attr.pname || !attr.oct)
             return;
         if (this.lastNote.pname === attr.pname && this.lastNote.oct === attr.oct)

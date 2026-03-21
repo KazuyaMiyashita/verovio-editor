@@ -8,24 +8,24 @@ declare class ActionManager {
     constructor(view: EditorView, app: App);
     canUndo(): boolean;
     canRedo(): boolean;
-    commit(caller: GenericView): Promise<any>;
+    commit(caller: GenericView): Promise<void>;
     editRefresh(): Promise<void>;
-    drag(x: number, y: number): Promise<any>;
-    keyDown(key: number, shiftKey: boolean, ctrlKey: boolean): Promise<any>;
-    keyUp(key: number, shiftKey: boolean, ctrlKey: boolean): Promise<any>;
-    insert(elementName: string, insertMode: string): Promise<any>;
-    formCres(): Promise<any>;
-    formDim(): Promise<any>;
-    placeAbove(): Promise<any>;
-    placeBelow(): Promise<any>;
-    placeAuto(): Promise<any>;
-    stemDirUp(): Promise<any>;
-    stemDirDown(): Promise<any>;
-    stemDirAuto(): Promise<any>;
-    undo(): Promise<any>;
-    redo(): Promise<any>;
-    setAttrValue(attribute: string, value: string, id: string): Promise<any>;
-    setAttrValueForTypes(attribute: string, value: string, elementTypes?: Array<string>): Promise<any>;
+    drag(x: number, y: number): Promise<void>;
+    keyDown(key: number, shiftKey: boolean, ctrlKey: boolean): Promise<void>;
+    keyUp(key: number, shiftKey: boolean, ctrlKey: boolean): Promise<void>;
+    insert(elementName: string, insertMode: string): Promise<void>;
+    formCres(): Promise<void>;
+    formDim(): Promise<void>;
+    placeAbove(): Promise<void>;
+    placeBelow(): Promise<void>;
+    placeAuto(): Promise<void>;
+    stemDirUp(): Promise<void>;
+    stemDirDown(): Promise<void>;
+    stemDirAuto(): Promise<void>;
+    undo(): Promise<void>;
+    redo(): Promise<void>;
+    setAttrValue(attribute: string, value: string, id: string): Promise<void>;
+    setAttrValueForTypes(attribute: string, value: string, elementTypes?: Array<string>): Promise<void>;
 }
 
 export declare class App {
@@ -101,7 +101,7 @@ export declare class App {
     private createFilter;
     private loadData;
     private pushNotification;
-    playMEI(): Promise<any>;
+    playMEI(): Promise<void>;
     private loadMEI;
     private applySelection;
     private checkSchema;
@@ -117,21 +117,21 @@ export declare class App {
     zoomIn(e: MouseEvent): void;
     login(e: Event): void;
     logout(e: Event): void;
-    fileImport(e: MouseEvent): Promise<any>;
-    fileInput(e: InputEvent): Promise<any>;
-    fileExport(e: Event): Promise<any>;
-    fileExportPDF(e: Event): Promise<any>;
-    fileExportMIDI(e: Event): Promise<any>;
-    fileCopyToClipboard(e: Event): Promise<any>;
-    fileLoadRecent(e: Event): Promise<any>;
-    fileSelection(e: Event): Promise<any>;
-    githubImport(e: Event): Promise<any>;
-    githubExport(e: Event): Promise<any>;
-    settingsEditor(e: Event): Promise<any>;
-    settingsVerovio(e: Event): Promise<any>;
-    helpAbout(e: Event): Promise<any>;
-    helpReset(e: Event): Promise<any>;
-    setView(e: Event): Promise<any>;
+    fileImport(e: MouseEvent): Promise<void>;
+    fileInput(e: InputEvent): Promise<void>;
+    fileExport(e: Event): Promise<void>;
+    fileExportPDF(e: Event): Promise<void>;
+    fileExportMIDI(e: Event): Promise<void>;
+    fileCopyToClipboard(e: Event): Promise<void>;
+    fileLoadRecent(e: Event): Promise<void>;
+    fileSelection(e: Event): Promise<void>;
+    githubImport(e: Event): Promise<void>;
+    githubExport(e: Event): Promise<void>;
+    settingsEditor(e: Event): Promise<void>;
+    settingsVerovio(e: Event): Promise<void>;
+    helpAbout(e: Event): Promise<void>;
+    helpReset(e: Event): Promise<void>;
+    setView(e: Event): Promise<void>;
 }
 
 export declare namespace App {
@@ -311,6 +311,15 @@ declare class EditorView extends ResponsiveView {
     scrollListener(e: Event): void;
 }
 
+declare namespace EditorView {
+    interface NoteAttributes {
+        pname?: string;
+        oct?: string;
+        accid?: string;
+        midiPitch?: number;
+    }
+}
+
 /**
  *  EventManager for binding events to a given parent object to avoid ES6 scope issues.
  */
@@ -318,7 +327,7 @@ declare class EventManager {
     private readonly parent;
     private cache;
     private appIDAttr;
-    constructor(parent: Object);
+    constructor(parent: any);
     bind(el: Element, ev: string, fct: Function): void;
     unbind(el: Element, ev: string): void;
     unbindAll(): void;
@@ -383,12 +392,12 @@ declare class GitHubManager {
     constructor(app: App);
     getName(): string;
     getLogin(): string;
-    getUser(): any;
-    getSelectedUser(): any;
-    getSelectedOrganization(): any;
-    getSelectedAccountName(): string;
+    getUser(): GitHubApi.User;
+    getSelectedUser(): GitHubApi.User;
+    getSelectedOrganization(): GitHubApi.Organization;
+    getSelectedRepo(): GitHubApi.Repository;
     getSelectedBranchName(): string;
-    getSelectedRepo(): any;
+    getSelectedAccountName(): string;
     getSelectedRepoName(): string;
     getSelectedPath(): Array<string>;
     selectedPathPop(): void;
@@ -399,10 +408,10 @@ declare class GitHubManager {
     private getSessionCookie;
     private storeSelection;
     private resetSelectedPath;
-    writeFile(filename: string, commitMsg: string): Promise<any>;
-    selectAccount(login: string): Promise<any>;
-    selectBranch(name: string): Promise<any>;
-    selectRepo(name: string): Promise<any>;
+    writeFile(filename: string, commitMsg: string): Promise<void>;
+    selectAccount(login: string): Promise<void>;
+    selectBranch(name: string): Promise<void>;
+    selectRepo(name: string): Promise<void>;
     private initUser;
 }
 
@@ -561,12 +570,12 @@ declare class Toolbar extends GenericView {
 }
 
 declare class ValidatorWorkerProxy extends WorkerProxy {
-    check: Function;
-    validate: Function;
-    validateNG: Function;
-    setRelaxNGSchema: Function;
-    setSchema: Function;
-    onRuntimeInitialized: Function;
+    check: (mei: string) => Promise<string>;
+    validate: (mei: string) => Promise<string>;
+    validateNG: (mei: string) => Promise<string>;
+    setRelaxNGSchema: (schema: string) => Promise<boolean>;
+    setSchema: (schema: string) => Promise<boolean>;
+    onRuntimeInitialized: () => Promise<void>;
     constructor(worker: Worker);
 }
 
@@ -659,26 +668,26 @@ declare namespace VerovioView {
 }
 
 declare class VerovioWorkerProxy extends WorkerProxy {
-    edit: Function;
-    editInfo: Function;
-    getAvailableOptions: Function;
-    getDefaultOptions: Function;
-    getElementAttr: Function;
-    getElementsAtTime: Function;
-    getLog: Function;
-    getOptions: Function;
-    getMEI: Function;
-    getPageCount: Function;
-    getPageWithElement: Function;
-    loadData: Function;
-    redoLayout: Function;
-    redoPagePitchPosLayout: Function;
-    renderToExpansionMap: Function;
-    renderToMIDI: Function;
-    renderToSVG: Function;
-    select: Function;
-    setOptions: Function;
-    getVersion: Function;
+    edit: (args: object) => Promise<boolean>;
+    editInfo: () => Promise<object>;
+    getAvailableOptions: () => Promise<object>;
+    getDefaultOptions: () => Promise<object>;
+    getElementAttr: (id: string) => Promise<object>;
+    getElementsAtTime: (time: number) => Promise<object>;
+    getLog: () => Promise<string>;
+    getOptions: () => Promise<object>;
+    getMEI: (options: object) => Promise<string>;
+    getPageCount: () => Promise<number>;
+    getPageWithElement: (id: string) => Promise<number>;
+    loadData: (data: string) => Promise<boolean>;
+    redoLayout: (options?: object) => Promise<void>;
+    redoPagePitchPosLayout: () => Promise<void>;
+    renderToExpansionMap: () => Promise<Record<string, string[]>>;
+    renderToMIDI: () => Promise<string>;
+    renderToSVG: (page: number) => Promise<string>;
+    select: (selection: object) => Promise<boolean>;
+    setOptions: (options: object) => Promise<boolean>;
+    getVersion: () => Promise<string>;
     onRuntimeInitialized: Function;
     constructor(worker: Worker);
 }

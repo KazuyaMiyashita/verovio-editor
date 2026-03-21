@@ -15,14 +15,14 @@ var e = class {
 		this.propagationList.includes(e) || this.propagationList.push(e);
 	}
 	dispatch(e) {
-		for (let t of this.cache.keys()) {
-			let n = this.cache.get(t);
-			for (let r of n.keys()) if (e.type === r) {
-				let i = n.get(r);
-				this.objs.get(t)[i.name](e);
+		for (let [t, n] of this.cache) {
+			let r = n.get(e.type);
+			if (r) {
+				let n = this.objs.get(t);
+				r.call(n, e);
 			}
 		}
-		for (let t in this.propagationList) this.propagationList[t].dispatch(e);
+		for (let t of this.propagationList) t.dispatch(e);
 	}
 };
 //#endregion
@@ -198,7 +198,7 @@ var T = class {
 	unbind(e, t) {
 		let n = e.getAttribute(this.appIDAttr) || e.getAttribute("id");
 		if (n && n in this.cache) {
-			if (t in this.cache[n]) for (let r of this.cache[n][t]) e.removeEventListener(t, r);
+			if (this.cache[n][t]) for (let r of this.cache[n][t]) e.removeEventListener(t, r);
 			delete this.cache[n];
 		}
 	}
@@ -3043,14 +3043,14 @@ var G = class extends T {
 	getSelectedOrganization() {
 		return this.selectedOrganization;
 	}
-	getSelectedAccountName() {
-		return this.selectedAccountName;
+	getSelectedRepo() {
+		return this.selectedRepo;
 	}
 	getSelectedBranchName() {
 		return this.selectedBranchName;
 	}
-	getSelectedRepo() {
-		return this.selectedRepo;
+	getSelectedAccountName() {
+		return this.selectedAccountName;
 	}
 	getSelectedRepoName() {
 		return this.selectedRepoName;
@@ -3091,7 +3091,7 @@ var G = class extends T {
 	}
 	async writeFile(e, t) {
 		try {
-			let n = this.app.verovio.getMEI({});
+			let n = await this.app.verovio.getMEI({});
 			await this.selectedRepo.writeFile(this.selectedBranchName, e, n, t, {}), this.app.showNotification("File was successfully pushed to GitHub");
 		} catch (e) {
 			console.error(e), this.app.showNotification("Something went wrong when pushing to GitHub");

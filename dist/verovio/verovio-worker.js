@@ -7,7 +7,6 @@ class VerovioDeferred {
     reject;
     resolve;
     constructor() {
-        //@ts-ignore
         this.promise = new Promise((resolve, reject) => {
             this.reject = reject;
             this.resolve = resolve;
@@ -20,11 +19,8 @@ addEventListener("message", function (event) {
     if (event.data.verovioUrl) {
         importScripts(event.data.verovioUrl);
         // Initialize the Verovio module once the script is loaded
-        //@ts-ignore
         verovio.module.onRuntimeInitialized = function () {
-            //@ts-ignore
             verovio.enableLog(verovio.LOG_DEBUG);
-            //@ts-ignore
             verovioToolkit = new verovio.toolkit();
             isVerovioModuleReady.resolve(null);
         };
