@@ -10,6 +10,7 @@ import { RNGLoader } from "./rng-loader.js";
 
 import { autoModeLimit } from "../utils/messages.js";
 import { appendDivTo, appendTextAreaTo } from "../utils/functions.js";
+import { AppEvent, createAppEvent } from "../events/event-types.js";
 
 const theme = "vrv"; // default for light theme
 
@@ -282,14 +283,13 @@ export class XMLEditorView extends GenericView {
         if (this.originalText === text) return;
         this.originalText = text;
         this.app.startLoading("Updating data ...", this.autoMode);
-        let event = new CustomEvent("onLoadData", {
-          detail: {
+        this.app.customEventManager.dispatch(
+          createAppEvent(AppEvent.LoadData, {
             caller: this,
             lightEndLoading: this.autoMode,
             mei: text,
-          },
-        });
-        this.app.customEventManager.dispatch(event);
+          }),
+        );
       } else {
         console.log("Validated data is obsolete");
         this.setStatus(Status.Unknown);
@@ -339,20 +339,17 @@ export class XMLEditorView extends GenericView {
     const elementType = line.match(/[^\>]*\<([^\ ]*).*/);
     if (id) {
       if (this.currentId !== id[1]) {
-        let event = new CustomEvent("onSelect", {
-          detail: {
+        this.app.customEventManager.dispatch(
+          createAppEvent(AppEvent.Select, {
             id: id[1],
             elementType: elementType[1],
             caller: this,
-          },
-        });
-        //console.debug( "Dispatch-onSelect" );
-        this.app.customEventManager.dispatch(event);
+          }),
+        );
       }
       this.currentId = id[1];
     }
-  }
-
+    }
   keyHandled(cm, string, event): void {
     this.setEdited(true);
     if (event.key === "Enter") {

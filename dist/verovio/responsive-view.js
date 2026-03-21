@@ -4,6 +4,7 @@
 import { EditorView } from "../editor/editor-view.js";
 import { VerovioView } from "../verovio/verovio-view.js";
 import { appendDivTo } from "../utils/functions.js";
+import { AppEvent, createAppEvent } from "../events/event-types.js";
 export class ResponsiveView extends VerovioView {
     svgWrapper;
     midiIds;
@@ -128,8 +129,7 @@ export class ResponsiveView extends VerovioView {
         if (elementsAtTime.page != this.currentPage) {
             this.currentPage = elementsAtTime.page;
             this.app.startLoading("Loading content ...", true);
-            let event = new CustomEvent("onPage");
-            this.app.customEventManager.dispatch(event);
+            this.app.customEventManager.dispatch(createAppEvent(AppEvent.Page));
         }
         if (elementsAtTime.notes.length > 0 &&
             this.midiIds != elementsAtTime.notes) {

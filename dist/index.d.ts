@@ -174,6 +174,23 @@ export declare namespace App {
     export function iconFor(element: string): string;
 }
 
+/**
+ * Application event types and their payloads.
+ */
+declare enum AppEvent {
+    Activate = "onActivate",
+    Deactivate = "onDeactivate",
+    LoadData = "onLoadData",
+    Select = "onSelect",
+    EditData = "onEditData",
+    Resized = "onResized",
+    CursorActivity = "onCursorActivity",
+    Page = "onPage",
+    Zoom = "onZoom",
+    StartLoading = "onStartLoading",
+    EndLoading = "onEndLoading"
+}
+
 declare class AppToolbar extends Toolbar {
     private readonly viewDocument;
     private readonly viewResponsive;
@@ -233,7 +250,7 @@ declare class CustomEventManager {
     private readonly objs;
     private readonly propagationList;
     constructor();
-    bind(obj: GenericView | App, ev: string, fct: Function): void;
+    bind(obj: GenericView | App, ev: AppEvent | string, fct: Function): void;
     addToPropagationList(customEventManager: CustomEventManager): void;
     dispatch(event: Event): void;
 }

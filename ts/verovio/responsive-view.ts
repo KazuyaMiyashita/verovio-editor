@@ -9,6 +9,8 @@ import { VerovioView } from "../verovio/verovio-view.js";
 import { VerovioWorkerProxy } from "../utils/worker-proxy.js";
 import { appendDivTo } from "../utils/functions.js";
 
+import { AppEvent, createAppEvent } from "../events/event-types.js";
+
 export class ResponsiveView extends VerovioView {
   protected svgWrapper: HTMLDivElement;
   protected midiIds: Array<string>;
@@ -163,8 +165,7 @@ export class ResponsiveView extends VerovioView {
     if (elementsAtTime.page != this.currentPage) {
       this.currentPage = elementsAtTime.page;
       this.app.startLoading("Loading content ...", true);
-      let event = new CustomEvent("onPage");
-      this.app.customEventManager.dispatch(event);
+      this.app.customEventManager.dispatch(createAppEvent(AppEvent.Page));
     }
     if (
       elementsAtTime.notes.length > 0 &&

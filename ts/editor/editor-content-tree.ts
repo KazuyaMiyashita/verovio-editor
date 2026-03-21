@@ -1,6 +1,7 @@
 import { App } from "../app.js";
 import { GenericTree, TreeNode } from "../utils/generic-tree.js";
 import { Tab } from "../utils/tab-group.js";
+import { AppEvent, createAppEvent } from "../events/event-types.js";
 
 export class EditorContentTree extends GenericTree {
   private readonly tab: Tab;
@@ -43,25 +44,23 @@ export class EditorContentTree extends GenericTree {
   }
 
   private select(element: string, id: string) {
-    let event = new CustomEvent("onSelect", {
-      detail: {
+    this.app.customEventManager.dispatch(
+      createAppEvent(AppEvent.Select, {
         id: id,
         element: element,
         caller: this,
-      },
-    });
-    this.app.customEventManager.dispatch(event);
+      }),
+    );
   }
 
   private cursorActivity(id: string, activity: string) {
-    let event = new CustomEvent("onCursorActivity", {
-      detail: {
+    this.app.customEventManager.dispatch(
+      createAppEvent(AppEvent.CursorActivity, {
         id: id,
         activity: activity,
         caller: this,
-      },
-    });
-    this.app.customEventManager.dispatch(event);
+      }),
+    );
   }
 
   private selectNode(node: TreeNode): void {

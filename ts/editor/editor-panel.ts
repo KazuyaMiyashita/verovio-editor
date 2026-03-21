@@ -20,6 +20,7 @@ import {
 import { XMLEditorView } from "../xml/xml-editor-view.js";
 import { appendDivTo } from "../utils/functions.js";
 import { autoModeOff, editedXML } from "../utils/messages.js";
+import { AppEvent, createAppEvent } from "../events/event-types.js";
 
 export class EditorPanel extends GenericView {
   public readonly eventManager: EventManager;
@@ -236,10 +237,12 @@ export class EditorPanel extends GenericView {
 
     if (!this.xmlEditorEnabled) {
       // Ideally we would send a onActive / onDeactivate event
-      let event = new CustomEvent("onDeactivate");
-      this.xmlEditorViewObj.customEventManager.dispatch(event);
-      event = new CustomEvent("onActivate");
-      this.tabGroupObj.customEventManager.dispatch(event);
+      this.xmlEditorViewObj.customEventManager.dispatch(
+        createAppEvent(AppEvent.Deactivate),
+      );
+      this.tabGroupObj.customEventManager.dispatch(
+        createAppEvent(AppEvent.Activate),
+      );
 
       this.xmlEditorView.style.display = "none";
       this.xmlEditorView.style.height = `0px`;
@@ -298,15 +301,19 @@ export class EditorPanel extends GenericView {
     }
 
     if (this.xmlEditorEnabled) {
-      let event = new CustomEvent("onDeactivate");
-      this.tabGroupObj.customEventManager.dispatch(event);
-      event = new CustomEvent("onActivate");
-      this.xmlEditorViewObj.customEventManager.dispatch(event);
+      this.tabGroupObj.customEventManager.dispatch(
+        createAppEvent(AppEvent.Deactivate),
+      );
+      this.xmlEditorViewObj.customEventManager.dispatch(
+        createAppEvent(AppEvent.Activate),
+      );
     } else {
-      let event = new CustomEvent("onDeactivate");
-      this.xmlEditorViewObj.customEventManager.dispatch(event);
-      event = new CustomEvent("onActivate");
-      this.tabGroupObj.customEventManager.dispatch(event);
+      this.xmlEditorViewObj.customEventManager.dispatch(
+        createAppEvent(AppEvent.Deactivate),
+      );
+      this.tabGroupObj.customEventManager.dispatch(
+        createAppEvent(AppEvent.Activate),
+      );
     }
   }
 
@@ -396,8 +403,9 @@ export class EditorPanel extends GenericView {
         this.draggingX = e.clientX;
       }
       // We can already update the xmlView size
-      let event = new CustomEvent("onResized");
-      this.xmlEditorViewObj.customEventManager.dispatch(event);
+      this.xmlEditorViewObj.customEventManager.dispatch(
+        createAppEvent(AppEvent.Resized),
+      );
 
       // To update Verovio
       //this.app.startLoading( "Adjusting size ...", true );
@@ -415,8 +423,7 @@ export class EditorPanel extends GenericView {
     // Update the splitter position and resize all
     this.app.startLoading("Adjusting size ...", true);
     this.updateSplitterSize();
-    let event = new CustomEvent("onResized");
-    this.customEventManager.dispatch(event);
+    this.customEventManager.dispatch(createAppEvent(AppEvent.Resized));
   }
 
   onToggleOrientation(e: Event): void {
@@ -425,9 +432,9 @@ export class EditorPanel extends GenericView {
     this.split.classList.toggle("vertical");
     this.split.classList.toggle("horizontal");
     this.app.startLoading("Adjusting size ...", true);
-    let event = new CustomEvent("onResized");
-    this.app.customEventManager.dispatch(event);
+    this.app.customEventManager.dispatch(createAppEvent(AppEvent.Resized));
   }
+
 
   ////////////////////////////////////////////////////////////////////////
   // Async event methods
@@ -466,33 +473,29 @@ export class EditorPanel extends GenericView {
       this.xmlEditorEnabled = false;
     }
     this.app.startLoading("Adjusting the interface ...", true);
-    let event = new CustomEvent("onActivate");
-    this.customEventManager.dispatch(event);
+    this.customEventManager.dispatch(createAppEvent(AppEvent.Activate));
     // We enabled the XML editor, update its data
     if (this.xmlEditorEnabled) {
       this.tabGroupObj.resetTabs();
       const mei = await this.verovio.getMEI({});
-      event = new CustomEvent("onLoadData", {
-        detail: {
+      this.app.customEventManager.dispatch(
+        createAppEvent(AppEvent.LoadData, {
           caller: this.editorView,
           mei: mei,
-        },
-      });
-      this.app.customEventManager.dispatch(event);
+        }),
+      );
     }
-    event = new CustomEvent("onResized");
-    this.customEventManager.dispatch(event);
+    this.customEventManager.dispatch(createAppEvent(AppEvent.Resized));
   }
 
   onForceReload(e: Event): void {
     if (this.xmlEditorViewObj && this.xmlEditorViewObj.isEdited()) {
-      let event = new CustomEvent("onLoadData", {
-        detail: {
+      this.customEventManager.dispatch(
+        createAppEvent(AppEvent.LoadData, {
           caller: this.xmlEditorViewObj,
           mei: this.xmlEditorViewObj.getValue(),
-        },
-      });
-      this.customEventManager.dispatch(event);
+        }),
+      );
     }
   }
 }

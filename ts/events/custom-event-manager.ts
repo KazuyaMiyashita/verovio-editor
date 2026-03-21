@@ -4,16 +4,17 @@
  * CustomEventManager hold a propagationList of other managers to call recursively.
  */
 
+import { AppEvent } from "./event-types.js";
 import { App } from "../app.js";
 import { GenericView } from "../utils/generic-view.js";
 
 export class CustomEventManager {
-  private readonly cache: Map<string, Map<string, Function>>;
+  private readonly cache: Map<string, Map<AppEvent | string, Function>>;
   private readonly objs: Map<string, GenericView | App>;
   private readonly propagationList: Array<CustomEventManager>;
 
   constructor() {
-    this.cache = new Map<string, Map<string, Function>>();
+    this.cache = new Map<string, Map<AppEvent | string, Function>>();
     this.objs = new Map<string, GenericView | App>();
     this.propagationList = [];
   }
@@ -23,13 +24,13 @@ export class CustomEventManager {
   ////////////////////////////////////////////////////////////////////////
 
   // Binds function `fct` to element `el` on event `ev`
-  public bind(obj: GenericView | App, ev: string, fct: Function) {
+  public bind(obj: GenericView | App, ev: AppEvent | string, fct: Function) {
     if (!this.cache.has(obj.id)) {
-      this.cache.set(obj.id, new Map<string, Function>());
+      this.cache.set(obj.id, new Map<AppEvent | string, Function>());
       this.objs.set(obj.id, obj);
     }
 
-    const bindings: Map<string, Function> = this.cache.get(obj.id);
+    const bindings: Map<AppEvent | string, Function> = this.cache.get(obj.id);
     if (!bindings.has(ev)) {
       bindings.set(ev, fct);
     }

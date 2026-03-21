@@ -1,4 +1,5 @@
 import { GenericTree } from "../utils/generic-tree.js";
+import { AppEvent, createAppEvent } from "../events/event-types.js";
 export class EditorContentTree extends GenericTree {
     tab;
     constructor(div, app, tab) {
@@ -32,24 +33,18 @@ export class EditorContentTree extends GenericTree {
         this.breadCrumbsWrapper.scrollLeft = this.breadCrumbsWrapper.scrollWidth;
     }
     select(element, id) {
-        let event = new CustomEvent("onSelect", {
-            detail: {
-                id: id,
-                element: element,
-                caller: this,
-            },
-        });
-        this.app.customEventManager.dispatch(event);
+        this.app.customEventManager.dispatch(createAppEvent(AppEvent.Select, {
+            id: id,
+            element: element,
+            caller: this,
+        }));
     }
     cursorActivity(id, activity) {
-        let event = new CustomEvent("onCursorActivity", {
-            detail: {
-                id: id,
-                activity: activity,
-                caller: this,
-            },
-        });
-        this.app.customEventManager.dispatch(event);
+        this.app.customEventManager.dispatch(createAppEvent(AppEvent.CursorActivity, {
+            id: id,
+            activity: activity,
+            caller: this,
+        }));
     }
     selectNode(node) {
         node.getLabel().classList.add("target");

@@ -41,6 +41,7 @@ import {
 } from "./utils/functions.js";
 import { aboutMsg, reloadMsg, resetMsg, version } from "./utils/messages.js";
 import { ContextMenu } from "./toolbars/context-menu.js";
+import { AppEvent, createAppEvent } from "./events/event-types.js";
 
 const filter = "/svg/filter.xml";
 const host =
@@ -290,9 +291,8 @@ export class App {
     window.onbeforeunload = this.onBeforeUnload.bind(this);
     //window.addEventListener("beforeunload", this.onBeforeUnload);
 
-    this.customEventManager.bind(this, "onResized", this.onResized);
-    let event = new CustomEvent("onResized");
-    this.customEventManager.dispatch(event);
+    this.customEventManager.bind(this, AppEvent.Resized, this.onResized);
+    this.customEventManager.dispatch(createAppEvent(AppEvent.Resized));
 
     const verovioWorkerURL = this.getWorkerURL(
       `${this.host}/dist/verovio/verovio-worker.js`,
@@ -418,13 +418,10 @@ export class App {
       this.loadingCount++;
     }
     this.loaderText.textContent = msg;
-    let event = new CustomEvent("onStartLoading", {
-      detail: {
-        light: light,
-        msg: msg,
-      },
-    });
-    this.customEventManager.dispatch(event);
+    this.customEventManager.dispatch(createAppEvent(AppEvent.StartLoading, {
+      light: light,
+      msg: msg,
+    }));
   }
 
   public endLoading(light: boolean = false): void {
@@ -440,8 +437,7 @@ export class App {
     this.loader.style.display = "none";
     this.views.style.pointerEvents = "";
     this.views.style.opacity = "";
-    let event = new CustomEvent("onEndLoading");
-    this.customEventManager.dispatch(event);
+    this.customEventManager.dispatch(createAppEvent(AppEvent.EndLoading));
   }
 
   public showNotification(message: string): void {
@@ -466,9 +462,8 @@ export class App {
     this.createViews();
     this.createStatusbar();
 
-    this.customEventManager.bind(this, "onResized", this.onResized);
-    let event = new CustomEvent("onResized");
-    this.customEventManager.dispatch(event);
+    this.customEventManager.bind(this, AppEvent.Resized, this.onResized);
+    this.customEventManager.dispatch(createAppEvent(AppEvent.Resized));
 
     if (this.options.isSafari) {
       this.showNotification(
@@ -544,8 +539,7 @@ export class App {
 
     this.endLoading();
 
-    let eventActivate = new CustomEvent("onActivate");
-    this.view.customEventManager.dispatch(eventActivate);
+    this.view.customEventManager.dispatch(createAppEvent(AppEvent.Activate));
   }
 
   private createToolbar(): void {
@@ -654,16 +648,12 @@ export class App {
 
     await this.checkSchema();
 
-    let event = new CustomEvent("onLoadData", {
-      detail: {
-        currentId: this.clientId,
-        caller: this.view,
-        lightEndLoading: false,
-        mei: this.inputData,
-      },
-    });
-
-    this.view.customEventManager.dispatch(event);
+    this.view.customEventManager.dispatch(createAppEvent(AppEvent.LoadData, {
+      currentId: this.clientId,
+      caller: this.view,
+      lightEndLoading: false,
+      mei: this.inputData,
+    }));
   }
 
   private async applySelection(): Promise<void> {
@@ -800,8 +790,7 @@ export class App {
     const timerThis = this;
     this.resizeTimer = setTimeout(function () {
       timerThis.startLoading("Resizing ...", true);
-      let event = new CustomEvent("onResized");
-      timerThis.customEventManager.dispatch(event);
+      timerThis.customEventManager.dispatch(createAppEvent(AppEvent.Resized));
     }, 100);
   }
 
@@ -813,8 +802,7 @@ export class App {
     if (this.toolbarView.getCurrentPage() > 1) {
       this.toolbarView.setCurrentPage(this.toolbarView.getCurrentPage() - 1);
       this.startLoading("Loading content ...", true);
-      let event = new CustomEvent("onPage");
-      this.customEventManager.dispatch(event);
+      this.customEventManager.dispatch(createAppEvent(AppEvent.Page));
     }
   }
 
@@ -822,8 +810,7 @@ export class App {
     if (this.toolbarView.getCurrentPage() < this.pageCount) {
       this.toolbarView.setCurrentPage(this.toolbarView.getCurrentPage() + 1);
       this.startLoading("Loading content ...", true);
-      let event = new CustomEvent("onPage");
-      this.customEventManager.dispatch(event);
+      this.customEventManager.dispatch(createAppEvent(AppEvent.Page));
     }
   }
 
@@ -833,8 +820,7 @@ export class App {
         this.toolbarView.getCurrentZoomIndex() - 1,
       );
       this.startLoading("Adjusting size ...", true);
-      let event = new CustomEvent("onZoom");
-      this.customEventManager.dispatch(event);
+      this.customEventManager.dispatch(createAppEvent(AppEvent.Zoom));
     }
   }
 
@@ -844,8 +830,7 @@ export class App {
         this.toolbarView.getCurrentZoomIndex() + 1,
       );
       this.startLoading("Adjusting size ...", true);
-      let event = new CustomEvent("onZoom");
-      this.customEventManager.dispatch(event);
+      this.customEventManager.dispatch(createAppEvent(AppEvent.Zoom));
     }
   }
 
@@ -944,14 +929,11 @@ export class App {
     if (dlgRes === 1) {
       this.options.selection = dlg.getSelection();
       await this.applySelection();
-      let event = new CustomEvent("onLoadData", {
-        detail: {
-          currentId: this.clientId,
-          caller: this.view,
-          reload: true,
-        },
-      });
-      this.customEventManager.dispatch(event);
+      this.customEventManager.dispatch(createAppEvent(AppEvent.LoadData, {
+        currentId: this.clientId,
+        caller: this.view,
+        reload: true,
+      }));
     }
   }
 
@@ -1018,14 +1000,11 @@ export class App {
     const dlgRes = await dlg.show();
     if (dlgRes === 1) {
       await this.verovio.setOptions(dlg.getChangedOptions());
-      let event = new CustomEvent("onLoadData", {
-        detail: {
-          currentId: this.clientId,
-          caller: this.view,
-          reload: true,
-        },
-      });
-      this.customEventManager.dispatch(event);
+      this.customEventManager.dispatch(createAppEvent(AppEvent.LoadData, {
+        currentId: this.clientId,
+        caller: this.view,
+        reload: true,
+      }));
     }
   }
 
@@ -1057,8 +1036,7 @@ export class App {
       this.midiPlayer.stop();
     }
 
-    let event = new CustomEvent("onDeactivate");
-    this.view.customEventManager.dispatch(event);
+    this.view.customEventManager.dispatch(createAppEvent(AppEvent.Deactivate));
 
     if (element.dataset.view == "document") {
       this.view = this.viewDocumentObj;
@@ -1072,18 +1050,14 @@ export class App {
     }
 
     this.startLoading("Switching view ...");
-    let eventActivate = new CustomEvent("onActivate");
-    this.view.customEventManager.dispatch(eventActivate);
-    let eventLoadData = new CustomEvent("onLoadData", {
-      detail: {
-        currentId: this.clientId,
-        caller: this.view,
-        reload: true,
-        lightEndLoading: false,
-      },
-    });
-    this.customEventManager.dispatch(eventLoadData);
-    this.toolbarObj.customEventManager.dispatch(eventActivate);
+    this.view.customEventManager.dispatch(createAppEvent(AppEvent.Activate));
+    this.customEventManager.dispatch(createAppEvent(AppEvent.LoadData, {
+      currentId: this.clientId,
+      caller: this.view,
+      reload: true,
+      lightEndLoading: false,
+    }));
+    this.toolbarObj.customEventManager.dispatch(createAppEvent(AppEvent.Activate));
   }
 }
 

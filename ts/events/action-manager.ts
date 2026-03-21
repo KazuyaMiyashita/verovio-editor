@@ -7,6 +7,8 @@ import { EventManager } from "./event-manager.js";
 import { GenericView } from "../utils/generic-view.js";
 import { VerovioView } from "../verovio/verovio-view.js";
 
+import { AppEvent, createAppEvent } from "./event-types.js";
+
 export class ActionManager {
   public readonly eventManager: EventManager;
 
@@ -60,13 +62,12 @@ export class ActionManager {
       id = this.editorViewObj.getSelection()[0].id;
     }
 
-    let event = new CustomEvent("onEditData", {
-      detail: {
+    this.app.customEventManager.dispatch(
+      createAppEvent(AppEvent.EditData, {
         id: id,
         caller: caller,
-      },
-    });
-    this.app.customEventManager.dispatch(event);
+      }),
+    );
   }
 
   public async editRefresh() {

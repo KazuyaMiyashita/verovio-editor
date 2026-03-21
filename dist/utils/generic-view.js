@@ -5,6 +5,7 @@
  */
 import { CustomEventManager } from "../events/custom-event-manager.js";
 import { appendDivTo, appendSpanTo, randomHex } from "../utils/functions.js";
+import { AppEvent } from "../events/event-types.js";
 export class GenericView {
     customEventManager;
     id;
@@ -22,17 +23,17 @@ export class GenericView {
         this.active = false;
         this.display = "block";
         this.customEventManager = new CustomEventManager();
-        this.customEventManager.bind(this, "onActivate", this.onActivate);
-        this.customEventManager.bind(this, "onCursorActivity", this.onCursorActivity);
-        this.customEventManager.bind(this, "onDeactivate", this.onDeactivate);
-        this.customEventManager.bind(this, "onEditData", this.onEditData);
-        this.customEventManager.bind(this, "onEndLoading", this.onEndLoading);
-        this.customEventManager.bind(this, "onLoadData", this.onLoadData);
-        this.customEventManager.bind(this, "onPage", this.onPage);
-        this.customEventManager.bind(this, "onResized", this.onResized);
-        this.customEventManager.bind(this, "onSelect", this.onSelect);
-        this.customEventManager.bind(this, "onStartLoading", this.onStartLoading);
-        this.customEventManager.bind(this, "onZoom", this.onZoom);
+        this.customEventManager.bind(this, AppEvent.Activate, this.onActivate);
+        this.customEventManager.bind(this, AppEvent.CursorActivity, this.onCursorActivity);
+        this.customEventManager.bind(this, AppEvent.Deactivate, this.onDeactivate);
+        this.customEventManager.bind(this, AppEvent.EditData, this.onEditData);
+        this.customEventManager.bind(this, AppEvent.EndLoading, this.onEndLoading);
+        this.customEventManager.bind(this, AppEvent.LoadData, this.onLoadData);
+        this.customEventManager.bind(this, AppEvent.Page, this.onPage);
+        this.customEventManager.bind(this, AppEvent.Resized, this.onResized);
+        this.customEventManager.bind(this, AppEvent.Select, this.onSelect);
+        this.customEventManager.bind(this, AppEvent.StartLoading, this.onStartLoading);
+        this.customEventManager.bind(this, AppEvent.Zoom, this.onZoom);
     }
     ////////////////////////////////////////////////////////////////////////
     // Getters and setters

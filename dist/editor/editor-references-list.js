@@ -2,6 +2,7 @@ import { App } from "../app.js";
 import { EventManager } from "../events/event-manager.js";
 import { GenericView } from "../utils/generic-view.js";
 import { appendDivTo } from "../utils/functions.js";
+import { AppEvent, createAppEvent } from "../events/event-types.js";
 export class EditorReferenceList extends GenericView {
     eventManager;
     tab;
@@ -41,24 +42,18 @@ export class EditorReferenceList extends GenericView {
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
     select(element, id) {
-        let event = new CustomEvent("onSelect", {
-            detail: {
-                id: id,
-                element: element,
-                caller: this,
-            },
-        });
-        this.app.customEventManager.dispatch(event);
+        this.app.customEventManager.dispatch(createAppEvent(AppEvent.Select, {
+            id: id,
+            element: element,
+            caller: this,
+        }));
     }
     cursorActivity(id, activity) {
-        let event = new CustomEvent("onCursorActivity", {
-            detail: {
-                id: id,
-                activity: activity,
-                caller: this,
-            },
-        });
-        this.app.customEventManager.dispatch(event);
+        this.app.customEventManager.dispatch(createAppEvent(AppEvent.CursorActivity, {
+            id: id,
+            activity: activity,
+            caller: this,
+        }));
     }
     //////////////////////////////////////////////////////////////////////////
     // Event methods

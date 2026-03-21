@@ -1,4 +1,5 @@
 import { EventManager } from "./event-manager.js";
+import { AppEvent, createAppEvent } from "./event-types.js";
 export class ActionManager {
     eventManager;
     app;
@@ -38,13 +39,10 @@ export class ActionManager {
         if (this.editorViewObj.hasSelection()) {
             id = this.editorViewObj.getSelection()[0].id;
         }
-        let event = new CustomEvent("onEditData", {
-            detail: {
-                id: id,
-                caller: caller,
-            },
-        });
-        this.app.customEventManager.dispatch(event);
+        this.app.customEventManager.dispatch(createAppEvent(AppEvent.EditData, {
+            id: id,
+            caller: caller,
+        }));
     }
     async editRefresh() {
         await this.editorViewObj.verovio.redoPagePitchPosLayout();

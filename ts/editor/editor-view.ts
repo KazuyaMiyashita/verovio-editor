@@ -15,6 +15,8 @@ import {
 } from "../utils/functions.js";
 import { midiScale } from "../midi/midi-scale.js";
 
+import { AppEvent, createAppEvent } from "../events/event-types.js";
+
 interface SelectedItem {
   element: string;
   id: string;
@@ -139,8 +141,7 @@ export class EditorView extends ResponsiveView {
     const pageWithElement = await this.verovio.getPageWithElement(id);
     if (pageWithElement > 0 && pageWithElement != this.currentPage) {
       this.currentPage = pageWithElement;
-      let event = new CustomEvent("onPage");
-      this.app.customEventManager.dispatch(event);
+      this.app.customEventManager.dispatch(createAppEvent(AppEvent.Page));
     }
     this.addToSelection(element, id);
   }
@@ -486,14 +487,13 @@ export class EditorView extends ResponsiveView {
     document.removeEventListener("mousemove", this.boundMouseMove);
     document.removeEventListener("touchmove", this.boundMouseMove);
 
-    let event = new CustomEvent("onSelect", {
-      detail: {
+    this.app.customEventManager.dispatch(
+      createAppEvent(AppEvent.Select, {
         id: node.id,
         elementType: node.classList[0],
         caller: this,
-      },
-    });
-    this.app.customEventManager.dispatch(event);
+      }),
+    );
 
     this.cursorPointerObj.initEvent(e, node);
 

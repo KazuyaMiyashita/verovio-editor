@@ -5,6 +5,7 @@
 import { GenericView } from "../utils/generic-view.js";
 import { autoModeLimit } from "../utils/messages.js";
 import { appendDivTo, appendTextAreaTo } from "../utils/functions.js";
+import { AppEvent, createAppEvent } from "../events/event-types.js";
 const theme = "vrv"; // default for light theme
 var Status;
 (function (Status) {
@@ -231,14 +232,11 @@ export class XMLEditorView extends GenericView {
                     return;
                 this.originalText = text;
                 this.app.startLoading("Updating data ...", this.autoMode);
-                let event = new CustomEvent("onLoadData", {
-                    detail: {
-                        caller: this,
-                        lightEndLoading: this.autoMode,
-                        mei: text,
-                    },
-                });
-                this.app.customEventManager.dispatch(event);
+                this.app.customEventManager.dispatch(createAppEvent(AppEvent.LoadData, {
+                    caller: this,
+                    lightEndLoading: this.autoMode,
+                    mei: text,
+                }));
             }
             else {
                 console.log("Validated data is obsolete");
@@ -284,15 +282,11 @@ export class XMLEditorView extends GenericView {
         const elementType = line.match(/[^\>]*\<([^\ ]*).*/);
         if (id) {
             if (this.currentId !== id[1]) {
-                let event = new CustomEvent("onSelect", {
-                    detail: {
-                        id: id[1],
-                        elementType: elementType[1],
-                        caller: this,
-                    },
-                });
-                //console.debug( "Dispatch-onSelect" );
-                this.app.customEventManager.dispatch(event);
+                this.app.customEventManager.dispatch(createAppEvent(AppEvent.Select, {
+                    id: id[1],
+                    elementType: elementType[1],
+                    caller: this,
+                }));
             }
             this.currentId = id[1];
         }

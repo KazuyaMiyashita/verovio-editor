@@ -8,6 +8,8 @@ import { EventManager } from "../events/event-manager.js";
 import { GenericView } from "./generic-view.js";
 import { appendDivTo } from "./functions.js";
 
+import { AppEvent, createAppEvent } from "../events/event-types.js";
+
 export class TabGroup extends GenericView {
   public readonly tabSelectors: HTMLDivElement;
   public readonly eventManager: EventManager;
@@ -167,15 +169,13 @@ export class Tab extends GenericView {
   public select() {
     this.tabSelector.classList.add("selected");
     this.div.style.display = "block";
-    let event = new CustomEvent("onActivate");
-    this.customEventManager.dispatch(event);
+    this.customEventManager.dispatch(createAppEvent(AppEvent.Activate));
   }
 
   public deselect() {
     this.tabSelector.classList.remove("selected");
     this.div.style.display = "none";
-    let event = new CustomEvent("onDeactivate");
-    this.customEventManager.dispatch(event);
+    this.customEventManager.dispatch(createAppEvent(AppEvent.Deactivate));
   }
 
   public isSelected(): boolean {

@@ -7,6 +7,7 @@ import { EditorCursorPointer } from "./editor-cursor-pointer.js";
 import { ResponsiveView } from "../verovio/responsive-view.js";
 import { appendDivTo, appendMidiPlayerTo, } from "../utils/functions.js";
 import { midiScale } from "../midi/midi-scale.js";
+import { AppEvent, createAppEvent } from "../events/event-types.js";
 export class EditorView extends ResponsiveView {
     cursorPointerObj;
     actionManager;
@@ -90,8 +91,7 @@ export class EditorView extends ResponsiveView {
         const pageWithElement = await this.verovio.getPageWithElement(id);
         if (pageWithElement > 0 && pageWithElement != this.currentPage) {
             this.currentPage = pageWithElement;
-            let event = new CustomEvent("onPage");
-            this.app.customEventManager.dispatch(event);
+            this.app.customEventManager.dispatch(createAppEvent(AppEvent.Page));
         }
         this.addToSelection(element, id);
     }
@@ -372,14 +372,11 @@ export class EditorView extends ResponsiveView {
         // More to reset here?
         document.removeEventListener("mousemove", this.boundMouseMove);
         document.removeEventListener("touchmove", this.boundMouseMove);
-        let event = new CustomEvent("onSelect", {
-            detail: {
-                id: node.id,
-                elementType: node.classList[0],
-                caller: this,
-            },
-        });
-        this.app.customEventManager.dispatch(event);
+        this.app.customEventManager.dispatch(createAppEvent(AppEvent.Select, {
+            id: node.id,
+            elementType: node.classList[0],
+            caller: this,
+        }));
         this.cursorPointerObj.initEvent(e, node);
         // we haven't started to drag yet, this might be just a selection
         document.addEventListener("mousemove", this.boundMouseMove);
