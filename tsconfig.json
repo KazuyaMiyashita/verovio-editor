@@ -1,12 +1,13 @@
 {
   "compilerOptions": {
-    "target": "es2017",
+    "target": "es2022",
     "module": "esnext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "outDir": "dist",
     "sourceMap": true,
     "declaration": true,
-    "strict": false
+    "strict": false,
+    "skipLibCheck": true
   },
   "include": ["ts/**/*.ts"]
 }
