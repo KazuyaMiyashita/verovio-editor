@@ -1,73 +1,73 @@
 /**
-* CustomEventManager class for managing custom events.
-* When an event is dispatched and found for an object, it is called.
-* CustomEventManager hold a propagationList of other managers to call recursively.
-*/
+ * CustomEventManager class for managing custom events.
+ * When an event is dispatched and found for an object, it is called.
+ * CustomEventManager hold a propagationList of other managers to call recursively.
+ */
 
-import { App } from '../app.js';
+import { App } from "../app.js";
 import { GenericView } from "../utils/generic-view.js";
 
 export class CustomEventManager {
-    private readonly cache: Map<string, Map<string, Function>>;
-    private readonly objs: Map<string, GenericView | App>;
-    private readonly propagationList: Array<CustomEventManager>;
+  private readonly cache: Map<string, Map<string, Function>>;
+  private readonly objs: Map<string, GenericView | App>;
+  private readonly propagationList: Array<CustomEventManager>;
 
-    constructor() {
-        this.cache = new Map<string, Map<string, Function>>;
-        this.objs = new Map<string, GenericView | App>;
-        this.propagationList = []
+  constructor() {
+    this.cache = new Map<string, Map<string, Function>>();
+    this.objs = new Map<string, GenericView | App>();
+    this.propagationList = [];
+  }
+
+  ////////////////////////////////////////////////////////////////////////
+  // Class-specific methods
+  ////////////////////////////////////////////////////////////////////////
+
+  // Binds function `fct` to element `el` on event `ev`
+  public bind(obj: GenericView | App, ev: string, fct: Function) {
+    if (!this.cache.has(obj.id)) {
+      this.cache.set(obj.id, new Map<string, Function>());
+      this.objs.set(obj.id, obj);
     }
 
-    ////////////////////////////////////////////////////////////////////////
-    // Class-specific methods
-    ////////////////////////////////////////////////////////////////////////
-
-    // Binds function `fct` to element `el` on event `ev`
-    public bind(obj: GenericView | App, ev: string, fct: Function) {
-        if (!this.cache.has(obj.id)) {
-            this.cache.set(obj.id, new Map<string, Function>);
-            this.objs.set(obj.id, obj);
-        }
-
-        const bindings: Map<string, Function> = this.cache.get(obj.id);
-        if (!bindings.has(ev)) {
-            bindings.set(ev, fct);
-        }
+    const bindings: Map<string, Function> = this.cache.get(obj.id);
+    if (!bindings.has(ev)) {
+      bindings.set(ev, fct);
     }
+  }
 
-    public addToPropagationList(customEventManager: CustomEventManager) {
-        if (!(this.propagationList.includes(customEventManager)))
-            this.propagationList.push(customEventManager);
-    }
+  public addToPropagationList(customEventManager: CustomEventManager) {
+    if (!this.propagationList.includes(customEventManager))
+      this.propagationList.push(customEventManager);
+  }
 
-    /* TODO
+  /* TODO
     // Unbinds all functions listening to event `ev` on element `el`
     unbind(el, ev)
     {
     }
     */
 
-    /* TODO
+  /* TODO
     // Unbinds everything managed by this
     unbindAll()
     {
     }
     */
 
-    public dispatch(event: Event) {
-        for (let objId of this.cache.keys()) {
-            const bindings: Map<string, Function> = this.cache.get(objId);
-            for (let ev of bindings.keys()) {
-                if (event.type === ev) {
-                    let fct: Function = bindings.get(ev);
-                    const o = this.objs.get(objId);
-                    o[fct.name](event);
-                }
-            }
+  public dispatch(event: Event) {
+    for (let objId of this.cache.keys()) {
+      const bindings: Map<string, Function> = this.cache.get(objId);
+      for (let ev of bindings.keys()) {
+        if (event.type === ev) {
+          let fct: Function = bindings.get(ev);
+          const o = this.objs.get(objId);
+          o[fct.name](event);
         }
-        for (let obj in this.propagationList) {
-            //console.debug(this.propagationList[obj]);
-            this.propagationList[obj]['dispatch'](event);
-        }
+      }
     }
+    for (let obj in this.propagationList) {
+      //console.debug(this.propagationList[obj]);
+      this.propagationList[obj]["dispatch"](event);
+    }
+  }
 }

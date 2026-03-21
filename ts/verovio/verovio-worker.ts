@@ -4,60 +4,63 @@
 
 let verovioToolkit = {};
 
-
 class VerovioDeferred {
-    promise: Promise<unknown>;
-    public reject!: (reason?: any) => void;
-    public resolve!: (value: (PromiseLike<unknown> | unknown)) => void;
+  promise: Promise<unknown>;
+  public reject!: (reason?: any) => void;
+  public resolve!: (value: PromiseLike<unknown> | unknown) => void;
 
-    constructor() {
-        //@ts-ignore
-        this.promise = new Promise((resolve, reject) => {
-            this.reject = reject;
-            this.resolve = resolve;
-        });
-    }
+  constructor() {
+    //@ts-ignore
+    this.promise = new Promise((resolve, reject) => {
+      this.reject = reject;
+      this.resolve = resolve;
+    });
+  }
 }
 
 const isVerovioModuleReady = new VerovioDeferred();
 
 // Listen for the first message to get the script URL
-addEventListener('message', function (event) {
+addEventListener(
+  "message",
+  function (event) {
     if (event.data.verovioUrl) {
-        importScripts(event.data.verovioUrl);
+      importScripts(event.data.verovioUrl);
 
-        // Initialize the Verovio module once the script is loaded
+      // Initialize the Verovio module once the script is loaded
+      //@ts-ignore
+      verovio.module.onRuntimeInitialized = function () {
         //@ts-ignore
-        verovio.module.onRuntimeInitialized = function () {
-            //@ts-ignore
-            verovio.enableLog(verovio.LOG_DEBUG);
-            //@ts-ignore
-            verovioToolkit = new verovio.toolkit();
-            isVerovioModuleReady.resolve(null);
-        };
-        return;
+        verovio.enableLog(verovio.LOG_DEBUG);
+        //@ts-ignore
+        verovioToolkit = new verovio.toolkit();
+        isVerovioModuleReady.resolve(null);
+      };
+      return;
     }
 
     // Destruct properties passed to this message event
     const { taskId, method, args } = event.data;
 
     // Wait until the Verovio module is ready
-    if (method === 'onRuntimeInitialized') {
-        isVerovioModuleReady.promise.then(() => {
-            postMessage({ taskId, method, args, result: null });
-        });
-        return;
+    if (method === "onRuntimeInitialized") {
+      isVerovioModuleReady.promise.then(() => {
+        postMessage({ taskId, method, args, result: null });
+      });
+      return;
     }
 
     // Check if Verovio toolkit has the requested method
     const fn = verovioToolkit[method || null];
     let result;
     if (fn) {
-        result = fn.apply(verovioToolkit, args || []);
+      result = fn.apply(verovioToolkit, args || []);
     } else {
-        console.warn('Unknown method:', method);
+      console.warn("Unknown method:", method);
     }
 
     // Always respond to worker calls with postMessage
     postMessage({ taskId, method, args, result });
-}, false);
+  },
+  false,
+);

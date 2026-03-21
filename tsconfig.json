@@ -1,11 +1,12 @@
 {
   "compilerOptions": {
     "target": "es2017",
+    "module": "esnext",
+    "moduleResolution": "node",
     "outDir": "dist",
-    "sourceMap": true
+    "sourceMap": true,
+    "declaration": true,
+    "strict": false
   },
-  "include": [
-    "ts/*.ts",
-    "ts/*/*.ts"
-  ]
+  "include": ["ts/**/*.ts"]
 }

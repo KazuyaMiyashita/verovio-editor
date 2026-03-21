@@ -3,61 +3,73 @@
  * It should not be instantiated directly but only through inherited classes.
  */
 
-import { App } from '../app.js';
-import { GenericView } from '../utils/generic-view.js';
-import { EventManager } from '../events/event-manager.js';
+import { App } from "../app.js";
+import { GenericView } from "../utils/generic-view.js";
+import { EventManager } from "../events/event-manager.js";
 
 export class Toolbar extends GenericView {
-    public readonly eventManager: EventManager;
+  public readonly eventManager: EventManager;
 
-    constructor(div: HTMLDivElement, app: App) {
-        super(div, app);
+  constructor(div: HTMLDivElement, app: App) {
+    super(div, app);
 
-        // One of the little quirks of writing in ES6, bind events
-        this.eventManager = new EventManager(this);
+    // One of the little quirks of writing in ES6, bind events
+    this.eventManager = new EventManager(this);
+  }
+
+  ////////////////////////////////////////////////////////////////////////
+  // Class-specific methods
+  ////////////////////////////////////////////////////////////////////////
+
+  protected updateToolbarGrp(grp: HTMLElement, condition: boolean): void {
+    if (grp === undefined) {
+      return;
     }
+    if (condition) grp.style.display = "block";
+    else grp.style.display = "none";
+  }
 
-    ////////////////////////////////////////////////////////////////////////
-    // Class-specific methods
-    ////////////////////////////////////////////////////////////////////////
-
-    protected updateToolbarGrp(grp: HTMLElement, condition: boolean): void {
-        if (grp === undefined) {
-            return;
-        }
-        if (condition) grp.style.display = 'block';
-        else grp.style.display = 'none';
+  protected updateToolbarBtnEnabled(
+    btn: HTMLElement,
+    condition: boolean,
+  ): void {
+    if (btn === undefined) {
+      return;
     }
+    if (condition) btn.classList.remove("disabled");
+    else btn.classList.add("disabled");
+  }
 
-    protected updateToolbarBtnEnabled(btn: HTMLElement, condition: boolean): void {
-        if (btn === undefined) {
-            return;
-        }
-        if (condition) btn.classList.remove("disabled");
-        else btn.classList.add("disabled");
+  protected updateToolbarBtnDisplay(
+    btn: HTMLElement,
+    condition: boolean,
+  ): void {
+    if (btn === undefined) {
+      return;
     }
+    if (condition) btn.style.display = "block";
+    else btn.style.display = "none";
+  }
 
-    protected updateToolbarBtnDisplay(btn: HTMLElement, condition: boolean): void {
-        if (btn === undefined) {
-            return;
-        }
-        if (condition) btn.style.display = 'block';
-        else btn.style.display = 'none';
+  protected updateToolbarBtnToggled(
+    btn: HTMLElement,
+    condition: boolean,
+  ): void {
+    if (btn === undefined) {
+      return;
     }
+    if (condition) btn.classList.add("toggled");
+    else btn.classList.remove("toggled");
+  }
 
-    protected updateToolbarBtnToggled(btn: HTMLElement, condition: boolean): void {
-        if (btn === undefined) {
-            return;
-        }
-        if (condition) btn.classList.add("toggled");
-        else btn.classList.remove("toggled");
+  protected updateToolbarSubmenuBtn(
+    btn: HTMLElement,
+    condition: boolean,
+  ): void {
+    if (btn === undefined) {
+      return;
     }
-
-    protected updateToolbarSubmenuBtn(btn: HTMLElement, condition: boolean): void {
-        if (btn === undefined) {
-            return;
-        }
-        if (condition) btn.classList.add("vrv-menu-checked");
-        else btn.classList.remove("vrv-menu-checked");
-    }
+    if (condition) btn.classList.add("vrv-menu-checked");
+    else btn.classList.remove("vrv-menu-checked");
+  }
 }

@@ -13,7 +13,7 @@ loadScript( "https://cdn.jsdelivr.net/combine/npm/tone@14.7.58,npm/@magenta/musi
   console.log( "Tone.js, Magenta.js, and HTML-MIDI-Player loaded" );
 } );
 
-import { VerovioApp } from '../../dist/verovio-app.js';
+import { VerovioApp } from '../../dist/verovio-editor.js';
 ( function ()
 {
   window.Verovio = window.Verovio || {};

@@ -2,75 +2,97 @@
  * The DialogSettingsEditor class for the editor settings.
  */
 
-import { App } from '../app.js';
-import { Dialog } from './dialog.js';
-import { appendDivTo, appendInputTo, appendOptionTo, appendSelectTo } from '../utils/functions.js';
+import { App } from "../app.js";
+import { Dialog } from "./dialog.js";
+import {
+  appendDivTo,
+  appendInputTo,
+  appendOptionTo,
+  appendSelectTo,
+} from "../utils/functions.js";
 
 export class DialogSettingsEditor extends Dialog {
-    protected reload: boolean;
+  protected reload: boolean;
 
-    protected readonly fields: HTMLDivElement;
-    protected readonly appOptions: App.Options;
-    protected readonly verovioVersion: HTMLSelectElement;
-    protected readonly devFeatures: HTMLInputElement | null;
+  protected readonly fields: HTMLDivElement;
+  protected readonly appOptions: App.Options;
+  protected readonly verovioVersion: HTMLSelectElement;
+  protected readonly devFeatures: HTMLInputElement | null;
 
-    constructor(div: HTMLDivElement, app: App, title: string, options: Dialog.Options, appOptions: App.Options) {
-        super(div, app, title, options);
+  constructor(
+    div: HTMLDivElement,
+    app: App,
+    title: string,
+    options: Dialog.Options,
+    appOptions: App.Options,
+  ) {
+    super(div, app, title, options);
 
-        this.appOptions = appOptions;
-        this.reload = false;
+    this.appOptions = appOptions;
+    this.reload = false;
 
-        this.addButton("Reset", this.reset);
+    this.addButton("Reset", this.reset);
 
-        this.fields = appendDivTo(this.content, { class: `vrv-dialog-form` });
+    this.fields = appendDivTo(this.content, { class: `vrv-dialog-form` });
 
-        this.appendLabel(this.fields, "Verovio version");
-        this.verovioVersion = appendSelectTo(this.fields, { class: `vrv-dialog-input` });
+    this.appendLabel(this.fields, "Verovio version");
+    this.verovioVersion = appendSelectTo(this.fields, {
+      class: `vrv-dialog-input`,
+    });
 
-        [["latest", "Latest release"], ["develop", "Development version"]].forEach(version => {
-            let option = appendOptionTo(this.verovioVersion, {});
-            option.value = version[0];
-            option.innerHTML = version[1];
-            if (appOptions.verovioVersion === version[0]) option.selected = true;
-        })
+    [
+      ["latest", "Latest release"],
+      ["develop", "Development version"],
+    ].forEach((version) => {
+      let option = appendOptionTo(this.verovioVersion, {});
+      option.value = version[0];
+      option.innerHTML = version[1];
+      if (appOptions.verovioVersion === version[0]) option.selected = true;
+    });
 
-        this.devFeatures = null;
-        if (appOptions.showDevFeatures) {
-            this.appendLabel(this.fields, "Development features");
-            this.devFeatures = appendInputTo(this.fields, { class: `vrv-dialog-input`, type: `checkbox` });
-            if (appOptions.devFeatures === true) this.devFeatures.checked = true;
-        }
+    this.devFeatures = null;
+    if (appOptions.showDevFeatures) {
+      this.appendLabel(this.fields, "Development features");
+      this.devFeatures = appendInputTo(this.fields, {
+        class: `vrv-dialog-input`,
+        type: `checkbox`,
+      });
+      if (appOptions.devFeatures === true) this.devFeatures.checked = true;
+    }
+  }
 
+  ////////////////////////////////////////////////////////////////////////
+  // Getters and setters
+  ////////////////////////////////////////////////////////////////////////
+
+  public getAppOptions(): App.Options {
+    return this.appOptions;
+  }
+
+  public isReload(): boolean {
+    return this.reload;
+  }
+
+  ////////////////////////////////////////////////////////////////////////
+  // Overriding methods
+  ////////////////////////////////////////////////////////////////////////
+
+  override ok(): void {
+    if (this.verovioVersion.value !== this.appOptions.verovioVersion) {
+      this.reload = true;
+    }
+    this.appOptions.verovioVersion = this.verovioVersion.value;
+    if (this.devFeatures) {
+      if (this.devFeatures.checked !== this.appOptions.devFeatures) {
+        this.reload = true;
+      }
+      this.appOptions.devFeatures = this.devFeatures.checked;
     }
 
-    ////////////////////////////////////////////////////////////////////////
-    // Getters and setters
-    ////////////////////////////////////////////////////////////////////////
+    super.ok();
+  }
 
-    public getAppOptions(): App.Options { return this.appOptions; }
-
-    public isReload(): boolean { return this.reload; }
-
-    ////////////////////////////////////////////////////////////////////////
-    // Overriding methods
-    ////////////////////////////////////////////////////////////////////////
-
-    override ok(): void {
-        if (this.verovioVersion.value !== this.appOptions.verovioVersion) {
-            this.reload = true;
-        }
-        this.appOptions.verovioVersion = this.verovioVersion.value;
-        if (this.devFeatures) {
-            if (this.devFeatures.checked !== this.appOptions.devFeatures) {
-                this.reload = true;
-            }
-            this.appOptions.devFeatures = this.devFeatures.checked;
-        }
-
-        super.ok();
-    }
-
-    override reset(): void {
-        super.ok();
-    }
+  override reset(): void {
+    super.ok();
+  }
 }

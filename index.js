@@ -1,4 +1,4 @@
-import { App } from "./dist/app.js";
+import { App } from "./ts/index.ts";
 
 function getParameterByName( name )
 {

@@ -3,14 +3,14 @@
  */
 
 export class Deferred {
-    public readonly promise: Promise<string>;
-    public reject: Function;
-    public resolve: Function
+  public readonly promise: Promise<string>;
+  public reject: Function;
+  public resolve: Function;
 
-    constructor() {
-        this.promise = new Promise((resolve: Function, reject: Function) => {
-            this.reject = reject
-            this.resolve = resolve
-        });
-    }
+  constructor() {
+    this.promise = new Promise((resolve: Function, reject: Function) => {
+      this.reject = reject;
+      this.resolve = resolve;
+    });
+  }
 }

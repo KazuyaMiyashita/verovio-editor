@@ -1,0 +1,49 @@
+{
+  "name": "verovio-editor",
+  "version": "1.0.0",
+  "description": "A customizable, web-based musical score editor built on Verovio.",
+  "type": "module",
+  "main": "./dist/verovio-editor.umd.cjs",
+  "module": "./dist/verovio-editor.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/verovio-editor.js",
+      "require": "./dist/verovio-editor.umd.cjs",
+      "types": "./dist/index.d.ts"
+    },
+    "./css/verovio.css": "./css/verovio.css"
+  },
+  "files": [
+    "dist",
+    "css",
+    "icons",
+    "svg"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "lint": "eslint 'ts/**/*.ts'",
+    "format": "prettier --write 'ts/**/*.ts' 'css/**/*.css' '*.json'"
+  },
+  "keywords": [
+    "verovio",
+    "mei",
+    "musicxml",
+    "editor",
+    "music"
+  ],
+  "author": "rism-digital",
+  "license": "AGPL-3.0",
+  "packageManager": "pnpm@10.29.3",
+  "devDependencies": {
+    "eslint": "^10.1.0",
+    "prettier": "^3.8.1",
+    "tslib": "^2.8.1",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.57.1",
+    "vite": "^8.0.1",
+    "vite-plugin-dts": "^4.5.4"
+  }
+}

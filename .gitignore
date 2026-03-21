@@ -1,3 +1,6 @@
+.pnpm-store
+node_modules
+
 .ruby-version
 .sass-cache
 .vscode/launch.json
