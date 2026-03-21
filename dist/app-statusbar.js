@@ -2,9 +2,11 @@
  * The AppStatusbar class is the implementation of the application status.
  * Events are attached to the App.eventManager.
  */
-import { GenericView } from './utils/generic-view.js';
-import { appendDivTo } from './utils/functions.js';
+import { GenericView } from "./utils/generic-view.js";
+import { appendDivTo } from "./utils/functions.js";
 export class AppStatusbar extends GenericView {
+    statusText;
+    versionText;
     constructor(div, app) {
         super(div, app);
         this.active = true;
@@ -31,7 +33,7 @@ export class AppStatusbar extends GenericView {
         if (!super.onStartLoading(e))
             return false;
         //console.debug("AppStatusbar:onStartLoading");
-        let msg = (e.detail.light) ? e.detail.msg : "In progress ...";
+        let msg = e.detail.light ? e.detail.msg : "In progress ...";
         this.statusText.textContent = msg;
         return true;
     }

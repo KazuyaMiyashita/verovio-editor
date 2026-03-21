@@ -3,6 +3,9 @@
  */
 let verovioToolkit = {};
 class VerovioDeferred {
+    promise;
+    reject;
+    resolve;
     constructor() {
         //@ts-ignore
         this.promise = new Promise((resolve, reject) => {
@@ -13,7 +16,7 @@ class VerovioDeferred {
 }
 const isVerovioModuleReady = new VerovioDeferred();
 // Listen for the first message to get the script URL
-addEventListener('message', function (event) {
+addEventListener("message", function (event) {
     if (event.data.verovioUrl) {
         importScripts(event.data.verovioUrl);
         // Initialize the Verovio module once the script is loaded
@@ -30,7 +33,7 @@ addEventListener('message', function (event) {
     // Destruct properties passed to this message event
     const { taskId, method, args } = event.data;
     // Wait until the Verovio module is ready
-    if (method === 'onRuntimeInitialized') {
+    if (method === "onRuntimeInitialized") {
         isVerovioModuleReady.promise.then(() => {
             postMessage({ taskId, method, args, result: null });
         });
@@ -43,7 +46,7 @@ addEventListener('message', function (event) {
         result = fn.apply(verovioToolkit, args || []);
     }
     else {
-        console.warn('Unknown method:', method);
+        console.warn("Unknown method:", method);
     }
     // Always respond to worker calls with postMessage
     postMessage({ taskId, method, args, result });

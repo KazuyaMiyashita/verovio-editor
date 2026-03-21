@@ -4,6 +4,7 @@
 //@ts-ignore
 const pako = window.pako;
 export class FileStack {
+    stack;
     constructor() {
         const cache = window.localStorage.getItem("fileStack");
         //console.debug( cache );
@@ -11,7 +12,7 @@ export class FileStack {
             idx: 0,
             items: 0,
             maxItems: 6,
-            filenames: []
+            filenames: [],
         }, JSON.parse(cache));
         //console.debug( this.stack );
     }
@@ -32,7 +33,7 @@ export class FileStack {
             this.stack.idx = this.stack.maxItems - 1;
         this.stack.filenames[this.stack.idx] = filename;
         //let compressedData = zlib.deflateSync( data ).toString( 'base64' );
-        let compressedData = btoa(pako.deflate(data, { to: 'string' }));
+        let compressedData = btoa(pako.deflate(data, { to: "string" }));
         window.localStorage.setItem("file-" + this.stack.idx, compressedData);
         // Increase the stack items if not full
         if (this.stack.items < this.stack.maxItems - 1)
@@ -42,7 +43,7 @@ export class FileStack {
     load(idx) {
         let data = window.localStorage.getItem("file-" + idx);
         //let decompressedData = zlib.inflateSync( new Buffer( data, 'base64' ) ).toString();
-        let decompressedData = pako.inflate(atob(data), { to: 'string' });
+        let decompressedData = pako.inflate(atob(data), { to: "string" });
         return { filename: this.stack.filenames[idx], data: decompressedData };
     }
     getLast() {
@@ -51,7 +52,7 @@ export class FileStack {
         }
     }
     fileList() {
-        let list = new Array;
+        let list = new Array();
         for (let i = 0; i < this.stack.items; i++) {
             let idx = (this.stack.idx + i) % this.stack.maxItems;
             list.push({ idx: idx, filename: this.stack.filenames[idx] });

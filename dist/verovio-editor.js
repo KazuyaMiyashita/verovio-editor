@@ -1,5 +1,8 @@
 //#region ts/events/custom-event-manager.ts
 var e = class {
+	cache;
+	objs;
+	propagationList;
 	constructor() {
 		this.cache = /* @__PURE__ */ new Map(), this.objs = /* @__PURE__ */ new Map(), this.propagationList = [];
 	}
@@ -103,6 +106,12 @@ function w(e, t) {
 //#endregion
 //#region ts/utils/generic-view.ts
 var T = class {
+	customEventManager;
+	id;
+	active;
+	app;
+	div;
+	display;
 	constructor(t, n) {
 		this.div = t, this.app = n, this.id = v(16), this.active = !1, this.display = "block", this.customEventManager = new e(), this.customEventManager.bind(this, "onActivate", this.onActivate), this.customEventManager.bind(this, "onCursorActivity", this.onCursorActivity), this.customEventManager.bind(this, "onDeactivate", this.onDeactivate), this.customEventManager.bind(this, "onEditData", this.onEditData), this.customEventManager.bind(this, "onEndLoading", this.onEndLoading), this.customEventManager.bind(this, "onLoadData", this.onLoadData), this.customEventManager.bind(this, "onPage", this.onPage), this.customEventManager.bind(this, "onResized", this.onResized), this.customEventManager.bind(this, "onSelect", this.onSelect), this.customEventManager.bind(this, "onStartLoading", this.onStartLoading), this.customEventManager.bind(this, "onZoom", this.onZoom);
 	}
@@ -155,6 +164,8 @@ var T = class {
 		return !!this.active;
 	}
 }, E = class extends T {
+	statusText;
+	versionText;
 	constructor(e, t) {
 		super(e, t), this.active = !0, this.statusText = i(this.div, { class: "vrv-status-text" }), this.versionText = i(this.div, { class: "vrv-status-version" });
 	}
@@ -170,6 +181,9 @@ var T = class {
 		return this.statusText.textContent = t, !0;
 	}
 }, D = class {
+	parent;
+	cache;
+	appIDAttr;
 	constructor(e) {
 		e && (this.parent = e, this.cache = {}, this.appIDAttr = "data-app-el-id");
 	}
@@ -196,6 +210,17 @@ var T = class {
 		this.cache = {};
 	}
 }, O = class e extends T {
+	verovio;
+	currentPage;
+	currentZoomIndex;
+	currentScale;
+	boundContextMenu;
+	boundMouseMove;
+	boundMouseUp;
+	boundKeyDown;
+	boundKeyUp;
+	boundResize;
+	eventManager;
 	constructor(e, t, n) {
 		super(e, t), this.verovio = n, this.eventManager = new D(this), this.bindListeners(), this.currentPage = 1, this.currentZoomIndex = this.app.getCurrentZoomIndex(), this.currentScale = this.app.zoomLevels[this.currentZoomIndex];
 	}
@@ -259,10 +284,21 @@ var T = class {
 //#endregion
 //#region ts/document/document-view.ts
 var ee = class extends IntersectionObserver {
+	pruningMargin;
+	lastPageIn;
+	view;
 	constructor(e, t, n) {
 		super(e, n), this.pruningMargin = 10, this.lastPageIn = 0, this.view = t;
 	}
 }, k = class extends O {
+	currentPageHeight;
+	currentPageWidth;
+	currentDocHeight;
+	currentDocWidth;
+	currentDocMargin;
+	pruning;
+	observer;
+	docWrapper;
 	constructor(e, t, n) {
 		super(e, t, n), this.docWrapper = i(this.div, {
 			class: "vrv-doc-wrapper",
@@ -361,12 +397,29 @@ var ee = class extends IntersectionObserver {
 		}
 	}
 }, A = class {
+	promise;
+	reject;
+	resolve;
 	constructor() {
 		this.promise = new Promise((e, t) => {
 			this.reject = t, this.resolve = e;
 		});
 	}
 }, j = class e {
+	app;
+	eventManager;
+	div;
+	options;
+	box;
+	top;
+	icon;
+	close;
+	content;
+	bottom;
+	cancelBtn;
+	okBtn;
+	boundKeyDown;
+	deferred;
 	constructor(t, n, r, a) {
 		this.options = Object.assign({
 			icon: "info",
@@ -428,18 +481,28 @@ var ee = class extends IntersectionObserver {
 //#endregion
 //#region ts/editor/editor-attribute-list.ts
 var te = class e extends T {
-	static {
-		this.readOnlyAttributes = [
-			/.*@xml:id/,
-			/.*@startid/,
-			/.*@endid/,
-			/.*@plist/,
-			/.*@copyof/,
-			/[staff|layer]@n$/
-		];
-	}
+	eventManager;
+	listWrapper;
+	listWrapperChild;
+	element;
+	elementId;
+	attributes;
+	attributesBasic;
+	types;
+	editedText;
+	tab;
+	actionManager;
+	customMethodsMap = [[/^.*@pname$/, this.customAllPname]];
+	static readOnlyAttributes = [
+		/.*@xml:id/,
+		/.*@startid/,
+		/.*@endid/,
+		/.*@plist/,
+		/.*@copyof/,
+		/[staff|layer]@n$/
+	];
 	constructor(e, t, n, r) {
-		super(e, t), this.customMethodsMap = [[/^.*@pname$/, this.customAllPname]], this.setDisplayFlex(), this.tab = n, this.actionManager = r, this.eventManager = new D(this), this.listWrapper = i(this.div, { class: "vrv-attribute-list-wrapper" }), this.listWrapperChild = void 0, this.element = "", this.elementId = "", this.attributes = {}, this.attributesBasic = {}, this.types = {}, this.editedText = !1;
+		super(e, t), this.setDisplayFlex(), this.tab = n, this.actionManager = r, this.eventManager = new D(this), this.listWrapper = i(this.div, { class: "vrv-attribute-list-wrapper" }), this.listWrapperChild = void 0, this.element = "", this.elementId = "", this.attributes = {}, this.attributesBasic = {}, this.types = {}, this.editedText = !1;
 	}
 	loadAttributesOrText(e) {
 		if (this.listWrapper.textContent = "", this.eventManager.unbindAll(), this.listWrapperChild && this.listWrapperChild.remove(), this.element = "", this.attributes = {}, this.attributesBasic = {}, this.types = {}, e.text) this.elementId = e.id, this.loadText(e.text);
@@ -606,6 +669,14 @@ var te = class e extends T {
 		n && (n.style.display = n.style.display === "none" ? "table-row-group" : "none", t.classList.toggle("close"));
 	}
 }, M = class extends T {
+	eventManager;
+	root;
+	useBreadCrumbs;
+	focusId;
+	displayDepth;
+	rootElement;
+	breadCrumbsWrapper;
+	breadCrumbs;
 	constructor(e, t) {
 		super(e, t), this.breadCrumbsWrapper = i(this.div, { class: "vrv-tree-breadcrumbs-wrapper" }), this.breadCrumbsWrapper.style.display = "none", this.breadCrumbs = i(this.breadCrumbsWrapper, { class: "vrv-tree-breadcrumbs" }), this.clearCrumbs(), this.root = null, this.useBreadCrumbs = !1, this.setDisplayFlex(), this.focusId = "", this.displayDepth = 2, this.eventManager = new D(this);
 	}
@@ -742,6 +813,14 @@ var te = class e extends T {
 	onMouseover(e) {}
 	onMouseout(e) {}
 }, N = class {
+	id;
+	element;
+	attributes;
+	isTextNode;
+	isLeaf;
+	div;
+	label;
+	children;
 	constructor(e, t, n = {}, r = [], i = !1, a = !1) {
 		this.id = e, this.element = t, this.attributes = n, this.children = r, this.isTextNode = i, this.isLeaf = a;
 	}
@@ -779,6 +858,7 @@ var te = class e extends T {
 		});
 	}
 }, ne = class extends M {
+	tab;
 	constructor(e, t, n) {
 		super(e, t), this.tab = n;
 	}
@@ -824,6 +904,9 @@ var te = class e extends T {
 		t.dataset.id && this.cursorActivity(t.dataset.id, "mouseout");
 	}
 }, P = class extends T {
+	eventManager;
+	tab;
+	listWrapper;
 	constructor(e, t, n) {
 		super(e, t), this.setDisplayFlex(), this.tab = n, this.eventManager = new D(this), this.listWrapper = i(this.div, { class: "vrv-reference-list-wrapper" });
 	}
@@ -870,6 +953,17 @@ var te = class e extends T {
 //#endregion
 //#region ts/editor/editor-content-panel.ts
 var re = class extends T {
+	contentTree;
+	contentTreeObj;
+	attributeList;
+	attributeListObj;
+	EditorAttributeList;
+	referencesFrom;
+	referencesFromObj;
+	referencesTo;
+	referencesToObj;
+	tab;
+	actionManager;
 	constructor(e, t, n, r) {
 		super(e, t), this.setDisplayFlex(), this.tab = n, this.actionManager = r, this.contentTree = i(this.addFieldSet("Content tree", 3), { class: "vrv-field-set-panel" }), this.contentTreeObj = new ne(this.contentTree, this.app, this.tab), this.contentTreeObj.setBreadCrumbs(), this.customEventManager.addToPropagationList(this.contentTreeObj.customEventManager), this.attributeList = i(this.addFieldSet("Attributes or text", 3), { class: "vrv-field-set-panel" }), this.attributeListObj = new te(this.attributeList, this.app, this.tab, this.actionManager), this.customEventManager.addToPropagationList(this.attributeListObj.customEventManager), this.referencesFrom = i(this.addFieldSet("Referencing elements"), { class: "vrv-field-set-panel" }), this.referencesFromObj = new P(this.referencesFrom, this.app, this.tab), this.customEventManager.addToPropagationList(this.referencesFromObj.customEventManager), this.referencesTo = i(this.addFieldSet("Referenced elements"), { class: "vrv-field-set-panel" }), this.referencesToObj = new P(this.referencesTo, this.app, this.tab), this.customEventManager.addToPropagationList(this.contentTreeObj.customEventManager);
 	}
@@ -896,6 +990,7 @@ var re = class extends T {
 		return super.onSelect(e) ? (this.updateContent(e.detail.id), !0) : !1;
 	}
 }, ie = class extends M {
+	tab;
 	constructor(e, t, n) {
 		super(e, t), this.tab = n, this.displayDepth = 4;
 	}
@@ -907,6 +1002,9 @@ var re = class extends T {
 		t.dataset.id && (t.classList.contains("open") ? this.collapseNode(t.dataset.id) : this.applyFocus(t.dataset.id)), e.stopPropagation();
 	}
 }, ae = class extends T {
+	sectionTree;
+	sectionTreeObj;
+	tab;
 	constructor(e, t, n) {
 		super(e, t), this.setDisplayFlex(), this.tab = n, this.sectionTree = i(this.addFieldSet("Score structure", 3), { class: "vrv-field-set-panel" }), this.sectionTreeObj = new ie(this.sectionTree, this.app, this.tab), this.sectionTreeObj.setBreadCrumbs(), this.customEventManager.addToPropagationList(this.sectionTreeObj.customEventManager);
 	}
@@ -927,6 +1025,7 @@ var re = class extends T {
 		return super.onEndLoading(e) ? (this.app.getPageCount() > 0 && !this.tab.loaded && this.updateContent(), !0) : !1;
 	}
 }, F = class extends T {
+	eventManager;
 	constructor(e, t) {
 		super(e, t), this.eventManager = new D(this);
 	}
@@ -946,6 +1045,28 @@ var re = class extends T {
 		e !== void 0 && (t ? e.classList.add("vrv-menu-checked") : e.classList.remove("vrv-menu-checked"));
 	}
 }, oe = class extends F {
+	selectedElementType;
+	panel;
+	layoutControls;
+	xmlEditorEnable;
+	xmlEditorOrientation;
+	xmlEditorValidate;
+	xmlEditorForce;
+	notes;
+	controlEvents;
+	undo;
+	redo;
+	controlEventControls;
+	placeAbove;
+	placeBelow;
+	placeAuto;
+	hairpinFormControls;
+	formCres;
+	formDim;
+	stemControls;
+	stemDirUp;
+	stemDirDown;
+	stemDirAuto;
 	constructor(e, t, n) {
 		let r = `${t.host}/icons/toolbar/editor-xml.png`, a = `${t.host}/icons/toolbar/validate.png`, o = `${t.host}/icons/toolbar/force.png`, s = `${t.host}/icons/editor/undo.png`, c = `${t.host}/icons/editor/redo.png`, l = `${t.host}/icons/editor/stem-dir-up.png`, u = `${t.host}/icons/editor/stem-dir-down.png`, f = `${t.host}/icons/editor/stem-dir-auto.png`, p = `${t.host}/icons/editor/place-below.png`, m = `${t.host}/icons/editor/place-auto.png`, h = `${t.host}/icons/editor/place-above.png`, g = `${t.host}/icons/editor/form-dim.png`, _ = `${t.host}/icons/editor/form-cres.png`;
 		super(e, t), this.panel = n, this.active = !0, this.selectedElementType = null, this.layoutControls = i(this.div, { class: "vrv-btn-group" }), i(this.layoutControls, { class: "vrv-h-separator" }), this.xmlEditorEnable = i(this.layoutControls, {
@@ -1024,6 +1145,12 @@ var re = class extends T {
 		this.panel.xmlEditorViewObj && this.panel.xmlEditorViewObj.isEdited() && this.panel.xmlEditorViewObj.triggerValidation();
 	}
 }, se = class {
+	eventManager;
+	app;
+	inProgress;
+	editorViewObj;
+	canUndoCache;
+	canRedoCache;
 	constructor(e, t) {
 		this.app = t, this.editorViewObj = e, this.eventManager = new D(this), this.inProgress = !1, this.canUndoCache = !1, this.canRedoCache = !1;
 	}
@@ -1177,6 +1304,20 @@ var re = class extends T {
 	}
 	async setAttrValueForTypes(e, t, n = []) {}
 }, ce = class {
+	editorViewObj;
+	activated;
+	pixPerPix;
+	viewTop;
+	viewLeft;
+	lastEvent;
+	scrollTop;
+	scrollLeft;
+	staffNode;
+	initX;
+	initY;
+	marginLeft;
+	marginTop;
+	MEIUnit;
 	constructor(e) {
 		this.editorViewObj = e, this.activated = !1, this.pixPerPix = 0, this.viewTop = 0, this.viewLeft = 0, this.lastEvent = null, this.scrollTop = 0, this.scrollLeft = 0, this.staffNode = null, this.initX = 0, this.initY = 0, this.marginLeft = 0, this.marginTop = 0, this.MEIUnit = 90;
 	}
@@ -1233,6 +1374,8 @@ var re = class extends T {
 		return [e - this.initX, t - this.initY];
 	}
 }, I = class extends O {
+	svgWrapper;
+	midiIds;
 	constructor(e, t, n) {
 		super(e, t, n), this.svgWrapper = i(this.div, { class: "vrv-svg-wrapper" }), this.midiIds = [];
 	}
@@ -1318,6 +1461,15 @@ var re = class extends T {
 		this.svgWrapper.scrollTop = t.scrollTop, this.svgWrapper.scrollLeft = t.scrollLeft;
 	}
 }, L = "data:audio/midi;base64,TVRoZAAAAAYAAQABAeBNVHJrAAADIACQFUCDYIAVQACQFkCDYIAWQACQF0CDYIAXQACQGECDYIAYQACQGUCDYIAZQACQGkCDYIAaQACQG0CDYIAbQACQHECDYIAcQACQHUCDYIAdQACQHkCDYIAeQACQH0CDYIAfQACQIECDYIAgQACQIUCDYIAhQACQIkCDYIAiQACQI0CDYIAjQACQJECDYIAkQACQJUCDYIAlQACQJkCDYIAmQACQJ0CDYIAnQACQKECDYIAoQACQKUCDYIApQACQKkCDYIAqQACQK0CDYIArQACQLECDYIAsQACQLUCDYIAtQACQLkCDYIAuQACQL0CDYIAvQACQMECDYIAwQACQMUCDYIAxQACQMkCDYIAyQACQM0CDYIAzQACQNECDYIA0QACQNUCDYIA1QACQNkCDYIA2QACQN0CDYIA3QACQOECDYIA4QACQOUCDYIA5QACQOkCDYIA6QACQO0CDYIA7QACQPECDYIA8QACQPUCDYIA9QACQPkCDYIA+QACQP0CDYIA/QACQQECDYIBAQACQQUCDYIBBQACQQkCDYIBCQACQQ0CDYIBDQACQRECDYIBEQACQRUCDYIBFQACQRkCDYIBGQACQR0CDYIBHQACQSECDYIBIQACQSUCDYIBJQACQSkCDYIBKQACQS0CDYIBLQACQTECDYIBMQACQTUCDYIBNQACQTkCDYIBOQACQT0CDYIBPQACQUECDYIBQQACQUUCDYIBRQACQUkCDYIBSQACQU0CDYIBTQACQVECDYIBUQACQVUCDYIBVQACQVkCDYIBWQACQV0CDYIBXQACQWECDYIBYQACQWUCDYIBZQACQWkCDYIBaQACQW0CDYIBbQACQXECDYIBcQACQXUCDYIBdQACQXkCDYIBeQACQX0CDYIBfQACQYECDYIBgQACQYUCDYIBhQACQYkCDYIBiQACQY0CDYIBjQACQZECDYIBkQACQZUCDYIBlQACQZkCDYIBmQACQZ0CDYIBnQACQaECDYIBoQACQaUCDYIBpQACQakCDYIBqQACQa0CDYIBrQACQbECDYIBsQINgbAAA/y8A", R = class extends I {
+	cursorPointerObj;
+	actionManager;
+	midiPlayerElement;
+	svgOverlay;
+	mouseMoveTimer;
+	draggingActive;
+	mouseOverId;
+	lastNote;
+	selectedItems;
 	constructor(e, t, n) {
 		super(e, t, n), this.midiPlayerElement = x(this.div, {}), this.midiPlayerElement.setAttribute("src", L), this.svgOverlay = i(this.div, {
 			class: "vrv-svg-overlay",
@@ -1533,6 +1685,20 @@ var re = class extends T {
 		this.cursorPointerObj.setScrollTop(t.scrollTop), this.cursorPointerObj.setScrollLeft(t.scrollLeft), this.svgWrapper.scrollTop = t.scrollTop, this.svgWrapper.scrollLeft = t.scrollLeft;
 	}
 }, le = class {
+	currentOctave;
+	actionManager;
+	boundKeyUp;
+	boundKeyDown;
+	app;
+	eventManager;
+	div;
+	octaves;
+	octaveNumbers;
+	letters;
+	keyboardWrapper;
+	keys;
+	note;
+	midiPlayerElement;
 	constructor(e, t) {
 		let n = `${t.host}/icons/keyboard/left.png`, r = `${t.host}/icons/keyboard/right.png`;
 		this.div = e, this.div.textContent = "", this.app = t, this.midiPlayerElement = x(this.div, {}), this.midiPlayerElement.setAttribute("src", L), this.eventManager = new D(this), this.bindListeners();
@@ -1676,6 +1842,10 @@ var re = class extends T {
 		document.removeEventListener("keydown", this.boundKeyDown), document.removeEventListener("keyup", this.boundKeyUp);
 	}
 }, z = class extends T {
+	tabSelectors;
+	eventManager;
+	selectedTab;
+	tabs;
 	constructor(e, t) {
 		super(e, t), this.div.textContent = "", this.tabSelectors = i(this.div, { class: "vrv-tab-selectors" }), this.tabs = [], this.selectedTab = null, this.eventManager = new D(this);
 	}
@@ -1727,6 +1897,9 @@ var re = class extends T {
 		this.select(t.dataset.tab);
 	}
 }, ue = class extends T {
+	tabGroupObj;
+	tabSelector;
+	loaded;
 	constructor(e, t, n, r) {
 		super(e, t), this.tabGroupObj = n, this.tabSelector = i(n.tabSelectors, {
 			class: "vrv-tab-selector",
@@ -1749,6 +1922,20 @@ var re = class extends T {
 }, B = "1.5.0", V = .5, de = `Live validation and synchronization from the XML editor is disabled for files larger than ${V}MB.\n\nPress 'Shift-Ctrl-V' to trigger validation and refreshing of the rendering.`, fe = `The Verovio Editor is an experimental online MEI editor prototype. It is based on [Verovio](https://www.verovio.org) and can be connected to [GitHub](https://github.com)\n\nVersion: ${B}`, pe = "You have un-synchronized modifications in the XML editor which will be lost.\n\nDo you want to continue?", me = "Changing the Verovio version requires the editor to be reloaded for the selected version to be active.\n\nDo you want to proceed now?", he = "This will reset all default options, reset the default file, remove all previous files, and reload the application.\n\nDo you want to proceed?", ge = "https://raw.githubusercontent.com/rism-digital/verovio-editor/refs/heads/main/CHANGELOG.md", _e = "https://raw.githubusercontent.com/rism-digital/verovio-editor/refs/heads/main/LICENSE", ve = "Libraries used in this application:\n* [blob-stream](https://github.com/devongovett/blob-stream)\n* [codemirror](https://codemirror.net/)\n* [html-midi-player](https://github.com/cifkao/html-midi-player)\n* [marked](https://marked.js.org/)\n* [pako](https://github.com/nodeca/pako)\n\n", ye = "vrv", H = /* @__PURE__ */ function(e) {
 	return e[e.Validating = 0] = "Validating", e[e.Valid = 1] = "Valid", e[e.Invalid = 2] = "Invalid", e[e.Unknown = 3] = "Unknown", e;
 }(H || {}), be = class extends T {
+	currentId;
+	updateLinting;
+	timestamp;
+	autoMode;
+	autoModeNotification;
+	edited;
+	formatting;
+	CMeditor;
+	lintOptions;
+	originalText;
+	validator;
+	rngLoader;
+	xmlValid;
+	xmlEditorView;
 	constructor(e, t, n, r) {
 		super(e, t), this.validator = n, this.rngLoader = r, this.currentId = null, this.xmlValid = i(this.div, { class: "vrv-xml-valid" }), this.xmlEditorView = _(this.div, {}), this.updateLinting = null, this.currentId = "", this.timestamp = Date.now(), this.edited = !1, this.autoMode = !1, this.autoModeNotification = !1, this.formatting = !1, this.originalText = "";
 		let a = this;
@@ -2000,6 +2187,40 @@ typeof CodeMirror < "u" && (CodeMirror.extendMode("xml", {
 //#endregion
 //#region ts/editor/editor-panel.ts
 var G = class extends T {
+	eventManager;
+	xmlEditorViewObj;
+	editorViewObj;
+	draggingSplitter;
+	draggingX;
+	draggingY;
+	splitterX;
+	splitterY;
+	splitterSize;
+	resizeTimer;
+	toolbar;
+	toolbarObj;
+	hSplit;
+	toolPanel;
+	tabGroup;
+	tabGroupObj;
+	vSplit;
+	keyboard;
+	HTMLDivElement;
+	keyboardObj;
+	split;
+	scorePanel;
+	scorePanelObj;
+	contentPanel;
+	contentPanelObj;
+	editorView;
+	splitter;
+	xmlEditorEnabled;
+	xmlEditorView;
+	verovio;
+	validator;
+	rngLoader;
+	boundMouseMove;
+	boundMouseUp;
 	constructor(e, t, n, r, a) {
 		super(e, t), this.verovio = n, this.validator = r, this.rngLoader = a, this.eventManager = new D(this), this.toolbar = i(this.div, { class: "vrv-editor-toolbar" }), this.toolbarObj = new oe(this.toolbar, this.app, this), this.customEventManager.addToPropagationList(this.toolbarObj.customEventManager), this.hSplit = i(this.div, { class: "vrv-h-split" }), this.toolPanel = i(this.hSplit, { class: "vrv-editor-tool-panel" }), this.vSplit = i(this.hSplit, { class: "vrv-v-split" }), this.split = i(this.vSplit, { class: "vrv-split" }), this.keyboard = i(this.vSplit, { class: "vrv-keyboard-panel" }), this.keyboardObj = new le(this.keyboard, this.app);
 		let o = this.app.options.editorSplitterHorizontal ? "vertical" : "horizontal";
@@ -2151,6 +2372,35 @@ var G = class extends T {
 		}
 	}
 }, Se = class extends F {
+	viewDocument;
+	viewResponsive;
+	viewSelector;
+	viewEditor;
+	subSubMenu;
+	editorSubToolbar;
+	midiPlayerSubToolbar;
+	pageControls;
+	nextPage;
+	prevPage;
+	fileImportMusicXML;
+	fileImportCMME;
+	fileImport;
+	fileMenuBtn;
+	fileRecent;
+	fileSelection;
+	zoomControls;
+	zoomIn;
+	zoomOut;
+	settingsEditor;
+	settingsVerovio;
+	helpReset;
+	helpAbout;
+	loginGroup;
+	login;
+	logout;
+	githubMenu;
+	githubImport;
+	githubExport;
 	constructor(e, t) {
 		super(e, t), this.active = !0;
 		let n = `${t.host}/icons/toolbar/arrow-left.png`, r = `${t.host}/icons/toolbar/arrow-right.png`, a = `${t.host}/icons/toolbar/document.png`, o = `${t.host}/icons/toolbar/editor.png`, s = `${t.host}/icons/toolbar/github-signin.png`, c = `${t.host}/icons/toolbar/layout.png`, l = `${t.host}/icons/toolbar/responsive.png`, u = `${t.host}/icons/toolbar/zoom-in.png`, d = `${t.host}/icons/toolbar/zoom-out.png`, f = `${t.host}/icons/toolbar/settings.png`, p = i(this.div, { class: "vrv-menu" });
@@ -2352,6 +2602,11 @@ var G = class extends T {
 		}
 	}
 }, K = class extends j {
+	fields;
+	exportOptions;
+	basicInput;
+	removeIdsInput;
+	ignoreHeaderInput;
 	constructor(e, t, n) {
 		super(e, t, n, {
 			icon: "info",
@@ -2384,6 +2639,24 @@ var G = class extends T {
 		super.ok();
 	}
 }, q = class extends j {
+	data;
+	filename;
+	githubManager;
+	iconsBranch;
+	iconsInstitution;
+	iconsFile;
+	iconsFolder;
+	iconsRepo;
+	iconsUser;
+	tabs;
+	tabUser;
+	tabRepo;
+	tabBranch;
+	tabFile;
+	loading;
+	list;
+	selection;
+	breadCrumbs;
 	constructor(e, t, n, r, a) {
 		super(e, t, n, r), this.iconsBranch = `${t.host}/icons/dialog/branch.png`, this.iconsInstitution = `${t.host}/icons/dialog/institution.png`, this.iconsFile = `${t.host}/icons/dialog/file.png`, this.iconsFolder = `${t.host}/icons/dialog/folder.png`, this.iconsRepo = `${t.host}/icons/dialog/repo.png`, this.iconsUser = `${t.host}/icons/dialog/user.png`, this.data = null, this.filename = "", this.githubManager = a, this.tabs = i(i(this.content, { class: "vrv-tab-group" }), { class: "vrv-tab-selectors" }), this.tabUser = i(this.tabs, {
 			class: "vrv-tab-selector active",
@@ -2542,6 +2815,9 @@ var G = class extends T {
 		}
 	}
 }, we = class extends q {
+	fields;
+	inputFile;
+	inputMessage;
 	constructor(e, t, n, r, a) {
 		r.okLabel = "Commit and push", super(e, t, n, r, a), this.okBtn.style.display = "flex", this.okBtn.classList.add("disabled"), this.fields = i(this.content, {
 			class: "vrv-dialog-form",
@@ -2567,6 +2843,11 @@ var G = class extends T {
 		this.okBtn.classList.toggle("disabled", !this.isValid());
 	}
 }, Te = class extends j {
+	selection;
+	fields;
+	selectMeasureRange;
+	selectStart;
+	selectEnd;
 	constructor(e, t, n, r, a) {
 		super(e, t, n, r), this.addButton("Reset", this.reset), this.fields = i(this.content, { class: "vrv-dialog-form" }), this.appendLabel(this.fields, "Measure range"), this.selectMeasureRange = o(this.fields, { class: "vrv-dialog-input" }), this.selectMeasureRange.placeholder = "Measure range (e.g., '2-10')", this.appendLabel(this.fields, "Start"), this.selectStart = o(this.fields, { class: "vrv-dialog-input" }), this.selectStart.placeholder = "Start measure xml:id", this.appendLabel(this.fields, "End"), this.selectEnd = o(this.fields, { class: "vrv-dialog-input" }), this.selectEnd.placeholder = "End measure xml:id", this.selection = a, a.measureRange ? this.selectMeasureRange.value = a.measureRange : (a.start && (this.selectStart.value = a.start), a.end && (this.selectStart.value = a.end));
 	}
@@ -2580,6 +2861,11 @@ var G = class extends T {
 		this.selection = {}, super.ok();
 	}
 }, Ee = class extends j {
+	reload;
+	fields;
+	appOptions;
+	verovioVersion;
+	devFeatures;
 	constructor(e, t, n, r, a) {
 		super(e, t, n, r), this.appOptions = a, this.reload = !1, this.addButton("Reset", this.reset), this.fields = i(this.content, { class: "vrv-dialog-form" }), this.appendLabel(this.fields, "Verovio version"), this.verovioVersion = u(this.fields, { class: "vrv-dialog-input" }), [["latest", "Latest release"], ["develop", "Development version"]].forEach((e) => {
 			let t = c(this.verovioVersion, {});
@@ -2602,6 +2888,13 @@ var G = class extends T {
 		super.ok();
 	}
 }, De = /* @__PURE__ */ "adjustPageHeight.adjustPageWidth.breaks.breaksSmartSb.humType.justifyVertically.landscape.mmOutput.outputFormatRaw.outputIndent.outputIndentTab.pageHeight.pageMarginLeft.pageMarginRight.pageMarginTop.pageMarginBottom.pageWidth.removeIds.scaleToPageSize.setLocale.showRuntime.shrinkToFit.svgBoundingBoxes.svgFormatRaw.svgRemoveXlink.svgViewBox.breaksNoWidow.engravingDefaults.fontLoadAll.systemMaxPerPage.transposeMdiv".split("."), Oe = class extends j {
+	changedOptions;
+	currentOptions;
+	defaultOptions;
+	verovio;
+	verovioDisabled;
+	tabGroup;
+	tabGroupObj;
 	constructor(e, t, n, r, a, o) {
 		super(e, t, n, r), this.verovioDisabled = De, this.verovio = o, this.tabGroup = i(this.content, { class: "vrv-tab-group" }), this.tabGroupObj = new z(this.tabGroup, t), this.box.style.maxWidth = "800px", this.addButton("Reset", this.reset);
 	}
@@ -2671,6 +2964,7 @@ var G = class extends T {
 		this.changedOptions = this.diffOptions(this.defaultOptions, !0), Object.keys(this.changedOptions).length === 0 ? super.cancel() : super.ok();
 	}
 }, J = window.pako, ke = class {
+	stack;
 	constructor() {
 		let e = window.localStorage.getItem("fileStack");
 		this.stack = Object.assign({
@@ -2717,6 +3011,18 @@ var G = class extends T {
 		window.localStorage.removeItem("fileStack"), this.stack.items = 0;
 	}
 }, Ae = class {
+	name;
+	login;
+	user;
+	selectedUser;
+	selectedOrganization;
+	selectedAccountName;
+	selectedBranchName;
+	selectedRepo;
+	selectedRepoName;
+	selectedPath;
+	gh;
+	app;
 	constructor(e) {
 		this.app = e, this.name = "GitHub", this.login = "unknown", this.user = null, this.selectedUser = null, this.selectedOrganization = null, this.selectedAccountName = "", this.selectedBranchName = "", this.selectedRepo = null, this.selectedRepoName = "", this.selectedPath = ["."], this.gh = null;
 		let t = this.getSessionCookie("ghtoken");
@@ -2812,6 +3118,17 @@ var G = class extends T {
 		t && t.login === this.login && (await this.selectAccount(t.account), await this.selectRepo(t.repo), await this.selectBranch(t.branch), this.selectedPath = t.path);
 	}
 }, je = class {
+	playing;
+	pausing;
+	currentTime;
+	currentTimeStr;
+	totalTime;
+	totalTimeStr;
+	view;
+	progressBarTimer;
+	expansionMap;
+	midiPlayerElement;
+	midiToolbar;
 	constructor(e) {
 		this.pausing = !1, this.playing = !1, this.midiToolbar = e, this.midiToolbar.setMidiPlayer(this), this.midiPlayerElement = x(this.midiToolbar.getDiv(), {}), this.midiPlayerElement.addEventListener("load", () => this.play()), this.midiPlayerElement.addEventListener("note", () => this.onUpdateNoteTime(this.midiPlayerElement.currentTime)), this.midiPlayerElement.addEventListener("stop", (e) => this.onStop(e)), this.currentTime = 0, this.currentTimeStr = "0.00", this.totalTime = 0, this.totalTimeStr = "0.00", this.progressBarTimer = null, this.view = null, this.expansionMap = {};
 	}
@@ -2895,6 +3212,19 @@ var G = class extends T {
 		this.midiToolbar.customEventManager.dispatch(n), this.view && this.view.midiStop();
 	}
 }, Me = class extends F {
+	midiPlayer;
+	pageDragStart;
+	barDragStart;
+	barWidth;
+	midiControls;
+	play;
+	pause;
+	stop;
+	progressControl;
+	midiCurrentTime;
+	midiBar;
+	midiBarPercent;
+	midiTotalTime;
 	constructor(e, t) {
 		let n = `${t.host}/icons/toolbar/play.png`, r = `${t.host}/icons/toolbar/pause.png`, a = `${t.host}/icons/toolbar/stop.png`;
 		super(e, t), this.midiPlayer = null, this.active = !0, this.pageDragStart = 0, this.barDragStart = 0, this.barWidth = 200, this.midiControls = i(this.app.toolbarObj.getMidiPlayerSubToolbar(), { class: "vrv-btn-group" }), i(this.midiControls, { class: "vrv-h-separator" }), this.play = i(this.midiControls, {
@@ -2954,6 +3284,9 @@ var G = class extends T {
 		return super.onEndLoading(e) ? (this.updateAll(), !0) : !1;
 	}
 }, Ne = class {
+	pdf;
+	currentScale;
+	verovio;
 	constructor(e, t, n) {
 		this.verovio = e, this.pdf = t, this.currentScale = n;
 	}
@@ -2983,6 +3316,8 @@ var G = class extends T {
 		return await this.verovio.setOptions(e), await this.verovio.redoLayout(), n;
 	}
 }, Y = class {
+	tags;
+	rngNs;
 	constructor() {
 		this.rngNs = "http://relaxng.org/ns/structure/1.0", this.tags = {};
 	}
@@ -3096,6 +3431,7 @@ var G = class extends T {
 		return e.namespaceURI === this.rngNs && e.localName === t;
 	}
 }, Pe = 1, X = /* @__PURE__ */ new Map(), Z = class {
+	worker;
 	constructor(e) {
 		return this.worker = e, this.worker.addEventListener("message", (e) => {
 			let { taskId: t, result: n } = e.data, r = X.get(t);
@@ -3112,18 +3448,51 @@ var G = class extends T {
 		} });
 	}
 }, Fe = class extends Z {
+	addPage;
+	end;
+	start;
 	constructor(e) {
 		super(e);
 	}
 }, Ie = class extends Z {
+	check;
+	validate;
+	validateNG;
+	setRelaxNGSchema;
+	setSchema;
+	onRuntimeInitialized;
 	constructor(e) {
 		super(e);
 	}
 }, Le = class extends Z {
+	edit;
+	editInfo;
+	getAvailableOptions;
+	getDefaultOptions;
+	getElementAttr;
+	getElementsAtTime;
+	getLog;
+	getOptions;
+	getMEI;
+	getPageCount;
+	getPageWithElement;
+	loadData;
+	redoLayout;
+	redoPagePitchPosLayout;
+	renderToExpansionMap;
+	renderToMIDI;
+	renderToSVG;
+	select;
+	setOptions;
+	getVersion;
+	onRuntimeInitialized;
 	constructor(e) {
 		super(e);
 	}
 }, Re = class extends T {
+	actionManager;
+	underlay;
+	eventManager;
 	constructor(e, t, n) {
 		super(e, t), this.underlay = n, this.eventManager = new D(this);
 	}
@@ -3182,6 +3551,59 @@ var G = class extends T {
 		this.actionManager.insert(t.dataset.elementName, t.dataset.insertMode);
 	}
 }, ze = "/svg/filter.xml", Q = window.location.hostname == "localhost" ? `http://${window.location.host}` : "https://editor.verovio.org", $ = class {
+	inputData;
+	dialogDiv;
+	host;
+	customEventManager;
+	zoomLevels;
+	eventManager;
+	id;
+	githubManager;
+	options;
+	fileStack;
+	verovio;
+	validator;
+	rngLoader;
+	rngLoaderBasic;
+	verovioOptions;
+	view;
+	toolbarView;
+	midiPlayer;
+	pageCount;
+	currentZoomIndex;
+	loadingCount;
+	toolbarObj;
+	contextMenuObj;
+	statusbarObj;
+	midiToolbarObj;
+	resizeTimer;
+	appIsLoaded;
+	appReset;
+	filename;
+	verovioRuntimeVersion;
+	viewDocumentObj;
+	viewEditorObj;
+	viewResponsiveObj;
+	pdf;
+	currentSchema;
+	input;
+	output;
+	fileCopy;
+	wrapper;
+	notification;
+	contextUnderlay;
+	contextMenu;
+	toolbar;
+	views;
+	loader;
+	loaderText;
+	statusbar;
+	view1;
+	view2;
+	view3;
+	clientId;
+	div;
+	notificationStack;
 	constructor(n, r) {
 		this.clientId = "fd81068a15354a300522", this.host = Q, this.id = this.clientId, this.notificationStack = [], this.githubManager = new Ae(this), this.options = Object.assign({
 			version: B,
@@ -3317,7 +3739,7 @@ var G = class extends T {
 		this.view.customEventManager.dispatch(e);
 	}
 	createToolbar() {
-		this.toolbarObj = new Se(this.toolbar, this), this.customEventManager.addToPropagationList(this.toolbarObj.customEventManager), this.midiToolbarObj = new Me(this.toolbar, this), this.midiPlayer = new je(this.midiToolbarObj), this.customEventManager.addToPropagationList(this.midiToolbarObj.customEventManager), this.contextMenuObj = new Re(this.contextMenu, this, this.contextUnderlay), this.customEventManager.addToPropagationList(this.contextMenuObj.customEventManager), this.div.addEventListener("contextmenu", ((e) => e.preventDefault()));
+		this.toolbarObj = new Se(this.toolbar, this), this.customEventManager.addToPropagationList(this.toolbarObj.customEventManager), this.midiToolbarObj = new Me(this.toolbar, this), this.midiPlayer = new je(this.midiToolbarObj), this.customEventManager.addToPropagationList(this.midiToolbarObj.customEventManager), this.contextMenuObj = new Re(this.contextMenu, this, this.contextUnderlay), this.customEventManager.addToPropagationList(this.contextMenuObj.customEventManager), this.div.addEventListener("contextmenu", (e) => e.preventDefault());
 	}
 	createStatusbar() {
 		this.options.enableStatusbar && (this.statusbarObj = new E(this.statusbar, this), this.customEventManager.addToPropagationList(this.statusbarObj.customEventManager), this.statusbarObj.setVerovioVersion(this.verovioRuntimeVersion));

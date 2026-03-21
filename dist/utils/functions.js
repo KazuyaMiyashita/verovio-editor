@@ -1,64 +1,66 @@
 export function appendAnchorTo(parent, options) {
-    return appendHTMLElementTo(parent, options, 'a');
+    return appendHTMLElementTo(parent, options, "a");
 }
 export function appendCanvasTo(parent, options) {
-    return appendHTMLElementTo(parent, options, 'canvas');
+    return appendHTMLElementTo(parent, options, "canvas");
 }
 export function appendDetailsTo(parent, options) {
-    return appendHTMLElementTo(parent, options, 'details');
+    return appendHTMLElementTo(parent, options, "details");
 }
 export function appendDivTo(parent, options) {
-    return appendHTMLElementTo(parent, options, 'div');
+    return appendHTMLElementTo(parent, options, "div");
 }
 export function insertDivBefore(parent, options, before) {
-    return insertHTMLElementBefore(parent, options, 'div', before);
+    return (insertHTMLElementBefore(parent, options, "div", before));
 }
 export function appendFieldSetTo(parent, options) {
-    return appendHTMLElementTo(parent, options, 'fieldset');
+    return appendHTMLElementTo(parent, options, "fieldset");
 }
 export function appendInputTo(parent, options) {
-    return appendHTMLElementTo(parent, options, 'input');
+    return appendHTMLElementTo(parent, options, "input");
 }
 export function appendLegendTo(parent, options) {
-    return appendHTMLElementTo(parent, options, 'legend');
+    return appendHTMLElementTo(parent, options, "legend");
 }
 export function appendLinkTo(parent, options) {
-    return appendHTMLElementTo(parent, options, 'link');
+    return appendHTMLElementTo(parent, options, "link");
 }
 export function appendOptionTo(parent, options) {
-    return appendHTMLElementTo(parent, options, 'option');
+    return appendHTMLElementTo(parent, options, "option");
 }
 export function appendOptGroupTo(parent, options) {
-    return appendHTMLElementTo(parent, options, 'optgroup');
+    return appendHTMLElementTo(parent, options, "optgroup");
 }
 export function appendSelectTo(parent, options) {
-    return appendHTMLElementTo(parent, options, 'select');
+    return appendHTMLElementTo(parent, options, "select");
 }
 export function appendSpanTo(parent, options, text = "") {
-    let span = appendHTMLElementTo(parent, options, 'span');
+    let span = appendHTMLElementTo(parent, options, "span");
     span.textContent = text;
     return span;
 }
 export function appendSummaryTo(parent, options) {
-    return appendHTMLElementTo(parent, options, 'summary');
+    return appendHTMLElementTo(parent, options, "summary");
 }
 export function appendTableTo(parent, options) {
-    return appendHTMLElementTo(parent, options, 'table');
+    return appendHTMLElementTo(parent, options, "table");
 }
 export function appendTBodyTo(parent, options) {
-    return appendHTMLElementTo(parent, options, 'tbody');
+    return appendHTMLElementTo(parent, options, "tbody");
 }
 export function appendTdTo(parent, options) {
-    return appendHTMLElementTo(parent, options, 'td');
+    return appendHTMLElementTo(parent, options, "td");
 }
 export function appendTrTo(parent, options) {
-    return appendHTMLElementTo(parent, options, 'tr');
+    return appendHTMLElementTo(parent, options, "tr");
 }
 export function appendTextAreaTo(parent, options) {
-    return appendHTMLElementTo(parent, options, 'textarea');
+    return appendHTMLElementTo(parent, options, "textarea");
 }
 export function randomHex(digits) {
-    return Math.floor((1 + Math.random()) * Math.pow(16, digits)).toString(16).substring(1);
+    return Math.floor((1 + Math.random()) * Math.pow(16, digits))
+        .toString(16)
+        .substring(1);
 }
 export function appendHTMLElementTo(parent, options, tag) {
     const element = document.createElement(tag);
@@ -73,9 +75,9 @@ function insertHTMLElementBefore(parent, options, tag, before) {
     return element;
 }
 export function appendMidiPlayerTo(parent, options) {
-    const midiPlayer = appendHTMLElementTo(parent, options, 'midi-player');
-    midiPlayer.setAttribute('sound-font', '');
-    midiPlayer.style.display = 'none';
+    const midiPlayer = (appendHTMLElementTo(parent, options, "midi-player"));
+    midiPlayer.setAttribute("sound-font", "");
+    midiPlayer.style.display = "none";
     return midiPlayer;
 }
 /**
@@ -84,10 +86,10 @@ export function appendMidiPlayerTo(parent, options) {
  */
 function setAttributes(element, attributes) {
     for (const prop in attributes) {
-        if (prop === 'style') {
+        if (prop === "style") {
             setStyle(element, attributes[prop]);
         }
-        else if (prop === 'dataset') {
+        else if (prop === "dataset") {
             setDataset(element, attributes[prop]);
         }
         else {

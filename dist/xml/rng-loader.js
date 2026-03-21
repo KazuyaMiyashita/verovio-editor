@@ -2,6 +2,8 @@
  * The RNGLoader class for parsing and storing an RNG Schema.
  */
 export class RNGLoader {
+    tags;
+    rngNs;
     constructor() {
         this.rngNs = "http://relaxng.org/ns/structure/1.0";
         this.tags = {};
@@ -12,11 +14,11 @@ export class RNGLoader {
     setRelaxNGSchema(data) {
         const parser = new window.DOMParser();
         const doc = parser.parseFromString(data, "text/xml");
-        "use strict";
+        ("use strict");
         this.tags = {};
         const funcThis = this;
         let definitions = this.collectDefinitions(doc);
-        let elements = new Map;
+        let elements = new Map();
         Object.keys(definitions).map(function (key) {
             definitions[key].map(function (define) {
                 funcThis.findElements(definitions, define, elements);
@@ -28,7 +30,9 @@ export class RNGLoader {
     //////////////////////////////////////////////////////////////////////////////
     // Getters and setters
     //////////////////////////////////////////////////////////////////////////////
-    getTags() { return this.tags; }
+    getTags() {
+        return this.tags;
+    }
     //////////////////////////////////////////////////////////////////////////////
     // schemaInfoCreator
     //////////////////////////////////////////////////////////////////////////////
@@ -37,7 +41,7 @@ export class RNGLoader {
      */
     collectDefinitions(doc) {
         "use strict";
-        let /**@type{!Object<!string,!Array.<!Element>>}*/ definitions = new Map, defs = doc.getElementsByTagNameNS(this.rngNs, "define"), i, name, def, array;
+        let /**@type{!Object<!string,!Array.<!Element>>}*/ definitions = new Map(), defs = doc.getElementsByTagNameNS(this.rngNs, "define"), i, name, def, array;
         for (i = 0; i < defs.length; i += 1) {
             def = defs.item(i);
             name = def.getAttribute("name");
@@ -52,7 +56,8 @@ export class RNGLoader {
     followReference(defs, stack, ref, handler) {
         "use strict";
         let name = ref.getAttribute("name").trim();
-        if (stack.indexOf(name) === -1) { // avoid infinite loop
+        if (stack.indexOf(name) === -1) {
+            // avoid infinite loop
             stack.push(name);
             defs[name].map(handler);
             stack.pop();
@@ -136,9 +141,9 @@ export class RNGLoader {
      */
     defineElement(defs, stack, rng, def) {
         "use strict";
-        let names = new Array;
-        let values = new Array;
-        let types = new Array;
+        let names = new Array();
+        let values = new Array();
+        let types = new Array();
         if (this.isRng(rng, "element")) {
             names = this.getNames(rng);
             names.map(function (name) {
@@ -241,7 +246,7 @@ export class RNGLoader {
         let e;
         let i;
         for (i = 0; i < starts.length; i += 1) {
-            e = /**@type{!Element}*/ (starts.item(i));
+            e = /**@type{!Element}*/ starts.item(i);
             this.findTopLevelElements(defs, stack, e, top);
         }
         return top;

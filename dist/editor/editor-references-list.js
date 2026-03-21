@@ -1,14 +1,19 @@
-import { App } from '../app.js';
-import { EventManager } from '../events/event-manager.js';
-import { GenericView } from '../utils/generic-view.js';
-import { appendDivTo } from '../utils/functions.js';
+import { App } from "../app.js";
+import { EventManager } from "../events/event-manager.js";
+import { GenericView } from "../utils/generic-view.js";
+import { appendDivTo } from "../utils/functions.js";
 export class EditorReferenceList extends GenericView {
+    eventManager;
+    tab;
+    listWrapper;
     constructor(div, app, tab) {
         super(div, app);
         this.setDisplayFlex();
         this.tab = tab;
         this.eventManager = new EventManager(this);
-        this.listWrapper = appendDivTo(this.div, { class: `vrv-reference-list-wrapper` });
+        this.listWrapper = appendDivTo(this.div, {
+            class: `vrv-reference-list-wrapper`,
+        });
     }
     ////////////////////////////////////////////////////////////////////////
     // Class-specific methods
@@ -16,10 +21,12 @@ export class EditorReferenceList extends GenericView {
     loadList(references, direction) {
         this.listWrapper.textContent = "";
         this.eventManager.unbindAll();
-        references.forEach(reference => {
-            let item = appendDivTo(this.listWrapper, { class: `vrv-reference-list-item vrv-mei-element` });
+        references.forEach((reference) => {
+            let item = appendDivTo(this.listWrapper, {
+                class: `vrv-reference-list-item vrv-mei-element`,
+            });
             item.style.backgroundImage = `url(${App.iconFor(reference.element)})`;
-            item.textContent = `${reference['element']} @ ${reference.referenceAttribute}`;
+            item.textContent = `${reference["element"]} @ ${reference.referenceAttribute}`;
             item.dataset.id = reference.id;
             item.dataset.element = reference.element;
             this.eventManager.bind(item, "click", this.onClick);
@@ -34,22 +41,22 @@ export class EditorReferenceList extends GenericView {
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
     select(element, id) {
-        let event = new CustomEvent('onSelect', {
+        let event = new CustomEvent("onSelect", {
             detail: {
                 id: id,
                 element: element,
-                caller: this
-            }
+                caller: this,
+            },
         });
         this.app.customEventManager.dispatch(event);
     }
     cursorActivity(id, activity) {
-        let event = new CustomEvent('onCursorActivity', {
+        let event = new CustomEvent("onCursorActivity", {
             detail: {
                 id: id,
                 activity: activity,
-                caller: this
-            }
+                caller: this,
+            },
         });
         this.app.customEventManager.dispatch(event);
     }
@@ -65,13 +72,13 @@ export class EditorReferenceList extends GenericView {
     onMouseover(e) {
         const element = e.target;
         if (element.dataset.id) {
-            this.cursorActivity(element.dataset.id, 'mouseover');
+            this.cursorActivity(element.dataset.id, "mouseover");
         }
     }
     onMouseout(e) {
         const element = e.target;
         if (element.dataset.id) {
-            this.cursorActivity(element.dataset.id, 'mouseout');
+            this.cursorActivity(element.dataset.id, "mouseout");
         }
     }
 }

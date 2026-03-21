@@ -4,9 +4,12 @@
  * For browser supporting it an IntersectionObserver is used to lazy-load the rendering of the pages.
  * When SVG rendering is use, a limited number of pages it keep in the DOM.
  */
-import { VerovioView } from '../verovio/verovio-view.js';
-import { appendCanvasTo, appendDivTo } from '../utils/functions.js';
+import { VerovioView } from "../verovio/verovio-view.js";
+import { appendCanvasTo, appendDivTo } from "../utils/functions.js";
 class DocumentViewObserver extends IntersectionObserver {
+    pruningMargin;
+    lastPageIn;
+    view;
     constructor(callback, view, options) {
         super(callback, options);
         this.pruningMargin = 10;
@@ -15,9 +18,20 @@ class DocumentViewObserver extends IntersectionObserver {
     }
 }
 export class DocumentView extends VerovioView {
+    currentPageHeight;
+    currentPageWidth;
+    currentDocHeight;
+    currentDocWidth;
+    currentDocMargin;
+    pruning;
+    observer;
+    docWrapper;
     constructor(div, app, verovio) {
         super(div, app, verovio);
-        this.docWrapper = appendDivTo(this.div, { class: `vrv-doc-wrapper`, style: { position: `absolute` } });
+        this.docWrapper = appendDivTo(this.div, {
+            class: `vrv-doc-wrapper`,
+            style: { position: `absolute` },
+        });
         this.observer;
         try {
             this.observer = new DocumentViewObserver(this.handleObserver, this);
@@ -32,16 +46,16 @@ export class DocumentView extends VerovioView {
     ////////////////////////////////////////////////////////////////////////
     async refreshView(update, lightEndLoading = true, mei = "", reload = false) {
         switch (update) {
-            case (VerovioView.Refresh.Activate):
+            case VerovioView.Refresh.Activate:
                 await this.updateActivate();
                 break;
-            case (VerovioView.Refresh.LoadData):
+            case VerovioView.Refresh.LoadData:
                 await this.updateLoadData(true, mei, reload);
                 break;
-            case (VerovioView.Refresh.Resized):
+            case VerovioView.Refresh.Resized:
                 await this.updateResized();
                 break;
-            case (VerovioView.Refresh.Zoom):
+            case VerovioView.Refresh.Zoom:
                 await this.updateZoom();
                 break;
         }
@@ -52,8 +66,8 @@ export class DocumentView extends VerovioView {
             this.docWrapper.firstChild.remove();
         }
         this.app.verovioOptions.adjustPageHeight = false;
-        this.app.verovioOptions.breaks = 'encoded';
-        this.app.verovioOptions.footer = 'auto';
+        this.app.verovioOptions.breaks = "encoded";
+        this.app.verovioOptions.footer = "auto";
         this.app.verovioOptions.scale = 100;
         this.app.verovioOptions.pageHeight = 2970;
         this.app.verovioOptions.pageWidth = 2100;
@@ -78,7 +92,9 @@ export class DocumentView extends VerovioView {
             this.observer.lastPageIn = 0;
         }
         for (let idx = 0; idx < this.app.getPageCount(); idx++) {
-            const pageWrapper = appendDivTo(this.docWrapper, { class: `vrv-page-wrapper` });
+            const pageWrapper = appendDivTo(this.docWrapper, {
+                class: `vrv-page-wrapper`,
+            });
             pageWrapper.style.height = `${this.currentPageHeight}px`;
             pageWrapper.style.width = `${this.currentPageWidth}px`;
             pageWrapper.style.marginTop = `${this.currentDocMargin}px`;
@@ -111,14 +127,23 @@ export class DocumentView extends VerovioView {
         this.div.style.height = this.div.parentElement.style.height;
         this.div.style.width = this.div.parentElement.style.width;
         if (this.docWrapper) {
-            this.currentDocMargin = this.app.options.documentViewMargin * this.currentScale / 100;
-            this.currentPageWidth = this.app.verovioOptions.pageWidth * this.currentScale / 100;
-            const docWidth = this.currentPageWidth + 2 * this.currentDocMargin + 2 * this.app.options.documentViewPageBorder;
+            this.currentDocMargin =
+                (this.app.options.documentViewMargin * this.currentScale) / 100;
+            this.currentPageWidth =
+                (this.app.verovioOptions.pageWidth * this.currentScale) / 100;
+            const docWidth = this.currentPageWidth +
+                2 * this.currentDocMargin +
+                2 * this.app.options.documentViewPageBorder;
             const elementWidth = parseInt(this.div.parentElement.style.width, 10);
             this.currentDocWidth = Math.max(elementWidth, docWidth);
             this.docWrapper.style.width = `${this.currentDocWidth}px`;
-            this.currentPageHeight = this.app.verovioOptions.pageHeight * this.currentScale / 100;
-            const docHeight = (this.currentPageHeight + this.currentDocMargin + 2 * this.app.options.documentViewPageBorder) * this.app.getPageCount() + this.currentDocMargin;
+            this.currentPageHeight =
+                (this.app.verovioOptions.pageHeight * this.currentScale) / 100;
+            const docHeight = (this.currentPageHeight +
+                this.currentDocMargin +
+                2 * this.app.options.documentViewPageBorder) *
+                this.app.getPageCount() +
+                this.currentDocMargin;
             const elementHeight = parseInt(this.div.parentElement.style.height, 10);
             this.currentDocHeight = Math.max(elementHeight, docHeight);
             this.docWrapper.style.height = `${this.currentDocHeight}px`;
@@ -175,11 +200,11 @@ export class DocumentView extends VerovioView {
             let page = this.docWrapper.children[idx];
             if (idx < this.observer.lastPageIn - this.observer.pruningMargin) {
                 delete page.dataset.loaded;
-                page.textContent = '';
+                page.textContent = "";
             }
             if (idx > this.observer.lastPageIn + this.observer.pruningMargin) {
                 delete page.dataset.loaded;
-                page.textContent = '';
+                page.textContent = "";
             }
         }
     }
@@ -202,7 +227,7 @@ export class DocumentView extends VerovioView {
         }
         // Canvas
         else {
-            const canvas = page.firstElementChild;
+            const canvas = (page.firstElementChild);
             const ctx = canvas.getContext("2d");
             const domURL = self.URL || self.webkitURL;
             const img = new Image();

@@ -3,9 +3,31 @@
  * It uses the App.view and App.toolbarView for enabling / disabling button.
  * Events are attached to the App.eventManager
  */
-import { Toolbar } from './toolbar.js';
-import { appendDivTo, appendSpanTo } from '../utils/functions.js';
+import { Toolbar } from "./toolbar.js";
+import { appendDivTo, appendSpanTo } from "../utils/functions.js";
 export class EditorToolbar extends Toolbar {
+    selectedElementType;
+    panel;
+    layoutControls;
+    xmlEditorEnable;
+    xmlEditorOrientation;
+    xmlEditorValidate;
+    xmlEditorForce;
+    notes;
+    controlEvents;
+    undo;
+    redo;
+    controlEventControls;
+    placeAbove;
+    placeBelow;
+    placeAuto;
+    hairpinFormControls;
+    formCres;
+    formDim;
+    stemControls;
+    stemDirUp;
+    stemDirDown;
+    stemDirAuto;
     constructor(div, app, panel) {
         let editorXml = `${app.host}/icons/toolbar/editor-xml.png`;
         let editorXmlValidate = `${app.host}/icons/toolbar/validate.png`;
@@ -24,71 +46,124 @@ export class EditorToolbar extends Toolbar {
         this.panel = panel;
         this.active = true;
         this.selectedElementType = null;
-        // sub-toolbar in application 
+        // sub-toolbar in application
         this.layoutControls = appendDivTo(this.div, { class: `vrv-btn-group` });
         appendDivTo(this.layoutControls, { class: `vrv-h-separator` });
-        this.xmlEditorEnable = appendDivTo(this.layoutControls, { class: `vrv-btn-icon-large`, style: { backgroundImage: `url(${editorXml})` } });
+        this.xmlEditorEnable = appendDivTo(this.layoutControls, {
+            class: `vrv-btn-icon-large`,
+            style: { backgroundImage: `url(${editorXml})` },
+        });
         appendSpanTo(this.xmlEditorEnable, { class: `vrv-tooltip` }, "Open or close the XML editor");
-        this.xmlEditorOrientation = appendDivTo(this.layoutControls, { class: `vrv-btn-icon-large` });
+        this.xmlEditorOrientation = appendDivTo(this.layoutControls, {
+            class: `vrv-btn-icon-large`,
+        });
         appendSpanTo(this.xmlEditorOrientation, { class: `vrv-tooltip` }, "Change the divider orientation");
-        this.xmlEditorValidate = appendDivTo(this.layoutControls, { class: `vrv-btn-icon-large`, style: { backgroundImage: `url(${editorXmlValidate})` } });
+        this.xmlEditorValidate = appendDivTo(this.layoutControls, {
+            class: `vrv-btn-icon-large`,
+            style: { backgroundImage: `url(${editorXmlValidate})` },
+        });
         appendSpanTo(this.xmlEditorValidate, { class: `vrv-tooltip` }, "Validate and refresh rendering ('Shift-Ctrl-V')");
-        this.xmlEditorForce = appendDivTo(this.layoutControls, { class: `vrv-btn-icon-large`, style: { backgroundImage: `url(${editorXmlForce})` } });
+        this.xmlEditorForce = appendDivTo(this.layoutControls, {
+            class: `vrv-btn-icon-large`,
+            style: { backgroundImage: `url(${editorXmlForce})` },
+        });
         appendSpanTo(this.xmlEditorForce, { class: `vrv-tooltip` }, "By-pass XML validation and force reload");
         // Undo and redo
         appendDivTo(this.div, { class: `vrv-h-separator` });
-        this.undo = appendDivTo(this.div, { class: `vrv-btn-icon-large`, style: { backgroundImage: `url(${undo})` } });
+        this.undo = appendDivTo(this.div, {
+            class: `vrv-btn-icon-large`,
+            style: { backgroundImage: `url(${undo})` },
+        });
         appendSpanTo(this.undo, { class: `vrv-tooltip` }, "Undo ('Shift-Ctrl-V')");
-        this.redo = appendDivTo(this.div, { class: `vrv-btn-icon-large`, style: { backgroundImage: `url(${redo})` } });
+        this.redo = appendDivTo(this.div, {
+            class: `vrv-btn-icon-large`,
+            style: { backgroundImage: `url(${redo})` },
+        });
         appendSpanTo(this.redo, { class: `vrv-tooltip` }, "Redo ('Shift-Ctrl-V')");
         appendDivTo(this.div, { class: `vrv-h-separator` });
-        this.notes = appendDivTo(this.div, { class: `vrv-btn-text`, 'data-before': `Notes` });
+        this.notes = appendDivTo(this.div, {
+            class: `vrv-btn-text`,
+            "data-before": `Notes`,
+        });
         appendDivTo(this.div, { class: `vrv-h-separator` });
-        this.controlEvents = appendDivTo(this.div, { class: `vrv-btn-text`, 'data-before': `Control events` });
+        this.controlEvents = appendDivTo(this.div, {
+            class: `vrv-btn-text`,
+            "data-before": `Control events`,
+        });
         // binding
-        this.panel.eventManager.bind(this.xmlEditorEnable, 'click', this.panel.onToggle);
-        this.panel.eventManager.bind(this.xmlEditorOrientation, 'click', this.panel.onToggleOrientation);
-        this.eventManager.bind(this.xmlEditorValidate, 'click', this.onTriggerValidation);
-        this.panel.eventManager.bind(this.xmlEditorForce, 'click', this.panel.onForceReload);
-        this.eventManager.bind(this.notes, 'click', this.onNotes);
-        this.eventManager.bind(this.controlEvents, 'click', this.onControlEvents);
+        this.panel.eventManager.bind(this.xmlEditorEnable, "click", this.panel.onToggle);
+        this.panel.eventManager.bind(this.xmlEditorOrientation, "click", this.panel.onToggleOrientation);
+        this.eventManager.bind(this.xmlEditorValidate, "click", this.onTriggerValidation);
+        this.panel.eventManager.bind(this.xmlEditorForce, "click", this.panel.onForceReload);
+        this.eventManager.bind(this.notes, "click", this.onNotes);
+        this.eventManager.bind(this.controlEvents, "click", this.onControlEvents);
         // controlEventControls
-        this.controlEventControls = appendDivTo(this.div, { class: `vrv-btn-group` });
+        this.controlEventControls = appendDivTo(this.div, {
+            class: `vrv-btn-group`,
+        });
         appendDivTo(this.controlEventControls, { class: `vrv-h-separator` });
-        this.placeAbove = appendDivTo(this.controlEventControls, { class: `vrv-btn-icon-large`, style: { backgroundImage: `url(${editorPlaceAbove})` } });
-        this.placeBelow = appendDivTo(this.controlEventControls, { class: `vrv-btn-icon-large`, style: { backgroundImage: `url(${editorPlaceBelow})` } });
-        this.placeAuto = appendDivTo(this.controlEventControls, { class: `vrv-btn-icon-large`, style: { backgroundImage: `url(${editorPlaceAuto})` } });
+        this.placeAbove = appendDivTo(this.controlEventControls, {
+            class: `vrv-btn-icon-large`,
+            style: { backgroundImage: `url(${editorPlaceAbove})` },
+        });
+        this.placeBelow = appendDivTo(this.controlEventControls, {
+            class: `vrv-btn-icon-large`,
+            style: { backgroundImage: `url(${editorPlaceBelow})` },
+        });
+        this.placeAuto = appendDivTo(this.controlEventControls, {
+            class: `vrv-btn-icon-large`,
+            style: { backgroundImage: `url(${editorPlaceAuto})` },
+        });
         // hairpinFormControls
-        this.hairpinFormControls = appendDivTo(this.div, { class: `vrv-btn-group` });
+        this.hairpinFormControls = appendDivTo(this.div, {
+            class: `vrv-btn-group`,
+        });
         appendDivTo(this.hairpinFormControls, { class: `vrv-h-separator` });
-        this.formCres = appendDivTo(this.hairpinFormControls, { class: `vrv-btn-icon-large`, style: { backgroundImage: `url(${editorFormCres})` } });
-        this.formDim = appendDivTo(this.hairpinFormControls, { class: `vrv-btn-icon-large`, style: { backgroundImage: `url(${editorFormDim})` } });
+        this.formCres = appendDivTo(this.hairpinFormControls, {
+            class: `vrv-btn-icon-large`,
+            style: { backgroundImage: `url(${editorFormCres})` },
+        });
+        this.formDim = appendDivTo(this.hairpinFormControls, {
+            class: `vrv-btn-icon-large`,
+            style: { backgroundImage: `url(${editorFormDim})` },
+        });
         // stemControls
         this.stemControls = appendDivTo(this.div, { class: `vrv-btn-group` });
         appendDivTo(this.stemControls, { class: `vrv-h-separator` });
-        this.stemDirUp = appendDivTo(this.stemControls, { class: `vrv-btn-icon-large`, style: { backgroundImage: `url(${editorStemDirUp})` } });
-        this.stemDirDown = appendDivTo(this.stemControls, { class: `vrv-btn-icon-large`, style: { backgroundImage: `url(${editorStemDirDown})` } });
-        this.stemDirAuto = appendDivTo(this.stemControls, { class: `vrv-btn-icon-large`, style: { backgroundImage: `url(${editorStemDirAuto})` } });
+        this.stemDirUp = appendDivTo(this.stemControls, {
+            class: `vrv-btn-icon-large`,
+            style: { backgroundImage: `url(${editorStemDirUp})` },
+        });
+        this.stemDirDown = appendDivTo(this.stemControls, {
+            class: `vrv-btn-icon-large`,
+            style: { backgroundImage: `url(${editorStemDirDown})` },
+        });
+        this.stemDirAuto = appendDivTo(this.stemControls, {
+            class: `vrv-btn-icon-large`,
+            style: { backgroundImage: `url(${editorStemDirAuto})` },
+        });
     }
     ////////////////////////////////////////////////////////////////////////
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
     bindEvents(actionManager) {
-        actionManager.eventManager.bind(this.undo, 'click', actionManager.undo);
-        actionManager.eventManager.bind(this.redo, 'click', actionManager.redo);
-        actionManager.eventManager.bind(this.formCres, 'click', actionManager.formCres);
-        actionManager.eventManager.bind(this.formDim, 'click', actionManager.formDim);
-        actionManager.eventManager.bind(this.placeAbove, 'click', actionManager.placeAbove);
-        actionManager.eventManager.bind(this.placeBelow, 'click', actionManager.placeBelow);
-        actionManager.eventManager.bind(this.placeAuto, 'click', actionManager.placeAuto);
-        actionManager.eventManager.bind(this.stemDirUp, 'click', actionManager.stemDirUp);
-        actionManager.eventManager.bind(this.stemDirDown, 'click', actionManager.stemDirDown);
-        actionManager.eventManager.bind(this.stemDirAuto, 'click', actionManager.stemDirAuto);
+        actionManager.eventManager.bind(this.undo, "click", actionManager.undo);
+        actionManager.eventManager.bind(this.redo, "click", actionManager.redo);
+        actionManager.eventManager.bind(this.formCres, "click", actionManager.formCres);
+        actionManager.eventManager.bind(this.formDim, "click", actionManager.formDim);
+        actionManager.eventManager.bind(this.placeAbove, "click", actionManager.placeAbove);
+        actionManager.eventManager.bind(this.placeBelow, "click", actionManager.placeBelow);
+        actionManager.eventManager.bind(this.placeAuto, "click", actionManager.placeAuto);
+        actionManager.eventManager.bind(this.stemDirUp, "click", actionManager.stemDirUp);
+        actionManager.eventManager.bind(this.stemDirDown, "click", actionManager.stemDirDown);
+        actionManager.eventManager.bind(this.stemDirAuto, "click", actionManager.stemDirAuto);
     }
     updateAll() {
         let iconsLayoutH = `${this.app.host}/icons/toolbar/layout-h.png`;
         let iconsLayoutV = `${this.app.host}/icons/toolbar/layout-v.png`;
-        const isHorizontal = (this.app.options.editorSplitterHorizontal) ? true : false;
+        const isHorizontal = this.app.options.editorSplitterHorizontal
+            ? true
+            : false;
         const isToggled = this.panel.isXmlEditorEnabled() ? true : false;
         const isAutoMode = this.panel.xmlEditorViewObj.isAutoMode() ? true : false;
         const isEdited = this.panel.xmlEditorViewObj.isEdited() ? true : false;
@@ -102,7 +177,7 @@ export class EditorToolbar extends Toolbar {
         this.updateToolbarBtnToggled(this.xmlEditorEnable, isToggled);
         // update display
         this.updateToolbarBtnDisplay(this.xmlEditorOrientation, isToggled);
-        this.updateToolbarBtnDisplay(this.xmlEditorValidate, (isToggled && !isAutoMode));
+        this.updateToolbarBtnDisplay(this.xmlEditorValidate, isToggled && !isAutoMode);
         this.updateToolbarBtnDisplay(this.xmlEditorForce, isToggled);
         // update enabled status
         this.updateToolbarBtnEnabled(this.undo, this.panel.editorViewObj.actionManager.canUndo());
@@ -112,21 +187,21 @@ export class EditorToolbar extends Toolbar {
         this.updateToolbarBtnEnabled(this.xmlEditorValidate, isToggled);
         this.updateToolbarBtnEnabled(this.xmlEditorForce, isEdited);
         /*
-        this.updateToolbarToggleBtn(this.notes, (this.selectedElementType === "NOTES"));
-        this.updateToolbarToggleBtn(this.controlEvents, (this.selectedElementType === "CONTROLEVENTS"));
-
-        // Disable hairpin for now
-        this.updateToolbarGrp(this.hairpinFormControls, false);
-        //this.updateToolbarGrp( this.hairpinFormControls, ["CONTROLEVENTS", "hairpin"].includes( this.selectedElementType ) );
-        this.updateToolbarGrp(this.controlEventControls, ["CONTROLEVENTS", "dir", "dynam", "hairpin", "tempo", "pedal"].includes(this.selectedElementType));
-        this.updateToolbarGrp(this.stemControls, ["NOTES", "note", "chord"].includes(this.selectedElementType));
-        */
+            this.updateToolbarToggleBtn(this.notes, (this.selectedElementType === "NOTES"));
+            this.updateToolbarToggleBtn(this.controlEvents, (this.selectedElementType === "CONTROLEVENTS"));
+    
+            // Disable hairpin for now
+            this.updateToolbarGrp(this.hairpinFormControls, false);
+            //this.updateToolbarGrp( this.hairpinFormControls, ["CONTROLEVENTS", "hairpin"].includes( this.selectedElementType ) );
+            this.updateToolbarGrp(this.controlEventControls, ["CONTROLEVENTS", "dir", "dynam", "hairpin", "tempo", "pedal"].includes(this.selectedElementType));
+            this.updateToolbarGrp(this.stemControls, ["NOTES", "note", "chord"].includes(this.selectedElementType));
+            */
         // Hide everything for now
-        this.notes.style.display = 'none';
-        this.controlEvents.style.display = 'none';
-        this.controlEventControls.style.display = 'none';
-        this.stemControls.style.display = 'none';
-        this.hairpinFormControls.style.display = 'none';
+        this.notes.style.display = "none";
+        this.controlEvents.style.display = "none";
+        this.controlEventControls.style.display = "none";
+        this.stemControls.style.display = "none";
+        this.hairpinFormControls.style.display = "none";
     }
     ////////////////////////////////////////////////////////////////////////
     // Custom event methods

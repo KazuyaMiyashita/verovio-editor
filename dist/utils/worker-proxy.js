@@ -1,7 +1,8 @@
 import { Deferred } from "../events/deferred.js";
 let id = 1;
-let callList = new Map;
+let callList = new Map();
 export class WorkerProxy {
+    worker;
     constructor(worker) {
         this.worker = worker;
         // Listen to response of the service worker
@@ -27,7 +28,7 @@ export class WorkerProxy {
                     target.worker.postMessage({
                         taskId,
                         method,
-                        args
+                        args,
                     });
                     // Create a new Deferred instance and store it in workerTasks HashMap
                     const deferred = new Deferred();
@@ -35,21 +36,51 @@ export class WorkerProxy {
                     // Return the (currently still unresolved) Promise of the Deferred instance
                     return deferred.promise;
                 };
-            }
+            },
         });
     }
 }
 export class PDFWorkerProxy extends WorkerProxy {
+    addPage;
+    end;
+    start;
     constructor(worker) {
         super(worker);
     }
 }
 export class ValidatorWorkerProxy extends WorkerProxy {
+    check;
+    validate;
+    validateNG;
+    setRelaxNGSchema;
+    setSchema;
+    onRuntimeInitialized;
     constructor(worker) {
         super(worker);
     }
 }
 export class VerovioWorkerProxy extends WorkerProxy {
+    edit;
+    editInfo;
+    getAvailableOptions;
+    getDefaultOptions;
+    getElementAttr;
+    getElementsAtTime;
+    getLog;
+    getOptions;
+    getMEI;
+    getPageCount;
+    getPageWithElement;
+    loadData;
+    redoLayout;
+    redoPagePitchPosLayout;
+    renderToExpansionMap;
+    renderToMIDI;
+    renderToSVG;
+    select;
+    setOptions;
+    getVersion;
+    onRuntimeInitialized;
     constructor(worker) {
         super(worker);
     }

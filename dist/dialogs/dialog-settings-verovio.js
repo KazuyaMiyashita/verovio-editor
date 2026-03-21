@@ -1,9 +1,9 @@
 /**
  * The DialogOptions class for setting specific options.
  */
-import { Dialog } from './dialog.js';
-import { TabGroup } from '../utils/tab-group.js';
-import { appendDivTo, appendInputTo, appendOptionTo, appendSelectTo, appendSpanTo } from '../utils/functions.js';
+import { Dialog } from "./dialog.js";
+import { TabGroup } from "../utils/tab-group.js";
+import { appendDivTo, appendInputTo, appendOptionTo, appendSelectTo, appendSpanTo, } from "../utils/functions.js";
 const VEROVIO_DISABLED_OPTIONS = [
     // Input and page layout options
     "adjustPageHeight",
@@ -38,9 +38,16 @@ const VEROVIO_DISABLED_OPTIONS = [
     "fontLoadAll",
     "systemMaxPerPage",
     // Element selectors and processing
-    "transposeMdiv"
+    "transposeMdiv",
 ];
 export class DialogSettingsVerovio extends Dialog {
+    changedOptions;
+    currentOptions;
+    defaultOptions;
+    verovio;
+    verovioDisabled;
+    tabGroup;
+    tabGroupObj;
     constructor(div, app, title, options, selection, verovioProxy) {
         super(div, app, title, options);
         this.verovioDisabled = VEROVIO_DISABLED_OPTIONS;
@@ -53,10 +60,12 @@ export class DialogSettingsVerovio extends Dialog {
     ////////////////////////////////////////////////////////////////////////
     // Getters and setters
     ////////////////////////////////////////////////////////////////////////
-    getChangedOptions() { return this.changedOptions; }
+    getChangedOptions() {
+        return this.changedOptions;
+    }
     ////////////////////////////////////////////////////////////////////////
     // Async worker methods
-    ////////////////////////////////////////////////////////////////////////    
+    ////////////////////////////////////////////////////////////////////////
     async loadOptions() {
         // Get object describing the available options
         const availableOptions = await this.verovio.getAvailableOptions();
@@ -90,20 +99,31 @@ export class DialogSettingsVerovio extends Dialog {
                 const label = this.appendLabel(fields, option.title);
                 appendSpanTo(label, { class: `vrv-tooltip-label` }, option.description);
                 let input;
-                if (option.type === 'bool') {
-                    input = appendInputTo(fields, { class: `vrv-dialog-input`, type: `checkbox` });
+                if (option.type === "bool") {
+                    input = appendInputTo(fields, {
+                        class: `vrv-dialog-input`,
+                        type: `checkbox`,
+                    });
                     if (currentValue === true)
                         input.checked = true;
                 }
-                else if (option.type === 'int') {
-                    input = appendInputTo(fields, { class: `vrv-dialog-input`, type: `number`, step: `1` });
+                else if (option.type === "int") {
+                    input = appendInputTo(fields, {
+                        class: `vrv-dialog-input`,
+                        type: `number`,
+                        step: `1`,
+                    });
                     input.value = currentValue;
                 }
-                else if (option.type === 'double') {
-                    input = appendInputTo(fields, { class: `vrv-dialog-input`, type: `number`, step: `0.01` });
+                else if (option.type === "double") {
+                    input = appendInputTo(fields, {
+                        class: `vrv-dialog-input`,
+                        type: `number`,
+                        step: `0.01`,
+                    });
                     input.value = currentValue;
                 }
-                else if (option.type === 'std::string-list') {
+                else if (option.type === "std::string-list") {
                     input = appendSelectTo(fields, { class: `vrv-dialog-input` });
                     for (const valueKey in option.values) {
                         const value = option.values[valueKey];
@@ -121,7 +141,9 @@ export class DialogSettingsVerovio extends Dialog {
                 }
                 input.name = optionKey;
                 // Comparison for array via stringified values
-                const nonDefault = (option.type === 'array') ? (JSON.stringify(currentValue) !== JSON.stringify(defaultValue)) : (currentValue !== defaultValue);
+                const nonDefault = option.type === "array"
+                    ? JSON.stringify(currentValue) !== JSON.stringify(defaultValue)
+                    : currentValue !== defaultValue;
                 if (nonDefault)
                     input.classList.add(`non-default`);
             }
@@ -131,13 +153,13 @@ export class DialogSettingsVerovio extends Dialog {
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
     diffOptions(options, reset) {
-        const inputs = this.content.querySelectorAll('.vrv-dialog-input');
+        const inputs = this.content.querySelectorAll(".vrv-dialog-input");
         const values = {};
-        inputs.forEach(element => {
+        inputs.forEach((element) => {
             const input = element;
             const label = input.name;
             let value;
-            if (input.type === 'checkbox') {
+            if (input.type === "checkbox") {
                 value = input.checked;
             }
             else {
@@ -147,21 +169,21 @@ export class DialogSettingsVerovio extends Dialog {
             const expectedType = typeof options[label];
             // For array field, set empty string into empty arrays and compare as stringified values
             if (Array.isArray(options[label])) {
-                value = (value === "") ? [] : String(value).split('\n');
-                changed = (JSON.stringify(value) !== JSON.stringify(options[label]));
+                value = value === "" ? [] : String(value).split("\n");
+                changed = JSON.stringify(value) !== JSON.stringify(options[label]);
             }
             else {
-                if (expectedType === 'number') {
+                if (expectedType === "number") {
                     value = Number(value);
                 }
-                else if (expectedType !== 'boolean') {
+                else if (expectedType !== "boolean") {
                     value = String(value);
                 }
-                changed = (options[label] !== value);
+                changed = options[label] !== value;
             }
             // When reset, use options (i.e., defaultOptions) as value being changed (back to default)
             if (changed)
-                values[label] = (reset) ? options[label] : value;
+                values[label] = reset ? options[label] : value;
         });
         return values;
     }
@@ -171,13 +193,12 @@ export class DialogSettingsVerovio extends Dialog {
     ok() {
         this.changedOptions = this.diffOptions(this.currentOptions, false);
         // trigger reload only if something has changed
-        (Object.keys(this.changedOptions).length === 0) ? super.cancel() : super.ok();
+        Object.keys(this.changedOptions).length === 0 ? super.cancel() : super.ok();
     }
     reset() {
         this.changedOptions = this.diffOptions(this.defaultOptions, true);
         // trigger reload only if something has changed
-        (Object.keys(this.changedOptions).length === 0) ? super.cancel() : super.ok();
+        Object.keys(this.changedOptions).length === 0 ? super.cancel() : super.ok();
     }
 }
-;
 //# sourceMappingURL=dialog-settings-verovio.js.map

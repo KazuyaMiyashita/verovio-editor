@@ -1,10 +1,24 @@
 /**
  * The Keyboard class.
  */
-import { EventManager } from '../events/event-manager.js';
-import { appendDivTo, appendMidiPlayerTo } from '../utils/functions.js';
-import { midiScale } from './midi-scale.js';
+import { EventManager } from "../events/event-manager.js";
+import { appendDivTo, appendMidiPlayerTo, } from "../utils/functions.js";
+import { midiScale } from "./midi-scale.js";
 export class Keyboard {
+    currentOctave;
+    actionManager;
+    boundKeyUp;
+    boundKeyDown;
+    app;
+    eventManager;
+    div;
+    octaves;
+    octaveNumbers;
+    letters;
+    keyboardWrapper;
+    keys;
+    note;
+    midiPlayerElement;
     constructor(div, app) {
         let iconsLeft = `${app.host}/icons/keyboard/left.png`;
         let iconsRight = `${app.host}/icons/keyboard/right.png`;
@@ -13,39 +27,105 @@ export class Keyboard {
         this.div.textContent = "";
         this.app = app;
         this.midiPlayerElement = appendMidiPlayerTo(this.div, {});
-        this.midiPlayerElement.setAttribute('src', midiScale);
+        this.midiPlayerElement.setAttribute("src", midiScale);
         this.eventManager = new EventManager(this);
         this.bindListeners(); // Document/Window-scoped events
-        let left = appendDivTo(this.div, { class: `vrv-keyboard-navigator`, style: { backgroundImage: `url(${iconsLeft})` } });
-        this.eventManager.bind(left, 'click', this.activateLower);
-        this.keyboardWrapper = appendDivTo(this.div, { class: `vrv-keyboard-wrapper` });
-        let right = appendDivTo(this.div, { class: `vrv-keyboard-navigator`, style: { backgroundImage: `url(${iconsRight})` } });
-        this.eventManager.bind(right, 'click', this.activateHigher);
-        this.octaves = appendDivTo(this.keyboardWrapper, { class: `vrv-keyboard-octaves` });
-        this.keys = appendDivTo(this.keyboardWrapper, { class: `vrv-keyboard-keys` });
-        this.eventManager.bind(this.keys, 'mousedown', this.mouseDownListener);
-        this.eventManager.bind(this.keys, 'mouseup', this.mouseUpListener);
-        this.letters = ['A', 'W', 'S', 'E', 'D', 'F', 'T', 'G', 'Y', 'H', 'U', 'J', 'K', 'O', 'L', 'P', ';'];
+        let left = appendDivTo(this.div, {
+            class: `vrv-keyboard-navigator`,
+            style: { backgroundImage: `url(${iconsLeft})` },
+        });
+        this.eventManager.bind(left, "click", this.activateLower);
+        this.keyboardWrapper = appendDivTo(this.div, {
+            class: `vrv-keyboard-wrapper`,
+        });
+        let right = appendDivTo(this.div, {
+            class: `vrv-keyboard-navigator`,
+            style: { backgroundImage: `url(${iconsRight})` },
+        });
+        this.eventManager.bind(right, "click", this.activateHigher);
+        this.octaves = appendDivTo(this.keyboardWrapper, {
+            class: `vrv-keyboard-octaves`,
+        });
+        this.keys = appendDivTo(this.keyboardWrapper, {
+            class: `vrv-keyboard-keys`,
+        });
+        this.eventManager.bind(this.keys, "mousedown", this.mouseDownListener);
+        this.eventManager.bind(this.keys, "mouseup", this.mouseUpListener);
+        this.letters = [
+            "A",
+            "W",
+            "S",
+            "E",
+            "D",
+            "F",
+            "T",
+            "G",
+            "Y",
+            "H",
+            "U",
+            "J",
+            "K",
+            "O",
+            "L",
+            "P",
+            ";",
+        ];
         this.octaveNumbers = [0, 1, 2, 3, 4, 5, 6, 7, 8];
-        this.octaveNumbers.forEach(octave => {
+        this.octaveNumbers.forEach((octave) => {
             let oct = appendDivTo(this.octaves, { class: `vrv-keyboard-octave` });
             oct.textContent = `C${octave}`;
             let midi = (octave + 1) * 12;
-            let c2 = appendDivTo(this.keys, { class: `vrv-keyboard-key white`, 'data-midi': `${midi++}` });
-            let c2s = appendDivTo(this.keys, { class: `vrv-keyboard-key black`, 'data-midi': `${midi++}` });
-            let d2 = appendDivTo(this.keys, { class: `vrv-keyboard-key white`, 'data-midi': `${midi++}` });
-            let d2s = appendDivTo(this.keys, { class: `vrv-keyboard-key black`, 'data-midi': `${midi++}` });
-            let e2 = appendDivTo(this.keys, { class: `vrv-keyboard-key white`, 'data-midi': `${midi++}` });
-            let f2 = appendDivTo(this.keys, { class: `vrv-keyboard-key white`, 'data-midi': `${midi++}` });
-            let f2s = appendDivTo(this.keys, { class: `vrv-keyboard-key black`, 'data-midi': `${midi++}` });
-            let g2 = appendDivTo(this.keys, { class: `vrv-keyboard-key white`, 'data-midi': `${midi++}` });
-            let g2s = appendDivTo(this.keys, { class: `vrv-keyboard-key black`, 'data-midi': `${midi++}` });
-            let a2 = appendDivTo(this.keys, { class: `vrv-keyboard-key white`, 'data-midi': `${midi++}` });
-            let a2s = appendDivTo(this.keys, { class: `vrv-keyboard-key black`, 'data-midi': `${midi++}` });
-            let b2 = appendDivTo(this.keys, { class: `vrv-keyboard-key white`, 'data-midi': `${midi++}` });
+            let c2 = appendDivTo(this.keys, {
+                class: `vrv-keyboard-key white`,
+                "data-midi": `${midi++}`,
+            });
+            let c2s = appendDivTo(this.keys, {
+                class: `vrv-keyboard-key black`,
+                "data-midi": `${midi++}`,
+            });
+            let d2 = appendDivTo(this.keys, {
+                class: `vrv-keyboard-key white`,
+                "data-midi": `${midi++}`,
+            });
+            let d2s = appendDivTo(this.keys, {
+                class: `vrv-keyboard-key black`,
+                "data-midi": `${midi++}`,
+            });
+            let e2 = appendDivTo(this.keys, {
+                class: `vrv-keyboard-key white`,
+                "data-midi": `${midi++}`,
+            });
+            let f2 = appendDivTo(this.keys, {
+                class: `vrv-keyboard-key white`,
+                "data-midi": `${midi++}`,
+            });
+            let f2s = appendDivTo(this.keys, {
+                class: `vrv-keyboard-key black`,
+                "data-midi": `${midi++}`,
+            });
+            let g2 = appendDivTo(this.keys, {
+                class: `vrv-keyboard-key white`,
+                "data-midi": `${midi++}`,
+            });
+            let g2s = appendDivTo(this.keys, {
+                class: `vrv-keyboard-key black`,
+                "data-midi": `${midi++}`,
+            });
+            let a2 = appendDivTo(this.keys, {
+                class: `vrv-keyboard-key white`,
+                "data-midi": `${midi++}`,
+            });
+            let a2s = appendDivTo(this.keys, {
+                class: `vrv-keyboard-key black`,
+                "data-midi": `${midi++}`,
+            });
+            let b2 = appendDivTo(this.keys, {
+                class: `vrv-keyboard-key white`,
+                "data-midi": `${midi++}`,
+            });
         });
-        this.eventManager.bind(this.div, 'mouseleave', this.mouseLeaveListener);
-        this.eventManager.bind(this.div, 'mouseenter', this.mouseEnterListener);
+        this.eventManager.bind(this.div, "mouseleave", this.mouseLeaveListener);
+        this.eventManager.bind(this.div, "mouseenter", this.mouseEnterListener);
         this.currentOctave = 3;
         this.activate();
     }
@@ -66,7 +146,7 @@ export class Keyboard {
         if (Number(midi) < 21)
             return;
         this.midiPlayerElement.stop();
-        this.midiPlayerElement.currentTime = ((Number(midi) - 21) * 0.5);
+        this.midiPlayerElement.currentTime = (Number(midi) - 21) * 0.5;
         this.midiPlayerElement.start();
         setTimeout(() => {
             this.midiPlayerElement.stop();
@@ -92,25 +172,29 @@ export class Keyboard {
         this.activate();
     }
     activate() {
-        this.keys.querySelectorAll('.vrv-keyboard-key').forEach(element => element.classList.remove('selected'));
-        this.octaves.querySelectorAll('.vrv-keyboard-octave').forEach(element => element.classList.remove('selected'));
+        this.keys
+            .querySelectorAll(".vrv-keyboard-key")
+            .forEach((element) => element.classList.remove("selected"));
+        this.octaves
+            .querySelectorAll(".vrv-keyboard-octave")
+            .forEach((element) => element.classList.remove("selected"));
         let key = this.keys.children[(this.currentOctave - 1) * 12];
-        this.letters.forEach(letter => {
+        this.letters.forEach((letter) => {
             if (key) {
-                key.setAttribute('data-key', letter);
-                key.classList.add('selected');
+                key.setAttribute("data-key", letter);
+                key.classList.add("selected");
                 key = key.nextElementSibling;
             }
         });
         let octave = this.octaves.children[this.currentOctave - 1];
-        octave.classList.add('selected');
+        octave.classList.add("selected");
         let totalWidth = this.keys.scrollWidth;
         if (totalWidth === 0)
             return;
         let visibleWidth = this.keys.clientWidth;
         let octaveWidth = octave.scrollWidth;
         let octaveOffset = octave.offsetLeft;
-        let shift = octaveOffset - (visibleWidth / 2) + (octaveWidth / 2);
+        let shift = octaveOffset - visibleWidth / 2 + octaveWidth / 2;
         //this.keyboardWrapper.scrollLeft = shift;
         this.keyboardWrapper.scroll({
             left: shift,
@@ -121,9 +205,9 @@ export class Keyboard {
     // Event methods
     ////////////////////////////////////////////////////////////////////////
     keyDownListener(e) {
-        if (e.key === 'ArrowLeft')
+        if (e.key === "ArrowLeft")
             this.activateLower();
-        else if (e.key === 'ArrowRight')
+        else if (e.key === "ArrowRight")
             this.activateHigher();
         else {
             let index = this.letters.indexOf(e.key.toUpperCase());
@@ -138,7 +222,9 @@ export class Keyboard {
         //console.log(e);
     }
     keyUpListener(e) {
-        this.keys.querySelectorAll('.vrv-keyboard-key').forEach(element => element.classList.remove("active"));
+        this.keys
+            .querySelectorAll(".vrv-keyboard-key")
+            .forEach((element) => element.classList.remove("active"));
         console.log(e);
     }
     mouseDownListener(e) {
@@ -154,12 +240,12 @@ export class Keyboard {
         target.classList.remove("active");
     }
     mouseEnterListener(e) {
-        document.addEventListener('keydown', this.boundKeyDown);
-        document.addEventListener('keyup', this.boundKeyUp);
+        document.addEventListener("keydown", this.boundKeyDown);
+        document.addEventListener("keyup", this.boundKeyUp);
     }
     mouseLeaveListener(e) {
-        document.removeEventListener('keydown', this.boundKeyDown);
-        document.removeEventListener('keyup', this.boundKeyUp);
+        document.removeEventListener("keydown", this.boundKeyDown);
+        document.removeEventListener("keyup", this.boundKeyUp);
     }
 }
 //# sourceMappingURL=keyboard.js.map

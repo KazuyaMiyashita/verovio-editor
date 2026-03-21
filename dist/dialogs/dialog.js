@@ -2,16 +2,30 @@
  * The Dialog class is the based class for other dialog implementations.
  * It should not be instantiated directly but only through inherited classes.
  */
-import { Deferred } from '../events/deferred.js';
-import { EventManager } from '../events/event-manager.js';
-import { appendDetailsTo, appendDivTo, appendSummaryTo, insertDivBefore } from '../utils/functions.js';
+import { Deferred } from "../events/deferred.js";
+import { EventManager } from "../events/event-manager.js";
+import { appendDetailsTo, appendDivTo, appendSummaryTo, insertDivBefore, } from "../utils/functions.js";
 export class Dialog {
+    app;
+    eventManager;
+    div;
+    options;
+    box;
+    top;
+    icon;
+    close;
+    content;
+    bottom;
+    cancelBtn;
+    okBtn;
+    boundKeyDown;
+    deferred;
     constructor(div, app, title, options) {
         this.options = Object.assign({
             icon: "info",
             type: Dialog.Type.OKCancel,
             okLabel: "OK",
-            cancelLabel: "Cancel"
+            cancelLabel: "Cancel",
         }, options);
         this.div = div;
         // Remove previous content
@@ -32,22 +46,28 @@ export class Dialog {
         this.content = appendDivTo(this.box, { class: `vrv-dialog-content` });
         // The bottom of the dialog with buttons
         this.bottom = appendDivTo(this.box, { class: `vrv-dialog-bottom` });
-        this.cancelBtn = appendDivTo(this.bottom, { class: `vrv-dialog-btn`, 'data-before': this.options.cancelLabel });
-        this.okBtn = appendDivTo(this.bottom, { class: `vrv-dialog-btn`, 'data-before': this.options.okLabel });
-        this.eventManager.bind(this.close, 'click', this.cancel);
-        this.eventManager.bind(this.cancelBtn, 'click', this.cancel);
-        this.eventManager.bind(this.okBtn, 'click', this.ok);
-        document.addEventListener('keydown', this.boundKeyDown);
+        this.cancelBtn = appendDivTo(this.bottom, {
+            class: `vrv-dialog-btn`,
+            "data-before": this.options.cancelLabel,
+        });
+        this.okBtn = appendDivTo(this.bottom, {
+            class: `vrv-dialog-btn`,
+            "data-before": this.options.okLabel,
+        });
+        this.eventManager.bind(this.close, "click", this.cancel);
+        this.eventManager.bind(this.cancelBtn, "click", this.cancel);
+        this.eventManager.bind(this.okBtn, "click", this.ok);
+        document.addEventListener("keydown", this.boundKeyDown);
         if (this.options.type === Dialog.Type.Msg) {
-            this.cancelBtn.style.display = 'none';
+            this.cancelBtn.style.display = "none";
         }
     }
     ////////////////////////////////////////////////////////////////////////
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
     addButton(label, event) {
-        const btn = insertDivBefore(this.bottom, { class: `vrv-dialog-btn`, 'data-before': label }, this.cancelBtn);
-        this.eventManager.bind(btn, 'click', event);
+        const btn = insertDivBefore(this.bottom, { class: `vrv-dialog-btn`, "data-before": label }, this.cancelBtn);
+        this.eventManager.bind(btn, "click", event);
     }
     setContent(content) {
         this.content.innerHTML = content;
@@ -63,14 +83,14 @@ export class Dialog {
         this.boundKeyDown = (e) => this.keyDownListener(e);
     }
     cancel() {
-        this.div.style.display = 'none';
-        document.removeEventListener('keydown', this.boundKeyDown);
+        this.div.style.display = "none";
+        document.removeEventListener("keydown", this.boundKeyDown);
         this.deferred.resolve(0);
     }
     ok() {
-        this.div.style.display = 'none';
-        document.removeEventListener('keydown', this.boundKeyDown);
-        const resolveValue = (this.options.type === Dialog.Type.Msg) ? 0 : 1;
+        this.div.style.display = "none";
+        document.removeEventListener("keydown", this.boundKeyDown);
+        const resolveValue = this.options.type === Dialog.Type.Msg ? 0 : 1;
         this.deferred.resolve(resolveValue);
     }
     reset() { }
@@ -78,7 +98,7 @@ export class Dialog {
     // Async methods
     ////////////////////////////////////////////////////////////////////////
     async show() {
-        this.div.style.display = 'block';
+        this.div.style.display = "block";
         this.okBtn.focus();
         this.deferred = new Deferred();
         return this.deferred.promise;
@@ -96,7 +116,7 @@ export class Dialog {
     // UI helper
     ////////////////////////////////////////////////////////////////////////
     appendLabel(parent, text) {
-        const label = appendDivTo(parent, { class: 'vrv-dialog-label' });
+        const label = appendDivTo(parent, { class: "vrv-dialog-label" });
         label.textContent = text;
         return label;
     }

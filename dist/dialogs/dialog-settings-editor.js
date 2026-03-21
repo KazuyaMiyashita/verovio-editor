@@ -1,9 +1,14 @@
 /**
  * The DialogSettingsEditor class for the editor settings.
  */
-import { Dialog } from './dialog.js';
-import { appendDivTo, appendInputTo, appendOptionTo, appendSelectTo } from '../utils/functions.js';
+import { Dialog } from "./dialog.js";
+import { appendDivTo, appendInputTo, appendOptionTo, appendSelectTo, } from "../utils/functions.js";
 export class DialogSettingsEditor extends Dialog {
+    reload;
+    fields;
+    appOptions;
+    verovioVersion;
+    devFeatures;
     constructor(div, app, title, options, appOptions) {
         super(div, app, title, options);
         this.appOptions = appOptions;
@@ -11,8 +16,13 @@ export class DialogSettingsEditor extends Dialog {
         this.addButton("Reset", this.reset);
         this.fields = appendDivTo(this.content, { class: `vrv-dialog-form` });
         this.appendLabel(this.fields, "Verovio version");
-        this.verovioVersion = appendSelectTo(this.fields, { class: `vrv-dialog-input` });
-        [["latest", "Latest release"], ["develop", "Development version"]].forEach(version => {
+        this.verovioVersion = appendSelectTo(this.fields, {
+            class: `vrv-dialog-input`,
+        });
+        [
+            ["latest", "Latest release"],
+            ["develop", "Development version"],
+        ].forEach((version) => {
             let option = appendOptionTo(this.verovioVersion, {});
             option.value = version[0];
             option.innerHTML = version[1];
@@ -22,7 +32,10 @@ export class DialogSettingsEditor extends Dialog {
         this.devFeatures = null;
         if (appOptions.showDevFeatures) {
             this.appendLabel(this.fields, "Development features");
-            this.devFeatures = appendInputTo(this.fields, { class: `vrv-dialog-input`, type: `checkbox` });
+            this.devFeatures = appendInputTo(this.fields, {
+                class: `vrv-dialog-input`,
+                type: `checkbox`,
+            });
             if (appOptions.devFeatures === true)
                 this.devFeatures.checked = true;
         }
@@ -30,8 +43,12 @@ export class DialogSettingsEditor extends Dialog {
     ////////////////////////////////////////////////////////////////////////
     // Getters and setters
     ////////////////////////////////////////////////////////////////////////
-    getAppOptions() { return this.appOptions; }
-    isReload() { return this.reload; }
+    getAppOptions() {
+        return this.appOptions;
+    }
+    isReload() {
+        return this.reload;
+    }
     ////////////////////////////////////////////////////////////////////////
     // Overriding methods
     ////////////////////////////////////////////////////////////////////////

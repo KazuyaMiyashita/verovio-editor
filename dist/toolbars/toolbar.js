@@ -2,9 +2,10 @@
  * The Toolbar class is the based class for other toolbar implementations.
  * It should not be instantiated directly but only through inherited classes.
  */
-import { GenericView } from '../utils/generic-view.js';
-import { EventManager } from '../events/event-manager.js';
+import { GenericView } from "../utils/generic-view.js";
+import { EventManager } from "../events/event-manager.js";
 export class Toolbar extends GenericView {
+    eventManager;
     constructor(div, app) {
         super(div, app);
         // One of the little quirks of writing in ES6, bind events
@@ -18,9 +19,9 @@ export class Toolbar extends GenericView {
             return;
         }
         if (condition)
-            grp.style.display = 'block';
+            grp.style.display = "block";
         else
-            grp.style.display = 'none';
+            grp.style.display = "none";
     }
     updateToolbarBtnEnabled(btn, condition) {
         if (btn === undefined) {
@@ -36,9 +37,9 @@ export class Toolbar extends GenericView {
             return;
         }
         if (condition)
-            btn.style.display = 'block';
+            btn.style.display = "block";
         else
-            btn.style.display = 'none';
+            btn.style.display = "none";
     }
     updateToolbarBtnToggled(btn, condition) {
         if (btn === undefined) {

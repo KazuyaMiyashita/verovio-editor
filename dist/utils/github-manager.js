@@ -2,20 +2,32 @@
  * The GitHubManager class managing a connection to GitHub through the GitHub API.
  */
 export class GitHubManager {
+    name;
+    login;
+    user; // GitHub::User object
+    selectedUser; // GitHub::User object
+    selectedOrganization; // GitHub::Organization object
+    selectedAccountName;
+    selectedBranchName;
+    selectedRepo; // GitHub::Repository object
+    selectedRepoName;
+    selectedPath;
+    gh; // GitHub object
+    app;
     constructor(app) {
         this.app = app;
-        this.name = 'GitHub';
-        this.login = 'unknown';
+        this.name = "GitHub";
+        this.login = "unknown";
         this.user = null;
         this.selectedUser = null;
         this.selectedOrganization = null;
-        this.selectedAccountName = '';
-        this.selectedBranchName = '';
+        this.selectedAccountName = "";
+        this.selectedBranchName = "";
         this.selectedRepo = null;
-        this.selectedRepoName = '';
-        this.selectedPath = ['.'];
+        this.selectedRepoName = "";
+        this.selectedPath = ["."];
         this.gh = null;
-        let tk = this.getSessionCookie('ghtoken');
+        let tk = this.getSessionCookie("ghtoken");
         if (tk) {
             tk = JSON.parse(atob(tk)).ghtoken;
         }
@@ -27,22 +39,44 @@ export class GitHubManager {
     ////////////////////////////////////////////////////////////////////////
     // Getters and setters
     ////////////////////////////////////////////////////////////////////////
-    getName() { return this.name; }
-    getLogin() { return this.login; }
-    getUser() { return this.user; }
-    getSelectedUser() { return this.selectedUser; }
-    getSelectedOrganization() { return this.selectedOrganization; }
-    getSelectedAccountName() { return this.selectedAccountName; }
-    getSelectedBranchName() { return this.selectedBranchName; }
-    getSelectedRepo() { return this.selectedRepo; }
-    getSelectedRepoName() { return this.selectedRepoName; }
-    getSelectedPath() { return this.selectedPath; }
-    selectedPathPop() { this.selectedPath.pop(); }
+    getName() {
+        return this.name;
+    }
+    getLogin() {
+        return this.login;
+    }
+    getUser() {
+        return this.user;
+    }
+    getSelectedUser() {
+        return this.selectedUser;
+    }
+    getSelectedOrganization() {
+        return this.selectedOrganization;
+    }
+    getSelectedAccountName() {
+        return this.selectedAccountName;
+    }
+    getSelectedBranchName() {
+        return this.selectedBranchName;
+    }
+    getSelectedRepo() {
+        return this.selectedRepo;
+    }
+    getSelectedRepoName() {
+        return this.selectedRepoName;
+    }
+    getSelectedPath() {
+        return this.selectedPath;
+    }
+    selectedPathPop() {
+        this.selectedPath.pop();
+    }
     ////////////////////////////////////////////////////////////////////////
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
     getPathString() {
-        return this.selectedPath.join('/');
+        return this.selectedPath.join("/");
     }
     appendToPath(dir) {
         this.selectedPath.push(dir);
@@ -53,21 +87,20 @@ export class GitHubManager {
         this.storeSelection();
     }
     isLoggedIn() {
-        return (this.gh !== null);
+        return this.gh !== null;
     }
     getSessionCookie(name) {
-        let v = document.cookie.match('(^|;) ?' + name + '=([^;]*)(;|$)');
+        let v = document.cookie.match("(^|;) ?" + name + "=([^;]*)(;|$)");
         return v ? v[2] : null;
     }
     storeSelection() {
-        this.app.options.github =
-            {
-                login: this.login,
-                account: this.selectedAccountName,
-                repo: this.selectedRepoName,
-                branch: this.selectedBranchName,
-                path: this.selectedPath
-            };
+        this.app.options.github = {
+            login: this.login,
+            account: this.selectedAccountName,
+            repo: this.selectedRepoName,
+            branch: this.selectedBranchName,
+            path: this.selectedPath,
+        };
     }
     resetSelectedPath() {
         this.selectedPath = ["."];
@@ -96,14 +129,14 @@ export class GitHubManager {
             this.selectedOrganization = this.gh.getOrganization(login);
         }
         this.selectedAccountName = login;
-        this.selectedBranchName = '';
+        this.selectedBranchName = "";
         this.selectedRepo = null;
-        this.selectedRepoName = '';
+        this.selectedRepoName = "";
         this.resetSelectedPath();
         this.storeSelection();
     }
     async selectBranch(name) {
-        if (name === '')
+        if (name === "")
             return;
         // Only need to check the name, but make sure it exists?
         this.selectedBranchName = name;
@@ -111,7 +144,7 @@ export class GitHubManager {
         this.storeSelection();
     }
     async selectRepo(name) {
-        if (name === '')
+        if (name === "")
             return;
         try {
             this.selectedRepo = this.gh.getRepo(this.selectedAccountName, name);
@@ -129,7 +162,8 @@ export class GitHubManager {
         this.user = this.gh.getUser();
         const profile = await this.user.getProfile();
         this.login = profile.data.login;
-        this.name = (profile.data.name !== null) ? profile.data.name : profile.data.login;
+        this.name =
+            profile.data.name !== null ? profile.data.name : profile.data.login;
         // also use it as default account
         this.selectedUser = this.user;
         this.selectedAccountName = this.login;

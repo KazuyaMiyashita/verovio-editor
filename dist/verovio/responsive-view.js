@@ -1,10 +1,12 @@
 /**
  * The ResponsiveView class implements a dynamic rendering view fitting and adjusting to the view port.
  */
-import { EditorView } from '../editor/editor-view.js';
-import { VerovioView } from '../verovio/verovio-view.js';
-import { appendDivTo } from '../utils/functions.js';
+import { EditorView } from "../editor/editor-view.js";
+import { VerovioView } from "../verovio/verovio-view.js";
+import { appendDivTo } from "../utils/functions.js";
 export class ResponsiveView extends VerovioView {
+    svgWrapper;
+    midiIds;
     constructor(div, app, verovio) {
         super(div, app, verovio);
         // initializes ui underneath the parent element, as well as Verovio communication
@@ -16,16 +18,16 @@ export class ResponsiveView extends VerovioView {
     ////////////////////////////////////////////////////////////////////////
     async refreshView(update, lightEndLoading = true, mei = "", reload = false) {
         switch (update) {
-            case (VerovioView.Refresh.Activate):
+            case VerovioView.Refresh.Activate:
                 await this.updateActivate();
                 break;
-            case (VerovioView.Refresh.LoadData):
+            case VerovioView.Refresh.LoadData:
                 await this.updateLoadData(mei, reload);
                 break;
-            case (VerovioView.Refresh.Resized):
+            case VerovioView.Refresh.Resized:
                 await this.updateResized();
                 break;
-            case (VerovioView.Refresh.Zoom):
+            case VerovioView.Refresh.Zoom:
                 await this.updateZoom();
                 break;
         }
@@ -33,11 +35,13 @@ export class ResponsiveView extends VerovioView {
     }
     async updateActivate() {
         this.app.verovioOptions.adjustPageHeight = true;
-        this.app.verovioOptions.breaks = 'auto';
-        this.app.verovioOptions.footer = 'none';
+        this.app.verovioOptions.breaks = "auto";
+        this.app.verovioOptions.footer = "none";
         this.app.verovioOptions.scale = this.currentScale;
-        this.app.verovioOptions.pageHeight = this.svgWrapper.clientHeight * (100 / this.app.verovioOptions.scale);
-        this.app.verovioOptions.pageWidth = this.svgWrapper.clientWidth * (100 / this.app.verovioOptions.scale);
+        this.app.verovioOptions.pageHeight =
+            this.svgWrapper.clientHeight * (100 / this.app.verovioOptions.scale);
+        this.app.verovioOptions.pageWidth =
+            this.svgWrapper.clientWidth * (100 / this.app.verovioOptions.scale);
         this.app.verovioOptions.justifyVertically = false;
         this.app.getMidiPlayer().setView(this);
         this.midiIds = [];
@@ -62,10 +66,14 @@ export class ResponsiveView extends VerovioView {
             this.updateSVGDimensions();
             // Reset pageHeight and pageWidth to match the effective scaled viewport width
             this.app.verovioOptions.scale = this.currentScale;
-            this.app.verovioOptions.pageHeight = this.svgWrapper.clientHeight * (100 / this.app.verovioOptions.scale);
-            this.app.verovioOptions.pageWidth = this.svgWrapper.clientWidth * (100 / this.app.verovioOptions.scale);
+            this.app.verovioOptions.pageHeight =
+                this.svgWrapper.clientHeight * (100 / this.app.verovioOptions.scale);
+            this.app.verovioOptions.pageWidth =
+                this.svgWrapper.clientWidth * (100 / this.app.verovioOptions.scale);
             // Not sure why we need to remove the top margin from the calculation... to be investigated
-            this.app.verovioOptions.pageHeight -= (this.app.verovioOptions.pageMarginTop) * (100 / this.app.verovioOptions.scale);
+            this.app.verovioOptions.pageHeight -=
+                this.app.verovioOptions.pageMarginTop *
+                    (100 / this.app.verovioOptions.scale);
             if (this.app.verovioOptions.pageHeight !== 0) {
                 await this.verovio.setOptions(this.app.verovioOptions);
             }
@@ -95,11 +103,12 @@ export class ResponsiveView extends VerovioView {
     async midiUpdate(time) {
         //const animateStart = document.getElementById( "highlighting-start" );
         let vrvTime = time;
-        let elementsAtTime = await this.app.verovio.getElementsAtTime(vrvTime);
-        if (this.app.getMidiPlayer().getExpansionMap() && !this.app.getMidiPlayer().getExpansionMap().empty) {
+        let elementsAtTime = (await this.app.verovio.getElementsAtTime(vrvTime));
+        if (this.app.getMidiPlayer().getExpansionMap() &&
+            !this.app.getMidiPlayer().getExpansionMap().empty) {
             const toBaseId = (id) => {
                 const expansion = this.app.getMidiPlayer().getExpansionMap()[id];
-                return (expansion && expansion.length > 0) ? expansion[0] : id;
+                return expansion && expansion.length > 0 ? expansion[0] : id;
             };
             if (elementsAtTime.notes)
                 elementsAtTime.notes = elementsAtTime.notes.map((id) => toBaseId(id));
@@ -119,28 +128,27 @@ export class ResponsiveView extends VerovioView {
         if (elementsAtTime.page != this.currentPage) {
             this.currentPage = elementsAtTime.page;
             this.app.startLoading("Loading content ...", true);
-            let event = new CustomEvent('onPage');
+            let event = new CustomEvent("onPage");
             this.app.customEventManager.dispatch(event);
         }
-        if ((elementsAtTime.notes.length > 0) && (this.midiIds != elementsAtTime.notes)) {
+        if (elementsAtTime.notes.length > 0 &&
+            this.midiIds != elementsAtTime.notes) {
             //updatePageOrScrollTo(elementsAtTime.notes[0]);
             for (let i = 0, len = this.midiIds.length; i < len; i++) {
                 let noteId = this.midiIds[i];
                 if (elementsAtTime.notes.indexOf(noteId) === -1) {
-                    let note = this.svgWrapper.querySelector('#' + noteId);
+                    let note = this.svgWrapper.querySelector("#" + noteId);
                     if (note)
                         note.style.filter = "";
                 }
             }
-            ;
             this.midiIds = elementsAtTime.notes;
             for (let i = 0, len = this.midiIds.length; i < len; i++) {
-                let note = this.svgWrapper.querySelector('#' + this.midiIds[i]);
+                let note = (this.svgWrapper.querySelector("#" + this.midiIds[i]));
                 if (note)
                     note.style.filter = "url(#highlighting)";
                 //if ( note ) animateStart.beginElement();
             }
-            ;
         }
     }
     ////////////////////////////////////////////////////////////////////////
@@ -148,11 +156,10 @@ export class ResponsiveView extends VerovioView {
     ////////////////////////////////////////////////////////////////////////
     midiStop() {
         for (let i = 0, len = this.midiIds.length; i < len; i++) {
-            let note = this.svgWrapper.querySelector('#' + this.midiIds[i]);
+            let note = (this.svgWrapper.querySelector("#" + this.midiIds[i]));
             if (note)
                 note.style.filter = "";
         }
-        ;
         this.midiIds = [];
     }
     updateSVGDimensions() {

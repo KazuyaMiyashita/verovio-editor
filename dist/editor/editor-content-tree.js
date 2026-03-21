@@ -1,5 +1,6 @@
-import { GenericTree } from '../utils/generic-tree.js';
+import { GenericTree } from "../utils/generic-tree.js";
 export class EditorContentTree extends GenericTree {
+    tab;
     constructor(div, app, tab) {
         super(div, app);
         this.tab = tab;
@@ -22,28 +23,31 @@ export class EditorContentTree extends GenericTree {
         });
         // The content tree manages the bread crumb separately, and not with Tree::m_focusId
         this.clearCrumbs();
-        context.ancestors.slice().reverse().forEach(ancestor => {
+        context.ancestors
+            .slice()
+            .reverse()
+            .forEach((ancestor) => {
             this.addCrumb(ancestor.element, ancestor.id);
         });
         this.breadCrumbsWrapper.scrollLeft = this.breadCrumbsWrapper.scrollWidth;
     }
     select(element, id) {
-        let event = new CustomEvent('onSelect', {
+        let event = new CustomEvent("onSelect", {
             detail: {
                 id: id,
                 element: element,
-                caller: this
-            }
+                caller: this,
+            },
         });
         this.app.customEventManager.dispatch(event);
     }
     cursorActivity(id, activity) {
-        let event = new CustomEvent('onCursorActivity', {
+        let event = new CustomEvent("onCursorActivity", {
             detail: {
                 id: id,
                 activity: activity,
-                caller: this
-            }
+                caller: this,
+            },
         });
         this.app.customEventManager.dispatch(event);
     }
@@ -79,13 +83,13 @@ export class EditorContentTree extends GenericTree {
     onMouseover(e) {
         const element = e.target;
         if (element.dataset.id) {
-            this.cursorActivity(element.dataset.id, 'mouseover');
+            this.cursorActivity(element.dataset.id, "mouseover");
         }
     }
     onMouseout(e) {
         const element = e.target;
         if (element.dataset.id) {
-            this.cursorActivity(element.dataset.id, 'mouseout');
+            this.cursorActivity(element.dataset.id, "mouseout");
         }
     }
 }

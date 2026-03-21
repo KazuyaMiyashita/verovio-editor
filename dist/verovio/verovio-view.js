@@ -3,9 +3,20 @@
  * It should not be instantiated directly but only through inherited classes.
  * The VerovioView is attached to a VerovioMessenger.
  */
-import { GenericView } from '../utils/generic-view.js';
-import { EventManager } from '../events/event-manager.js';
+import { GenericView } from "../utils/generic-view.js";
+import { EventManager } from "../events/event-manager.js";
 export class VerovioView extends GenericView {
+    verovio;
+    currentPage;
+    currentZoomIndex;
+    currentScale;
+    boundContextMenu;
+    boundMouseMove;
+    boundMouseUp;
+    boundKeyDown;
+    boundKeyUp;
+    boundResize;
+    eventManager;
     constructor(div, app, verovio) {
         super(div, app);
         // VerovioMessenger object
@@ -21,12 +32,24 @@ export class VerovioView extends GenericView {
     ///////////////////////////////////////////////////////////////////////
     // Getters and setters
     ////////////////////////////////////////////////////////////////////////
-    getCurrentPage() { return this.currentPage; }
-    setCurrentPage(value) { this.currentPage = value; }
-    getCurrentZoomIndex() { return this.currentZoomIndex; }
-    setCurrentZoomIndex(value) { this.currentZoomIndex = value; }
-    getCurrentScale() { return this.currentScale; }
-    setCurrentScale(value) { this.currentScale = value; }
+    getCurrentPage() {
+        return this.currentPage;
+    }
+    setCurrentPage(value) {
+        this.currentPage = value;
+    }
+    getCurrentZoomIndex() {
+        return this.currentZoomIndex;
+    }
+    setCurrentZoomIndex(value) {
+        this.currentZoomIndex = value;
+    }
+    getCurrentScale() {
+        return this.currentScale;
+    }
+    setCurrentScale(value) {
+        this.currentScale = value;
+    }
     ////////////////////////////////////////////////////////////////////////
     // Class-specific method
     ////////////////////////////////////////////////////////////////////////
@@ -52,11 +75,11 @@ export class VerovioView extends GenericView {
     destroy() {
         // Called to unsubscribe from all events. Probably a good idea to call this if the object is deleted.
         this.eventManager.unbindAll();
-        document.removeEventListener('contextmenu', this.contextMenuListener);
-        document.removeEventListener('mousemove', this.boundMouseMove);
-        document.removeEventListener('mouseup', this.boundMouseUp);
-        document.removeEventListener('touchmove', this.boundMouseMove);
-        document.removeEventListener('touchend', this.boundMouseUp);
+        document.removeEventListener("contextmenu", this.contextMenuListener);
+        document.removeEventListener("mousemove", this.boundMouseMove);
+        document.removeEventListener("mouseup", this.boundMouseUp);
+        document.removeEventListener("touchmove", this.boundMouseMove);
+        document.removeEventListener("touchend", this.boundMouseUp);
         super.destroy();
     }
     ////////////////////////////////////////////////////////////////////////
@@ -70,13 +93,12 @@ export class VerovioView extends GenericView {
         return true;
     }
     onLoadData(e) {
-        var _a, _b, _c, _d, _e, _f;
         if (!super.onLoadData(e))
             return false;
         //console.debug("VerovioView::onLoadData");
-        const mei = (_b = (_a = e.detail) === null || _a === void 0 ? void 0 : _a.mei) !== null && _b !== void 0 ? _b : '';
-        const lightEndLoading = (_d = (_c = e.detail) === null || _c === void 0 ? void 0 : _c.lightEndLoading) !== null && _d !== void 0 ? _d : true;
-        const reload = (_f = (_e = e.detail) === null || _e === void 0 ? void 0 : _e.reload) !== null && _f !== void 0 ? _f : false;
+        const mei = e.detail?.mei ?? "";
+        const lightEndLoading = e.detail?.lightEndLoading ?? true;
+        const reload = e.detail?.reload ?? false;
         this.refreshView(VerovioView.Refresh.LoadData, lightEndLoading, mei, reload);
         return true;
     }
@@ -122,7 +144,5 @@ export class VerovioView extends GenericView {
         Refresh[Refresh["LoadData"] = 2] = "LoadData";
         Refresh[Refresh["Zoom"] = 3] = "Zoom";
     })(Refresh = VerovioView.Refresh || (VerovioView.Refresh = {}));
-    ;
 })(VerovioView || (VerovioView = {}));
-;
 //# sourceMappingURL=verovio-view.js.map

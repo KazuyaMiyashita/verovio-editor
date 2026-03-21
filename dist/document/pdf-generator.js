@@ -2,6 +2,9 @@
  * The PDFGenerator class handling the verovio and the pdf WorkerProxy instances.
  */
 export class PDFGenerator {
+    pdf;
+    currentScale;
+    verovio;
     constructor(verovioProxy, pdfProxy, scale) {
         this.verovio = verovioProxy;
         this.pdf = pdfProxy;
@@ -21,12 +24,17 @@ export class PDFGenerator {
             mmOutput: true,
             pageHeight: 2970,
             pageWidth: 2100,
-            scale: 100
+            scale: 100,
         };
         await this.verovio.setOptions(pdfOptions);
         await this.verovio.redoLayout();
         const pageCount = await this.verovio.getPageCount();
-        await this.pdf.start({ useCSS: true, compress: true, autoFirstPage: false, layout: "portrait" });
+        await this.pdf.start({
+            useCSS: true,
+            compress: true,
+            autoFirstPage: false,
+            layout: "portrait",
+        });
         for (let i = 0; i < pageCount; i++) {
             const svg = await this.verovio.renderToSVG(i + 1);
             await this.pdf.addPage(svg);

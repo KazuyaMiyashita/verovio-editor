@@ -1,9 +1,22 @@
 /**
  * The MidiToolbar class for controlling the MidiPlayer.
  */
-import { Toolbar } from './toolbar.js';
-import { appendDivTo } from '../utils/functions.js';
+import { Toolbar } from "./toolbar.js";
+import { appendDivTo } from "../utils/functions.js";
 export class MidiToolbar extends Toolbar {
+    midiPlayer;
+    pageDragStart;
+    barDragStart;
+    barWidth;
+    midiControls;
+    play;
+    pause;
+    stop;
+    progressControl;
+    midiCurrentTime;
+    midiBar;
+    midiBarPercent;
+    midiTotalTime;
     constructor(div, app) {
         let iconsPlay = `${app.host}/icons/toolbar/play.png`;
         let iconsPause = `${app.host}/icons/toolbar/pause.png`;
@@ -15,25 +28,42 @@ export class MidiToolbar extends Toolbar {
         this.barDragStart = 0;
         // set in the css in .vrv-midi-bar via $midi-bar-width
         this.barWidth = 200;
-        // sub-toolbar in application 
+        // sub-toolbar in application
         this.midiControls = appendDivTo(this.app.toolbarObj.getMidiPlayerSubToolbar(), { class: `vrv-btn-group` });
         appendDivTo(this.midiControls, { class: `vrv-h-separator` });
-        this.play = appendDivTo(this.midiControls, { class: `vrv-btn-icon-large`, style: { backgroundImage: `url(${iconsPlay})` } });
-        this.pause = appendDivTo(this.midiControls, { class: `vrv-btn-icon-large`, style: { backgroundImage: `url(${iconsPause})` } });
-        this.stop = appendDivTo(this.midiControls, { class: `vrv-btn-icon-large`, style: { backgroundImage: `url(${iconsStop})` } });
-        this.progressControl = appendDivTo(this.midiControls, { class: `vrv-midi-progress` });
+        this.play = appendDivTo(this.midiControls, {
+            class: `vrv-btn-icon-large`,
+            style: { backgroundImage: `url(${iconsPlay})` },
+        });
+        this.pause = appendDivTo(this.midiControls, {
+            class: `vrv-btn-icon-large`,
+            style: { backgroundImage: `url(${iconsPause})` },
+        });
+        this.stop = appendDivTo(this.midiControls, {
+            class: `vrv-btn-icon-large`,
+            style: { backgroundImage: `url(${iconsStop})` },
+        });
+        this.progressControl = appendDivTo(this.midiControls, {
+            class: `vrv-midi-progress`,
+        });
         appendDivTo(this.progressControl, { class: `vrv-h-separator` });
-        this.midiCurrentTime = appendDivTo(this.progressControl, { class: `vrv-midi-current-time` });
+        this.midiCurrentTime = appendDivTo(this.progressControl, {
+            class: `vrv-midi-current-time`,
+        });
         this.midiBar = appendDivTo(this.progressControl, { class: `vrv-midi-bar` });
-        this.midiBarPercent = appendDivTo(this.midiBar, { class: `vrv-midi-bar-percent` });
-        this.midiTotalTime = appendDivTo(this.progressControl, { class: `vrv-midi-total-time` });
+        this.midiBarPercent = appendDivTo(this.midiBar, {
+            class: `vrv-midi-bar-percent`,
+        });
+        this.midiTotalTime = appendDivTo(this.progressControl, {
+            class: `vrv-midi-total-time`,
+        });
         // binding
-        this.eventManager.bind(this.play, 'click', this.onPlay);
-        this.eventManager.bind(this.pause, 'click', this.onPause);
-        this.eventManager.bind(this.stop, 'click', this.onStop);
-        this.eventManager.bind(this.midiBar, 'mousedown', this.onProgressBarDown);
-        this.eventManager.bind(this.midiBar, 'mousemove', this.onProgressBarMove);
-        this.eventManager.bind(this.midiBar, 'mouseup', this.onProgressBarUp);
+        this.eventManager.bind(this.play, "click", this.onPlay);
+        this.eventManager.bind(this.pause, "click", this.onPause);
+        this.eventManager.bind(this.stop, "click", this.onStop);
+        this.eventManager.bind(this.midiBar, "mousedown", this.onProgressBarDown);
+        this.eventManager.bind(this.midiBar, "mousemove", this.onProgressBarMove);
+        this.eventManager.bind(this.midiBar, "mouseup", this.onProgressBarUp);
         // hide the pause, stop and progress bar
         this.updateToolbarBtnDisplay(this.pause, false);
         this.updateToolbarBtnDisplay(this.stop, false);
@@ -42,14 +72,19 @@ export class MidiToolbar extends Toolbar {
     ////////////////////////////////////////////////////////////////////////
     // Getter and setters
     ////////////////////////////////////////////////////////////////////////
-    setMidiPlayer(midiPlayer) { this.midiPlayer = midiPlayer; }
+    setMidiPlayer(midiPlayer) {
+        this.midiPlayer = midiPlayer;
+    }
     ////////////////////////////////////////////////////////////////////////
     // Class specific methods
     ////////////////////////////////////////////////////////////////////////
     updateProgressBar() {
         this.midiTotalTime.textContent = this.midiPlayer.getTotalTimeStr();
         this.midiCurrentTime.textContent = this.midiPlayer.getCurrentTimeStr();
-        let percent = (this.midiPlayer.getTotalTime()) ? (this.midiPlayer.getCurrentTime() / this.midiPlayer.getTotalTime() * 100) : 0;
+        let percent = this.midiPlayer.getTotalTime()
+            ? (this.midiPlayer.getCurrentTime() / this.midiPlayer.getTotalTime()) *
+                100
+            : 0;
         this.midiBarPercent.style.width = `${percent}%`;
     }
     updateDragging(pageX) {
@@ -61,7 +96,7 @@ export class MidiToolbar extends Toolbar {
     }
     updateAll() {
         this.updateProgressBar();
-        this.updateToolbarGrp(this.midiControls, (this.app.getPageCount() > 0));
+        this.updateToolbarGrp(this.midiControls, this.app.getPageCount() > 0);
         this.updateToolbarBtnDisplay(this.play, !this.midiPlayer.isPlaying() || this.midiPlayer.isPausing());
         this.updateToolbarBtnDisplay(this.pause, !this.midiPlayer.isPausing() && this.midiPlayer.isPlaying());
         this.updateToolbarBtnDisplay(this.stop, this.midiPlayer.isPlaying() || this.midiPlayer.isPausing());

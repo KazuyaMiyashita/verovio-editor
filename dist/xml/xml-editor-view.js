@@ -2,9 +2,9 @@
  * The XMLEditorView class implements an code editor, with validation and code completion.
  * It uses the CodeMirror editor package and a ValidatorMessenger
  */
-import { GenericView } from '../utils/generic-view.js';
-import { autoModeLimit } from '../utils/messages.js';
-import { appendDivTo, appendTextAreaTo } from '../utils/functions.js';
+import { GenericView } from "../utils/generic-view.js";
+import { autoModeLimit } from "../utils/messages.js";
+import { appendDivTo, appendTextAreaTo } from "../utils/functions.js";
 const theme = "vrv"; // default for light theme
 var Status;
 (function (Status) {
@@ -13,8 +13,21 @@ var Status;
     Status[Status["Invalid"] = 2] = "Invalid";
     Status[Status["Unknown"] = 3] = "Unknown";
 })(Status || (Status = {}));
-;
 export class XMLEditorView extends GenericView {
+    currentId;
+    updateLinting;
+    timestamp; // For checking if the data validated is still the data loaded
+    autoMode; // For indicating if live validation and sync is on
+    autoModeNotification; // For indicating if the notification should be displayed
+    edited; // For indicating if the XML content is edited but not synchronized
+    formatting; // For indicating that XML formatting is under progress
+    CMeditor;
+    lintOptions;
+    originalText;
+    validator;
+    rngLoader;
+    xmlValid;
+    xmlEditorView;
     constructor(div, app, validator, rngLoader) {
         super(div, app);
         // Validator object
@@ -31,12 +44,12 @@ export class XMLEditorView extends GenericView {
         this.autoMode = false;
         this.autoModeNotification = false;
         this.formatting = false;
-        this.originalText = '';
+        this.originalText = "";
         const cmThis = this;
         this.lintOptions = {
-            "caller": cmThis,
-            "getAnnotations": cmThis.validate,
-            "async": true
+            caller: cmThis,
+            getAnnotations: cmThis.validate,
+            async: true,
         };
         this.CMeditor = CodeMirror.fromTextArea(this.xmlEditorView, {
             lineNumbers: true,
@@ -57,8 +70,12 @@ export class XMLEditorView extends GenericView {
             gutters: ["CodeMirror-lint-markers", "CodeMirror-foldgutter"],
         });
         const map = {
-            "Shift-Ctrl-V": function (cm) { cmThis.triggerValidation(); },
-            "Shift-Ctrl-F": function (cm) { cmThis.formatXML(); },
+            "Shift-Ctrl-V": function (cm) {
+                cmThis.triggerValidation();
+            },
+            "Shift-Ctrl-F": function (cm) {
+                cmThis.formatXML();
+            },
         };
         this.CMeditor.addKeyMap(map);
         this.CMeditor.on("cursorActivity", function (cm) {
@@ -68,7 +85,8 @@ export class XMLEditorView extends GenericView {
             cmThis.keyHandled(cm, string, event);
         });
         this.CMeditor.on("change", function (cm, changes, event) {
-            if (changes.origin === "setValue" || (cmThis.autoMode && !cmThis.formatting)) {
+            if (changes.origin === "setValue" ||
+                (cmThis.autoMode && !cmThis.formatting)) {
                 cmThis.triggerValidation();
             }
             else {
@@ -81,15 +99,25 @@ export class XMLEditorView extends GenericView {
     ////////////////////////////////////////////////////////////////////////
     // Getters and Setters
     ////////////////////////////////////////////////////////////////////////
-    isEdited() { return this.edited; }
-    setEdited(edited) { this.edited = edited; }
-    isAutoMode() { return this.autoMode; }
+    isEdited() {
+        return this.edited;
+    }
+    setEdited(edited) {
+        this.edited = edited;
+    }
+    isAutoMode() {
+        return this.autoMode;
+    }
     setMode(fileSize) {
-        this.autoMode = (fileSize < (autoModeLimit * 1024 * 1024));
+        this.autoMode = fileSize < autoModeLimit * 1024 * 1024;
         this.autoModeNotification = !this.autoMode;
     }
-    isAutoModeNotification() { return this.autoModeNotification; }
-    setAutoModeNotification(autoModeNotification) { this.autoModeNotification = autoModeNotification; }
+    isAutoModeNotification() {
+        return this.autoModeNotification;
+    }
+    setAutoModeNotification(autoModeNotification) {
+        this.autoModeNotification = autoModeNotification;
+    }
     ////////////////////////////////////////////////////////////////////////
     // Async worker methods
     ////////////////////////////////////////////////////////////////////////
@@ -146,16 +174,16 @@ export class XMLEditorView extends GenericView {
         this.xmlValid.classList.remove("unknown");
         let statusClass;
         switch (status) {
-            case (Status.Validating):
+            case Status.Validating:
                 statusClass = "wait";
                 break;
-            case (Status.Valid):
+            case Status.Valid:
                 statusClass = "ok";
                 break;
-            case (Status.Invalid):
+            case Status.Invalid:
                 statusClass = "error";
                 break;
-            case (Status.Unknown):
+            case Status.Unknown:
                 statusClass = "unknown";
                 break;
         }
@@ -190,7 +218,7 @@ export class XMLEditorView extends GenericView {
                 from: new CodeMirror.Pos(line, 0),
                 to: new CodeMirror.Pos(line, lines[line].length),
                 severity: "error",
-                message: messages[i].message
+                message: messages[i].message,
             });
             i += 1;
         }
@@ -203,12 +231,12 @@ export class XMLEditorView extends GenericView {
                     return;
                 this.originalText = text;
                 this.app.startLoading("Updating data ...", this.autoMode);
-                let event = new CustomEvent('onLoadData', {
+                let event = new CustomEvent("onLoadData", {
                     detail: {
                         caller: this,
                         lightEndLoading: this.autoMode,
-                        mei: text
-                    }
+                        mei: text,
+                    },
                 });
                 this.app.customEventManager.dispatch(event);
             }
@@ -256,12 +284,12 @@ export class XMLEditorView extends GenericView {
         const elementType = line.match(/[^\>]*\<([^\ ]*).*/);
         if (id) {
             if (this.currentId !== id[1]) {
-                let event = new CustomEvent('onSelect', {
+                let event = new CustomEvent("onSelect", {
                     detail: {
                         id: id[1],
                         elementType: elementType[1],
-                        caller: this
-                    }
+                        caller: this,
+                    },
                 });
                 //console.debug( "Dispatch-onSelect" );
                 this.app.customEventManager.dispatch(event);
@@ -280,7 +308,7 @@ export class XMLEditorView extends GenericView {
             if (lastChar === ">" && nextChar === "<") {
                 let tabSize = cm.getOption("tabSize");
                 cm.doc.replaceRange(" ".repeat(tabSize) + "\n" + " ".repeat(ch), cm.getCursor());
-                cm.setCursor({ line: line, ch: (ch + tabSize) });
+                cm.setCursor({ line: line, ch: ch + tabSize });
             }
         }
     }
@@ -324,7 +352,7 @@ export class XMLEditorView extends GenericView {
     }
 }
 ////////////////////////////////////////////////////////////////////////
-// CodeMirror extraKeys functions 
+// CodeMirror extraKeys functions
 // Could be move to XMLEditorView:: keyHandled ?
 ////////////////////////////////////////////////////////////////////////
 function completeAfter(cm, pred) {
@@ -332,7 +360,10 @@ function completeAfter(cm, pred) {
     if (!pred || pred())
         setTimeout(function () {
             if (!cm.state.completionActive)
-                CodeMirror.showHint(cm, CodeMirror.hint.xml, { schemaInfo: CodeMirror.schemaInfo, completeSingle: false });
+                CodeMirror.showHint(cm, CodeMirror.hint.xml, {
+                    schemaInfo: CodeMirror.schemaInfo,
+                    completeSingle: false,
+                });
         }, 100);
     return CodeMirror.Pass;
 }
@@ -345,7 +376,9 @@ function completeIfAfterLt(cm) {
 function completeIfInTag(cm) {
     return completeAfter(cm, function () {
         let tok = cm.getTokenAt(cm.getCursor());
-        if (tok.type == "string" && (!/['"]/.test(tok.string.charAt(tok.string.length - 1)) || tok.string.length == 1))
+        if (tok.type == "string" &&
+            (!/['"]/.test(tok.string.charAt(tok.string.length - 1)) ||
+                tok.string.length == 1))
             return false;
         let inner = CodeMirror.innerMode(cm.getMode(), tok.state).state;
         return inner.tagName;
@@ -354,7 +387,7 @@ function completeIfInTag(cm) {
 ////////////////////////////////////////////////////////////////////////
 // CodeMirror extension for autoFormatRange
 ////////////////////////////////////////////////////////////////////////
-if (typeof CodeMirror !== 'undefined') {
+if (typeof CodeMirror !== "undefined") {
     CodeMirror.extendMode("xml", {
         commentStart: "<!--",
         commentEnd: "-->",
@@ -362,28 +395,32 @@ if (typeof CodeMirror !== 'undefined') {
             // Never at new lines for now because this causes problem with text in MEI - e.g., with <rend> spacing
             //return ( type == "tag" && />$/.test( content ) || /^<.</.test( textAfter ) ) || ( type == "tag bracket" && />$/.test( content ) );
             return false;
-        }
+        },
     });
     CodeMirror.defineExtension("commentRange", function (isComment, from, to) {
         var cm = this, curMode = CodeMirror.innerMode(cm.getMode(), cm.getTokenAt(from).state).mode;
         cm.operation(function () {
-            if (isComment) { // Comment range
+            if (isComment) {
+                // Comment range
                 cm.replaceRange(curMode.commentEnd, to);
                 cm.replaceRange(curMode.commentStart, from);
-                if (from.line == to.line && from.ch == to.ch) // An empty comment inserted - put cursor inside
+                if (from.line == to.line && from.ch == to.ch)
+                    // An empty comment inserted - put cursor inside
                     cm.setCursor(from.line, from.ch + curMode.commentStart.length);
             }
-            else { // Uncomment range
+            else {
+                // Uncomment range
                 var selText = cm.getRange(from, to);
                 var startIndex = selText.indexOf(curMode.commentStart);
                 var endIndex = selText.lastIndexOf(curMode.commentEnd);
                 if (startIndex > -1 && endIndex > -1 && endIndex > startIndex) {
                     // Take string till comment start
-                    selText = selText.substr(0, startIndex)
-                        // From comment start till comment end
-                        + selText.substring(startIndex + curMode.commentStart.length, endIndex)
-                        // From comment end till string end
-                        + selText.substr(endIndex + curMode.commentEnd.length);
+                    selText =
+                        selText.substr(0, startIndex) +
+                            // From comment start till comment end
+                            selText.substring(startIndex + curMode.commentStart.length, endIndex) +
+                            // From comment end till string end
+                            selText.substr(endIndex + curMode.commentEnd.length);
                 }
                 cm.replaceRange(selText, from, to);
             }
@@ -418,7 +455,8 @@ if (typeof CodeMirror !== 'undefined') {
                     out += cur;
                     atSol = false;
                 }
-                if (!atSol && inner.mode.newlineAfterToken &&
+                if (!atSol &&
+                    inner.mode.newlineAfterToken &&
                     inner.mode.newlineAfterToken(style, cur, stream.string.slice(stream.pos) || text[i + 1] || "", inner.state))
                     newline();
             }

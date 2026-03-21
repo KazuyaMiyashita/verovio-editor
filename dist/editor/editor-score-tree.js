@@ -1,5 +1,6 @@
-import { GenericTree } from '../utils/generic-tree.js';
+import { GenericTree } from "../utils/generic-tree.js";
 export class EditorScoreTree extends GenericTree {
+    tab;
     constructor(div, app, tab) {
         super(div, app);
         this.tab = tab;

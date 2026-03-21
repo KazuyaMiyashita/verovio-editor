@@ -2,10 +2,14 @@
  * The Toolbar class is the based class for other toolbar implementations.
  * It should not be instantiated directly but only through inherited classes.
  */
-import { EventManager } from '../events/event-manager.js';
-import { GenericView } from './generic-view.js';
-import { appendDivTo } from './functions.js';
+import { EventManager } from "../events/event-manager.js";
+import { GenericView } from "./generic-view.js";
+import { appendDivTo } from "./functions.js";
 export class TabGroup extends GenericView {
+    tabSelectors;
+    eventManager;
+    selectedTab;
+    tabs;
     constructor(div, app) {
         super(div, app);
         // Remove previous content
@@ -18,7 +22,9 @@ export class TabGroup extends GenericView {
     ////////////////////////////////////////////////////////////////////////
     // Getters and setters
     ////////////////////////////////////////////////////////////////////////
-    getSelectedTab() { return this.selectedTab; }
+    getSelectedTab() {
+        return this.selectedTab;
+    }
     ////////////////////////////////////////////////////////////////////////
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
@@ -43,7 +49,7 @@ export class TabGroup extends GenericView {
     select(id) {
         if (this.selectedTab && this.selectedTab.id === id)
             return;
-        this.tabs.forEach(tab => {
+        this.tabs.forEach((tab) => {
             if (id === tab.id)
                 this.selectedTab = tab;
             else
@@ -52,7 +58,7 @@ export class TabGroup extends GenericView {
         this.selectedTab.select();
     }
     resetTabs() {
-        this.tabs.forEach(tab => {
+        this.tabs.forEach((tab) => {
             tab.loaded = false;
         });
     }
@@ -105,7 +111,7 @@ export class TabGroup extends GenericView {
         return true;
     }
     dispatchToAll(e) {
-        this.tabs.forEach(tab => {
+        this.tabs.forEach((tab) => {
             tab.customEventManager.dispatch(e);
         });
     }
@@ -118,31 +124,37 @@ export class TabGroup extends GenericView {
     }
 }
 export class Tab extends GenericView {
+    tabGroupObj;
+    tabSelector;
+    loaded;
     constructor(div, app, tabGroup, label) {
         super(div, app);
         this.tabGroupObj = tabGroup;
-        this.tabSelector = appendDivTo(tabGroup.tabSelectors, { class: `vrv-tab-selector`, dataset: { tab: `${this.id}` } });
+        this.tabSelector = appendDivTo(tabGroup.tabSelectors, {
+            class: `vrv-tab-selector`,
+            dataset: { tab: `${this.id}` },
+        });
         this.tabSelector.textContent = label;
         this.loaded = false;
-        tabGroup.eventManager.bind(this.tabSelector, 'click', tabGroup.onSelectTab);
+        tabGroup.eventManager.bind(this.tabSelector, "click", tabGroup.onSelectTab);
     }
     ////////////////////////////////////////////////////////////////////////
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
     select() {
         this.tabSelector.classList.add("selected");
-        this.div.style.display = 'block';
-        let event = new CustomEvent('onActivate');
+        this.div.style.display = "block";
+        let event = new CustomEvent("onActivate");
         this.customEventManager.dispatch(event);
     }
     deselect() {
         this.tabSelector.classList.remove("selected");
-        this.div.style.display = 'none';
-        let event = new CustomEvent('onDeactivate');
+        this.div.style.display = "none";
+        let event = new CustomEvent("onDeactivate");
         this.customEventManager.dispatch(event);
     }
     isSelected() {
-        return (this.tabGroupObj.getSelectedTab() === this);
+        return this.tabGroupObj.getSelectedTab() === this;
     }
 }
 //# sourceMappingURL=tab-group.js.map

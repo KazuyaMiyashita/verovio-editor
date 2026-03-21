@@ -1,31 +1,39 @@
 /**
  * The DialogGhImport class for navigating GitHub and selecting a file.
  */
-import { DialogGhImport } from './dialog-gh-import.js';
-import { appendDivTo, appendInputTo, appendTextAreaTo } from '../utils/functions.js';
+import { DialogGhImport } from "./dialog-gh-import.js";
+import { appendDivTo, appendInputTo, appendTextAreaTo, } from "../utils/functions.js";
 export class DialogGhExport extends DialogGhImport {
+    fields;
+    inputFile;
+    inputMessage;
     constructor(div, app, title, options, githubManager) {
-        options.okLabel = 'Commit and push';
+        options.okLabel = "Commit and push";
         super(div, app, title, options, githubManager);
-        this.okBtn.style.display = 'flex';
-        this.okBtn.classList.add('disabled');
-        this.fields = appendDivTo(this.content, { class: `vrv-dialog-form`, style: { 'display': `none` } });
+        this.okBtn.style.display = "flex";
+        this.okBtn.classList.add("disabled");
+        this.fields = appendDivTo(this.content, {
+            class: `vrv-dialog-form`,
+            style: { display: `none` },
+        });
         this.appendLabel(this.fields, "Filename");
         this.inputFile = appendInputTo(this.fields, { class: `vrv-dialog-input` });
         this.inputFile.placeholder = "Name of an existing or of a new file";
-        this.eventManager.bind(this.inputFile, 'input', this.enableOk);
+        this.eventManager.bind(this.inputFile, "input", this.enableOk);
         this.appendLabel(this.fields, "Commit message");
-        this.inputMessage = appendTextAreaTo(this.fields, { class: `vrv-dialog-input` });
+        this.inputMessage = appendTextAreaTo(this.fields, {
+            class: `vrv-dialog-input`,
+        });
         this.inputMessage.placeholder = "The commit message to be sent to GitHub";
-        this.eventManager.bind(this.inputMessage, 'input', this.enableOk);
+        this.eventManager.bind(this.inputMessage, "input", this.enableOk);
     }
     ////////////////////////////////////////////////////////////////////////
     // Async network methods
     ////////////////////////////////////////////////////////////////////////
     async selectFile(e) {
         const element = e.target;
-        if (element.dataset.type === 'dir') {
-            if (element.dataset.name === '..') {
+        if (element.dataset.type === "dir") {
+            if (element.dataset.name === "..") {
                 this.githubManager.selectedPathPop();
             }
             else {
@@ -41,24 +49,24 @@ export class DialogGhExport extends DialogGhImport {
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
     isValid() {
-        return (this.inputFile.value !== '' && this.inputMessage.value !== '');
+        return this.inputFile.value !== "" && this.inputMessage.value !== "";
     }
     ////////////////////////////////////////////////////////////////////////
     // Overriding methods
     ////////////////////////////////////////////////////////////////////////
     updateSelectionAndBreadcrumbs() {
         super.updateSelectionAndBreadcrumbs();
-        if (this.githubManager.getSelectedBranchName() === '') {
-            this.fields.style.display = 'none';
+        if (this.githubManager.getSelectedBranchName() === "") {
+            this.fields.style.display = "none";
         }
         else {
-            this.fields.style.display = 'grid';
+            this.fields.style.display = "grid";
         }
     }
     ok() {
         if (!this.isValid())
             return;
-        const filename = this.githubManager.getPathString() + '/' + this.inputFile.value;
+        const filename = this.githubManager.getPathString() + "/" + this.inputFile.value;
         const commitMsg = this.inputMessage.value;
         this.githubManager.writeFile(filename, commitMsg);
         super.ok();
@@ -67,7 +75,7 @@ export class DialogGhExport extends DialogGhImport {
     // Event methods
     ////////////////////////////////////////////////////////////////////////
     enableOk(e) {
-        this.okBtn.classList.toggle('disabled', !this.isValid());
+        this.okBtn.classList.toggle("disabled", !this.isValid());
     }
 }
 //# sourceMappingURL=dialog-gh-export.js.map

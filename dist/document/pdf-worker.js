@@ -6,6 +6,9 @@ importScripts("https://www.verovio.org/javascript/pdfkit/blobstream.js");
 importScripts("https://www.verovio.org/javascript/pdfkit/source.js");
 importScripts("https://www.verovio.org/javascript/pdfkit/Leipzig-ttf.js");
 class PDFDeferred {
+    promise;
+    reject;
+    resolve;
     constructor() {
         // @ts-ignore
         this.promise = new Promise((resolve, reject) => {
@@ -26,45 +29,50 @@ let fontCallback = function (family, bold, italic, fontOptions) {
     }
     if (family.match(/(?:^|,)\s*sans-serif\s*$/) || true) {
         if (bold && italic) {
-            return 'Times-BoldItalic';
+            return "Times-BoldItalic";
         }
         if (bold && !italic) {
-            return 'Times-Bold';
+            return "Times-Bold";
         }
         if (!bold && italic) {
-            return 'Times-Italic';
+            return "Times-Italic";
         }
         if (!bold && !italic) {
-            return 'Times-Roman';
+            return "Times-Roman";
         }
     }
 };
 const options = { fontCallback: fontCallback };
 //@ts-ignore
-let vrvFontBuffer = Uint8Array.from(atob(LeipzigTTF), c => c.charCodeAt(0));
+let vrvFontBuffer = Uint8Array.from(atob(LeipzigTTF), (c) => c.charCodeAt(0));
 // Variables that will be instantiated through start()
 let outString = "";
 let doc = null;
 let outStream = null;
 let docEnd = null;
 // Listen to messages send to this worker
-addEventListener('message', function (event) {
+addEventListener("message", function (event) {
     // Destruct properties passed to this message event
     const { taskId, method, args } = event.data;
     // Check if verovio toolkit has passed method
     //const fn = methods[method || null];
     let result;
-    if (method === 'start') {
+    if (method === "start") {
         //@ts-ignore
-        doc = new PDFDocument({ useCSS: true, compress: true, autoFirstPage: false, layout: pdfOrientation });
+        doc = new PDFDocument({
+            useCSS: true,
+            compress: true,
+            autoFirstPage: false,
+            layout: pdfOrientation,
+        });
         outString = "";
         //@ts-ignore
         const outStream = blobStream();
         doc.pipe(outStream);
-        doc.registerFont('Leipzig', vrvFontBuffer);
+        doc.registerFont("Leipzig", vrvFontBuffer);
         // The deferred promised that will be resolved through end() via on('finish')
         docEnd = new PDFDeferred();
-        outStream.on('finish', function () {
+        outStream.on("finish", function () {
             let streamBlob = outStream.toBlob("application/pdf");
             var reader = new FileReader();
             reader.readAsDataURL(streamBlob);
@@ -76,7 +84,7 @@ addEventListener('message', function (event) {
         });
         result = "ok";
     }
-    else if (method === 'end') {
+    else if (method === "end") {
         doc.end();
         console.debug("Waiting for doc to finish");
         docEnd.promise.then(() => {
@@ -89,7 +97,7 @@ addEventListener('message', function (event) {
         });
         return;
     }
-    else if (method === 'addPage') {
+    else if (method === "addPage") {
         doc.addPage({ size: pdfFormat, layout: pdfOrientation });
         // @ts-ignore
         SVGtoPDF(doc, args[0], 0, 0, options);

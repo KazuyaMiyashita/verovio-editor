@@ -2,6 +2,20 @@
  * The EditorCursorPointer class
  */
 export class EditorCursorPointer {
+    editorViewObj;
+    activated;
+    pixPerPix;
+    viewTop;
+    viewLeft;
+    lastEvent;
+    scrollTop;
+    scrollLeft;
+    staffNode;
+    initX;
+    initY;
+    marginLeft;
+    marginTop;
+    MEIUnit;
     constructor(editorView) {
         // EditorView object
         this.editorViewObj = editorView;
@@ -22,36 +36,45 @@ export class EditorCursorPointer {
     ////////////////////////////////////////////////////////////////////////
     // Getters and setters
     ////////////////////////////////////////////////////////////////////////
-    setLastEvent(lastEvent) { this.lastEvent = lastEvent; }
-    getLastEvent() { return this.lastEvent; }
-    setScrollTop(scrollTop) { this.scrollTop = scrollTop; }
-    setScrollLeft(scrollLeft) { this.scrollLeft = scrollLeft; }
+    setLastEvent(lastEvent) {
+        this.lastEvent = lastEvent;
+    }
+    getLastEvent() {
+        return this.lastEvent;
+    }
+    setScrollTop(scrollTop) {
+        this.scrollTop = scrollTop;
+    }
+    setScrollLeft(scrollLeft) {
+        this.scrollLeft = scrollLeft;
+    }
     ////////////////////////////////////////////////////////////////////////
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
     xToMEI(x) {
-        return Math.round(x - this.viewLeft + this.scrollLeft) * this.pixPerPix - this.marginLeft;
+        return (Math.round(x - this.viewLeft + this.scrollLeft) * this.pixPerPix -
+            this.marginLeft);
     }
     yToMEI(y) {
         return Math.round((y - this.viewTop + this.scrollTop) * this.pixPerPix - this.marginTop);
     }
     xToView(x) {
-        return (x + this.marginLeft) / this.pixPerPix - this.scrollLeft + this.viewLeft;
+        return ((x + this.marginLeft) / this.pixPerPix - this.scrollLeft + this.viewLeft);
     }
     yToView(y) {
-        return (y + this.marginTop) / this.pixPerPix - this.scrollTop + this.viewTop;
+        return ((y + this.marginTop) / this.pixPerPix - this.scrollTop + this.viewTop);
     }
     init(svgRoot, top, left) {
-        const svgViewBox = svgRoot.querySelector('svg');
-        const actualSizeArr = svgViewBox.getAttribute('viewBox').split(' ');
+        const svgViewBox = svgRoot.querySelector("svg");
+        const actualSizeArr = svgViewBox.getAttribute("viewBox").split(" ");
         const actualHeight = parseInt(actualSizeArr[3]);
-        const svgHeight = parseInt(svgRoot.getAttribute('height'));
+        const svgHeight = parseInt(svgRoot.getAttribute("height"));
         // get the margins
         this.marginLeft = 0;
         this.marginTop = 0;
         try {
-            const g = svgViewBox.querySelector('g.page-margin');
-            const transform = g.getAttribute('transform');
+            const g = svgViewBox.querySelector("g.page-margin");
+            const transform = g.getAttribute("transform");
             const regexp = /translate\((\d*),\ (\d*)/g;
             const match = regexp.exec(transform);
             this.marginLeft = Number(match[1]);
@@ -60,7 +83,7 @@ export class EditorCursorPointer {
         catch (err) {
             console.debug("Loading margin failed");
         }
-        this.pixPerPix = (actualHeight / svgHeight);
+        this.pixPerPix = actualHeight / svgHeight;
         this.viewTop = top;
         this.viewLeft = left;
     }
@@ -78,15 +101,15 @@ export class EditorCursorPointer {
         this.staffNode = this.editorViewObj.getClosestMEIElement(node, "staff");
         if (!this.staffNode)
             return;
-        let staffLines = this.staffNode.querySelectorAll('g.staff > path');
+        let staffLines = this.staffNode.querySelectorAll("g.staff > path");
         if (staffLines.length === 0)
             return;
         try {
-            const d1 = staffLines[0].getAttribute('d');
+            const d1 = staffLines[0].getAttribute("d");
             const regexp1 = /M\d*\ (\d*)/g;
             const match1 = regexp1.exec(d1);
             let topLine = Number(match1[1]);
-            const d2 = staffLines[staffLines.length - 1].getAttribute('d');
+            const d2 = staffLines[staffLines.length - 1].getAttribute("d");
             const regexp2 = /M\d*\ (\d*)/g;
             const match2 = regexp2.exec(d2);
             let bottomLine = Number(match2[1]);

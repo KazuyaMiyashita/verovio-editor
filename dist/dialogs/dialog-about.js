@@ -1,12 +1,16 @@
 /**
  * The DialogAbout class.
  */
-import { Dialog } from './dialog.js';
-import { appendDivTo } from '../utils/functions.js';
-import { changelogUrl, libraries, licenseUrl } from '../utils/messages.js';
+import { Dialog } from "./dialog.js";
+import { appendDivTo } from "../utils/functions.js";
+import { changelogUrl, libraries, licenseUrl } from "../utils/messages.js";
 export class DialogAbout extends Dialog {
     constructor(div, app, title) {
-        super(div, app, title, { okLabel: "Close", icon: "info", type: Dialog.Type.Msg });
+        super(div, app, title, {
+            okLabel: "Close",
+            icon: "info",
+            type: Dialog.Type.Msg,
+        });
     }
     ////////////////////////////////////////////////////////////////////////
     // Async network methods
