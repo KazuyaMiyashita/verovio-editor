@@ -305,7 +305,7 @@ export class EditorPanel extends GenericView {
         document.removeEventListener("mousemove", this.boundMouseMove);
         document.removeEventListener("mouseup", this.boundMouseUp);
         // Update the splitter position and resize all
-        this.app.startLoading("Adjusting size ...", true);
+        this.app.loaderService.start("Adjusting size ...", true);
         this.updateSplitterSize();
         this.customEventManager.dispatch(createAppEvent(AppEvent.Resized));
     }
@@ -314,7 +314,7 @@ export class EditorPanel extends GenericView {
             !this.app.options.editorSplitterHorizontal;
         this.split.classList.toggle("vertical");
         this.split.classList.toggle("horizontal");
-        this.app.startLoading("Adjusting size ...", true);
+        this.app.loaderService.start("Adjusting size ...", true);
         this.app.customEventManager.dispatch(createAppEvent(AppEvent.Resized));
     }
     ////////////////////////////////////////////////////////////////////////
@@ -342,7 +342,7 @@ export class EditorPanel extends GenericView {
             }
             this.xmlEditorEnabled = false;
         }
-        this.app.startLoading("Adjusting the interface ...", true);
+        this.app.loaderService.start("Adjusting the interface ...", true);
         this.customEventManager.dispatch(createAppEvent(AppEvent.Activate));
         // We enabled the XML editor, update its data
         if (this.xmlEditorEnabled) {

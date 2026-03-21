@@ -48,7 +48,7 @@ export class ResponsiveView extends VerovioView {
         await this.updateZoom();
         break;
     }
-    this.app.endLoading(lightEndLoading);
+    this.app.loaderService.end(lightEndLoading);
   }
 
   private async updateActivate(): Promise<any> {
@@ -125,7 +125,7 @@ export class ResponsiveView extends VerovioView {
     const svg = await this.verovio.renderToSVG(this.currentPage);
     this.svgWrapper.innerHTML = svg;
 
-    if (lightEndLoading) this.app.endLoading(true);
+    if (lightEndLoading) this.app.loaderService.end(true);
   }
 
   public async midiUpdate(time: number): Promise<any> {
@@ -164,7 +164,7 @@ export class ResponsiveView extends VerovioView {
     }
     if (elementsAtTime.page != this.currentPage) {
       this.currentPage = elementsAtTime.page;
-      this.app.startLoading("Loading content ...", true);
+      this.app.loaderService.start("Loading content ...", true);
       this.app.customEventManager.dispatch(createAppEvent(AppEvent.Page));
     }
     if (

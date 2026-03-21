@@ -135,7 +135,7 @@ export class XMLEditorView extends GenericView {
         // keep the callback
         editor.setStatus(Status.Validating);
         editor.updateLinting = updateLinting;
-        editor.app.startLoading("Validating ...", true);
+        editor.app.loaderService.start("Validating ...", true);
         let validation = "[]";
         if (editor.app.options.enableValidation) {
             validation = await editor.validator.validateNG(text);
@@ -143,7 +143,7 @@ export class XMLEditorView extends GenericView {
         else {
             validation = await editor.validator.check(text);
         }
-        editor.app.endLoading(true);
+        editor.app.loaderService.end(true);
         editor.highlightValidation(text, validation, editor.timestamp);
     }
     async replaceSchema(schemaFile) {
@@ -231,7 +231,7 @@ export class XMLEditorView extends GenericView {
                 if (this.originalText === text)
                     return;
                 this.originalText = text;
-                this.app.startLoading("Updating data ...", this.autoMode);
+                this.app.loaderService.start("Updating data ...", this.autoMode);
                 this.app.customEventManager.dispatch(createAppEvent(AppEvent.LoadData, {
                     caller: this,
                     lightEndLoading: this.autoMode,

@@ -112,11 +112,11 @@ export class GitHubManager {
         try {
             let mei = await this.app.verovio.getMEI({});
             await this.selectedRepo.writeFile(this.selectedBranchName, filename, mei, commitMsg, {});
-            this.app.showNotification("File was successfully pushed to GitHub");
+            this.app.notificationService.show("File was successfully pushed to GitHub");
         }
         catch (err) {
             console.error(err);
-            this.app.showNotification("Something went wrong when pushing to GitHub");
+            this.app.notificationService.show("Something went wrong when pushing to GitHub");
         }
     }
     async selectAccount(login) {

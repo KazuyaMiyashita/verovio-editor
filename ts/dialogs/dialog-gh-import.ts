@@ -243,7 +243,7 @@ export class DialogGhImport extends Dialog {
 
   protected async listFiles(): Promise<any> {
     if (this.githubManager.getSelectedRepo() === null) {
-      this.app.showNotification("Select a repository first");
+      this.app.notificationService.show("Select a repository first");
       return;
     }
 
@@ -341,7 +341,7 @@ export class DialogGhImport extends Dialog {
 
   private async listBranches(): Promise<any> {
     if (this.githubManager.getSelectedRepo() === null) {
-      this.app.showNotification("Select a repository first");
+      this.app.notificationService.show("Select a repository first");
       return;
     }
 

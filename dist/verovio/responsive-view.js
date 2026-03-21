@@ -32,7 +32,7 @@ export class ResponsiveView extends VerovioView {
                 await this.updateZoom();
                 break;
         }
-        this.app.endLoading(lightEndLoading);
+        this.app.loaderService.end(lightEndLoading);
     }
     async updateActivate() {
         this.app.verovioOptions.adjustPageHeight = true;
@@ -99,7 +99,7 @@ export class ResponsiveView extends VerovioView {
         const svg = await this.verovio.renderToSVG(this.currentPage);
         this.svgWrapper.innerHTML = svg;
         if (lightEndLoading)
-            this.app.endLoading(true);
+            this.app.loaderService.end(true);
     }
     async midiUpdate(time) {
         //const animateStart = document.getElementById( "highlighting-start" );
@@ -128,7 +128,7 @@ export class ResponsiveView extends VerovioView {
         }
         if (elementsAtTime.page != this.currentPage) {
             this.currentPage = elementsAtTime.page;
-            this.app.startLoading("Loading content ...", true);
+            this.app.loaderService.start("Loading content ...", true);
             this.app.customEventManager.dispatch(createAppEvent(AppEvent.Page));
         }
         if (elementsAtTime.notes.length > 0 &&

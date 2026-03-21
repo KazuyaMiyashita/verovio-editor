@@ -148,10 +148,10 @@ export class GitHubManager {
         commitMsg,
         {},
       );
-      this.app.showNotification("File was successfully pushed to GitHub");
+      this.app.notificationService.show("File was successfully pushed to GitHub");
     } catch (err) {
       console.error(err);
-      this.app.showNotification("Something went wrong when pushing to GitHub");
+      this.app.notificationService.show("Something went wrong when pushing to GitHub");
     }
   }
 

@@ -133,7 +133,7 @@ export class EditorView extends ResponsiveView {
     //  make sure highlights are up to date
     this.highlightSelected();
 
-    if (lightEndLoading) this.app.endLoading(true);
+    if (lightEndLoading) this.app.loaderService.end(true);
   }
 
   private async select(element: string, id: string): Promise<any> {

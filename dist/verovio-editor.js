@@ -333,7 +333,7 @@ var te = class extends IntersectionObserver {
 				await this.updateZoom();
 				break;
 		}
-		this.app.endLoading(t);
+		this.app.loaderService.end(t);
 	}
 	async updateActivate() {
 		for (; this.docWrapper.firstChild;) this.docWrapper.firstChild.remove();
@@ -674,7 +674,7 @@ var ne = class e extends D {
 		let t = e.target, n = t.closest("tbody").nextElementSibling;
 		n && (n.style.display = n.style.display === "none" ? "table-row-group" : "none", t.classList.toggle("close"));
 	}
-}, N = class extends D {
+}, re = class extends D {
 	eventManager;
 	root;
 	useBreadCrumbs;
@@ -786,7 +786,7 @@ var ne = class e extends D {
 		return null;
 	}
 	buildTreeFromJson(e) {
-		let { id: t = null, element: n, attributes: r = {}, children: i = [], isTextNode: a = !1, isLeaf: o = !1 } = e, s = new P(t, n, r, [], a, o);
+		let { id: t = null, element: n, attributes: r = {}, children: i = [], isTextNode: a = !1, isLeaf: o = !1 } = e, s = new N(t, n, r, [], a, o);
 		return Array.isArray(i) && s.setChildren(i.map((e) => this.buildTreeFromJson(e))), s;
 	}
 	buildTreeFromElement(e) {
@@ -796,9 +796,9 @@ var ne = class e extends D {
 		for (let t of Array.from(e.childNodes)) if (t.nodeType === Node.ELEMENT_NODE) n.push(this.buildTreeFromElement(t));
 		else if (t.nodeType === Node.TEXT_NODE) {
 			let e = t.textContent?.trim();
-			e && n.push(new P(null, "#text", { textContent: e }, [], !0, !0));
+			e && n.push(new N(null, "#text", { textContent: e }, [], !0, !0));
 		}
-		return new P(t["xml:id"] || null, e.tagName, t, n, !1, n.length === 0);
+		return new N(t["xml:id"] || null, e.tagName, t, n, !1, n.length === 0);
 	}
 	toXmlElement() {
 		let e = document.implementation.createDocument(null, "", null);
@@ -818,7 +818,7 @@ var ne = class e extends D {
 	onContextmenu(e) {}
 	onMouseover(e) {}
 	onMouseout(e) {}
-}, P = class {
+}, N = class {
 	id;
 	element;
 	attributes;
@@ -863,7 +863,7 @@ var ne = class e extends D {
 			e.html(r, t, n + 1);
 		});
 	}
-}, re = class extends N {
+}, ie = class extends re {
 	tab;
 	constructor(e, t, n) {
 		super(e, t), this.tab = n;
@@ -907,7 +907,7 @@ var ne = class e extends D {
 		let t = e.target;
 		t.dataset.id && this.cursorActivity(t.dataset.id, "mouseout");
 	}
-}, F = class extends D {
+}, P = class extends D {
 	eventManager;
 	tab;
 	listWrapper;
@@ -951,10 +951,10 @@ var ne = class e extends D {
 	e.Direction = /* @__PURE__ */ function(e) {
 		return e[e.From = 0] = "From", e[e.To = 1] = "To", e;
 	}({});
-})(F ||= {});
+})(P ||= {});
 //#endregion
 //#region ts/editor/editor-content-panel.ts
-var ie = class extends D {
+var ae = class extends D {
 	contentTree;
 	contentTreeObj;
 	attributeList;
@@ -967,7 +967,7 @@ var ie = class extends D {
 	tab;
 	actionManager;
 	constructor(e, t, n, r) {
-		super(e, t), this.setDisplayFlex(), this.tab = n, this.actionManager = r, this.contentTree = i(this.addFieldSet("Content tree", 3), { class: "vrv-field-set-panel" }), this.contentTreeObj = new re(this.contentTree, this.app, this.tab), this.contentTreeObj.setBreadCrumbs(), this.customEventManager.addToPropagationList(this.contentTreeObj.customEventManager), this.attributeList = i(this.addFieldSet("Attributes or text", 3), { class: "vrv-field-set-panel" }), this.attributeListObj = new ne(this.attributeList, this.app, this.tab, this.actionManager), this.customEventManager.addToPropagationList(this.attributeListObj.customEventManager), this.referencesFrom = i(this.addFieldSet("Referencing elements"), { class: "vrv-field-set-panel" }), this.referencesFromObj = new F(this.referencesFrom, this.app, this.tab), this.customEventManager.addToPropagationList(this.referencesFromObj.customEventManager), this.referencesTo = i(this.addFieldSet("Referenced elements"), { class: "vrv-field-set-panel" }), this.referencesToObj = new F(this.referencesTo, this.app, this.tab), this.customEventManager.addToPropagationList(this.contentTreeObj.customEventManager);
+		super(e, t), this.setDisplayFlex(), this.tab = n, this.actionManager = r, this.contentTree = i(this.addFieldSet("Content tree", 3), { class: "vrv-field-set-panel" }), this.contentTreeObj = new ie(this.contentTree, this.app, this.tab), this.contentTreeObj.setBreadCrumbs(), this.customEventManager.addToPropagationList(this.contentTreeObj.customEventManager), this.attributeList = i(this.addFieldSet("Attributes or text", 3), { class: "vrv-field-set-panel" }), this.attributeListObj = new ne(this.attributeList, this.app, this.tab, this.actionManager), this.customEventManager.addToPropagationList(this.attributeListObj.customEventManager), this.referencesFrom = i(this.addFieldSet("Referencing elements"), { class: "vrv-field-set-panel" }), this.referencesFromObj = new P(this.referencesFrom, this.app, this.tab), this.customEventManager.addToPropagationList(this.referencesFromObj.customEventManager), this.referencesTo = i(this.addFieldSet("Referenced elements"), { class: "vrv-field-set-panel" }), this.referencesToObj = new P(this.referencesTo, this.app, this.tab), this.customEventManager.addToPropagationList(this.contentTreeObj.customEventManager);
 	}
 	async updateContent(e) {
 		if (await this.app.verovio.edit({
@@ -975,7 +975,7 @@ var ie = class extends D {
 			param: { elementId: `${e}` }
 		})) {
 			let t = await this.app.verovio.editInfo();
-			this.contentTreeObj.loadContext(t), e !== "" && (this.attributeListObj.loadAttributesOrText(t.object), this.referencesFromObj.loadList(t.referringElements, F.Direction.From), this.referencesToObj.loadList(t.referencedElements, F.Direction.To));
+			this.contentTreeObj.loadContext(t), e !== "" && (this.attributeListObj.loadAttributesOrText(t.object), this.referencesFromObj.loadList(t.referringElements, P.Direction.From), this.referencesToObj.loadList(t.referencedElements, P.Direction.To));
 		}
 		this.tab.loaded = !0;
 	}
@@ -991,7 +991,7 @@ var ie = class extends D {
 	onSelect(e) {
 		return super.onSelect(e) ? (this.updateContent(e.detail.id), !0) : !1;
 	}
-}, ae = class extends N {
+}, oe = class extends re {
 	tab;
 	constructor(e, t, n) {
 		super(e, t), this.tab = n, this.displayDepth = 4;
@@ -1003,12 +1003,12 @@ var ie = class extends D {
 		let t = e.target;
 		t.dataset.id && (t.classList.contains("open") ? this.collapseNode(t.dataset.id) : this.applyFocus(t.dataset.id)), e.stopPropagation();
 	}
-}, oe = class extends D {
+}, se = class extends D {
 	sectionTree;
 	sectionTreeObj;
 	tab;
 	constructor(e, t, n) {
-		super(e, t), this.setDisplayFlex(), this.tab = n, this.sectionTree = i(this.addFieldSet("Score structure", 3), { class: "vrv-field-set-panel" }), this.sectionTreeObj = new ae(this.sectionTree, this.app, this.tab), this.sectionTreeObj.setBreadCrumbs(), this.customEventManager.addToPropagationList(this.sectionTreeObj.customEventManager);
+		super(e, t), this.setDisplayFlex(), this.tab = n, this.sectionTree = i(this.addFieldSet("Score structure", 3), { class: "vrv-field-set-panel" }), this.sectionTreeObj = new oe(this.sectionTree, this.app, this.tab), this.sectionTreeObj.setBreadCrumbs(), this.customEventManager.addToPropagationList(this.sectionTreeObj.customEventManager);
 	}
 	async updateContent() {
 		if (this.sectionTreeObj.resetFocus(), await this.app.verovio.edit({
@@ -1026,7 +1026,7 @@ var ie = class extends D {
 	onEndLoading(e) {
 		return super.onEndLoading(e) ? (this.app.getPageCount() > 0 && !this.tab.loaded && this.updateContent(), !0) : !1;
 	}
-}, I = class extends D {
+}, F = class extends D {
 	eventManager;
 	constructor(e, t) {
 		super(e, t), this.eventManager = new O(this);
@@ -1046,7 +1046,7 @@ var ie = class extends D {
 	updateToolbarSubmenuBtn(e, t) {
 		e !== void 0 && (t ? e.classList.add("vrv-menu-checked") : e.classList.remove("vrv-menu-checked"));
 	}
-}, se = class extends I {
+}, ce = class extends F {
 	selectedElementType;
 	panel;
 	layoutControls;
@@ -1146,7 +1146,7 @@ var ie = class extends D {
 	onTriggerValidation(e) {
 		this.panel.xmlEditorViewObj && this.panel.xmlEditorViewObj.isEdited() && this.panel.xmlEditorViewObj.triggerValidation();
 	}
-}, ce = class {
+}, le = class {
 	eventManager;
 	app;
 	inProgress;
@@ -1282,12 +1282,12 @@ var ie = class extends D {
 		await this.setAttrValueForTypes("stem.dir", "", ["note", "chord"]);
 	}
 	async undo() {
-		this.app.startLoading("Undoing ...", !0), await this.editorViewObj.verovio.edit({ action: "undo" });
+		this.app.loaderService.start("Undoing ...", !0), await this.editorViewObj.verovio.edit({ action: "undo" });
 		let e = await this.editorViewObj.verovio.editInfo();
 		this.canUndoCache = e.canUndo, this.canRedoCache = e.canRedo, await this.editorViewObj.renderPage(!0);
 	}
 	async redo() {
-		this.app.startLoading("Redoing ...", !0), await this.editorViewObj.verovio.edit({ action: "redo" });
+		this.app.loaderService.start("Redoing ...", !0), await this.editorViewObj.verovio.edit({ action: "redo" });
 		let e = await this.editorViewObj.verovio.editInfo();
 		this.canUndoCache = e.canUndo, this.canRedoCache = e.canRedo, await this.editorViewObj.renderPage(!0);
 	}
@@ -1303,7 +1303,7 @@ var ie = class extends D {
 		await this.editorViewObj.verovio.edit(r);
 	}
 	async setAttrValueForTypes(e, t, n = []) {}
-}, le = class {
+}, ue = class {
 	editorViewObj;
 	activated;
 	pixPerPix;
@@ -1373,7 +1373,7 @@ var ie = class extends D {
 		let e = this.xToMEI(this.lastEvent.pageX), t = this.yToMEI(this.lastEvent.pageY);
 		return [e - this.initX, t - this.initY];
 	}
-}, L = class extends k {
+}, I = class extends k {
 	svgWrapper;
 	midiIds;
 	constructor(e, t, n) {
@@ -1394,7 +1394,7 @@ var ie = class extends D {
 				await this.updateZoom();
 				break;
 		}
-		this.app.endLoading(t);
+		this.app.loaderService.end(t);
 	}
 	async updateActivate() {
 		this.app.verovioOptions.adjustPageHeight = !0, this.app.verovioOptions.breaks = "auto", this.app.verovioOptions.footer = "none", this.app.verovioOptions.scale = this.currentScale, this.app.verovioOptions.pageHeight = this.svgWrapper.clientHeight * (100 / this.app.verovioOptions.scale), this.app.verovioOptions.pageWidth = this.svgWrapper.clientWidth * (100 / this.app.verovioOptions.scale), this.app.verovioOptions.justifyVertically = !1, this.app.getMidiPlayer().setView(this), this.midiIds = [], this.app.verovioOptions.pageHeight !== 0 && await this.verovio.setOptions(this.app.verovioOptions);
@@ -1403,14 +1403,14 @@ var ie = class extends D {
 		t && (e = await this.verovio.getMEI({})), await this.verovio.loadData(e), this.app.setPageCount(await this.verovio.getPageCount()), await this.updateResized();
 	}
 	async updateResized() {
-		this instanceof z || (this.div.style.height = this.div.parentElement.style.height, this.div.style.width = this.div.parentElement.style.width), this.div && this.svgWrapper && (this.updateSVGDimensions(), this.app.verovioOptions.scale = this.currentScale, this.app.verovioOptions.pageHeight = this.svgWrapper.clientHeight * (100 / this.app.verovioOptions.scale), this.app.verovioOptions.pageWidth = this.svgWrapper.clientWidth * (100 / this.app.verovioOptions.scale), this.app.verovioOptions.pageHeight -= this.app.verovioOptions.pageMarginTop * (100 / this.app.verovioOptions.scale), this.app.verovioOptions.pageHeight !== 0 && await this.verovio.setOptions(this.app.verovioOptions), this.app.getPageCount() > 0 && (await this.verovio.setOptions(this.app.verovioOptions), await this.verovio.redoLayout(this.app.verovioOptions), this.app.setPageCount(await this.verovio.getPageCount()), this.currentPage > this.app.getPageCount() && (this.currentPage = this.app.getPageCount()), await this.renderPage()));
+		this instanceof R || (this.div.style.height = this.div.parentElement.style.height, this.div.style.width = this.div.parentElement.style.width), this.div && this.svgWrapper && (this.updateSVGDimensions(), this.app.verovioOptions.scale = this.currentScale, this.app.verovioOptions.pageHeight = this.svgWrapper.clientHeight * (100 / this.app.verovioOptions.scale), this.app.verovioOptions.pageWidth = this.svgWrapper.clientWidth * (100 / this.app.verovioOptions.scale), this.app.verovioOptions.pageHeight -= this.app.verovioOptions.pageMarginTop * (100 / this.app.verovioOptions.scale), this.app.verovioOptions.pageHeight !== 0 && await this.verovio.setOptions(this.app.verovioOptions), this.app.getPageCount() > 0 && (await this.verovio.setOptions(this.app.verovioOptions), await this.verovio.redoLayout(this.app.verovioOptions), this.app.setPageCount(await this.verovio.getPageCount()), this.currentPage > this.app.getPageCount() && (this.currentPage = this.app.getPageCount()), await this.renderPage()));
 	}
 	async updateZoom() {
 		await this.updateResized();
 	}
 	async renderPage(e = !1) {
 		let t = await this.verovio.renderToSVG(this.currentPage);
-		this.svgWrapper.innerHTML = t, e && this.app.endLoading(!0);
+		this.svgWrapper.innerHTML = t, e && this.app.loaderService.end(!0);
 	}
 	async midiUpdate(e) {
 		let t = e, n = await this.app.verovio.getElementsAtTime(t);
@@ -1421,7 +1421,7 @@ var ie = class extends D {
 			};
 			n.notes &&= n.notes.map((t) => e(t)), n.chords &&= n.chords.map((t) => e(t)), n.rests &&= n.rests.map((t) => e(t)), n.measure && (n.measure = e(n.measure), n.page = await this.app.verovio.getPageWithElement(n.measure));
 		}
-		if (!(Object.keys(n).length === 0 || n.page === 0) && (n.page != this.currentPage && (this.currentPage = n.page, this.app.startLoading("Loading content ...", !0), this.app.customEventManager.dispatch(E(T.Page))), n.notes.length > 0 && this.midiIds != n.notes)) {
+		if (!(Object.keys(n).length === 0 || n.page === 0) && (n.page != this.currentPage && (this.currentPage = n.page, this.app.loaderService.start("Loading content ...", !0), this.app.customEventManager.dispatch(E(T.Page))), n.notes.length > 0 && this.midiIds != n.notes)) {
 			for (let e = 0, t = this.midiIds.length; e < t; e++) {
 				let t = this.midiIds[e];
 				if (n.notes.indexOf(t) === -1) {
@@ -1453,7 +1453,7 @@ var ie = class extends D {
 		let t = e.target;
 		this.svgWrapper.scrollTop = t.scrollTop, this.svgWrapper.scrollLeft = t.scrollLeft;
 	}
-}, R = "data:audio/midi;base64,TVRoZAAAAAYAAQABAeBNVHJrAAADIACQFUCDYIAVQACQFkCDYIAWQACQF0CDYIAXQACQGECDYIAYQACQGUCDYIAZQACQGkCDYIAaQACQG0CDYIAbQACQHECDYIAcQACQHUCDYIAdQACQHkCDYIAeQACQH0CDYIAfQACQIECDYIAgQACQIUCDYIAhQACQIkCDYIAiQACQI0CDYIAjQACQJECDYIAkQACQJUCDYIAlQACQJkCDYIAmQACQJ0CDYIAnQACQKECDYIAoQACQKUCDYIApQACQKkCDYIAqQACQK0CDYIArQACQLECDYIAsQACQLUCDYIAtQACQLkCDYIAuQACQL0CDYIAvQACQMECDYIAwQACQMUCDYIAxQACQMkCDYIAyQACQM0CDYIAzQACQNECDYIA0QACQNUCDYIA1QACQNkCDYIA2QACQN0CDYIA3QACQOECDYIA4QACQOUCDYIA5QACQOkCDYIA6QACQO0CDYIA7QACQPECDYIA8QACQPUCDYIA9QACQPkCDYIA+QACQP0CDYIA/QACQQECDYIBAQACQQUCDYIBBQACQQkCDYIBCQACQQ0CDYIBDQACQRECDYIBEQACQRUCDYIBFQACQRkCDYIBGQACQR0CDYIBHQACQSECDYIBIQACQSUCDYIBJQACQSkCDYIBKQACQS0CDYIBLQACQTECDYIBMQACQTUCDYIBNQACQTkCDYIBOQACQT0CDYIBPQACQUECDYIBQQACQUUCDYIBRQACQUkCDYIBSQACQU0CDYIBTQACQVECDYIBUQACQVUCDYIBVQACQVkCDYIBWQACQV0CDYIBXQACQWECDYIBYQACQWUCDYIBZQACQWkCDYIBaQACQW0CDYIBbQACQXECDYIBcQACQXUCDYIBdQACQXkCDYIBeQACQX0CDYIBfQACQYECDYIBgQACQYUCDYIBhQACQYkCDYIBiQACQY0CDYIBjQACQZECDYIBkQACQZUCDYIBlQACQZkCDYIBmQACQZ0CDYIBnQACQaECDYIBoQACQaUCDYIBpQACQakCDYIBqQACQa0CDYIBrQACQbECDYIBsQINgbAAA/y8A", z = class extends L {
+}, L = "data:audio/midi;base64,TVRoZAAAAAYAAQABAeBNVHJrAAADIACQFUCDYIAVQACQFkCDYIAWQACQF0CDYIAXQACQGECDYIAYQACQGUCDYIAZQACQGkCDYIAaQACQG0CDYIAbQACQHECDYIAcQACQHUCDYIAdQACQHkCDYIAeQACQH0CDYIAfQACQIECDYIAgQACQIUCDYIAhQACQIkCDYIAiQACQI0CDYIAjQACQJECDYIAkQACQJUCDYIAlQACQJkCDYIAmQACQJ0CDYIAnQACQKECDYIAoQACQKUCDYIApQACQKkCDYIAqQACQK0CDYIArQACQLECDYIAsQACQLUCDYIAtQACQLkCDYIAuQACQL0CDYIAvQACQMECDYIAwQACQMUCDYIAxQACQMkCDYIAyQACQM0CDYIAzQACQNECDYIA0QACQNUCDYIA1QACQNkCDYIA2QACQN0CDYIA3QACQOECDYIA4QACQOUCDYIA5QACQOkCDYIA6QACQO0CDYIA7QACQPECDYIA8QACQPUCDYIA9QACQPkCDYIA+QACQP0CDYIA/QACQQECDYIBAQACQQUCDYIBBQACQQkCDYIBCQACQQ0CDYIBDQACQRECDYIBEQACQRUCDYIBFQACQRkCDYIBGQACQR0CDYIBHQACQSECDYIBIQACQSUCDYIBJQACQSkCDYIBKQACQS0CDYIBLQACQTECDYIBMQACQTUCDYIBNQACQTkCDYIBOQACQT0CDYIBPQACQUECDYIBQQACQUUCDYIBRQACQUkCDYIBSQACQU0CDYIBTQACQVECDYIBUQACQVUCDYIBVQACQVkCDYIBWQACQV0CDYIBXQACQWECDYIBYQACQWUCDYIBZQACQWkCDYIBaQACQW0CDYIBbQACQXECDYIBcQACQXUCDYIBdQACQXkCDYIBeQACQX0CDYIBfQACQYECDYIBgQACQYUCDYIBhQACQYkCDYIBiQACQY0CDYIBjQACQZECDYIBkQACQZUCDYIBlQACQZkCDYIBmQACQZ0CDYIBnQACQaECDYIBoQACQaUCDYIBpQACQakCDYIBqQACQa0CDYIBrQACQbECDYIBsQINgbAAA/y8A", R = class extends I {
 	cursorPointerObj;
 	actionManager;
 	midiPlayerElement;
@@ -1464,14 +1464,14 @@ var ie = class extends D {
 	lastNote;
 	selectedItems;
 	constructor(e, t, n) {
-		super(e, t, n), this.midiPlayerElement = x(this.div, {}), this.midiPlayerElement.setAttribute("src", R), this.svgOverlay = i(this.div, {
+		super(e, t, n), this.midiPlayerElement = x(this.div, {}), this.midiPlayerElement.setAttribute("src", L), this.svgOverlay = i(this.div, {
 			class: "vrv-svg-overlay",
 			style: { position: "absolute" }
-		}), this.cursorPointerObj = new le(this), this.eventManager.bind(this.svgOverlay, "scroll", this.scrollListener), this.eventManager.bind(this.svgOverlay, "mouseleave", this.mouseLeaveListener), this.eventManager.bind(this.svgOverlay, "mouseenter", this.mouseEnterListener), this.mouseMoveTimer = !1, this.draggingActive = !1, this.mouseOverId = "", this.lastNote = {
+		}), this.cursorPointerObj = new ue(this), this.eventManager.bind(this.svgOverlay, "scroll", this.scrollListener), this.eventManager.bind(this.svgOverlay, "mouseleave", this.mouseLeaveListener), this.eventManager.bind(this.svgOverlay, "mouseenter", this.mouseEnterListener), this.mouseMoveTimer = !1, this.draggingActive = !1, this.mouseOverId = "", this.lastNote = {
 			midiPitch: 0,
 			oct: "",
 			pname: ""
-		}, this.actionManager = new ce(this, t), this.app.contextMenuObj.setActionManager(this.actionManager), this.selectedItems = [];
+		}, this.actionManager = new le(this, t), this.app.contextMenuObj.setActionManager(this.actionManager), this.selectedItems = [];
 	}
 	getActionManager() {
 		return this.actionManager;
@@ -1487,7 +1487,7 @@ var ie = class extends D {
 	}
 	async renderPage(e = !1, t = !0) {
 		let n = await this.verovio.renderToSVG(this.currentPage);
-		this.svgWrapper.innerHTML = n, this.initCursor(), t && this.createOverlay(), this.highlightSelected(), e && this.app.endLoading(!0);
+		this.svgWrapper.innerHTML = n, this.initCursor(), t && this.createOverlay(), this.highlightSelected(), e && this.app.loaderService.end(!0);
 	}
 	async select(e, t) {
 		this.highlightMouseOverReset();
@@ -1670,7 +1670,7 @@ var ie = class extends D {
 		let t = e.target;
 		this.cursorPointerObj.setScrollTop(t.scrollTop), this.cursorPointerObj.setScrollLeft(t.scrollLeft), this.svgWrapper.scrollTop = t.scrollTop, this.svgWrapper.scrollLeft = t.scrollLeft;
 	}
-}, ue = class {
+}, de = class {
 	currentOctave;
 	actionManager;
 	boundKeyUp;
@@ -1687,7 +1687,7 @@ var ie = class extends D {
 	midiPlayerElement;
 	constructor(e, t) {
 		let n = `${t.host}/icons/keyboard/left.png`, r = `${t.host}/icons/keyboard/right.png`;
-		this.div = e, this.div.textContent = "", this.app = t, this.midiPlayerElement = x(this.div, {}), this.midiPlayerElement.setAttribute("src", R), this.eventManager = new O(this), this.bindListeners();
+		this.div = e, this.div.textContent = "", this.app = t, this.midiPlayerElement = x(this.div, {}), this.midiPlayerElement.setAttribute("src", L), this.eventManager = new O(this), this.bindListeners();
 		let a = i(this.div, {
 			class: "vrv-keyboard-navigator",
 			style: { backgroundImage: `url(${n})` }
@@ -1827,7 +1827,7 @@ var ie = class extends D {
 	mouseLeaveListener(e) {
 		document.removeEventListener("keydown", this.boundKeyDown), document.removeEventListener("keyup", this.boundKeyUp);
 	}
-}, B = class extends D {
+}, z = class extends D {
 	tabSelectors;
 	eventManager;
 	selectedTab;
@@ -1839,7 +1839,7 @@ var ie = class extends D {
 		return this.selectedTab;
 	}
 	addTab(e) {
-		let t = new de(i(this.div, { class: "vrv-tab-content" }), this.app, this, e);
+		let t = new fe(i(this.div, { class: "vrv-tab-content" }), this.app, this, e);
 		return this.tabs.length === 0 ? (this.selectedTab = t, t.select()) : t.deselect(), this.tabs.push(t), t;
 	}
 	setHeight(e) {
@@ -1882,7 +1882,7 @@ var ie = class extends D {
 		let t = e.target;
 		this.select(t.dataset.tab);
 	}
-}, de = class extends D {
+}, fe = class extends D {
 	tabGroupObj;
 	tabSelector;
 	loaded;
@@ -1901,9 +1901,9 @@ var ie = class extends D {
 	isSelected() {
 		return this.tabGroupObj.getSelectedTab() === this;
 	}
-}, V = "1.5.0", H = .5, fe = `Live validation and synchronization from the XML editor is disabled for files larger than ${H}MB.\n\nPress 'Shift-Ctrl-V' to trigger validation and refreshing of the rendering.`, pe = `The Verovio Editor is an experimental online MEI editor prototype. It is based on [Verovio](https://www.verovio.org) and can be connected to [GitHub](https://github.com)\n\nVersion: ${V}`, me = "You have un-synchronized modifications in the XML editor which will be lost.\n\nDo you want to continue?", he = "Changing the Verovio version requires the editor to be reloaded for the selected version to be active.\n\nDo you want to proceed now?", ge = "This will reset all default options, reset the default file, remove all previous files, and reload the application.\n\nDo you want to proceed?", _e = "https://raw.githubusercontent.com/rism-digital/verovio-editor/refs/heads/main/CHANGELOG.md", ve = "https://raw.githubusercontent.com/rism-digital/verovio-editor/refs/heads/main/LICENSE", ye = "Libraries used in this application:\n* [blob-stream](https://github.com/devongovett/blob-stream)\n* [codemirror](https://codemirror.net/)\n* [html-midi-player](https://github.com/cifkao/html-midi-player)\n* [marked](https://marked.js.org/)\n* [pako](https://github.com/nodeca/pako)\n\n", be = "vrv", U = /* @__PURE__ */ function(e) {
+}, B = "1.5.0", V = .5, pe = `Live validation and synchronization from the XML editor is disabled for files larger than ${V}MB.\n\nPress 'Shift-Ctrl-V' to trigger validation and refreshing of the rendering.`, me = `The Verovio Editor is an experimental online MEI editor prototype. It is based on [Verovio](https://www.verovio.org) and can be connected to [GitHub](https://github.com)\n\nVersion: ${B}`, he = "You have un-synchronized modifications in the XML editor which will be lost.\n\nDo you want to continue?", ge = "Changing the Verovio version requires the editor to be reloaded for the selected version to be active.\n\nDo you want to proceed now?", _e = "This will reset all default options, reset the default file, remove all previous files, and reload the application.\n\nDo you want to proceed?", ve = "https://raw.githubusercontent.com/rism-digital/verovio-editor/refs/heads/main/CHANGELOG.md", ye = "https://raw.githubusercontent.com/rism-digital/verovio-editor/refs/heads/main/LICENSE", be = "Libraries used in this application:\n* [blob-stream](https://github.com/devongovett/blob-stream)\n* [codemirror](https://codemirror.net/)\n* [html-midi-player](https://github.com/cifkao/html-midi-player)\n* [marked](https://marked.js.org/)\n* [pako](https://github.com/nodeca/pako)\n\n", xe = "vrv", H = /* @__PURE__ */ function(e) {
 	return e[e.Validating = 0] = "Validating", e[e.Valid = 1] = "Valid", e[e.Invalid = 2] = "Invalid", e[e.Unknown = 3] = "Unknown", e;
-}(U || {}), xe = class extends D {
+}(H || {}), Se = class extends D {
 	currentId;
 	updateLinting;
 	timestamp;
@@ -1931,15 +1931,15 @@ var ie = class extends D {
 			autoCloseTags: !0,
 			indentUnit: 3,
 			mode: "xml",
-			theme: be,
+			theme: xe,
 			foldGutter: !0,
 			styleActiveLine: !0,
 			hintOptions: { schemaInfo: this.rngLoader.getTags() },
 			extraKeys: {
-				"'<'": W,
-				"'/'": Se,
-				"' '": G,
-				"'='": G
+				"'<'": U,
+				"'/'": Ce,
+				"' '": W,
+				"'='": W
 			},
 			gutters: ["CodeMirror-lint-markers", "CodeMirror-foldgutter"]
 		}), this.CMeditor.addKeyMap({
@@ -1954,7 +1954,7 @@ var ie = class extends D {
 		}), this.CMeditor.on("keyHandled", function(e, t, n) {
 			a.keyHandled(e, t, n);
 		}), this.CMeditor.on("change", function(e, t, n) {
-			t.origin === "setValue" || a.autoMode && !a.formatting ? a.triggerValidation() : (a.suspendValidation(), a.setStatus(U.Unknown));
+			t.origin === "setValue" || a.autoMode && !a.formatting ? a.triggerValidation() : (a.suspendValidation(), a.setStatus(H.Unknown));
 		}), this.CMeditor.options.hintOptions.schemaInfo = this.rngLoader.getTags();
 	}
 	isEdited() {
@@ -1967,7 +1967,7 @@ var ie = class extends D {
 		return this.autoMode;
 	}
 	setMode(e) {
-		this.autoMode = e < H * 1024 * 1024, this.autoModeNotification = !this.autoMode;
+		this.autoMode = e < V * 1024 * 1024, this.autoModeNotification = !this.autoMode;
 	}
 	isAutoModeNotification() {
 		return this.autoModeNotification;
@@ -1979,9 +1979,9 @@ var ie = class extends D {
 		if (!t || !n.caller || !e) return;
 		let r = n.caller;
 		if (!r.active || r.formatting) return;
-		r.setStatus(U.Validating), r.updateLinting = t, r.app.startLoading("Validating ...", !0);
+		r.setStatus(H.Validating), r.updateLinting = t, r.app.loaderService.start("Validating ...", !0);
 		let i = "[]";
-		i = r.app.options.enableValidation ? await r.validator.validateNG(e) : await r.validator.check(e), r.app.endLoading(!0), r.highlightValidation(e, i, r.timestamp);
+		i = r.app.options.enableValidation ? await r.validator.validateNG(e) : await r.validator.check(e), r.app.loaderService.end(!0), r.highlightValidation(e, i, r.timestamp);
 	}
 	async replaceSchema(e) {
 		try {
@@ -2000,16 +2000,16 @@ var ie = class extends D {
 		this.xmlValid.classList.remove("wait"), this.xmlValid.classList.remove("ok"), this.xmlValid.classList.remove("error"), this.xmlValid.classList.remove("unknown");
 		let t;
 		switch (e) {
-			case U.Validating:
+			case H.Validating:
 				t = "wait";
 				break;
-			case U.Valid:
+			case H.Valid:
 				t = "ok";
 				break;
-			case U.Invalid:
+			case H.Invalid:
 				t = "error";
 				break;
-			case U.Unknown:
+			case H.Unknown:
 				t = "unknown";
 				break;
 		}
@@ -2040,14 +2040,14 @@ var ie = class extends D {
 			}), a += 1;
 		}
 		if (this.updateLinting(this.CMeditor, i), i.length == 0) if (n === this.timestamp) {
-			if (this.setStatus(U.Valid), this.edited = !1, this.originalText === e) return;
-			this.originalText = e, this.app.startLoading("Updating data ...", this.autoMode), this.app.customEventManager.dispatch(E(T.LoadData, {
+			if (this.setStatus(H.Valid), this.edited = !1, this.originalText === e) return;
+			this.originalText = e, this.app.loaderService.start("Updating data ...", this.autoMode), this.app.customEventManager.dispatch(E(T.LoadData, {
 				caller: this,
 				lightEndLoading: this.autoMode,
 				mei: e
 			}));
-		} else console.log("Validated data is obsolete"), this.setStatus(U.Unknown), this.edited = !1;
-		else this.setStatus(U.Invalid), this.edited = !0;
+		} else console.log("Validated data is obsolete"), this.setStatus(H.Unknown), this.edited = !1;
+		else this.setStatus(H.Invalid), this.edited = !0;
 	}
 	formatXML() {
 		console.debug("XMLEditorView::FormatXML"), this.formatting = !0;
@@ -2100,7 +2100,7 @@ var ie = class extends D {
 		return super.onSelect(e) ? (this.currentId = e.detail.id, this.setCurrent(this.currentId), !0) : !1;
 	}
 };
-function W(e, t) {
+function U(e, t) {
 	return e.getCursor(), (!t || t()) && setTimeout(function() {
 		e.state.completionActive || CodeMirror.showHint(e, CodeMirror.hint.xml, {
 			schemaInfo: CodeMirror.schemaInfo,
@@ -2108,14 +2108,14 @@ function W(e, t) {
 		});
 	}, 100), CodeMirror.Pass;
 }
-function Se(e) {
-	return W(e, function() {
+function Ce(e) {
+	return U(e, function() {
 		let t = e.getCursor();
 		return e.getRange(CodeMirror.Pos(t.line, t.ch - 1), t) == "<";
 	});
 }
-function G(e) {
-	return W(e, function() {
+function W(e) {
+	return U(e, function() {
 		let t = e.getTokenAt(e.getCursor());
 		return t.type == "string" && (!/['"]/.test(t.string.charAt(t.string.length - 1)) || t.string.length == 1) ? !1 : CodeMirror.innerMode(e.getMode(), t.state).state.tagName;
 	});
@@ -2160,7 +2160,7 @@ typeof CodeMirror < "u" && (CodeMirror.extendMode("xml", {
 }));
 //#endregion
 //#region ts/editor/editor-panel.ts
-var K = class extends D {
+var G = class extends D {
 	eventManager;
 	xmlEditorViewObj;
 	editorViewObj;
@@ -2196,16 +2196,16 @@ var K = class extends D {
 	boundMouseMove;
 	boundMouseUp;
 	constructor(e, t, n, r, a) {
-		super(e, t), this.verovio = n, this.validator = r, this.rngLoader = a, this.eventManager = new O(this), this.toolbar = i(this.div, { class: "vrv-editor-toolbar" }), this.toolbarObj = new se(this.toolbar, this.app, this), this.customEventManager.addToPropagationList(this.toolbarObj.customEventManager), this.hSplit = i(this.div, { class: "vrv-h-split" }), this.toolPanel = i(this.hSplit, { class: "vrv-editor-tool-panel" }), this.vSplit = i(this.hSplit, { class: "vrv-v-split" }), this.split = i(this.vSplit, { class: "vrv-split" }), this.keyboard = i(this.vSplit, { class: "vrv-keyboard-panel" }), this.keyboardObj = new ue(this.keyboard, this.app);
+		super(e, t), this.verovio = n, this.validator = r, this.rngLoader = a, this.eventManager = new O(this), this.toolbar = i(this.div, { class: "vrv-editor-toolbar" }), this.toolbarObj = new ce(this.toolbar, this.app, this), this.customEventManager.addToPropagationList(this.toolbarObj.customEventManager), this.hSplit = i(this.div, { class: "vrv-h-split" }), this.toolPanel = i(this.hSplit, { class: "vrv-editor-tool-panel" }), this.vSplit = i(this.hSplit, { class: "vrv-v-split" }), this.split = i(this.vSplit, { class: "vrv-split" }), this.keyboard = i(this.vSplit, { class: "vrv-keyboard-panel" }), this.keyboardObj = new de(this.keyboard, this.app);
 		let o = this.app.options.editorSplitterHorizontal ? "vertical" : "horizontal";
 		this.split.classList.add(o), this.editorView = i(this.split, {
 			class: "vrv-view",
 			style: ""
-		}), this.editorViewObj = new z(this.editorView, this.app, this.verovio), this.customEventManager.addToPropagationList(this.editorViewObj.customEventManager), this.toolbarObj.bindEvents(this.editorViewObj.actionManager), this.tabGroup = i(this.toolPanel, { class: "vrv-tab-group" }), this.tabGroupObj = new B(this.tabGroup, this.app);
+		}), this.editorViewObj = new R(this.editorView, this.app, this.verovio), this.customEventManager.addToPropagationList(this.editorViewObj.customEventManager), this.toolbarObj.bindEvents(this.editorViewObj.actionManager), this.tabGroup = i(this.toolPanel, { class: "vrv-tab-group" }), this.tabGroupObj = new z(this.tabGroup, this.app);
 		let s = this.tabGroupObj.addTab("Score");
-		this.scorePanel = i(s.getDiv(), { class: "vrv-tab-content-panel" }), this.scorePanelObj = new oe(this.scorePanel, this.app, s), s.customEventManager.addToPropagationList(this.scorePanelObj.customEventManager);
+		this.scorePanel = i(s.getDiv(), { class: "vrv-tab-content-panel" }), this.scorePanelObj = new se(this.scorePanel, this.app, s), s.customEventManager.addToPropagationList(this.scorePanelObj.customEventManager);
 		let c = this.tabGroupObj.addTab("Content");
-		this.tabGroupObj.select(c.id), this.contentPanel = i(c.getDiv(), { class: "vrv-tab-content-panel" }), this.contentPanelObj = new ie(this.contentPanel, this.app, c, this.editorViewObj.actionManager), c.customEventManager.addToPropagationList(this.contentPanelObj.customEventManager), this.splitter = i(this.split, { class: "" }), this.eventManager.bind(this.splitter, "mousedown", this.onDragInit), this.boundMouseMove = (e) => this.onDragMove(e), this.boundMouseUp = (e) => this.onDragUp(e), this.draggingSplitter = !1, this.draggingX = 0, this.draggingY = 0, this.splitterX = 0, this.splitterY = 0, this.xmlEditorEnabled = !1, this.xmlEditorView = i(this.split, { class: "vrv-xml" }), this.xmlEditorViewObj = new xe(this.xmlEditorView, this.app, this.validator, this.rngLoader), this.splitterSize = 60, this.resizeTimer;
+		this.tabGroupObj.select(c.id), this.contentPanel = i(c.getDiv(), { class: "vrv-tab-content-panel" }), this.contentPanelObj = new ae(this.contentPanel, this.app, c, this.editorViewObj.actionManager), c.customEventManager.addToPropagationList(this.contentPanelObj.customEventManager), this.splitter = i(this.split, { class: "" }), this.eventManager.bind(this.splitter, "mousedown", this.onDragInit), this.boundMouseMove = (e) => this.onDragMove(e), this.boundMouseUp = (e) => this.onDragUp(e), this.draggingSplitter = !1, this.draggingX = 0, this.draggingY = 0, this.splitterX = 0, this.splitterY = 0, this.xmlEditorEnabled = !1, this.xmlEditorView = i(this.split, { class: "vrv-xml" }), this.xmlEditorViewObj = new Se(this.xmlEditorView, this.app, this.validator, this.rngLoader), this.splitterSize = 60, this.resizeTimer;
 	}
 	setXmlEditorEnabled(e) {
 		this.xmlEditorEnabled = e;
@@ -2289,10 +2289,10 @@ var K = class extends D {
 		}
 	}
 	onDragUp(e) {
-		this.draggingSplitter = !1, document.removeEventListener("mousemove", this.boundMouseMove), document.removeEventListener("mouseup", this.boundMouseUp), this.app.startLoading("Adjusting size ...", !0), this.updateSplitterSize(), this.customEventManager.dispatch(E(T.Resized));
+		this.draggingSplitter = !1, document.removeEventListener("mousemove", this.boundMouseMove), document.removeEventListener("mouseup", this.boundMouseUp), this.app.loaderService.start("Adjusting size ...", !0), this.updateSplitterSize(), this.customEventManager.dispatch(E(T.Resized));
 	}
 	onToggleOrientation(e) {
-		this.app.options.editorSplitterHorizontal = !this.app.options.editorSplitterHorizontal, this.split.classList.toggle("vertical"), this.split.classList.toggle("horizontal"), this.app.startLoading("Adjusting size ...", !0), this.app.customEventManager.dispatch(E(T.Resized));
+		this.app.options.editorSplitterHorizontal = !this.app.options.editorSplitterHorizontal, this.split.classList.toggle("vertical"), this.split.classList.toggle("horizontal"), this.app.loaderService.start("Adjusting size ...", !0), this.app.customEventManager.dispatch(E(T.Resized));
 	}
 	async onToggle(e) {
 		if (this.xmlEditorEnabled) {
@@ -2301,7 +2301,7 @@ var K = class extends D {
 					okLabel: "Yes",
 					icon: "question"
 				});
-				if (e.setContent(marked.parse(me)), await e.show() === 0) return;
+				if (e.setContent(marked.parse(he)), await e.show() === 0) return;
 				this.xmlEditorViewObj.setEdited(!1);
 			}
 			this.xmlEditorEnabled = !1;
@@ -2310,9 +2310,9 @@ var K = class extends D {
 				icon: "warning",
 				type: M.Type.Msg
 			});
-			e.setContent(marked.parse(fe)), await e.show(), this.xmlEditorViewObj.setAutoModeNotification(!1);
+			e.setContent(marked.parse(pe)), await e.show(), this.xmlEditorViewObj.setAutoModeNotification(!1);
 		}
-		if (this.app.startLoading("Adjusting the interface ...", !0), this.customEventManager.dispatch(E(T.Activate)), this.xmlEditorEnabled) {
+		if (this.app.loaderService.start("Adjusting the interface ...", !0), this.customEventManager.dispatch(E(T.Activate)), this.xmlEditorEnabled) {
 			this.tabGroupObj.resetTabs();
 			let e = await this.verovio.getMEI({});
 			this.app.customEventManager.dispatch(E(T.LoadData, {
@@ -2328,7 +2328,7 @@ var K = class extends D {
 			mei: this.xmlEditorViewObj.getValue()
 		}));
 	}
-}, Ce = class extends I {
+}, we = class extends F {
 	viewDocument;
 	viewResponsive;
 	viewSelector;
@@ -2512,7 +2512,7 @@ var K = class extends D {
 	}
 	updateAll() {
 		this.updateToolbarBtnEnabled(this.prevPage, this.app.getToolbarView().getCurrentPage() > 1), this.updateToolbarBtnEnabled(this.nextPage, this.app.getToolbarView().getCurrentPage() < this.app.getPageCount()), this.updateToolbarBtnEnabled(this.zoomOut, this.app.getPageCount() > 0 && this.app.getToolbarView().getCurrentZoomIndex() > 0), this.updateToolbarBtnEnabled(this.zoomIn, this.app.getPageCount() > 0 && this.app.getToolbarView().getCurrentZoomIndex() < this.app.zoomLevels.length - 1);
-		let e = this.app.getView() instanceof L && !(this.app.getView() instanceof K), t = this.app.getView() instanceof K, n = this.app.getView() instanceof A, r = this.app.options.selection && Object.keys(this.app.options.selection).length !== 0;
+		let e = this.app.getView() instanceof I && !(this.app.getView() instanceof G), t = this.app.getView() instanceof G, n = this.app.getView() instanceof A, r = this.app.options.selection && Object.keys(this.app.options.selection).length !== 0;
 		this.updateToolbarGrp(this.pageControls, !n), this.updateToolbarGrp(this.midiPlayerSubToolbar, t || e), this.updateToolbarGrp(this.editorSubToolbar, t), this.updateToolbarSubmenuBtn(this.viewDocument, n), this.updateToolbarSubmenuBtn(this.viewResponsive, e), this.updateToolbarSubmenuBtn(this.viewEditor, t), this.updateToolbarSubmenuBtn(this.fileSelection, r), this.app.githubManager.isLoggedIn() && (this.githubMenu.style.display = "block", this.updateToolbarBtnDisplay(this.logout, !0), this.login.setAttribute("data-before", this.app.githubManager.getName()), this.login.classList.add("inactivated")), this.updateRecent();
 	}
 	onMouseOver(e) {
@@ -2534,7 +2534,7 @@ var K = class extends D {
 	onStartLoading(e) {
 		return super.onStartLoading(e) ? (this.updateToolbarBtnEnabled(this.prevPage, !1), this.updateToolbarBtnEnabled(this.nextPage, !1), this.updateToolbarBtnEnabled(this.zoomOut, !1), this.updateToolbarBtnEnabled(this.zoomIn, !1), !0) : !1;
 	}
-}, we = class extends M {
+}, Te = class extends M {
 	constructor(e, t, n) {
 		super(e, t, n, {
 			okLabel: "Close",
@@ -2544,21 +2544,21 @@ var K = class extends D {
 	}
 	async load() {
 		let e = i(this.content, {});
-		e.innerHTML = marked.parse(ye);
+		e.innerHTML = marked.parse(be);
 		try {
-			let e = await (await fetch(ve)).text();
+			let e = await (await fetch(ye)).text();
 			this.addDetails("License (AGPL-3.0)", marked.parse(e));
 		} catch (e) {
 			console.error(e);
 		}
 		try {
-			let e = await (await fetch(_e)).text();
+			let e = await (await fetch(ve)).text();
 			this.addDetails("Change log", marked.parse(e));
 		} catch (e) {
 			console.error(e);
 		}
 	}
-}, q = class extends M {
+}, K = class extends M {
 	fields;
 	exportOptions;
 	basicInput;
@@ -2595,7 +2595,7 @@ var K = class extends D {
 	reset() {
 		super.ok();
 	}
-}, J = class extends M {
+}, q = class extends M {
 	data;
 	filename;
 	githubManager;
@@ -2685,7 +2685,7 @@ var K = class extends D {
 	}
 	async listFiles() {
 		if (this.githubManager.getSelectedRepo() === null) {
-			this.app.showNotification("Select a repository first");
+			this.app.notificationService.show("Select a repository first");
 			return;
 		}
 		this.loadingStart(this.tabFile);
@@ -2727,7 +2727,7 @@ var K = class extends D {
 	}
 	async listBranches() {
 		if (this.githubManager.getSelectedRepo() === null) {
-			this.app.showNotification("Select a repository first");
+			this.app.notificationService.show("Select a repository first");
 			return;
 		}
 		this.loadingStart(this.tabBranch);
@@ -2771,7 +2771,7 @@ var K = class extends D {
 				break;
 		}
 	}
-}, Te = class extends J {
+}, Ee = class extends q {
 	fields;
 	inputFile;
 	inputMessage;
@@ -2799,7 +2799,7 @@ var K = class extends D {
 	enableOk(e) {
 		this.okBtn.classList.toggle("disabled", !this.isValid());
 	}
-}, Ee = class extends M {
+}, De = class extends M {
 	selection;
 	fields;
 	selectMeasureRange;
@@ -2817,7 +2817,7 @@ var K = class extends D {
 	reset() {
 		this.selection = {}, super.ok();
 	}
-}, De = class extends M {
+}, Oe = class extends M {
 	reload;
 	fields;
 	appOptions;
@@ -2844,7 +2844,7 @@ var K = class extends D {
 	reset() {
 		super.ok();
 	}
-}, Oe = /* @__PURE__ */ "adjustPageHeight.adjustPageWidth.breaks.breaksSmartSb.humType.justifyVertically.landscape.mmOutput.outputFormatRaw.outputIndent.outputIndentTab.pageHeight.pageMarginLeft.pageMarginRight.pageMarginTop.pageMarginBottom.pageWidth.removeIds.scaleToPageSize.setLocale.showRuntime.shrinkToFit.svgBoundingBoxes.svgFormatRaw.svgRemoveXlink.svgViewBox.breaksNoWidow.engravingDefaults.fontLoadAll.systemMaxPerPage.transposeMdiv".split("."), ke = class extends M {
+}, ke = /* @__PURE__ */ "adjustPageHeight.adjustPageWidth.breaks.breaksSmartSb.humType.justifyVertically.landscape.mmOutput.outputFormatRaw.outputIndent.outputIndentTab.pageHeight.pageMarginLeft.pageMarginRight.pageMarginTop.pageMarginBottom.pageWidth.removeIds.scaleToPageSize.setLocale.showRuntime.shrinkToFit.svgBoundingBoxes.svgFormatRaw.svgRemoveXlink.svgViewBox.breaksNoWidow.engravingDefaults.fontLoadAll.systemMaxPerPage.transposeMdiv".split("."), Ae = class extends M {
 	changedOptions;
 	currentOptions;
 	defaultOptions;
@@ -2853,7 +2853,7 @@ var K = class extends D {
 	tabGroup;
 	tabGroupObj;
 	constructor(e, t, n, r, a, o) {
-		super(e, t, n, r), this.verovioDisabled = Oe, this.verovio = o, this.tabGroup = i(this.content, { class: "vrv-tab-group" }), this.tabGroupObj = new B(this.tabGroup, t), this.box.style.maxWidth = "800px", this.addButton("Reset", this.reset);
+		super(e, t, n, r), this.verovioDisabled = ke, this.verovio = o, this.tabGroup = i(this.content, { class: "vrv-tab-group" }), this.tabGroupObj = new z(this.tabGroup, t), this.box.style.maxWidth = "800px", this.addButton("Reset", this.reset);
 	}
 	getChangedOptions() {
 		return this.changedOptions;
@@ -2920,7 +2920,7 @@ var K = class extends D {
 	reset() {
 		this.changedOptions = this.diffOptions(this.defaultOptions, !0), Object.keys(this.changedOptions).length === 0 ? super.cancel() : super.ok();
 	}
-}, Y = window.pako, Ae = class {
+}, J = window.pako, je = class {
 	stack;
 	constructor() {
 		let e = window.localStorage.getItem("fileStack");
@@ -2938,18 +2938,18 @@ var K = class extends D {
 			return;
 		}
 		this.stack.idx--, this.stack.idx < 0 && (this.stack.idx = this.stack.maxItems - 1), this.stack.filenames[this.stack.idx] = e;
-		let r = btoa(Y.deflate(t, { to: "string" }));
+		let r = btoa(J.deflate(t, { to: "string" }));
 		window.localStorage.setItem("file-" + this.stack.idx, r), this.stack.items < this.stack.maxItems - 1 && this.stack.items++, window.localStorage.setItem("fileStack", JSON.stringify(this.stack));
 	}
 	load(e) {
-		let t = window.localStorage.getItem("file-" + e), n = Y.inflate(atob(t), { to: "string" });
+		let t = window.localStorage.getItem("file-" + e), n = J.inflate(atob(t), { to: "string" });
 		return {
 			filename: this.stack.filenames[e],
 			data: n
 		};
 	}
 	getLast() {
-		if (Y !== void 0 && this.stack.items > 0) return this.load(this.stack.idx);
+		if (J !== void 0 && this.stack.items > 0) return this.load(this.stack.idx);
 	}
 	fileList() {
 		let e = [];
@@ -2967,7 +2967,7 @@ var K = class extends D {
 		for (let t = 0; t < e.length; t++) window.localStorage.removeItem("file-" + e[t][0]);
 		window.localStorage.removeItem("fileStack"), this.stack.items = 0;
 	}
-}, je = class {
+}, Me = class {
 	name;
 	login;
 	user;
@@ -3049,9 +3049,9 @@ var K = class extends D {
 	async writeFile(e, t) {
 		try {
 			let n = await this.app.verovio.getMEI({});
-			await this.selectedRepo.writeFile(this.selectedBranchName, e, n, t, {}), this.app.showNotification("File was successfully pushed to GitHub");
+			await this.selectedRepo.writeFile(this.selectedBranchName, e, n, t, {}), this.app.notificationService.show("File was successfully pushed to GitHub");
 		} catch (e) {
-			console.error(e), this.app.showNotification("Something went wrong when pushing to GitHub");
+			console.error(e), this.app.notificationService.show("Something went wrong when pushing to GitHub");
 		}
 	}
 	async selectAccount(e) {
@@ -3074,7 +3074,7 @@ var K = class extends D {
 		let t = this.app.options.github;
 		t && t.login === this.login && (await this.selectAccount(t.account), await this.selectRepo(t.repo), await this.selectBranch(t.branch), this.selectedPath = t.path);
 	}
-}, Me = class {
+}, Ne = class {
 	playing;
 	pausing;
 	currentTime;
@@ -3160,7 +3160,7 @@ var K = class extends D {
 		let t = !!(e && e.detail && e.detail.finished);
 		this.stopTimer(), this.pausing = !1, this.playing = !1, t && (this.currentTime = this.totalTime, this.currentTimeStr = this.samplesToTime(this.currentTime)), this.midiToolbar.customEventManager.dispatch(E(T.EditData)), this.view && this.view.midiStop();
 	}
-}, Ne = class extends I {
+}, Pe = class extends F {
 	midiPlayer;
 	pageDragStart;
 	barDragStart;
@@ -3232,39 +3232,162 @@ var K = class extends D {
 	onEndLoading(e) {
 		return super.onEndLoading(e) ? (this.updateAll(), !0) : !1;
 	}
-}, Pe = class {
-	pdf;
-	currentScale;
-	verovio;
+}, Fe = class extends D {
+	actionManager;
+	underlay;
+	eventManager;
 	constructor(e, t, n) {
-		this.verovio = e, this.pdf = t, this.currentScale = n;
+		super(e, t), this.underlay = n, this.eventManager = new O(this);
 	}
-	async generateFile() {
-		let e = await this.verovio.getOptions();
-		e.scale = this.currentScale, console.log(e), await this.verovio.setOptions({
-			adjustPageHeight: !1,
-			footer: "auto",
-			justifyVertically: !0,
-			mmOutput: !0,
-			pageHeight: 2970,
-			pageWidth: 2100,
-			scale: 100
-		}), await this.verovio.redoLayout();
-		let t = await this.verovio.getPageCount();
-		await this.pdf.start({
-			useCSS: !0,
-			compress: !0,
-			autoFirstPage: !1,
-			layout: "portrait"
+	setActionManager(e) {
+		this.actionManager = e;
+	}
+	show(e) {
+		this.div.style.top = e.clientY + "px", this.div.style.left = e.clientX + "px", this.div.style.display = "inline-block", this.underlay.style.display = "block";
+	}
+	hide() {
+		this.underlay.style.display = "none", this.div.style.display = "none";
+	}
+	onDismiss(e) {
+		this.hide();
+	}
+	buildFor(e) {
+		this.eventManager.unbindAll(), this.eventManager.bind(this.div, "click", this.hide), this.eventManager.bind(this.underlay, "click", this.onDismiss);
+		let t = i(i(this.div, { class: "vrv-menu" }), { class: "vrv-menu-content" }), n = i(t, { class: "vrv-submenu" });
+		i(n, {
+			class: "vrv-submenu-text",
+			"data-before": "Insert before"
 		});
-		for (let e = 0; e < t; e++) {
-			let t = await this.verovio.renderToSVG(e + 1);
-			await this.pdf.addPage(t);
-		}
-		let n = await this.pdf.end();
-		return await this.verovio.setOptions(e), await this.verovio.redoLayout(), n;
+		let r = i(n, { class: "vrv-submenu-content" });
+		["note", "rest"].forEach((e) => {
+			let t = i(r, {
+				class: "vrv-menu-text",
+				"data-before": e
+			});
+			t.dataset.elementName = e, t.dataset.insertMode = "insertBefore", this.eventManager.bind(t, "click", this.insertNote);
+		});
+		let a = i(t, { class: "vrv-submenu" });
+		i(a, {
+			class: "vrv-submenu-text",
+			"data-before": "Insert after"
+		}), r = i(a, { class: "vrv-submenu-content" }), ["note", "rest"].forEach((e) => {
+			let t = i(r, {
+				class: "vrv-menu-text",
+				"data-before": e
+			});
+			t.dataset.elementName = e, t.dataset.insertMode = "insertAfter", this.eventManager.bind(t, "click", this.insertNote);
+		});
+		let o = i(t, { class: "vrv-submenu" });
+		i(o, {
+			class: "vrv-submenu-text",
+			"data-before": "Append child"
+		}), r = i(o, { class: "vrv-submenu-content" }), ["note", "rest"].forEach((e) => {
+			let t = i(r, {
+				class: "vrv-menu-text",
+				"data-before": e
+			});
+			t.dataset.elementName = e, t.dataset.insertMode = "appendChild", this.eventManager.bind(t, "click", this.insertNote);
+		});
 	}
-}, X = class {
+	insertNote(e) {
+		let t = e.target;
+		this.actionManager.insert(t.dataset.elementName, t.dataset.insertMode);
+	}
+}, Ie = class {
+	element;
+	stack;
+	constructor(e) {
+		this.element = e, this.stack = [];
+	}
+	show(e) {
+		this.stack.push(e), this.stack.length < 2 && this.push();
+	}
+	push() {
+		this.stack.length !== 0 && (this.element.textContent = this.stack[0], this.element.classList.remove("disabled"), setTimeout(() => {
+			this.element.classList.add("disabled"), this.stack.shift(), this.stack.length > 0 && this.push();
+		}, 3500));
+	}
+}, Le = class {
+	loader;
+	loaderText;
+	views;
+	customEventManager;
+	loadingCount;
+	constructor(e, t, n, r) {
+		this.loader = e, this.loaderText = t, this.views = n, this.customEventManager = r, this.loadingCount = 0;
+	}
+	start(e, t = !1) {
+		t ? this.views.style.pointerEvents = "none" : (this.views.style.overflow = "hidden", this.loader.style.display = "flex", this.loadingCount++), this.loaderText.textContent = e, this.customEventManager.dispatch(E(T.StartLoading, {
+			light: t,
+			msg: e
+		}));
+	}
+	end(e = !1) {
+		e || (this.loadingCount--, this.loadingCount < 0 && (console.error("endLoading index corrupted"), this.loadingCount = 0)), !(this.loadingCount > 0) && (this.views.style.overflow = "scroll", this.loader.style.display = "none", this.views.style.pointerEvents = "", this.views.style.opacity = "", this.customEventManager.dispatch(E(T.EndLoading)));
+	}
+	getCount() {
+		return this.loadingCount;
+	}
+}, Re = 1, Y = /* @__PURE__ */ new Map(), X = class {
+	worker;
+	constructor(e) {
+		return this.worker = e, this.worker.addEventListener("message", (e) => {
+			let { taskId: t, result: n } = e.data, r = Y.get(t);
+			r && (r.resolve(n), Y.delete(t));
+		}, !1), new Proxy(this, { get: (e, t) => function() {
+			let n = Re++, r = Array.prototype.slice.call(arguments);
+			e.worker.postMessage({
+				taskId: n,
+				method: t,
+				args: r
+			});
+			let i = new j();
+			return Y.set(n, i), i.promise;
+		} });
+	}
+}, ze = class extends X {
+	addPage;
+	end;
+	start;
+	constructor(e) {
+		super(e);
+	}
+}, Be = class extends X {
+	check;
+	validate;
+	validateNG;
+	setRelaxNGSchema;
+	setSchema;
+	onRuntimeInitialized;
+	constructor(e) {
+		super(e);
+	}
+}, Ve = class extends X {
+	edit;
+	editInfo;
+	getAvailableOptions;
+	getDefaultOptions;
+	getElementAttr;
+	getElementsAtTime;
+	getLog;
+	getOptions;
+	getMEI;
+	getPageCount;
+	getPageWithElement;
+	loadData;
+	redoLayout;
+	redoPagePitchPosLayout;
+	renderToExpansionMap;
+	renderToMIDI;
+	renderToSVG;
+	select;
+	setOptions;
+	getVersion;
+	onRuntimeInitialized;
+	constructor(e) {
+		super(e);
+	}
+}, Z = class {
 	tags;
 	rngNs;
 	constructor() {
@@ -3379,128 +3502,131 @@ var K = class extends D {
 	isRng(e, t) {
 		return e.namespaceURI === this.rngNs && e.localName === t;
 	}
-}, Fe = 1, Z = /* @__PURE__ */ new Map(), Q = class {
-	worker;
+}, He = class {
+	verovio;
+	validator = null;
+	rngLoader = null;
+	rngLoaderBasic = null;
+	verovioRuntimeVersion = "";
+	host;
 	constructor(e) {
-		return this.worker = e, this.worker.addEventListener("message", (e) => {
-			let { taskId: t, result: n } = e.data, r = Z.get(t);
-			r && (r.resolve(n), Z.delete(t));
-		}, !1), new Proxy(this, { get: (e, t) => function() {
-			let n = Fe++, r = Array.prototype.slice.call(arguments);
-			e.worker.postMessage({
-				taskId: n,
-				method: t,
-				args: r
-			});
-			let i = new j();
-			return Z.set(n, i), i.promise;
-		} });
+		this.host = e.host;
+		let t = this.getWorkerURL(`${e.host}/dist/verovio/verovio-worker.js`), n = new Worker(t), r = `https://www.verovio.org/javascript/${e.verovioVersion}/verovio-toolkit-wasm.js`;
+		if (n.postMessage({ verovioUrl: r }), this.verovio = new Ve(n), e.enableEditor) {
+			let t = this.getWorkerURL(`${e.host}/dist/xml/validator-worker.js`);
+			this.validator = new Be(new Worker(t)), this.rngLoader = new Z(), this.rngLoaderBasic = new Z();
+		}
 	}
-}, Ie = class extends Q {
-	addPage;
-	end;
-	start;
-	constructor(e) {
-		super(e);
+	getWorkerURL(e) {
+		let t = `importScripts("${e}");`;
+		return URL.createObjectURL(new Blob([t], { type: "text/javascript" }));
 	}
-}, Le = class extends Q {
-	check;
-	validate;
-	validateNG;
-	setRelaxNGSchema;
-	setSchema;
-	onRuntimeInitialized;
-	constructor(e) {
-		super(e);
+	async init(e) {
+		if (await this.verovio.onRuntimeInitialized(), this.verovioRuntimeVersion = await this.verovio.getVersion(), this.validator && this.rngLoader && this.rngLoaderBasic) {
+			await this.validator.onRuntimeInitialized();
+			let t = await (await fetch(e.schema)).text();
+			e.enableValidation && await this.validator.setRelaxNGSchema(t), this.rngLoader.setRelaxNGSchema(t);
+			let n = await (await fetch(e.schemaBasic)).text();
+			this.rngLoaderBasic.setRelaxNGSchema(n);
+		}
+		return this.verovioRuntimeVersion;
 	}
-}, Re = class extends Q {
-	edit;
-	editInfo;
-	getAvailableOptions;
-	getDefaultOptions;
-	getElementAttr;
-	getElementsAtTime;
-	getLog;
-	getOptions;
-	getMEI;
-	getPageCount;
-	getPageWithElement;
-	loadData;
-	redoLayout;
-	redoPagePitchPosLayout;
-	renderToExpansionMap;
-	renderToMIDI;
-	renderToSVG;
-	select;
-	setOptions;
-	getVersion;
-	onRuntimeInitialized;
-	constructor(e) {
-		super(e);
+	getRuntimeVersion() {
+		return this.verovioRuntimeVersion;
 	}
-}, ze = class extends D {
-	actionManager;
-	underlay;
-	eventManager;
+	getPDFWorker() {
+		let e = this.getWorkerURL(`${this.host}/dist/document/pdf-worker.js`);
+		return new ze(new Worker(e));
+	}
+}, Ue = class {
+	pdf;
+	currentScale;
+	verovio;
 	constructor(e, t, n) {
-		super(e, t), this.underlay = n, this.eventManager = new O(this);
+		this.verovio = e, this.pdf = t, this.currentScale = n;
 	}
-	setActionManager(e) {
-		this.actionManager = e;
-	}
-	show(e) {
-		this.div.style.top = e.clientY + "px", this.div.style.left = e.clientX + "px", this.div.style.display = "inline-block", this.underlay.style.display = "block";
-	}
-	hide() {
-		this.underlay.style.display = "none", this.div.style.display = "none";
-	}
-	onDismiss(e) {
-		this.hide();
-	}
-	buildFor(e) {
-		this.eventManager.unbindAll(), this.eventManager.bind(this.div, "click", this.hide), this.eventManager.bind(this.underlay, "click", this.onDismiss);
-		let t = i(i(this.div, { class: "vrv-menu" }), { class: "vrv-menu-content" }), n = i(t, { class: "vrv-submenu" });
-		i(n, {
-			class: "vrv-submenu-text",
-			"data-before": "Insert before"
+	async generateFile() {
+		let e = await this.verovio.getOptions();
+		e.scale = this.currentScale, console.log(e), await this.verovio.setOptions({
+			adjustPageHeight: !1,
+			footer: "auto",
+			justifyVertically: !0,
+			mmOutput: !0,
+			pageHeight: 2970,
+			pageWidth: 2100,
+			scale: 100
+		}), await this.verovio.redoLayout();
+		let t = await this.verovio.getPageCount();
+		await this.pdf.start({
+			useCSS: !0,
+			compress: !0,
+			autoFirstPage: !1,
+			layout: "portrait"
 		});
-		let r = i(n, { class: "vrv-submenu-content" });
-		["note", "rest"].forEach((e) => {
-			let t = i(r, {
-				class: "vrv-menu-text",
-				"data-before": e
+		for (let e = 0; e < t; e++) {
+			let t = await this.verovio.renderToSVG(e + 1);
+			await this.pdf.addPage(t);
+		}
+		let n = await this.pdf.end();
+		return await this.verovio.setOptions(e), await this.verovio.redoLayout(), n;
+	}
+}, We = class {
+	app;
+	fileStack;
+	inputData = "";
+	filename = "untitled.xml";
+	constructor(e) {
+		this.app = e, this.fileStack = e.fileStack;
+	}
+	getInputData() {
+		return this.inputData;
+	}
+	getFilename() {
+		return this.filename;
+	}
+	loadData(e, t = "untitled.xml", n = !1, r = !1) {
+		this.inputData.length !== 0 && r || (this.inputData.length !== 0 && (this.fileStack.store(this.filename, this.inputData), this.app.toolbarObj !== null && this.app.toolbarObj.updateRecent()), this.inputData = e, this.filename = t, this.app.isLoaded() && this.loadMEI(n));
+	}
+	async loadMEI(e) {
+		this.app.loaderService.start("Loading the MEI data ..."), e && (await this.app.verovio.loadData(this.inputData), this.inputData = await this.app.verovio.getMEI({})), this.app.viewEditorObj && (this.app.viewEditorObj.setXmlEditorEnabled(!1), this.app.viewEditorObj.xmlEditorViewObj.setMode(this.inputData.length)), await this.checkSchema(), this.app.getView().customEventManager.dispatch(E(T.LoadData, {
+			currentId: this.app.id,
+			caller: this.app.getView(),
+			lightEndLoading: !1,
+			mei: this.inputData
+		}));
+	}
+	async checkSchema() {
+		if (!this.app.options.enableEditor || !/<\?xml-model.*schematypens=\"http?:\/\/relaxng\.org\/ns\/structure\/1\.0\"/.exec(this.inputData)) return;
+		let e = /<\?xml-model.*href="([^"]*).*/.exec(this.inputData);
+		if (e && e[1] !== this.app.getCurrentSchema()) {
+			this.app.setCurrentSchema(this.app.options.schemaDefault);
+			let t = new M(this.app.dialogDiv, this.app, "Different Schema in the file", {
+				icon: "warning",
+				type: M.Type.Msg
 			});
-			t.dataset.elementName = e, t.dataset.insertMode = "insertBefore", this.eventManager.bind(t, "click", this.insertNote);
-		});
-		let a = i(t, { class: "vrv-submenu" });
-		i(a, {
-			class: "vrv-submenu-text",
-			"data-before": "Insert after"
-		}), r = i(a, { class: "vrv-submenu-content" }), ["note", "rest"].forEach((e) => {
-			let t = i(r, {
-				class: "vrv-menu-text",
-				"data-before": e
-			});
-			t.dataset.elementName = e, t.dataset.insertMode = "insertAfter", this.eventManager.bind(t, "click", this.insertNote);
-		});
-		let o = i(t, { class: "vrv-submenu" });
-		i(o, {
-			class: "vrv-submenu-text",
-			"data-before": "Append child"
-		}), r = i(o, { class: "vrv-submenu-content" }), ["note", "rest"].forEach((e) => {
-			let t = i(r, {
-				class: "vrv-menu-text",
-				"data-before": e
-			});
-			t.dataset.elementName = e, t.dataset.insertMode = "appendChild", this.eventManager.bind(t, "click", this.insertNote);
-		});
+			t.setContent(`The Schema '${e[1]}' in the file is different from the one in the editor<br><br>The validation in the editor will use the Schema '${this.app.options.schemaDefault}'`), await t.show();
+		}
 	}
-	insertNote(e) {
-		let t = e.target;
-		this.actionManager.insert(t.dataset.elementName, t.dataset.insertMode);
+	async generatePDF(e) {
+		this.app.pdfWorker || (this.app.pdfWorker = this.app.verovioService.getPDFWorker());
+		let t = await new Ue(this.app.verovio, this.app.pdfWorker, this.app.verovioOptions.scale).generateFile();
+		this.app.loaderService.end(), e.href = `${t}`, e.download = this.filename.replace(/\.[^\.]*$/, ".pdf"), e.click();
 	}
-}, Be = "/svg/filter.xml", Ve = window.location.hostname == "localhost" ? `http://${window.location.host}` : "https://editor.verovio.org", $ = class {
-	inputData;
+	async generateMIDI(e) {
+		let t = await this.app.verovio.renderToMIDI();
+		this.app.loaderService.end(), e.href = `data:audio/midi;base64,${t}`, e.download = this.filename.replace(/\.[^\.]*$/, ".mid"), e.click();
+	}
+	async generateMEI(e, t = null) {
+		let n = await this.app.verovio.getMEI(e);
+		return this.app.loaderService.end(), t && (t.href = "data:text/xml;charset=utf-8," + encodeURIComponent(n), t.download = this.filename.replace(/\.[^\.]*$/, ".mei"), t.click()), n;
+	}
+	setInputData(e) {
+		this.inputData = e;
+	}
+	setFilename(e) {
+		this.filename = e;
+	}
+}, Ge = "/svg/filter.xml", Q = window.location.hostname == "localhost" ? `http://${window.location.host}` : "https://editor.verovio.org", $ = class {
 	dialogDiv;
 	host;
 	customEventManager;
@@ -3518,9 +3644,12 @@ var K = class extends D {
 	view;
 	toolbarView;
 	midiPlayer;
+	notificationService;
+	loaderService;
+	verovioService;
+	fileService;
 	pageCount;
 	currentZoomIndex;
-	loadingCount;
 	toolbarObj;
 	contextMenuObj;
 	statusbarObj;
@@ -3528,7 +3657,6 @@ var K = class extends D {
 	resizeTimer;
 	appIsLoaded;
 	appReset;
-	filename;
 	verovioRuntimeVersion;
 	viewDocumentObj;
 	viewEditorObj;
@@ -3552,10 +3680,9 @@ var K = class extends D {
 	view3;
 	clientId;
 	div;
-	notificationStack;
 	constructor(n, r) {
-		this.clientId = "fd81068a15354a300522", this.host = Ve, this.id = this.clientId, this.notificationStack = [], this.githubManager = new je(this), this.options = Object.assign({
-			version: V,
+		this.clientId = "fd81068a15354a300522", this.host = Q, this.id = this.clientId, this.githubManager = new Me(this), this.options = Object.assign({
+			version: B,
 			verovioVersion: "latest",
 			documentViewMargin: 100,
 			documentViewPageBorder: 1,
@@ -3584,7 +3711,7 @@ var K = class extends D {
 			t < i || n < o ? console.warn(`Version ${r.version} is new, options not reloaded`) : this.options = Object.assign(this.options, e);
 		}
 		let c = localStorage.getItem("showDevFeatures");
-		for (c === null ? this.options.devFeatures = !1 : this.options.showDevFeatures = c === "true", this.fileStack = new Ae(), r.appReset && this.fileStack.reset(), this.div = n, this.zoomLevels = [
+		for (c === null ? this.options.devFeatures = !1 : this.options.showDevFeatures = c === "true", this.fileStack = new je(), r.appReset && this.fileStack.reset(), this.div = n, this.zoomLevels = [
 			5,
 			10,
 			20,
@@ -3597,12 +3724,17 @@ var K = class extends D {
 		s(document.head, {
 			href: `${this.host}/css/verovio.css`,
 			rel: "stylesheet"
-		}), this.loadingCount = 0, this.eventManager = new O(this), this.customEventManager = new e(), this.toolbarObj = null, this.createFilter(), this.input = o(this.div, {
+		}), this.eventManager = new O(this), this.customEventManager = new e(), this.toolbarObj = null, this.createFilter(), this.input = o(this.div, {
 			type: "file",
 			class: "vrv-file-input"
-		}), this.input.onchange = this.fileInput.bind(this), this.output = t(this.div, { class: "vrv-file-output" }), this.fileCopy = _(this.div, { class: "vrv-file-copy" }), this.wrapper = i(this.div, { class: "vrv-wrapper" }), this.notification = i(this.wrapper, { class: "vrv-notification disabled" }), this.contextUnderlay = i(this.wrapper, { class: "vrv-context-underlay" }), this.contextMenu = i(this.wrapper, { class: "vrv-context-menu" }), this.dialogDiv = i(this.wrapper, { class: "vrv-dialog" }), this.toolbar = i(this.wrapper, { class: "vrv-toolbar" }), this.views = i(this.wrapper, { class: "vrv-views" }), this.loader = i(this.views, { class: "vrv-loading" }), this.loaderText = i(this.loader, { class: "vrv-loading-text" }), this.statusbar = i(this.wrapper, { class: "vrv-statusbar" }), this.options.enableStatusbar || (this.statusbar.style.minHeight = "0px"), this.pdf = null, this.verovio = null, this.validator = null, this.rngLoader = null, this.resizeTimer = 0, window.onresize = this.onResize.bind(this), window.onbeforeunload = this.onBeforeUnload.bind(this), this.customEventManager.bind(this, T.Resized, this.onResized), this.customEventManager.dispatch(E(T.Resized));
-		let l = this.getWorkerURL(`${this.host}/dist/verovio/verovio-worker.js`), u = new Worker(l), d = `https://www.verovio.org/javascript/${this.options.verovioVersion}/verovio-toolkit-wasm.js`;
-		if (u.postMessage({ verovioUrl: d }), this.verovio = new Re(u), this.verovioOptions = {
+		}), this.input.onchange = this.fileInput.bind(this), this.output = t(this.div, { class: "vrv-file-output" }), this.fileCopy = _(this.div, { class: "vrv-file-copy" }), this.wrapper = i(this.div, { class: "vrv-wrapper" }), this.notification = i(this.wrapper, { class: "vrv-notification disabled" }), this.contextUnderlay = i(this.wrapper, { class: "vrv-context-underlay" }), this.contextMenu = i(this.wrapper, { class: "vrv-context-menu" }), this.dialogDiv = i(this.wrapper, { class: "vrv-dialog" }), this.toolbar = i(this.wrapper, { class: "vrv-toolbar" }), this.views = i(this.wrapper, { class: "vrv-views" }), this.loader = i(this.views, { class: "vrv-loading" }), this.loaderText = i(this.loader, { class: "vrv-loading-text" }), this.statusbar = i(this.wrapper, { class: "vrv-statusbar" }), this.options.enableStatusbar || (this.statusbar.style.minHeight = "0px"), this.notificationService = new Ie(this.notification), this.loaderService = new Le(this.loader, this.loaderText, this.views, this.customEventManager), this.fileService = new We(this), this.verovioService = new He({
+			verovioVersion: this.options.verovioVersion,
+			host: this.host,
+			enableEditor: this.options.enableEditor,
+			enableValidation: this.options.enableValidation,
+			schema: this.options.schema,
+			schemaBasic: this.options.schemaBasic
+		}), this.verovio = this.verovioService.verovio, this.validator = this.verovioService.validator, this.rngLoader = this.verovioService.rngLoader, this.rngLoaderBasic = this.verovioService.rngLoaderBasic, this.pdf = null, this.resizeTimer = 0, window.onresize = this.onResize.bind(this), window.onbeforeunload = this.onBeforeUnload.bind(this), this.customEventManager.bind(this, T.Resized, this.onResized), this.customEventManager.dispatch(E(T.Resized)), this.verovioOptions = {
 			pageHeight: 2970,
 			pageWidth: 2100,
 			pageMarginLeft: 50,
@@ -3611,25 +3743,17 @@ var K = class extends D {
 			pageMarginBottom: 50,
 			scale: 100,
 			xmlIdSeed: 1
-		}, this.pageCount = 0, this.currentZoomIndex = 4, this.verovioRuntimeVersion = "", this.options.enableEditor) {
-			let e = this.getWorkerURL(`${this.host}/dist/xml/validator-worker.js`);
-			this.validator = new Le(new Worker(e)), this.rngLoader = new X(), this.rngLoaderBasic = new X();
-		}
-		this.appIsLoaded = !1, this.appReset = !1, this.inputData = "", this.filename = "untitled.xml";
-		let f = this.fileStack.getLast();
-		f && (console.log("Reloading", f.filename), this.loadData(f.data, f.filename)), this.startLoading("Loading Verovio ..."), this.verovio.onRuntimeInitialized().then(async () => {
-			let e = await this.verovio.getVersion();
-			console.log(e), this.verovioRuntimeVersion = e, this.endLoading(), this.options.enableEditor ? (this.startLoading("Loading the XML validator ..."), this.validator.onRuntimeInitialized().then(async () => {
-				this.currentSchema = this.options.schema;
-				let e = await (await fetch(this.currentSchema)).text();
-				if (this.options.enableValidation) {
-					let t = await this.validator.setRelaxNGSchema(e);
-					console.log("Schema loaded", t);
-				}
-				this.rngLoader.setRelaxNGSchema(e);
-				let t = await (await fetch(this.options.schemaBasic)).text();
-				console.log(this.options.schemaBasic), this.rngLoaderBasic.setRelaxNGSchema(t), this.endLoading(), this.createInterfaceAndLoadData();
-			})) : this.createInterfaceAndLoadData();
+		}, this.pageCount = 0, this.currentZoomIndex = 4, this.verovioRuntimeVersion = "", this.appIsLoaded = !1, this.appReset = !1;
+		let l = this.fileStack.getLast();
+		l && (console.log("Reloading", l.filename), this.fileService.loadData(l.data, l.filename)), this.loaderService.start("Loading Verovio ..."), this.verovioService.init({
+			verovioVersion: this.options.verovioVersion,
+			host: this.host,
+			enableEditor: this.options.enableEditor,
+			enableValidation: this.options.enableValidation,
+			schema: this.options.schema,
+			schemaBasic: this.options.schemaBasic
+		}).then((e) => {
+			this.verovioRuntimeVersion = e, this.loaderService.end(), this.createInterfaceAndLoadData();
 		});
 	}
 	getView() {
@@ -3650,34 +3774,33 @@ var K = class extends D {
 	getCurrentZoomIndex() {
 		return this.currentZoomIndex;
 	}
-	startLoading(e, t = !1) {
-		t ? this.views.style.pointerEvents = "none" : (this.views.style.overflow = "hidden", this.loader.style.display = "flex", this.loadingCount++), this.loaderText.textContent = e, this.customEventManager.dispatch(E(T.StartLoading, {
-			light: t,
-			msg: e
-		}));
+	isLoaded() {
+		return this.appIsLoaded;
 	}
-	endLoading(e = !1) {
-		e || (this.loadingCount--, this.loadingCount < 0 && console.error("endLoading index corrupted")), !(this.loadingCount > 0) && (this.views.style.overflow = "scroll", this.loader.style.display = "none", this.views.style.pointerEvents = "", this.views.style.opacity = "", this.customEventManager.dispatch(E(T.EndLoading)));
+	getCurrentSchema() {
+		return this.currentSchema;
 	}
-	showNotification(e) {
-		this.notificationStack.push(e), this.notificationStack.length < 2 && this.pushNotification();
+	setCurrentSchema(e) {
+		this.currentSchema = e;
+	}
+	get pdfWorker() {
+		return this.pdf;
+	}
+	set pdfWorker(e) {
+		this.pdf = e;
 	}
 	destroy() {
 		this.eventManager.unbindAll();
 	}
-	getWorkerURL(e) {
-		let t = `importScripts("${e}");`;
-		return URL.createObjectURL(new Blob([t], { type: "text/javascript" }));
-	}
 	createInterfaceAndLoadData() {
-		this.startLoading("Create the interface ..."), this.createToolbar(), this.createViews(), this.createStatusbar(), this.customEventManager.bind(this, T.Resized, this.onResized), this.customEventManager.dispatch(E(T.Resized)), this.options.isSafari && this.showNotification("It seems that you are using Safari, on which XML validation unfortunately does not work.<br/>Please use another browser to have XML validation enabled."), this.appIsLoaded = !0, this.endLoading(), this.inputData && this.loadMEI(!1);
+		this.loaderService.start("Create the interface ..."), this.createToolbar(), this.createViews(), this.createStatusbar(), this.customEventManager.bind(this, T.Resized, this.onResized), this.customEventManager.dispatch(E(T.Resized)), this.options.isSafari && this.notificationService.show("It seems that you are using Safari, on which XML validation unfortunately does not work.<br/>Please use another browser to have XML validation enabled."), this.appIsLoaded = !0, this.loaderService.end(), this.fileService.getInputData() && this.fileService.loadMEI(!1);
 	}
 	createViews() {
-		if (this.startLoading("Loading the views ..."), this.view = null, this.toolbarView = null, this.options.enableDocument && (this.currentZoomIndex = this.options.documentZoom, this.view1 = i(this.views, { class: "vrv-view" }), this.viewDocumentObj = new A(this.view1, this, this.verovio), this.customEventManager.addToPropagationList(this.viewDocumentObj.customEventManager), this.options.defaultView === "document" && (this.view = this.viewDocumentObj, this.toolbarView = this.viewDocumentObj)), this.options.enableEditor && (this.currentZoomIndex = this.options.editorZoom, this.view2 = i(this.views, { class: "vrv-view" }), this.viewEditorObj = new K(this.view2, this, this.verovio, this.validator, this.rngLoader), this.customEventManager.addToPropagationList(this.viewEditorObj.customEventManager), this.options.defaultView === "editor" && (this.view = this.viewEditorObj, this.toolbarView = this.viewEditorObj.editorViewObj)), this.options.enableResponsive && (this.currentZoomIndex = this.options.responsiveZoom, this.view3 = i(this.views, { class: "vrv-view" }), this.viewResponsiveObj = new L(this.view3, this, this.verovio), this.customEventManager.addToPropagationList(this.viewResponsiveObj.customEventManager), this.options.defaultView === "responsive" && (this.view = this.viewResponsiveObj, this.toolbarView = this.viewResponsiveObj)), !this.view) throw `No view enabled or unknown default view '${this.options.defaultView}' selected.`;
-		this.endLoading(), this.view.customEventManager.dispatch(E(T.Activate));
+		if (this.loaderService.start("Loading the views ..."), this.view = null, this.toolbarView = null, this.options.enableDocument && (this.currentZoomIndex = this.options.documentZoom, this.view1 = i(this.views, { class: "vrv-view" }), this.viewDocumentObj = new A(this.view1, this, this.verovio), this.customEventManager.addToPropagationList(this.viewDocumentObj.customEventManager), this.options.defaultView === "document" && (this.view = this.viewDocumentObj, this.toolbarView = this.viewDocumentObj)), this.options.enableEditor && (this.currentZoomIndex = this.options.editorZoom, this.view2 = i(this.views, { class: "vrv-view" }), this.viewEditorObj = new G(this.view2, this, this.verovio, this.validator, this.rngLoader), this.customEventManager.addToPropagationList(this.viewEditorObj.customEventManager), this.options.defaultView === "editor" && (this.view = this.viewEditorObj, this.toolbarView = this.viewEditorObj.editorViewObj)), this.options.enableResponsive && (this.currentZoomIndex = this.options.responsiveZoom, this.view3 = i(this.views, { class: "vrv-view" }), this.viewResponsiveObj = new I(this.view3, this, this.verovio), this.customEventManager.addToPropagationList(this.viewResponsiveObj.customEventManager), this.options.defaultView === "responsive" && (this.view = this.viewResponsiveObj, this.toolbarView = this.viewResponsiveObj)), !this.view) throw `No view enabled or unknown default view '${this.options.defaultView}' selected.`;
+		this.loaderService.end(), this.view.customEventManager.dispatch(E(T.Activate));
 	}
 	createToolbar() {
-		this.toolbarObj = new Ce(this.toolbar, this), this.customEventManager.addToPropagationList(this.toolbarObj.customEventManager), this.midiToolbarObj = new Ne(this.toolbar, this), this.midiPlayer = new Me(this.midiToolbarObj), this.customEventManager.addToPropagationList(this.midiToolbarObj.customEventManager), this.contextMenuObj = new ze(this.contextMenu, this, this.contextUnderlay), this.customEventManager.addToPropagationList(this.contextMenuObj.customEventManager), this.div.addEventListener("contextmenu", (e) => e.preventDefault());
+		this.toolbarObj = new we(this.toolbar, this), this.customEventManager.addToPropagationList(this.toolbarObj.customEventManager), this.midiToolbarObj = new Pe(this.toolbar, this), this.midiPlayer = new Ne(this.midiToolbarObj), this.customEventManager.addToPropagationList(this.midiToolbarObj.customEventManager), this.contextMenuObj = new Fe(this.contextMenu, this, this.contextUnderlay), this.customEventManager.addToPropagationList(this.contextMenuObj.customEventManager), this.div.addEventListener("contextmenu", (e) => e.preventDefault());
 	}
 	createStatusbar() {
 		this.options.enableStatusbar && (this.statusbarObj = new ee(this.statusbar, this), this.customEventManager.addToPropagationList(this.statusbarObj.customEventManager), this.statusbarObj.setVerovioVersion(this.verovioRuntimeVersion));
@@ -3687,21 +3810,7 @@ var K = class extends D {
 		var t = new XMLHttpRequest();
 		t.onreadystatechange = function() {
 			this.readyState == 4 && this.status == 200 && e.appendChild(this.responseXML.documentElement);
-		}, t.open("GET", `${this.host}${Be}`, !0), t.send();
-	}
-	loadData(e, t = "untitled.xml", n = !1, r = !1) {
-		if (this.inputData.length != 0) {
-			if (r) return;
-			this.fileStack.store(this.filename, this.inputData), this.toolbarObj !== null && this.toolbarObj.updateRecent();
-		}
-		this.inputData = e, this.filename = t, this.appIsLoaded && this.loadMEI(n);
-	}
-	pushNotification() {
-		this.notification.textContent = this.notificationStack[0], this.notification.classList.remove("disabled");
-		let e = this;
-		setTimeout(function() {
-			e.notification.classList.add("disabled"), e.notificationStack.shift(), e.notificationStack.length > 0 && e.pushNotification();
-		}, 3500);
+		}, t.open("GET", `${this.host}${Ge}`, !0), t.send();
 	}
 	async playMEI() {
 		let e = await this.verovio.renderToExpansionMap();
@@ -3709,71 +3818,35 @@ var K = class extends D {
 		let t = "data:audio/midi;base64," + await this.verovio.renderToMIDI();
 		this.midiPlayer.playFile(t);
 	}
-	async loadMEI(e) {
-		this.startLoading("Loading the MEI data ..."), e && (console.log("Converting to MEI"), await this.verovio.loadData(this.inputData), this.inputData = await this.verovio.getMEI({})), this.viewEditorObj && (this.viewEditorObj.setXmlEditorEnabled(!1), this.viewEditorObj.xmlEditorViewObj.setMode(this.inputData.length)), await this.checkSchema(), this.view.customEventManager.dispatch(E(T.LoadData, {
-			currentId: this.clientId,
-			caller: this.view,
-			lightEndLoading: !1,
-			mei: this.inputData
-		}));
-	}
 	async applySelection() {
 		let e = this.options.selection;
 		(!e || Object.keys(e).length === 0) && (e = {}), await this.verovio.select(e);
-	}
-	async checkSchema() {
-		if (!this.options.enableEditor || !/<\?xml-model.*schematypens=\"http?:\/\/relaxng\.org\/ns\/structure\/1\.0\"/.exec(this.inputData)) return;
-		let e = /<\?xml-model.*href="([^"]*).*/.exec(this.inputData);
-		if (e && e[1] !== this.currentSchema) {
-			this.currentSchema = this.options.schemaDefault;
-			let t = new M(this.dialogDiv, this, "Different Schema in the file", {
-				icon: "warning",
-				type: M.Type.Msg
-			});
-			t.setContent(`The Schema '${e[1]}' in the file is different from the one in the editor<br><br>The validation in the editor will use the Schema '${this.options.schemaDefault}'`), await t.show();
-		}
-	}
-	async generatePDF() {
-		if (!this.pdf) {
-			let e = this.getWorkerURL(`${this.host}/dist/document/pdf-worker.js`);
-			this.pdf = new Ie(new Worker(e));
-		}
-		let e = await new Pe(this.verovio, this.pdf, this.verovioOptions.scale).generateFile();
-		this.endLoading(), this.output.href = `${e}`, this.output.download = this.filename.replace(/\.[^\.]*$/, ".pdf"), this.output.click();
-	}
-	async generateMIDI() {
-		let e = await this.verovio.renderToMIDI();
-		this.endLoading(), this.output.href = `data:audio/midi;base64,${e}`, this.output.download = this.filename.replace(/\.[^\.]*$/, ".mid"), this.output.click();
-	}
-	async generateMEI(e) {
-		let t = await this.verovio.getMEI(e);
-		this.endLoading(), this.output.href = "data:text/xml;charset=utf-8," + encodeURIComponent(t), this.output.download = this.filename.replace(/\.[^\.]*$/, ".mei"), this.output.click();
 	}
 	onResized(e) {
 		let t = this.div.clientHeight - this.toolbar.clientHeight - this.statusbar.clientHeight;
 		return t < parseInt(this.views.style.minHeight, 10) && (t = Number(this.views.style.minHeight), this.div.style.height = `${t + this.toolbar.clientHeight}px`), this.views.style.height = `${t}px`, this.views.style.width = `${this.div.clientWidth}px`, this.statusbar.style.top = `${t}px`, !0;
 	}
 	onBeforeUnload(e) {
-		this.appReset || (this.viewDocumentObj && (this.options.documentZoom = this.viewDocumentObj.getCurrentZoomIndex()), this.viewResponsiveObj && (this.options.responsiveZoom = this.viewResponsiveObj.getCurrentZoomIndex()), this.viewEditorObj && (this.options.editorZoom = this.viewEditorObj.editorViewObj.getCurrentZoomIndex()), this.view == this.viewDocumentObj ? this.options.defaultView = "document" : this.view == this.viewResponsiveObj ? this.options.defaultView = "responsive" : this.view == this.viewEditorObj && (this.options.defaultView = "editor"), delete this.options.selection, delete this.options.editorial, delete this.options.showDevFeatures, window.localStorage.setItem("options", JSON.stringify(this.options)), this.fileStack.store(this.filename, this.inputData));
+		this.appReset || (this.viewDocumentObj && (this.options.documentZoom = this.viewDocumentObj.getCurrentZoomIndex()), this.viewResponsiveObj && (this.options.responsiveZoom = this.viewResponsiveObj.getCurrentZoomIndex()), this.viewEditorObj && (this.options.editorZoom = this.viewEditorObj.editorViewObj.getCurrentZoomIndex()), this.view == this.viewDocumentObj ? this.options.defaultView = "document" : this.view == this.viewResponsiveObj ? this.options.defaultView = "responsive" : this.view == this.viewEditorObj && (this.options.defaultView = "editor"), delete this.options.selection, delete this.options.editorial, delete this.options.showDevFeatures, window.localStorage.setItem("options", JSON.stringify(this.options)), this.fileStack.store(this.fileService.getFilename(), this.fileService.getInputData()));
 	}
 	onResize(e) {
 		clearTimeout(this.resizeTimer);
 		let t = this;
 		this.resizeTimer = setTimeout(function() {
-			t.startLoading("Resizing ...", !0), t.customEventManager.dispatch(E(T.Resized));
+			t.loaderService.start("Resizing ...", !0), t.customEventManager.dispatch(E(T.Resized));
 		}, 100);
 	}
 	prevPage(e) {
-		this.toolbarView.getCurrentPage() > 1 && (this.toolbarView.setCurrentPage(this.toolbarView.getCurrentPage() - 1), this.startLoading("Loading content ...", !0), this.customEventManager.dispatch(E(T.Page)));
+		this.toolbarView.getCurrentPage() > 1 && (this.toolbarView.setCurrentPage(this.toolbarView.getCurrentPage() - 1), this.loaderService.start("Loading content ...", !0), this.customEventManager.dispatch(E(T.Page)));
 	}
 	nextPage(e) {
-		this.toolbarView.getCurrentPage() < this.pageCount && (this.toolbarView.setCurrentPage(this.toolbarView.getCurrentPage() + 1), this.startLoading("Loading content ...", !0), this.customEventManager.dispatch(E(T.Page)));
+		this.toolbarView.getCurrentPage() < this.pageCount && (this.toolbarView.setCurrentPage(this.toolbarView.getCurrentPage() + 1), this.loaderService.start("Loading content ...", !0), this.customEventManager.dispatch(E(T.Page)));
 	}
 	zoomOut(e) {
-		this.toolbarView.getCurrentZoomIndex() > 0 && (this.toolbarView.setCurrentZoomIndex(this.toolbarView.getCurrentZoomIndex() - 1), this.startLoading("Adjusting size ...", !0), this.customEventManager.dispatch(E(T.Zoom)));
+		this.toolbarView.getCurrentZoomIndex() > 0 && (this.toolbarView.setCurrentZoomIndex(this.toolbarView.getCurrentZoomIndex() - 1), this.loaderService.start("Adjusting size ...", !0), this.customEventManager.dispatch(E(T.Zoom)));
 	}
 	zoomIn(e) {
-		this.toolbarView.getCurrentZoomIndex() < this.zoomLevels.length - 1 && (this.toolbarView.setCurrentZoomIndex(this.toolbarView.getCurrentZoomIndex() + 1), this.startLoading("Adjusting size ...", !0), this.customEventManager.dispatch(E(T.Zoom)));
+		this.toolbarView.getCurrentZoomIndex() < this.zoomLevels.length - 1 && (this.toolbarView.setCurrentZoomIndex(this.toolbarView.getCurrentZoomIndex() + 1), this.loaderService.start("Adjusting size ...", !0), this.customEventManager.dispatch(E(T.Zoom)));
 	}
 	login(e) {
 		location.href = `https://github.com/login/oauth/authorize?client_id=${this.clientId}&redirect_uri=${this.host}/oauth/redirect&scope=public_repo%20read:org`;
@@ -3790,31 +3863,31 @@ var K = class extends D {
 		if (!n) return;
 		let r = new FileReader(), i = this, a = n.name, o = t.dataset.ext != "MEI";
 		r.onload = async function(e) {
-			i.loadData(e.target.result, a, o);
+			i.fileService.loadData(e.target.result, a, o);
 		}, r.readAsText(n);
 	}
 	async fileExport(e) {
-		let t = new q(this.dialogDiv, this, "Select MEI export parameters");
-		await t.show() !== 0 && (this.startLoading("Generating MEI file ..."), this.generateMEI(t.getExportOptions()));
+		let t = new K(this.dialogDiv, this, "Select MEI export parameters");
+		await t.show() !== 0 && (this.loaderService.start("Generating MEI file ..."), this.fileService.generateMEI(t.getExportOptions(), this.output));
 	}
 	async fileExportPDF(e) {
-		this.startLoading("Generating PDF file ..."), this.generatePDF();
+		this.loaderService.start("Generating PDF file ..."), this.fileService.generatePDF(this.output);
 	}
 	async fileExportMIDI(e) {
-		this.startLoading("Generating MIDI file ..."), this.generateMIDI();
+		this.loaderService.start("Generating MIDI file ..."), this.fileService.generateMIDI(this.output);
 	}
 	async fileCopyToClipboard(e) {
-		let t = new q(this.dialogDiv, this, "Select MEI export parameters");
+		let t = new K(this.dialogDiv, this, "Select MEI export parameters");
 		if (await t.show() === 0) return;
 		let n = await this.verovio.getMEI(t.getExportOptions());
-		this.fileCopy.value = n, this.fileCopy.select(), document.execCommand("copy"), this.showNotification("MEI copied to clipboard");
+		this.fileCopy.value = n, this.fileCopy.select(), document.execCommand("copy"), this.notificationService.show("MEI copied to clipboard");
 	}
 	async fileLoadRecent(e) {
 		let t = e.target, n = this.fileStack.load(Number(t.dataset.idx));
-		this.loadData(n.data, n.filename);
+		this.fileService.loadData(n.data, n.filename);
 	}
 	async fileSelection(e) {
-		let t = new Ee(this.dialogDiv, this, "Apply a selection to the file currently loaded", {
+		let t = new De(this.dialogDiv, this, "Apply a selection to the file currently loaded", {
 			okLabel: "Apply",
 			icon: "info",
 			type: M.Type.OKCancel
@@ -3826,14 +3899,14 @@ var K = class extends D {
 		})));
 	}
 	async githubImport(e) {
-		let t = new J(this.dialogDiv, this, "Import an MEI file from GitHub", {}, this.githubManager);
-		await t.show() === 1 && this.loadData(t.getData(), t.getFilename());
+		let t = new q(this.dialogDiv, this, "Import an MEI file from GitHub", {}, this.githubManager);
+		await t.show() === 1 && this.fileService.loadData(t.getData(), t.getFilename());
 	}
 	async githubExport(e) {
-		await new Te(this.dialogDiv, this, "Export an MEI file to GitHub", {}, this.githubManager).show();
+		await new Ee(this.dialogDiv, this, "Export an MEI file to GitHub", {}, this.githubManager).show();
 	}
 	async settingsEditor(e) {
-		let t = new De(this.dialogDiv, this, "Editor options", {
+		let t = new Oe(this.dialogDiv, this, "Editor options", {
 			okLabel: "Apply",
 			icon: "info",
 			type: M.Type.OKCancel
@@ -3843,12 +3916,12 @@ var K = class extends D {
 				okLabel: "Yes",
 				icon: "question"
 			});
-			if (e.setContent(marked.parse(he)), await e.show() === 0) return;
+			if (e.setContent(marked.parse(ge)), await e.show() === 0) return;
 			location.reload();
 		}
 	}
 	async settingsVerovio(e) {
-		let t = new ke(this.dialogDiv, this, "Verovio options", {
+		let t = new Ae(this.dialogDiv, this, "Verovio options", {
 			okLabel: "Apply",
 			icon: "info",
 			type: M.Type.OKCancel
@@ -3860,19 +3933,19 @@ var K = class extends D {
 		})));
 	}
 	async helpAbout(e) {
-		let t = new we(this.dialogDiv, this, "About this application"), n = await this.verovio.getVersion();
-		t.setContent(marked.parse(pe + `\n\nVerovio: ${n}`)), await t.load(), await t.show();
+		let t = new Te(this.dialogDiv, this, "About this application"), n = await this.verovio.getVersion();
+		t.setContent(marked.parse(me + `\n\nVerovio: ${n}`)), await t.load(), await t.show();
 	}
 	async helpReset(e) {
 		let t = new M(this.dialogDiv, this, "Reset to default", {
 			okLabel: "Yes",
 			icon: "question"
 		});
-		t.setContent(marked.parse(ge)), await t.show() !== 0 && (this.fileStack.reset(), window.localStorage.removeItem("options"), this.appReset = !0, location.reload());
+		t.setContent(marked.parse(_e)), await t.show() !== 0 && (this.fileStack.reset(), window.localStorage.removeItem("options"), this.appReset = !0, location.reload());
 	}
 	async setView(e) {
 		let t = e.target;
-		this.midiPlayer && this.midiPlayer.isPlaying() && this.midiPlayer.stop(), this.view.customEventManager.dispatch(E(T.Deactivate)), t.dataset.view == "document" ? (this.view = this.viewDocumentObj, this.toolbarView = this.viewDocumentObj) : t.dataset.view == "editor" ? (this.view = this.viewEditorObj, this.toolbarView = this.viewEditorObj.editorViewObj) : t.dataset.view == "responsive" && (this.view = this.viewResponsiveObj, this.toolbarView = this.viewResponsiveObj), this.startLoading("Switching view ..."), this.view.customEventManager.dispatch(E(T.Activate)), this.customEventManager.dispatch(E(T.LoadData, {
+		this.midiPlayer && this.midiPlayer.isPlaying() && this.midiPlayer.stop(), this.view.customEventManager.dispatch(E(T.Deactivate)), t.dataset.view == "document" ? (this.view = this.viewDocumentObj, this.toolbarView = this.viewDocumentObj) : t.dataset.view == "editor" ? (this.view = this.viewEditorObj, this.toolbarView = this.viewEditorObj.editorViewObj) : t.dataset.view == "responsive" && (this.view = this.viewResponsiveObj, this.toolbarView = this.viewResponsiveObj), this.loaderService.start("Switching view ..."), this.view.customEventManager.dispatch(E(T.Activate)), this.customEventManager.dispatch(E(T.LoadData, {
 			currentId: this.clientId,
 			caller: this.view,
 			reload: !0,
@@ -3882,16 +3955,16 @@ var K = class extends D {
 };
 (function(e) {
 	function t(e) {
-		return (/* @__PURE__ */ "accid.annot.app.arpeg.artic.beam.beamSpan.beatRpt.bracketSpan.breath.bTrem.caesura.choice.chord.clef.cpMark.custos.dir.dynam.ending.f.fb.fermata.fing.fTrem.gliss.graceGrp.hairpin.halfmRpt.harm.keySig.layer.layerDef.lb.lv.mdiv.measure.meterSig.mordent.mRest.mRpt.mRpt2.mSpace.multiRest.multiRpt.note.octave.ornam.pb.pedal.phrase.reh.rend.repeatMark.rest.sb.score.scoreDef.section.slur.staff.staffDef.syl.symbol.tempo.text.tie.trill.tuplet.tupletSpan.turn.verse".split(".")).includes(e) || (e = "missing"), `${Ve}/icons/mei/${e}.png`;
+		return (/* @__PURE__ */ "accid.annot.app.arpeg.artic.beam.beamSpan.beatRpt.bracketSpan.breath.bTrem.caesura.choice.chord.clef.cpMark.custos.dir.dynam.ending.f.fb.fermata.fing.fTrem.gliss.graceGrp.hairpin.halfmRpt.harm.keySig.layer.layerDef.lb.lv.mdiv.measure.meterSig.mordent.mRest.mRpt.mRpt2.mSpace.multiRest.multiRpt.note.octave.ornam.pb.pedal.phrase.reh.rend.repeatMark.rest.sb.score.scoreDef.section.slur.staff.staffDef.syl.symbol.tempo.text.tie.trill.tuplet.tupletSpan.turn.verse".split(".")).includes(e) || (e = "missing"), `${Q}/icons/mei/${e}.png`;
 	}
 	e.iconFor = t;
 })($ ||= {});
 //#endregion
 //#region ts/verovio-app.ts
-var He = class extends $ {
+var Ke = class extends $ {
 	constructor(e, t) {
 		t.enableEditor = !1, super(e, t);
 	}
 };
 //#endregion
-export { $ as App, He as VerovioApp };
+export { $ as App, Ke as VerovioApp };

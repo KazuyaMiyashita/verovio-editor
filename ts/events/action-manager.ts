@@ -309,7 +309,7 @@ export class ActionManager {
   }
 
   public async undo(): Promise<void> {
-    this.app.startLoading("Undoing ...", true);
+    this.app.loaderService.start("Undoing ...", true);
     const editorAction = { action: "undo" };
     await this.editorViewObj.verovio.edit(editorAction);
     const info =
@@ -320,7 +320,7 @@ export class ActionManager {
   }
 
   public async redo(): Promise<void> {
-    this.app.startLoading("Redoing ...", true);
+    this.app.loaderService.start("Redoing ...", true);
     const editorAction = { action: "redo" };
     await this.editorViewObj.verovio.edit(editorAction);
     const info =

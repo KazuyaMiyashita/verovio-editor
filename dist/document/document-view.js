@@ -59,7 +59,7 @@ export class DocumentView extends VerovioView {
                 await this.updateZoom();
                 break;
         }
-        this.app.endLoading(lightEndLoading);
+        this.app.loaderService.end(lightEndLoading);
     }
     async updateActivate() {
         while (this.docWrapper.firstChild) {

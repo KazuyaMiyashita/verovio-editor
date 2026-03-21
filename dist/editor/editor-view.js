@@ -84,7 +84,7 @@ export class EditorView extends ResponsiveView {
         //  make sure highlights are up to date
         this.highlightSelected();
         if (lightEndLoading)
-            this.app.endLoading(true);
+            this.app.loaderService.end(true);
     }
     async select(element, id) {
         this.highlightMouseOverReset();

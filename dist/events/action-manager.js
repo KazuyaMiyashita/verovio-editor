@@ -250,7 +250,7 @@ export class ActionManager {
         await this.setAttrValueForTypes("stem.dir", "", ["note", "chord"]);
     }
     async undo() {
-        this.app.startLoading("Undoing ...", true);
+        this.app.loaderService.start("Undoing ...", true);
         const editorAction = { action: "undo" };
         await this.editorViewObj.verovio.edit(editorAction);
         const info = (await this.editorViewObj.verovio.editInfo());
@@ -259,7 +259,7 @@ export class ActionManager {
         await this.editorViewObj.renderPage(true);
     }
     async redo() {
-        this.app.startLoading("Redoing ...", true);
+        this.app.loaderService.start("Redoing ...", true);
         const editorAction = { action: "redo" };
         await this.editorViewObj.verovio.edit(editorAction);
         const info = (await this.editorViewObj.verovio.editInfo());
