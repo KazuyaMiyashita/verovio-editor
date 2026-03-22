@@ -138,7 +138,9 @@ export class App {
         : "https://editor.verovio.org");
     this.id = this.clientId;
 
-    this.githubManager = new GitHubManager(this);
+    if (options?.enableGitHub !== false) {
+      this.githubManager = new GitHubManager(this);
+    }
 
     this.options = Object.assign(
       {
@@ -247,10 +249,12 @@ export class App {
       this.div.firstChild.remove();
     }
 
-    appendLinkTo(document.head, {
-      href: `${this.host}/css/verovio.css`,
-      rel: `stylesheet`,
-    });
+    if (this.options.injectStyles !== false) {
+      appendLinkTo(document.head, {
+        href: `${this.host}/css/verovio.css`,
+        rel: `stylesheet`,
+      });
+    }
 
     this.eventManager = new EventManager(this);
     this.customEventManager = new CustomEventManager();
@@ -730,10 +734,10 @@ export class App {
   }
 
   ////////////////////////////////////////////////////////////////////////
-  // Event methods
+  // Public API methods
   ////////////////////////////////////////////////////////////////////////
 
-  prevPage(e: MouseEvent): void {
+  goToPreviousPage(): void {
     if (this.toolbarView.getCurrentPage() > 1) {
       this.toolbarView.setCurrentPage(this.toolbarView.getCurrentPage() - 1);
       this.loaderService.start("Loading content ...", true);
@@ -741,7 +745,7 @@ export class App {
     }
   }
 
-  nextPage(e: MouseEvent): void {
+  goToNextPage(): void {
     if (this.toolbarView.getCurrentPage() < this.pageCount) {
       this.toolbarView.setCurrentPage(this.toolbarView.getCurrentPage() + 1);
       this.loaderService.start("Loading content ...", true);
@@ -749,24 +753,62 @@ export class App {
     }
   }
 
-  zoomOut(e: MouseEvent): void {
-    if (this.toolbarView.getCurrentZoomIndex() > 0) {
-      this.toolbarView.setCurrentZoomIndex(
-        this.toolbarView.getCurrentZoomIndex() - 1,
-      );
+  setZoom(index: number): void {
+    if (index >= 0 && index < this.zoomLevels.length) {
+      this.toolbarView.setCurrentZoomIndex(index);
       this.loaderService.start("Adjusting size ...", true);
       this.customEventManager.dispatch(createAppEvent(AppEvent.Zoom));
     }
   }
 
-  zoomIn(e: MouseEvent): void {
-    if (this.toolbarView.getCurrentZoomIndex() < this.zoomLevels.length - 1) {
-      this.toolbarView.setCurrentZoomIndex(
-        this.toolbarView.getCurrentZoomIndex() + 1,
-      );
-      this.loaderService.start("Adjusting size ...", true);
-      this.customEventManager.dispatch(createAppEvent(AppEvent.Zoom));
+  zoomOutView(): void {
+    if (this.toolbarView.getCurrentZoomIndex() > 0) {
+      this.setZoom(this.toolbarView.getCurrentZoomIndex() - 1);
     }
+  }
+
+  zoomInView(): void {
+    if (this.toolbarView.getCurrentZoomIndex() < this.zoomLevels.length - 1) {
+      this.setZoom(this.toolbarView.getCurrentZoomIndex() + 1);
+    }
+  }
+
+  play(): void {
+    if (this.midiPlayer) {
+      this.midiPlayer.play();
+    }
+  }
+
+  pause(): void {
+    if (this.midiPlayer && this.midiPlayer.isPlaying()) {
+      this.midiPlayer.pause();
+    }
+  }
+
+  stop(): void {
+    if (this.midiPlayer) {
+      this.midiPlayer.stop();
+    }
+  }
+
+  ////////////////////////////////////////////////////////////////////////
+  // Event methods
+  ////////////////////////////////////////////////////////////////////////
+
+  prevPage(e: MouseEvent): void {
+    this.goToPreviousPage();
+  }
+
+  nextPage(e: MouseEvent): void {
+    this.goToNextPage();
+  }
+
+  zoomOut(e: MouseEvent): void {
+    this.zoomOutView();
+  }
+
+  zoomIn(e: MouseEvent): void {
+    this.zoomInView();
   }
 
   login(e: Event): void {
@@ -813,6 +855,12 @@ export class App {
   }
 
   async fileExport(e: Event): Promise<void> {
+    if (this.options.useCustomDialogs) {
+      const event = new CustomEvent("onExportRequest", { cancelable: true });
+      this.eventTarget.dispatchEvent(event);
+      if (event.defaultPrevented) return;
+    }
+
     const dlg = new DialogExport(
       this.dialogDiv,
       this,
@@ -835,6 +883,12 @@ export class App {
   }
 
   async fileCopyToClipboard(e: Event): Promise<void> {
+    if (this.options.useCustomDialogs) {
+      const event = new CustomEvent("onExportRequest", { cancelable: true });
+      this.eventTarget.dispatchEvent(event);
+      if (event.defaultPrevented) return;
+    }
+
     const dlg = new DialogExport(
       this.dialogDiv,
       this,
@@ -857,6 +911,12 @@ export class App {
   }
 
   async fileSelection(e: Event): Promise<void> {
+    if (this.options.useCustomDialogs) {
+      const event = new CustomEvent("onSelectionRequest", { cancelable: true });
+      this.eventTarget.dispatchEvent(event);
+      if (event.defaultPrevented) return;
+    }
+
     const dlg = new DialogSelection(
       this.dialogDiv,
       this,
@@ -879,6 +939,13 @@ export class App {
   }
 
   async githubImport(e: Event): Promise<void> {
+    if (!this.githubManager) return;
+    if (this.options.useCustomDialogs) {
+      const event = new CustomEvent("onGithubImportRequest", { cancelable: true });
+      this.eventTarget.dispatchEvent(event);
+      if (event.defaultPrevented) return;
+    }
+
     const dlg = new DialogGhImport(
       this.dialogDiv,
       this,
@@ -893,6 +960,13 @@ export class App {
   }
 
   async githubExport(e: Event): Promise<void> {
+    if (!this.githubManager) return;
+    if (this.options.useCustomDialogs) {
+      const event = new CustomEvent("onGithubExportRequest", { cancelable: true });
+      this.eventTarget.dispatchEvent(event);
+      if (event.defaultPrevented) return;
+    }
+
     const dlg = new DialogGhExport(
       this.dialogDiv,
       this,
@@ -906,6 +980,12 @@ export class App {
   }
 
   async settingsEditor(e: Event): Promise<void> {
+    if (this.options.useCustomDialogs) {
+      const event = new CustomEvent("onSettingsRequest", { cancelable: true, detail: { type: "editor" } });
+      this.eventTarget.dispatchEvent(event);
+      if (event.defaultPrevented) return;
+    }
+
     const dlg = new DialogSettingsEditor(
       this.dialogDiv,
       this,
@@ -929,6 +1009,12 @@ export class App {
   }
 
   async settingsVerovio(e: Event): Promise<void> {
+    if (this.options.useCustomDialogs) {
+      const event = new CustomEvent("onSettingsRequest", { cancelable: true, detail: { type: "verovio" } });
+      this.eventTarget.dispatchEvent(event);
+      if (event.defaultPrevented) return;
+    }
+
     const dlg = new DialogSettingsVerovio(
       this.dialogDiv,
       this,
@@ -1040,6 +1126,7 @@ export namespace App {
     enableContextMenu?: boolean;
     enableFilter?: boolean;
     enableValidation?: boolean;
+    enableGitHub?: boolean;
     github?: GitHubManager.Options;
     responsiveZoom?: number;
     schemaDefault?: string;
@@ -1055,6 +1142,8 @@ export namespace App {
     storageProvider?: StorageProvider;
     devFeatures?: boolean;
     showDevFeatures?: boolean;
+    useCustomDialogs?: boolean;
+    injectStyles?: boolean;
   }
 
   export interface MEIExportOptions {

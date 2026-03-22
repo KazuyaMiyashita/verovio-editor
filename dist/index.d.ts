@@ -111,6 +111,14 @@ export declare class App {
     onResized(e: CustomEvent): boolean;
     onBeforeUnload(e: Event): void;
     onResize(e: Event): void;
+    goToPreviousPage(): void;
+    goToNextPage(): void;
+    setZoom(index: number): void;
+    zoomOutView(): void;
+    zoomInView(): void;
+    play(): void;
+    pause(): void;
+    stop(): void;
     prevPage(e: MouseEvent): void;
     nextPage(e: MouseEvent): void;
     zoomOut(e: MouseEvent): void;
@@ -160,6 +168,7 @@ export declare namespace App {
         enableContextMenu?: boolean;
         enableFilter?: boolean;
         enableValidation?: boolean;
+        enableGitHub?: boolean;
         github?: GitHubManager.Options;
         responsiveZoom?: number;
         schemaDefault?: string;
@@ -175,6 +184,8 @@ export declare namespace App {
         storageProvider?: StorageProvider;
         devFeatures?: boolean;
         showDevFeatures?: boolean;
+        useCustomDialogs?: boolean;
+        injectStyles?: boolean;
     }
     export interface MEIExportOptions {
         scoreBased: boolean;

@@ -98,7 +98,9 @@ export class App {
                     ? `http://${window.location.host}`
                     : "https://editor.verovio.org");
         this.id = this.clientId;
-        this.githubManager = new GitHubManager(this);
+        if (options?.enableGitHub !== false) {
+            this.githubManager = new GitHubManager(this);
+        }
         this.options = Object.assign({
             version: version,
             verovioVersion: "latest",
@@ -183,10 +185,12 @@ export class App {
         while (this.div.firstChild) {
             this.div.firstChild.remove();
         }
-        appendLinkTo(document.head, {
-            href: `${this.host}/css/verovio.css`,
-            rel: `stylesheet`,
-        });
+        if (this.options.injectStyles !== false) {
+            appendLinkTo(document.head, {
+                href: `${this.host}/css/verovio.css`,
+                rel: `stylesheet`,
+            });
+        }
         this.eventManager = new EventManager(this);
         this.customEventManager = new CustomEventManager();
         // Bridge internal events to public eventTarget
@@ -534,35 +538,68 @@ export class App {
         }, 100);
     }
     ////////////////////////////////////////////////////////////////////////
-    // Event methods
+    // Public API methods
     ////////////////////////////////////////////////////////////////////////
-    prevPage(e) {
+    goToPreviousPage() {
         if (this.toolbarView.getCurrentPage() > 1) {
             this.toolbarView.setCurrentPage(this.toolbarView.getCurrentPage() - 1);
             this.loaderService.start("Loading content ...", true);
             this.customEventManager.dispatch(createAppEvent(AppEvent.Page));
         }
     }
-    nextPage(e) {
+    goToNextPage() {
         if (this.toolbarView.getCurrentPage() < this.pageCount) {
             this.toolbarView.setCurrentPage(this.toolbarView.getCurrentPage() + 1);
             this.loaderService.start("Loading content ...", true);
             this.customEventManager.dispatch(createAppEvent(AppEvent.Page));
         }
     }
-    zoomOut(e) {
-        if (this.toolbarView.getCurrentZoomIndex() > 0) {
-            this.toolbarView.setCurrentZoomIndex(this.toolbarView.getCurrentZoomIndex() - 1);
+    setZoom(index) {
+        if (index >= 0 && index < this.zoomLevels.length) {
+            this.toolbarView.setCurrentZoomIndex(index);
             this.loaderService.start("Adjusting size ...", true);
             this.customEventManager.dispatch(createAppEvent(AppEvent.Zoom));
         }
     }
-    zoomIn(e) {
-        if (this.toolbarView.getCurrentZoomIndex() < this.zoomLevels.length - 1) {
-            this.toolbarView.setCurrentZoomIndex(this.toolbarView.getCurrentZoomIndex() + 1);
-            this.loaderService.start("Adjusting size ...", true);
-            this.customEventManager.dispatch(createAppEvent(AppEvent.Zoom));
+    zoomOutView() {
+        if (this.toolbarView.getCurrentZoomIndex() > 0) {
+            this.setZoom(this.toolbarView.getCurrentZoomIndex() - 1);
         }
+    }
+    zoomInView() {
+        if (this.toolbarView.getCurrentZoomIndex() < this.zoomLevels.length - 1) {
+            this.setZoom(this.toolbarView.getCurrentZoomIndex() + 1);
+        }
+    }
+    play() {
+        if (this.midiPlayer) {
+            this.midiPlayer.play();
+        }
+    }
+    pause() {
+        if (this.midiPlayer && this.midiPlayer.isPlaying()) {
+            this.midiPlayer.pause();
+        }
+    }
+    stop() {
+        if (this.midiPlayer) {
+            this.midiPlayer.stop();
+        }
+    }
+    ////////////////////////////////////////////////////////////////////////
+    // Event methods
+    ////////////////////////////////////////////////////////////////////////
+    prevPage(e) {
+        this.goToPreviousPage();
+    }
+    nextPage(e) {
+        this.goToNextPage();
+    }
+    zoomOut(e) {
+        this.zoomOutView();
+    }
+    zoomIn(e) {
+        this.zoomInView();
     }
     login(e) {
         location.href = `https://github.com/login/oauth/authorize?client_id=${this.clientId}&redirect_uri=${this.host}/oauth/redirect&scope=public_repo%20read:org`;
@@ -600,6 +637,12 @@ export class App {
         reader.readAsText(file);
     }
     async fileExport(e) {
+        if (this.options.useCustomDialogs) {
+            const event = new CustomEvent("onExportRequest", { cancelable: true });
+            this.eventTarget.dispatchEvent(event);
+            if (event.defaultPrevented)
+                return;
+        }
         const dlg = new DialogExport(this.dialogDiv, this, "Select MEI export parameters");
         const dlgRes = await dlg.show();
         if (dlgRes === 0)
@@ -616,6 +659,12 @@ export class App {
         this.fileService.generateMIDI(this.output);
     }
     async fileCopyToClipboard(e) {
+        if (this.options.useCustomDialogs) {
+            const event = new CustomEvent("onExportRequest", { cancelable: true });
+            this.eventTarget.dispatchEvent(event);
+            if (event.defaultPrevented)
+                return;
+        }
         const dlg = new DialogExport(this.dialogDiv, this, "Select MEI export parameters");
         const dlgRes = await dlg.show();
         if (dlgRes === 0)
@@ -633,6 +682,12 @@ export class App {
         this.fileService.loadData(file.data, file.filename);
     }
     async fileSelection(e) {
+        if (this.options.useCustomDialogs) {
+            const event = new CustomEvent("onSelectionRequest", { cancelable: true });
+            this.eventTarget.dispatchEvent(event);
+            if (event.defaultPrevented)
+                return;
+        }
         const dlg = new DialogSelection(this.dialogDiv, this, "Apply a selection to the file currently loaded", { okLabel: "Apply", icon: "info", type: Dialog.Type.OKCancel }, this.options.selection);
         const dlgRes = await dlg.show();
         if (dlgRes === 1) {
@@ -646,6 +701,14 @@ export class App {
         }
     }
     async githubImport(e) {
+        if (!this.githubManager)
+            return;
+        if (this.options.useCustomDialogs) {
+            const event = new CustomEvent("onGithubImportRequest", { cancelable: true });
+            this.eventTarget.dispatchEvent(event);
+            if (event.defaultPrevented)
+                return;
+        }
         const dlg = new DialogGhImport(this.dialogDiv, this, "Import an MEI file from GitHub", {}, this.githubManager);
         const dlgRes = await dlg.show();
         if (dlgRes === 1) {
@@ -653,12 +716,26 @@ export class App {
         }
     }
     async githubExport(e) {
+        if (!this.githubManager)
+            return;
+        if (this.options.useCustomDialogs) {
+            const event = new CustomEvent("onGithubExportRequest", { cancelable: true });
+            this.eventTarget.dispatchEvent(event);
+            if (event.defaultPrevented)
+                return;
+        }
         const dlg = new DialogGhExport(this.dialogDiv, this, "Export an MEI file to GitHub", {}, this.githubManager);
         const dlgRes = await dlg.show();
         if (dlgRes === 1) {
         }
     }
     async settingsEditor(e) {
+        if (this.options.useCustomDialogs) {
+            const event = new CustomEvent("onSettingsRequest", { cancelable: true, detail: { type: "editor" } });
+            this.eventTarget.dispatchEvent(event);
+            if (event.defaultPrevented)
+                return;
+        }
         const dlg = new DialogSettingsEditor(this.dialogDiv, this, "Editor options", { okLabel: "Apply", icon: "info", type: Dialog.Type.OKCancel }, this.options);
         const dlgRes = await dlg.show();
         if (dlgRes === 1) {
@@ -676,6 +753,12 @@ export class App {
         }
     }
     async settingsVerovio(e) {
+        if (this.options.useCustomDialogs) {
+            const event = new CustomEvent("onSettingsRequest", { cancelable: true, detail: { type: "verovio" } });
+            this.eventTarget.dispatchEvent(event);
+            if (event.defaultPrevented)
+                return;
+        }
         const dlg = new DialogSettingsVerovio(this.dialogDiv, this, "Verovio options", { okLabel: "Apply", icon: "info", type: Dialog.Type.OKCancel }, this.options.selection, this.verovio);
         await dlg.loadOptions();
         const dlgRes = await dlg.show();

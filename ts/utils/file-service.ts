@@ -85,6 +85,11 @@ export class FileService {
     const schemaMatch = schema.exec(this.inputData);
     if (schemaMatch && schemaMatch[1] !== this.app.getCurrentSchema()) {
       this.app.setCurrentSchema(this.app.options.schemaDefault);
+      if (this.app.options.useCustomDialogs) {
+        const event = new CustomEvent("onSchemaWarningRequest", { cancelable: true, detail: { schema: schemaMatch[1], defaultSchema: this.app.options.schemaDefault } });
+        this.app.dispatchEvent(event);
+        if (event.defaultPrevented) return;
+      }
       const dlg = new Dialog(
         this.app.dialogDiv,
         this.app,

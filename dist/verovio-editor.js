@@ -2515,7 +2515,7 @@ var K = class extends D {
 	updateAll() {
 		this.updateToolbarBtnEnabled(this.prevPage, this.app.getToolbarView().getCurrentPage() > 1), this.updateToolbarBtnEnabled(this.nextPage, this.app.getToolbarView().getCurrentPage() < this.app.getPageCount()), this.updateToolbarBtnEnabled(this.zoomOut, this.app.getPageCount() > 0 && this.app.getToolbarView().getCurrentZoomIndex() > 0), this.updateToolbarBtnEnabled(this.zoomIn, this.app.getPageCount() > 0 && this.app.getToolbarView().getCurrentZoomIndex() < this.app.zoomLevels.length - 1);
 		let e = this.app.getView() instanceof L && !(this.app.getView() instanceof K), t = this.app.getView() instanceof K, n = this.app.getView() instanceof A, r = this.app.options.selection && Object.keys(this.app.options.selection).length !== 0;
-		this.updateToolbarGrp(this.pageControls, !n), this.updateToolbarGrp(this.midiPlayerSubToolbar, t || e), this.updateToolbarGrp(this.editorSubToolbar, t), this.updateToolbarSubmenuBtn(this.viewDocument, n), this.updateToolbarSubmenuBtn(this.viewResponsive, e), this.updateToolbarSubmenuBtn(this.viewEditor, t), this.updateToolbarSubmenuBtn(this.fileSelection, r), this.app.githubManager.isLoggedIn() && (this.githubMenu.style.display = "block", this.updateToolbarBtnDisplay(this.logout, !0), this.login.setAttribute("data-before", this.app.githubManager.getName()), this.login.classList.add("inactivated")), this.updateRecent();
+		this.updateToolbarGrp(this.pageControls, !n), this.updateToolbarGrp(this.midiPlayerSubToolbar, t || e), this.updateToolbarGrp(this.editorSubToolbar, t), this.updateToolbarSubmenuBtn(this.viewDocument, n), this.updateToolbarSubmenuBtn(this.viewResponsive, e), this.updateToolbarSubmenuBtn(this.viewEditor, t), this.updateToolbarSubmenuBtn(this.fileSelection, r), this.app.githubManager ? this.app.githubManager.isLoggedIn() && (this.githubMenu.style.display = "block", this.updateToolbarBtnDisplay(this.logout, !0), this.login.setAttribute("data-before", this.app.githubManager.getName()), this.login.classList.add("inactivated")) : this.loginGroup.style.display = "none", this.updateRecent();
 	}
 	onMouseOver(e) {
 		Array.from(this.div.querySelectorAll("div.vrv-menu-content")).forEach((e) => {
@@ -3614,7 +3614,16 @@ var K = class extends D {
 		if (!this.app.options.enableEditor || !/<\?xml-model.*schematypens=\"http?:\/\/relaxng\.org\/ns\/structure\/1\.0\"/.exec(this.inputData)) return;
 		let e = /<\?xml-model.*href="([^"]*).*/.exec(this.inputData);
 		if (e && e[1] !== this.app.getCurrentSchema()) {
-			this.app.setCurrentSchema(this.app.options.schemaDefault);
+			if (this.app.setCurrentSchema(this.app.options.schemaDefault), this.app.options.useCustomDialogs) {
+				let t = new CustomEvent("onSchemaWarningRequest", {
+					cancelable: !0,
+					detail: {
+						schema: e[1],
+						defaultSchema: this.app.options.schemaDefault
+					}
+				});
+				if (this.app.dispatchEvent(t), t.defaultPrevented) return;
+			}
 			let t = new M(this.app.dialogDiv, this.app, "Different Schema in the file", {
 				icon: "warning",
 				type: M.Type.Msg
@@ -3714,7 +3723,7 @@ var K = class extends D {
 	clientId;
 	div;
 	constructor(n, r) {
-		this.clientId = r?.githubClientId || "fd81068a15354a300522", this.host = r?.baseUrl || (window.location.hostname == "localhost" ? `http://${window.location.host}` : "https://editor.verovio.org"), this.id = this.clientId, this.githubManager = new ke(this), this.options = Object.assign({
+		this.clientId = r?.githubClientId || "fd81068a15354a300522", this.host = r?.baseUrl || (window.location.hostname == "localhost" ? `http://${window.location.host}` : "https://editor.verovio.org"), this.id = this.clientId, r?.enableGitHub !== !1 && (this.githubManager = new ke(this)), this.options = Object.assign({
 			version: V,
 			verovioVersion: "latest",
 			documentViewMargin: 100,
@@ -3761,7 +3770,7 @@ var K = class extends D {
 			150,
 			200
 		]; this.div.firstChild;) this.div.firstChild.remove();
-		s(document.head, {
+		this.options.injectStyles !== !1 && s(document.head, {
 			href: `${this.host}/css/verovio.css`,
 			rel: "stylesheet"
 		}), this.eventManager = new O(this), this.customEventManager = new e();
@@ -3901,17 +3910,41 @@ var K = class extends D {
 			t.loaderService.start("Resizing ...", !0), t.customEventManager.dispatch(E(T.Resized));
 		}, 100);
 	}
-	prevPage(e) {
+	goToPreviousPage() {
 		this.toolbarView.getCurrentPage() > 1 && (this.toolbarView.setCurrentPage(this.toolbarView.getCurrentPage() - 1), this.loaderService.start("Loading content ...", !0), this.customEventManager.dispatch(E(T.Page)));
 	}
-	nextPage(e) {
+	goToNextPage() {
 		this.toolbarView.getCurrentPage() < this.pageCount && (this.toolbarView.setCurrentPage(this.toolbarView.getCurrentPage() + 1), this.loaderService.start("Loading content ...", !0), this.customEventManager.dispatch(E(T.Page)));
 	}
+	setZoom(e) {
+		e >= 0 && e < this.zoomLevels.length && (this.toolbarView.setCurrentZoomIndex(e), this.loaderService.start("Adjusting size ...", !0), this.customEventManager.dispatch(E(T.Zoom)));
+	}
+	zoomOutView() {
+		this.toolbarView.getCurrentZoomIndex() > 0 && this.setZoom(this.toolbarView.getCurrentZoomIndex() - 1);
+	}
+	zoomInView() {
+		this.toolbarView.getCurrentZoomIndex() < this.zoomLevels.length - 1 && this.setZoom(this.toolbarView.getCurrentZoomIndex() + 1);
+	}
+	play() {
+		this.midiPlayer && this.midiPlayer.play();
+	}
+	pause() {
+		this.midiPlayer && this.midiPlayer.isPlaying() && this.midiPlayer.pause();
+	}
+	stop() {
+		this.midiPlayer && this.midiPlayer.stop();
+	}
+	prevPage(e) {
+		this.goToPreviousPage();
+	}
+	nextPage(e) {
+		this.goToNextPage();
+	}
 	zoomOut(e) {
-		this.toolbarView.getCurrentZoomIndex() > 0 && (this.toolbarView.setCurrentZoomIndex(this.toolbarView.getCurrentZoomIndex() - 1), this.loaderService.start("Adjusting size ...", !0), this.customEventManager.dispatch(E(T.Zoom)));
+		this.zoomOutView();
 	}
 	zoomIn(e) {
-		this.toolbarView.getCurrentZoomIndex() < this.zoomLevels.length - 1 && (this.toolbarView.setCurrentZoomIndex(this.toolbarView.getCurrentZoomIndex() + 1), this.loaderService.start("Adjusting size ...", !0), this.customEventManager.dispatch(E(T.Zoom)));
+		this.zoomInView();
 	}
 	login(e) {
 		location.href = `https://github.com/login/oauth/authorize?client_id=${this.clientId}&redirect_uri=${this.host}/oauth/redirect&scope=public_repo%20read:org`;
@@ -3932,6 +3965,10 @@ var K = class extends D {
 		}, r.readAsText(n);
 	}
 	async fileExport(e) {
+		if (this.options.useCustomDialogs) {
+			let e = new CustomEvent("onExportRequest", { cancelable: !0 });
+			if (this.eventTarget.dispatchEvent(e), e.defaultPrevented) return;
+		}
 		let t = new q(this.dialogDiv, this, "Select MEI export parameters");
 		await t.show() !== 0 && (this.loaderService.start("Generating MEI file ..."), this.fileService.generateMEI(t.getExportOptions(), this.output));
 	}
@@ -3942,6 +3979,10 @@ var K = class extends D {
 		this.loaderService.start("Generating MIDI file ..."), this.fileService.generateMIDI(this.output);
 	}
 	async fileCopyToClipboard(e) {
+		if (this.options.useCustomDialogs) {
+			let e = new CustomEvent("onExportRequest", { cancelable: !0 });
+			if (this.eventTarget.dispatchEvent(e), e.defaultPrevented) return;
+		}
 		let t = new q(this.dialogDiv, this, "Select MEI export parameters");
 		if (await t.show() === 0) return;
 		let n = await this.verovio.getMEI(t.getExportOptions());
@@ -3952,6 +3993,10 @@ var K = class extends D {
 		this.fileService.loadData(n.data, n.filename);
 	}
 	async fileSelection(e) {
+		if (this.options.useCustomDialogs) {
+			let e = new CustomEvent("onSelectionRequest", { cancelable: !0 });
+			if (this.eventTarget.dispatchEvent(e), e.defaultPrevented) return;
+		}
 		let t = new we(this.dialogDiv, this, "Apply a selection to the file currently loaded", {
 			okLabel: "Apply",
 			icon: "info",
@@ -3964,13 +4009,31 @@ var K = class extends D {
 		})));
 	}
 	async githubImport(e) {
+		if (!this.githubManager) return;
+		if (this.options.useCustomDialogs) {
+			let e = new CustomEvent("onGithubImportRequest", { cancelable: !0 });
+			if (this.eventTarget.dispatchEvent(e), e.defaultPrevented) return;
+		}
 		let t = new J(this.dialogDiv, this, "Import an MEI file from GitHub", {}, this.githubManager);
 		await t.show() === 1 && this.fileService.loadData(t.getData(), t.getFilename());
 	}
 	async githubExport(e) {
-		await new Ce(this.dialogDiv, this, "Export an MEI file to GitHub", {}, this.githubManager).show();
+		if (this.githubManager) {
+			if (this.options.useCustomDialogs) {
+				let e = new CustomEvent("onGithubExportRequest", { cancelable: !0 });
+				if (this.eventTarget.dispatchEvent(e), e.defaultPrevented) return;
+			}
+			await new Ce(this.dialogDiv, this, "Export an MEI file to GitHub", {}, this.githubManager).show();
+		}
 	}
 	async settingsEditor(e) {
+		if (this.options.useCustomDialogs) {
+			let e = new CustomEvent("onSettingsRequest", {
+				cancelable: !0,
+				detail: { type: "editor" }
+			});
+			if (this.eventTarget.dispatchEvent(e), e.defaultPrevented) return;
+		}
 		let t = new Te(this.dialogDiv, this, "Editor options", {
 			okLabel: "Apply",
 			icon: "info",
@@ -3986,6 +4049,13 @@ var K = class extends D {
 		}
 	}
 	async settingsVerovio(e) {
+		if (this.options.useCustomDialogs) {
+			let e = new CustomEvent("onSettingsRequest", {
+				cancelable: !0,
+				detail: { type: "verovio" }
+			});
+			if (this.eventTarget.dispatchEvent(e), e.defaultPrevented) return;
+		}
 		let t = new De(this.dialogDiv, this, "Verovio options", {
 			okLabel: "Apply",
 			icon: "info",

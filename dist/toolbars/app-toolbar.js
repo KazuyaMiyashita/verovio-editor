@@ -352,11 +352,16 @@ export class AppToolbar extends Toolbar {
         this.updateToolbarSubmenuBtn(this.viewResponsive, isResponsive);
         this.updateToolbarSubmenuBtn(this.viewEditor, isEditor);
         this.updateToolbarSubmenuBtn(this.fileSelection, hasSelection);
-        if (this.app.githubManager.isLoggedIn()) {
-            this.githubMenu.style.display = "block";
-            this.updateToolbarBtnDisplay(this.logout, true);
-            this.login.setAttribute("data-before", this.app.githubManager.getName());
-            this.login.classList.add("inactivated");
+        if (this.app.githubManager) {
+            if (this.app.githubManager.isLoggedIn()) {
+                this.githubMenu.style.display = "block";
+                this.updateToolbarBtnDisplay(this.logout, true);
+                this.login.setAttribute("data-before", this.app.githubManager.getName());
+                this.login.classList.add("inactivated");
+            }
+        }
+        else {
+            this.loginGroup.style.display = "none";
         }
         this.updateRecent();
     }
