@@ -86,7 +86,7 @@ export declare class App {
     constructor(div: HTMLDivElement, options?: App.Options);
     getView(): GenericView;
     getToolbarView(): VerovioView;
-    getMidiPlayer(): MidiPlayer;
+    getMidiPlayer(): MidiPlayer | null;
     getPageCount(): number;
     setPageCount(pageCount: number): void;
     getCurrentZoomIndex(): number;
@@ -150,6 +150,10 @@ export declare namespace App {
         enableEditor: boolean;
         enableResponsive: boolean;
         enableStatusbar: boolean;
+        enableToolbar: boolean;
+        enableMidiToolbar: boolean;
+        enableContextMenu: boolean;
+        enableFilter: boolean;
         enableValidation: boolean;
         github: GitHubManager.Options;
         responsiveZoom: number;
@@ -582,8 +586,9 @@ declare class MidiPlayer {
     private progressBarTimer;
     private expansionMap;
     private readonly midiPlayerElement;
-    private readonly midiToolbar;
-    constructor(midiToolbar: MidiToolbar);
+    private readonly midiUI;
+    private readonly customEventManager;
+    constructor(container: HTMLElement, midiUI?: MidiUI, customEventManager?: CustomEventManager);
     isPlaying(): boolean;
     isPausing(): boolean;
     getCurrentTime(): number;
@@ -606,34 +611,9 @@ declare class MidiPlayer {
     onStop(e: CustomEvent): void;
 }
 
-declare class MidiToolbar extends Toolbar {
-    private midiPlayer;
-    private pageDragStart;
-    private barDragStart;
-    private barWidth;
-    private readonly midiControls;
-    private readonly play;
-    private readonly pause;
-    private readonly stop;
-    private readonly progressControl;
-    private readonly midiCurrentTime;
-    private readonly midiBar;
-    private readonly midiBarPercent;
-    private readonly midiTotalTime;
-    constructor(div: HTMLDivElement, app: App);
-    setMidiPlayer(midiPlayer: MidiPlayer): void;
-    updateProgressBar(): void;
-    private updateDragging;
-    private updateAll;
-    onPlay(e: MouseEvent): void;
-    onPause(e: MouseEvent): void;
-    onStop(e: MouseEvent): void;
-    onProgressBarDown(e: MouseEvent): void;
-    onProgressBarMove(e: MouseEvent): void;
-    onProgressBarUp(e: MouseEvent): void;
-    onActivate(e: CustomEvent): boolean;
-    onEditData(e: CustomEvent): boolean;
-    onEndLoading(e: CustomEvent): boolean;
+declare interface MidiUI {
+    setMidiPlayer(player: MidiPlayer): void;
+    update(player: MidiPlayer): void;
 }
 
 /**

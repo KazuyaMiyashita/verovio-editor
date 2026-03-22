@@ -61,7 +61,10 @@ export class ResponsiveView extends VerovioView {
     this.app.verovioOptions.pageWidth =
       this.svgWrapper.clientWidth * (100 / this.app.verovioOptions.scale);
     this.app.verovioOptions.justifyVertically = false;
-    this.app.getMidiPlayer().setView(this);
+    const midiPlayer = this.app.getMidiPlayer();
+    if (midiPlayer) {
+      midiPlayer.setView(this);
+    }
 
     this.midiIds = [];
 
@@ -136,12 +139,11 @@ export class ResponsiveView extends VerovioView {
       vrvTime,
     )) as VerovioView.ElementsAtTime;
 
-    if (
-      this.app.getMidiPlayer().getExpansionMap() &&
-      !this.app.getMidiPlayer().getExpansionMap().empty
-    ) {
+    const midiPlayer = this.app.getMidiPlayer();
+    if (midiPlayer && midiPlayer.getExpansionMap()) {
+      const expansionMap = midiPlayer.getExpansionMap();
       const toBaseId = (id: string): string => {
-        const expansion = this.app.getMidiPlayer().getExpansionMap()[id];
+        const expansion = expansionMap[id];
         return expansion && expansion.length > 0 ? expansion[0] : id;
       };
 

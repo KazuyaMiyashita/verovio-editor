@@ -159,6 +159,10 @@ export class App {
         enableEditor: true,
         enableResponsive: true,
         enableStatusbar: true,
+        enableToolbar: true,
+        enableMidiToolbar: true,
+        enableContextMenu: true,
+        enableFilter: true,
         enableValidation: true,
         showDevFeatures: false,
 
@@ -249,8 +253,10 @@ export class App {
 
     this.toolbarObj = null;
 
-    // Create and load the SVG filter
-    this.createFilter();
+    if (this.options.enableFilter) {
+      // Create and load the SVG filter
+      this.createFilter();
+    }
 
     // Create input for reading files
     this.input = appendInputTo(this.div, {
@@ -284,6 +290,9 @@ export class App {
 
     // Create a toolbar div
     this.toolbar = appendDivTo(this.wrapper, { class: `vrv-toolbar` });
+    if (!this.options.enableToolbar && !this.options.enableMidiToolbar) {
+      this.toolbar.style.display = "none";
+    }
 
     // Views
     this.views = appendDivTo(this.wrapper, { class: `vrv-views` });
@@ -295,6 +304,7 @@ export class App {
     // Status bar
     this.statusbar = appendDivTo(this.wrapper, { class: `vrv-statusbar` });
     if (!this.options.enableStatusbar) {
+      this.statusbar.style.display = "none";
       this.statusbar.style.minHeight = "0px";
     }
 
@@ -398,7 +408,7 @@ export class App {
     return this.toolbarView;
   }
 
-  public getMidiPlayer(): MidiPlayer {
+  public getMidiPlayer(): MidiPlayer | null {
     return this.midiPlayer;
   }
 
@@ -528,25 +538,38 @@ export class App {
   }
 
   private createToolbar(): void {
-    this.toolbarObj = new AppToolbar(this.toolbar, this);
-    this.customEventManager.addToPropagationList(
-      this.toolbarObj.customEventManager,
-    );
+    if (this.options.enableToolbar) {
+      this.toolbarObj = new AppToolbar(this.toolbar, this);
+      this.customEventManager.addToPropagationList(
+        this.toolbarObj.customEventManager,
+      );
+    }
 
-    this.midiToolbarObj = new MidiToolbar(this.toolbar, this);
-    this.midiPlayer = new MidiPlayer(this.midiToolbarObj);
-    this.customEventManager.addToPropagationList(
-      this.midiToolbarObj.customEventManager,
-    );
+    if (this.options.enableMidiToolbar) {
+      this.midiToolbarObj = new MidiToolbar(this.toolbar, this);
+      this.midiPlayer = new MidiPlayer(
+        this.midiToolbarObj.getDiv(),
+        this.midiToolbarObj,
+        this.customEventManager,
+      );
+      this.customEventManager.addToPropagationList(
+        this.midiToolbarObj.customEventManager,
+      );
+    } else {
+      // Create midi player without toolbar if needed?
+      // For now just skip if no toolbar
+    }
 
-    this.contextMenuObj = new ContextMenu(
-      this.contextMenu,
-      this,
-      this.contextUnderlay,
-    );
-    this.customEventManager.addToPropagationList(
-      this.contextMenuObj.customEventManager,
-    );
+    if (this.options.enableContextMenu) {
+      this.contextMenuObj = new ContextMenu(
+        this.contextMenu,
+        this,
+        this.contextUnderlay,
+      );
+      this.customEventManager.addToPropagationList(
+        this.contextMenuObj.customEventManager,
+      );
+    }
     this.div.addEventListener("contextmenu", (e) => e.preventDefault());
   }
 
@@ -578,6 +601,7 @@ export class App {
   ////////////////////////////////////////////////////////////////////////
 
   public async playMEI(): Promise<void> {
+    if (!this.midiPlayer) return;
     const expansionMap = await this.verovio.renderToExpansionMap();
     this.midiPlayer.setExpansionMap(expansionMap);
     const base64midi = await this.verovio.renderToMIDI();
@@ -934,9 +958,11 @@ export class App {
         lightEndLoading: false,
       }),
     );
-    this.toolbarObj.customEventManager.dispatch(
-      createAppEvent(AppEvent.Activate),
-    );
+    if (this.toolbarObj) {
+      this.toolbarObj.customEventManager.dispatch(
+        createAppEvent(AppEvent.Activate),
+      );
+    }
   }
 }
 
@@ -965,6 +991,10 @@ export namespace App {
     enableEditor: boolean;
     enableResponsive: boolean;
     enableStatusbar: boolean;
+    enableToolbar: boolean;
+    enableMidiToolbar: boolean;
+    enableContextMenu: boolean;
+    enableFilter: boolean;
     enableValidation: boolean;
     github: GitHubManager.Options;
     responsiveZoom: number;

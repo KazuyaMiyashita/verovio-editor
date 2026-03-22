@@ -1397,7 +1397,9 @@ var ie = class extends D {
 		this.app.loaderService.end(t);
 	}
 	async updateActivate() {
-		this.app.verovioOptions.adjustPageHeight = !0, this.app.verovioOptions.breaks = "auto", this.app.verovioOptions.footer = "none", this.app.verovioOptions.scale = this.currentScale, this.app.verovioOptions.pageHeight = this.svgWrapper.clientHeight * (100 / this.app.verovioOptions.scale), this.app.verovioOptions.pageWidth = this.svgWrapper.clientWidth * (100 / this.app.verovioOptions.scale), this.app.verovioOptions.justifyVertically = !1, this.app.getMidiPlayer().setView(this), this.midiIds = [], this.app.verovioOptions.pageHeight !== 0 && await this.verovio.setOptions(this.app.verovioOptions);
+		this.app.verovioOptions.adjustPageHeight = !0, this.app.verovioOptions.breaks = "auto", this.app.verovioOptions.footer = "none", this.app.verovioOptions.scale = this.currentScale, this.app.verovioOptions.pageHeight = this.svgWrapper.clientHeight * (100 / this.app.verovioOptions.scale), this.app.verovioOptions.pageWidth = this.svgWrapper.clientWidth * (100 / this.app.verovioOptions.scale), this.app.verovioOptions.justifyVertically = !1;
+		let e = this.app.getMidiPlayer();
+		e && e.setView(this), this.midiIds = [], this.app.verovioOptions.pageHeight !== 0 && await this.verovio.setOptions(this.app.verovioOptions);
 	}
 	async updateLoadData(e, t) {
 		t && (e = await this.verovio.getMEI({})), await this.verovio.loadData(e), this.app.setPageCount(await this.verovio.getPageCount()), await this.updateResized();
@@ -1413,13 +1415,13 @@ var ie = class extends D {
 		this.svgWrapper.innerHTML = t, e && this.app.loaderService.end(!0);
 	}
 	async midiUpdate(e) {
-		let t = e, n = await this.app.verovio.getElementsAtTime(t);
-		if (this.app.getMidiPlayer().getExpansionMap() && !this.app.getMidiPlayer().getExpansionMap().empty) {
-			let e = (e) => {
-				let t = this.app.getMidiPlayer().getExpansionMap()[e];
-				return t && t.length > 0 ? t[0] : e;
+		let t = e, n = await this.app.verovio.getElementsAtTime(t), r = this.app.getMidiPlayer();
+		if (r && r.getExpansionMap()) {
+			let e = r.getExpansionMap(), t = (t) => {
+				let n = e[t];
+				return n && n.length > 0 ? n[0] : t;
 			};
-			n.notes &&= n.notes.map((t) => e(t)), n.chords &&= n.chords.map((t) => e(t)), n.rests &&= n.rests.map((t) => e(t)), n.measure && (n.measure = e(n.measure), n.page = await this.app.verovio.getPageWithElement(n.measure));
+			n.notes &&= n.notes.map((e) => t(e)), n.chords &&= n.chords.map((e) => t(e)), n.rests &&= n.rests.map((e) => t(e)), n.measure && (n.measure = t(n.measure), n.page = await this.app.verovio.getPageWithElement(n.measure));
 		}
 		if (!(Object.keys(n).length === 0 || n.page === 0) && (n.page != this.currentPage && (this.currentPage = n.page, this.app.loaderService.start("Loading content ...", !0), this.app.customEventManager.dispatch(E(T.Page))), n.notes.length > 0 && this.midiIds != n.notes)) {
 			for (let e = 0, t = this.midiIds.length; e < t; e++) {
@@ -3091,9 +3093,10 @@ var K = class extends D {
 	progressBarTimer;
 	expansionMap;
 	midiPlayerElement;
-	midiToolbar;
-	constructor(e) {
-		this.pausing = !1, this.playing = !1, this.midiToolbar = e, this.midiToolbar.setMidiPlayer(this), this.midiPlayerElement = x(this.midiToolbar.getDiv(), {}), this.midiPlayerElement.addEventListener("load", () => this.play()), this.midiPlayerElement.addEventListener("note", () => this.onUpdateNoteTime(this.midiPlayerElement.currentTime)), this.midiPlayerElement.addEventListener("stop", (e) => this.onStop(e)), this.currentTime = 0, this.currentTimeStr = "0.00", this.totalTime = 0, this.totalTimeStr = "0.00", this.progressBarTimer = null, this.view = null, this.expansionMap = {};
+	midiUI;
+	customEventManager;
+	constructor(e, t, n) {
+		this.pausing = !1, this.playing = !1, this.midiUI = t || null, this.midiUI && this.midiUI.setMidiPlayer(this), this.customEventManager = n || null, this.midiPlayerElement = x(e, {}), this.midiPlayerElement.addEventListener("load", () => this.play()), this.midiPlayerElement.addEventListener("note", () => this.onUpdateNoteTime(this.midiPlayerElement.currentTime)), this.midiPlayerElement.addEventListener("stop", (e) => this.onStop(e)), this.currentTime = 0, this.currentTimeStr = "0.00", this.totalTime = 0, this.totalTimeStr = "0.00", this.progressBarTimer = null, this.view = null, this.expansionMap = {};
 	}
 	isPlaying() {
 		return this.playing;
@@ -3126,13 +3129,13 @@ var K = class extends D {
 		this.midiPlayerElement.setAttribute("src", e);
 	}
 	play() {
-		this.midiPlayerElement.start(), this.totalTime = this.midiPlayerElement.duration * 1e3, this.totalTimeStr = this.samplesToTime(this.totalTime), this.currentTime = this.midiPlayerElement.currentTime * 1e3, this.currentTimeStr = this.samplesToTime(this.currentTime), this.startTimer(), this.pausing = !1, this.playing = !0, this.midiToolbar.customEventManager.dispatch(E(T.EditData));
+		this.midiPlayerElement.start(), this.totalTime = this.midiPlayerElement.duration * 1e3, this.totalTimeStr = this.samplesToTime(this.totalTime), this.currentTime = this.midiPlayerElement.currentTime * 1e3, this.currentTimeStr = this.samplesToTime(this.currentTime), this.startTimer(), this.pausing = !1, this.playing = !0, this.customEventManager && this.customEventManager.dispatch(E(T.EditData)), this.midiUI && this.midiUI.update(this);
 	}
 	stop() {
-		this.currentTime = 0, this.currentTimeStr = "0.00", this.totalTime = 0, this.totalTimeStr = "0.00", this.midiPlayerElement.stop(), this.stopTimer(), this.pausing = !1, this.playing = !1, this.midiToolbar.customEventManager.dispatch(E(T.EditData)), this.view && this.view.midiStop();
+		this.currentTime = 0, this.currentTimeStr = "0.00", this.totalTime = 0, this.totalTimeStr = "0.00", this.midiPlayerElement.stop(), this.stopTimer(), this.pausing = !1, this.playing = !1, this.customEventManager && this.customEventManager.dispatch(E(T.EditData)), this.midiUI && this.midiUI.update(this), this.view && this.view.midiStop();
 	}
 	pause() {
-		this.midiPlayerElement.stop(), this.stopTimer(), this.pausing = !0, this.playing = !1, this.midiToolbar.customEventManager.dispatch(E(T.EditData)), this.view && this.view.midiStop();
+		this.midiPlayerElement.stop(), this.stopTimer(), this.pausing = !0, this.playing = !1, this.customEventManager && this.customEventManager.dispatch(E(T.EditData)), this.midiUI && this.midiUI.update(this), this.view && this.view.midiStop();
 	}
 	seekToPercent(e) {
 		if (!this.midiPlayerElement.playing) return;
@@ -3144,7 +3147,7 @@ var K = class extends D {
 		this.currentTime < t && (this.currentTime = t, this.onUpdate(this.currentTime));
 	}
 	onUpdate(e) {
-		this.currentTime = e, this.currentTimeStr = this.samplesToTime(this.currentTime), this.midiToolbar.updateProgressBar(), this.view && this.view.midiUpdate(e);
+		this.currentTime = e, this.currentTimeStr = this.samplesToTime(this.currentTime), this.midiUI && this.midiUI.update(this), this.view && this.view.midiUpdate(e);
 	}
 	startTimer() {
 		this.progressBarTimer === null && (this.progressBarTimer = setInterval(() => {
@@ -3164,7 +3167,7 @@ var K = class extends D {
 	}
 	onStop(e) {
 		let t = !!(e && e.detail && e.detail.finished);
-		this.stopTimer(), this.pausing = !1, this.playing = !1, t && (this.currentTime = this.totalTime, this.currentTimeStr = this.samplesToTime(this.currentTime)), this.midiToolbar.customEventManager.dispatch(E(T.EditData)), this.view && this.view.midiStop();
+		this.stopTimer(), this.pausing = !1, this.playing = !1, t && (this.currentTime = this.totalTime, this.currentTimeStr = this.samplesToTime(this.currentTime)), this.customEventManager && this.customEventManager.dispatch(E(T.EditData)), this.midiUI && this.midiUI.update(this), this.view && this.view.midiStop();
 	}
 }, je = class extends I {
 	midiPlayer;
@@ -3180,21 +3183,26 @@ var K = class extends D {
 	midiBar;
 	midiBarPercent;
 	midiTotalTime;
-	constructor(e, t) {
-		let n = `${t.host}/icons/toolbar/play.png`, r = `${t.host}/icons/toolbar/pause.png`, a = `${t.host}/icons/toolbar/stop.png`;
-		super(e, t), this.midiPlayer = null, this.active = !0, this.pageDragStart = 0, this.barDragStart = 0, this.barWidth = 200, this.midiControls = i(this.app.toolbarObj.getMidiPlayerSubToolbar(), { class: "vrv-btn-group" }), i(this.midiControls, { class: "vrv-h-separator" }), this.play = i(this.midiControls, {
-			class: "vrv-btn-icon-large",
-			style: { backgroundImage: `url(${n})` }
-		}), this.pause = i(this.midiControls, {
+	constructor(e, t, n) {
+		let r = `${t.host}/icons/toolbar/play.png`, a = `${t.host}/icons/toolbar/pause.png`, o = `${t.host}/icons/toolbar/stop.png`;
+		super(e, t), this.midiPlayer = null, this.active = !0, this.pageDragStart = 0, this.barDragStart = 0, this.barWidth = 200;
+		let s = n;
+		!s && this.app.toolbarObj && (s = this.app.toolbarObj.getMidiPlayerSubToolbar()), s ||= e, this.midiControls = i(s, { class: "vrv-btn-group" }), i(this.midiControls, { class: "vrv-h-separator" }), this.play = i(this.midiControls, {
 			class: "vrv-btn-icon-large",
 			style: { backgroundImage: `url(${r})` }
-		}), this.stop = i(this.midiControls, {
+		}), this.pause = i(this.midiControls, {
 			class: "vrv-btn-icon-large",
 			style: { backgroundImage: `url(${a})` }
+		}), this.stop = i(this.midiControls, {
+			class: "vrv-btn-icon-large",
+			style: { backgroundImage: `url(${o})` }
 		}), this.progressControl = i(this.midiControls, { class: "vrv-midi-progress" }), i(this.progressControl, { class: "vrv-h-separator" }), this.midiCurrentTime = i(this.progressControl, { class: "vrv-midi-current-time" }), this.midiBar = i(this.progressControl, { class: "vrv-midi-bar" }), this.midiBarPercent = i(this.midiBar, { class: "vrv-midi-bar-percent" }), this.midiTotalTime = i(this.progressControl, { class: "vrv-midi-total-time" }), this.eventManager.bind(this.play, "click", this.onPlay), this.eventManager.bind(this.pause, "click", this.onPause), this.eventManager.bind(this.stop, "click", this.onStop), this.eventManager.bind(this.midiBar, "mousedown", this.onProgressBarDown), this.eventManager.bind(this.midiBar, "mousemove", this.onProgressBarMove), this.eventManager.bind(this.midiBar, "mouseup", this.onProgressBarUp), this.updateToolbarBtnDisplay(this.pause, !1), this.updateToolbarBtnDisplay(this.stop, !1), this.updateToolbarGrp(this.progressControl, !1);
 	}
 	setMidiPlayer(e) {
 		this.midiPlayer = e;
+	}
+	update() {
+		this.updateAll();
 	}
 	updateProgressBar() {
 		this.midiTotalTime.textContent = this.midiPlayer.getTotalTimeStr(), this.midiCurrentTime.textContent = this.midiPlayer.getCurrentTimeStr();
@@ -3719,6 +3727,10 @@ var K = class extends D {
 			enableEditor: !0,
 			enableResponsive: !0,
 			enableStatusbar: !0,
+			enableToolbar: !0,
+			enableMidiToolbar: !0,
+			enableContextMenu: !0,
+			enableFilter: !0,
 			enableValidation: !0,
 			showDevFeatures: !1,
 			selection: {},
@@ -3751,10 +3763,10 @@ var K = class extends D {
 		s(document.head, {
 			href: `${this.host}/css/verovio.css`,
 			rel: "stylesheet"
-		}), this.eventManager = new O(this), this.customEventManager = new e(), this.toolbarObj = null, this.createFilter(), this.input = o(this.div, {
+		}), this.eventManager = new O(this), this.customEventManager = new e(), this.toolbarObj = null, this.options.enableFilter && this.createFilter(), this.input = o(this.div, {
 			type: "file",
 			class: "vrv-file-input"
-		}), this.input.onchange = this.fileInput.bind(this), this.output = t(this.div, { class: "vrv-file-output" }), this.fileCopy = _(this.div, { class: "vrv-file-copy" }), this.wrapper = i(this.div, { class: "vrv-wrapper" }), this.notification = i(this.wrapper, { class: "vrv-notification disabled" }), this.contextUnderlay = i(this.wrapper, { class: "vrv-context-underlay" }), this.contextMenu = i(this.wrapper, { class: "vrv-context-menu" }), this.dialogDiv = i(this.wrapper, { class: "vrv-dialog" }), this.toolbar = i(this.wrapper, { class: "vrv-toolbar" }), this.views = i(this.wrapper, { class: "vrv-views" }), this.loader = i(this.views, { class: "vrv-loading" }), this.loaderText = i(this.loader, { class: "vrv-loading-text" }), this.statusbar = i(this.wrapper, { class: "vrv-statusbar" }), this.options.enableStatusbar || (this.statusbar.style.minHeight = "0px"), this.notificationService = new Ne(this.notification), this.loaderService = new Pe(this.loader, this.loaderText, this.views, this.customEventManager), this.fileService = new Ve(this), this.verovioService = new ze({
+		}), this.input.onchange = this.fileInput.bind(this), this.output = t(this.div, { class: "vrv-file-output" }), this.fileCopy = _(this.div, { class: "vrv-file-copy" }), this.wrapper = i(this.div, { class: "vrv-wrapper" }), this.notification = i(this.wrapper, { class: "vrv-notification disabled" }), this.contextUnderlay = i(this.wrapper, { class: "vrv-context-underlay" }), this.contextMenu = i(this.wrapper, { class: "vrv-context-menu" }), this.dialogDiv = i(this.wrapper, { class: "vrv-dialog" }), this.toolbar = i(this.wrapper, { class: "vrv-toolbar" }), !this.options.enableToolbar && !this.options.enableMidiToolbar && (this.toolbar.style.display = "none"), this.views = i(this.wrapper, { class: "vrv-views" }), this.loader = i(this.views, { class: "vrv-loading" }), this.loaderText = i(this.loader, { class: "vrv-loading-text" }), this.statusbar = i(this.wrapper, { class: "vrv-statusbar" }), this.options.enableStatusbar || (this.statusbar.style.display = "none", this.statusbar.style.minHeight = "0px"), this.notificationService = new Ne(this.notification), this.loaderService = new Pe(this.loader, this.loaderText, this.views, this.customEventManager), this.fileService = new Ve(this), this.verovioService = new ze({
 			verovioVersion: this.options.verovioVersion,
 			verovioUrl: this.options.verovioUrl,
 			validatorUrl: this.options.validatorUrl,
@@ -3833,7 +3845,7 @@ var K = class extends D {
 		this.loaderService.end(), this.view.customEventManager.dispatch(E(T.Activate));
 	}
 	createToolbar() {
-		this.toolbarObj = new xe(this.toolbar, this), this.customEventManager.addToPropagationList(this.toolbarObj.customEventManager), this.midiToolbarObj = new je(this.toolbar, this), this.midiPlayer = new Ae(this.midiToolbarObj), this.customEventManager.addToPropagationList(this.midiToolbarObj.customEventManager), this.contextMenuObj = new Me(this.contextMenu, this, this.contextUnderlay), this.customEventManager.addToPropagationList(this.contextMenuObj.customEventManager), this.div.addEventListener("contextmenu", (e) => e.preventDefault());
+		this.options.enableToolbar && (this.toolbarObj = new xe(this.toolbar, this), this.customEventManager.addToPropagationList(this.toolbarObj.customEventManager)), this.options.enableMidiToolbar && (this.midiToolbarObj = new je(this.toolbar, this), this.midiPlayer = new Ae(this.midiToolbarObj.getDiv(), this.midiToolbarObj, this.customEventManager), this.customEventManager.addToPropagationList(this.midiToolbarObj.customEventManager)), this.options.enableContextMenu && (this.contextMenuObj = new Me(this.contextMenu, this, this.contextUnderlay), this.customEventManager.addToPropagationList(this.contextMenuObj.customEventManager)), this.div.addEventListener("contextmenu", (e) => e.preventDefault());
 	}
 	createStatusbar() {
 		this.options.enableStatusbar && (this.statusbarObj = new ee(this.statusbar, this), this.customEventManager.addToPropagationList(this.statusbarObj.customEventManager), this.statusbarObj.setVerovioVersion(this.verovioRuntimeVersion));
@@ -3846,6 +3858,7 @@ var K = class extends D {
 		}, t.open("GET", `${this.host}${We}`, !0), t.send();
 	}
 	async playMEI() {
+		if (!this.midiPlayer) return;
 		let e = await this.verovio.renderToExpansionMap();
 		this.midiPlayer.setExpansionMap(e);
 		let t = "data:audio/midi;base64," + await this.verovio.renderToMIDI();
@@ -3983,7 +3996,7 @@ var K = class extends D {
 			caller: this.view,
 			reload: !0,
 			lightEndLoading: !1
-		})), this.toolbarObj.customEventManager.dispatch(E(T.Activate));
+		})), this.toolbarObj && this.toolbarObj.customEventManager.dispatch(E(T.Activate));
 	}
 };
 (function(e) {

@@ -17,7 +17,7 @@ export class MidiToolbar extends Toolbar {
     midiBar;
     midiBarPercent;
     midiTotalTime;
-    constructor(div, app) {
+    constructor(div, app, container) {
         let iconsPlay = `${app.host}/icons/toolbar/play.png`;
         let iconsPause = `${app.host}/icons/toolbar/pause.png`;
         let iconsStop = `${app.host}/icons/toolbar/stop.png`;
@@ -29,7 +29,16 @@ export class MidiToolbar extends Toolbar {
         // set in the css in .vrv-midi-bar via $midi-bar-width
         this.barWidth = 200;
         // sub-toolbar in application
-        this.midiControls = appendDivTo(this.app.toolbarObj.getMidiPlayerSubToolbar(), { class: `vrv-btn-group` });
+        let actualContainer = container;
+        if (!actualContainer && this.app.toolbarObj) {
+            actualContainer = this.app.toolbarObj.getMidiPlayerSubToolbar();
+        }
+        if (!actualContainer) {
+            actualContainer = div;
+        }
+        this.midiControls = appendDivTo(actualContainer, {
+            class: `vrv-btn-group`,
+        });
         appendDivTo(this.midiControls, { class: `vrv-h-separator` });
         this.play = appendDivTo(this.midiControls, {
             class: `vrv-btn-icon-large`,
@@ -74,6 +83,9 @@ export class MidiToolbar extends Toolbar {
     ////////////////////////////////////////////////////////////////////////
     setMidiPlayer(midiPlayer) {
         this.midiPlayer = midiPlayer;
+    }
+    update() {
+        this.updateAll();
     }
     ////////////////////////////////////////////////////////////////////////
     // Class specific methods

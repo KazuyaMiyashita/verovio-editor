@@ -115,6 +115,10 @@ export class App {
             enableEditor: true,
             enableResponsive: true,
             enableStatusbar: true,
+            enableToolbar: true,
+            enableMidiToolbar: true,
+            enableContextMenu: true,
+            enableFilter: true,
             enableValidation: true,
             showDevFeatures: false,
             // Selection is empty by default
@@ -184,8 +188,10 @@ export class App {
         this.eventManager = new EventManager(this);
         this.customEventManager = new CustomEventManager();
         this.toolbarObj = null;
-        // Create and load the SVG filter
-        this.createFilter();
+        if (this.options.enableFilter) {
+            // Create and load the SVG filter
+            this.createFilter();
+        }
         // Create input for reading files
         this.input = appendInputTo(this.div, {
             type: `file`,
@@ -211,6 +217,9 @@ export class App {
         this.dialogDiv = appendDivTo(this.wrapper, { class: `vrv-dialog` });
         // Create a toolbar div
         this.toolbar = appendDivTo(this.wrapper, { class: `vrv-toolbar` });
+        if (!this.options.enableToolbar && !this.options.enableMidiToolbar) {
+            this.toolbar.style.display = "none";
+        }
         // Views
         this.views = appendDivTo(this.wrapper, { class: `vrv-views` });
         // Loader
@@ -219,6 +228,7 @@ export class App {
         // Status bar
         this.statusbar = appendDivTo(this.wrapper, { class: `vrv-statusbar` });
         if (!this.options.enableStatusbar) {
+            this.statusbar.style.display = "none";
             this.statusbar.style.minHeight = "0px";
         }
         this.notificationService = new NotificationService(this.notification);
@@ -390,13 +400,23 @@ export class App {
         this.view.customEventManager.dispatch(createAppEvent(AppEvent.Activate));
     }
     createToolbar() {
-        this.toolbarObj = new AppToolbar(this.toolbar, this);
-        this.customEventManager.addToPropagationList(this.toolbarObj.customEventManager);
-        this.midiToolbarObj = new MidiToolbar(this.toolbar, this);
-        this.midiPlayer = new MidiPlayer(this.midiToolbarObj);
-        this.customEventManager.addToPropagationList(this.midiToolbarObj.customEventManager);
-        this.contextMenuObj = new ContextMenu(this.contextMenu, this, this.contextUnderlay);
-        this.customEventManager.addToPropagationList(this.contextMenuObj.customEventManager);
+        if (this.options.enableToolbar) {
+            this.toolbarObj = new AppToolbar(this.toolbar, this);
+            this.customEventManager.addToPropagationList(this.toolbarObj.customEventManager);
+        }
+        if (this.options.enableMidiToolbar) {
+            this.midiToolbarObj = new MidiToolbar(this.toolbar, this);
+            this.midiPlayer = new MidiPlayer(this.midiToolbarObj.getDiv(), this.midiToolbarObj, this.customEventManager);
+            this.customEventManager.addToPropagationList(this.midiToolbarObj.customEventManager);
+        }
+        else {
+            // Create midi player without toolbar if needed?
+            // For now just skip if no toolbar
+        }
+        if (this.options.enableContextMenu) {
+            this.contextMenuObj = new ContextMenu(this.contextMenu, this, this.contextUnderlay);
+            this.customEventManager.addToPropagationList(this.contextMenuObj.customEventManager);
+        }
         this.div.addEventListener("contextmenu", (e) => e.preventDefault());
     }
     createStatusbar() {
@@ -421,6 +441,8 @@ export class App {
     // Async worker methods
     ////////////////////////////////////////////////////////////////////////
     async playMEI() {
+        if (!this.midiPlayer)
+            return;
         const expansionMap = await this.verovio.renderToExpansionMap();
         this.midiPlayer.setExpansionMap(expansionMap);
         const base64midi = await this.verovio.renderToMIDI();
@@ -690,7 +712,9 @@ export class App {
             reload: true,
             lightEndLoading: false,
         }));
-        this.toolbarObj.customEventManager.dispatch(createAppEvent(AppEvent.Activate));
+        if (this.toolbarObj) {
+            this.toolbarObj.customEventManager.dispatch(createAppEvent(AppEvent.Activate));
+        }
     }
 }
 ////////////////////////////////////////////////////////////////////////

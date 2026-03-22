@@ -3,12 +3,12 @@
  */
 
 import { App } from "../app.js";
-import { MidiPlayer } from "../midi/midi-player.js";
+import { MidiPlayer, MidiUI } from "../midi/midi-player.js";
 import { Toolbar } from "./toolbar.js";
 
 import { appendDivTo } from "../utils/functions.js";
 
-export class MidiToolbar extends Toolbar {
+export class MidiToolbar extends Toolbar implements MidiUI {
   private midiPlayer: MidiPlayer;
 
   private pageDragStart: number;
@@ -25,7 +25,7 @@ export class MidiToolbar extends Toolbar {
   private readonly midiBarPercent: HTMLDivElement;
   private readonly midiTotalTime: HTMLDivElement;
 
-  constructor(div: HTMLDivElement, app: App) {
+  constructor(div: HTMLDivElement, app: App, container?: HTMLDivElement) {
     let iconsPlay = `${app.host}/icons/toolbar/play.png`;
     let iconsPause = `${app.host}/icons/toolbar/pause.png`;
     let iconsStop = `${app.host}/icons/toolbar/stop.png`;
@@ -42,10 +42,17 @@ export class MidiToolbar extends Toolbar {
     this.barWidth = 200;
 
     // sub-toolbar in application
-    this.midiControls = appendDivTo(
-      this.app.toolbarObj.getMidiPlayerSubToolbar(),
-      { class: `vrv-btn-group` },
-    );
+    let actualContainer = container;
+    if (!actualContainer && this.app.toolbarObj) {
+      actualContainer = this.app.toolbarObj.getMidiPlayerSubToolbar();
+    }
+    if (!actualContainer) {
+      actualContainer = div;
+    }
+
+    this.midiControls = appendDivTo(actualContainer, {
+      class: `vrv-btn-group`,
+    });
     appendDivTo(this.midiControls, { class: `vrv-h-separator` });
 
     this.play = appendDivTo(this.midiControls, {
@@ -99,6 +106,10 @@ export class MidiToolbar extends Toolbar {
 
   public setMidiPlayer(midiPlayer: MidiPlayer): void {
     this.midiPlayer = midiPlayer;
+  }
+
+  public update(): void {
+    this.updateAll();
   }
 
   ////////////////////////////////////////////////////////////////////////
