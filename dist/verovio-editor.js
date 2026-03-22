@@ -217,13 +217,13 @@ var ne = class {
 		this.loader = e, this.loaderText = t, this.views = n, this.customEventManager = r, this.loadingCount = 0;
 	}
 	start(e, t = !1) {
-		t ? this.views.style.pointerEvents = "none" : (this.views.style.overflow = "hidden", this.loader.style.display = "flex", this.loadingCount++), this.loaderText.textContent = e, this.customEventManager.dispatch(j(A.StartLoading, {
+		console.debug(`[LoaderService] start: ${e} (light=${t}), count=${this.loadingCount}`), t ? this.views.style.pointerEvents = "none" : (this.views.style.overflow = "hidden", this.loader.style.display = "flex", this.loadingCount++), this.loaderText.textContent = e, this.customEventManager.dispatch(j(A.StartLoading, {
 			light: t,
 			msg: e
 		}));
 	}
 	end(e = !1) {
-		e || (this.loadingCount--, this.loadingCount < 0 && (console.error("endLoading index corrupted"), this.loadingCount = 0)), !(this.loadingCount > 0) && (this.views.style.overflow = "scroll", this.loader.style.display = "none", this.views.style.pointerEvents = "", this.views.style.opacity = "", this.customEventManager.dispatch(j(A.EndLoading)));
+		console.debug(`[LoaderService] end: (light=${e}), count=${this.loadingCount}`), e || (this.loadingCount--, this.loadingCount < 0 && (console.error("endLoading index corrupted"), this.loadingCount = 0)), !(this.loadingCount > 0) && (this.views.style.overflow = "scroll", this.loader.style.display = "none", this.views.style.pointerEvents = "", this.views.style.opacity = "", this.customEventManager.dispatch(j(A.EndLoading)));
 	}
 	getCount() {
 		return this.loadingCount;
@@ -3387,7 +3387,9 @@ var je = class extends V {
 	init() {
 		if (this.app.options.enableToolbar !== !1) {
 			let e = this.app.toolbarElement;
-			e && (this.toolbarObj = new Ne(e, this.app), this.app.customEventManager.addToPropagationList(this.toolbarObj.customEventManager), this.app.registerService("toolbar", this.toolbarObj), this.toolbarObj.onActivate(null), this.toolbarObj.updateAll(), this.renderContributions());
+			e && (this.toolbarObj = new Ne(e, this.app), this.app.customEventManager.addToPropagationList(this.toolbarObj.customEventManager), this.app.registerService("toolbar", this.toolbarObj), this.toolbarObj.onActivate(null), this.toolbarObj.updateAll(), this.renderContributions(), this.app.ready.then(() => {
+				this.app.loaderService.getCount() === 0 && this.toolbarObj.onEndLoading(j(A.EndLoading));
+			}));
 		}
 	}
 	renderContributions() {
@@ -3964,7 +3966,9 @@ var je = class extends V {
 	init() {
 		if (this.app.options.enableStatusbar !== !1) {
 			let e = this.app.statusbarElement;
-			e && (this.statusbarObj = new Be(e, this.app), this.app.customEventManager.addToPropagationList(this.statusbarObj.customEventManager), this.statusbarObj.setVerovioVersion(this.app.getRuntimeVersion()));
+			e && (this.statusbarObj = new Be(e, this.app), this.app.customEventManager.addToPropagationList(this.statusbarObj.customEventManager), this.statusbarObj.setVerovioVersion(this.app.getRuntimeVersion()), this.app.ready.then(() => {
+				this.app.loaderService.getCount() === 0 && this.statusbarObj.onEndLoading(j(A.EndLoading));
+			}));
 		}
 	}
 }, He = class extends V {

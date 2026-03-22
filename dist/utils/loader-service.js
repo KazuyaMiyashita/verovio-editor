@@ -16,6 +16,7 @@ export class LoaderService {
         this.loadingCount = 0;
     }
     start(msg, light = false) {
+        console.debug(`[LoaderService] start: ${msg} (light=${light}), count=${this.loadingCount}`);
         if (light) {
             this.views.style.pointerEvents = "none";
         }
@@ -31,6 +32,7 @@ export class LoaderService {
         }));
     }
     end(light = false) {
+        console.debug(`[LoaderService] end: (light=${light}), count=${this.loadingCount}`);
         if (!light) {
             this.loadingCount--;
             if (this.loadingCount < 0) {

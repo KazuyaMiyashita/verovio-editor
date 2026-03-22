@@ -1,4 +1,5 @@
 import { App } from "../app.js";
+import { AppEvent, createAppEvent } from "../events/event-types.js";
 import { EditorPlugin } from "./plugin.js";
 import { AppToolbar } from "../toolbars/app-toolbar.js";
 import { appendDivTo } from "../utils/functions.js";
@@ -40,6 +41,13 @@ export class StandardToolbarPlugin implements EditorPlugin {
         this.toolbarObj.updateAll();
         
         this.renderContributions();
+
+        // Pull state once the app is fully ready
+        this.app.ready.then(() => {
+          if (this.app.loaderService.getCount() === 0) {
+            this.toolbarObj.onEndLoading(createAppEvent(AppEvent.EndLoading) as any);
+          }
+        });
       }
     }
   }
