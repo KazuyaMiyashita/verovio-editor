@@ -88,6 +88,8 @@ export class App {
     appReset = false;
     verovioRuntimeVersion = "";
     resizeTimer;
+    resolveReady;
+    ready;
     clientId;
     div;
     constructor(div, options) {
@@ -103,6 +105,9 @@ export class App {
                     ? `http://${window.location.host}`
                     : "https://editor.verovio.org");
         this.id = this.clientId;
+        this.ready = new Promise((resolve) => {
+            this.resolveReady = resolve;
+        });
         this.options = Object.assign({
             version: version,
             verovioVersion: "latest",
@@ -377,9 +382,10 @@ export class App {
         }
         this.appIsLoaded = true;
         this.loaderService.end();
-        if (this.fileService.getInputData()) {
+        if (this.view && this.fileService.getInputData()) {
             this.fileService.loadMEI(false);
         }
+        this.resolveReady();
     }
     createViews() {
         this.view = null;
@@ -750,7 +756,13 @@ export class App {
         this.viewsRegistry.set(id, view);
         if (this.options.defaultView === id || !this.view) {
             this.view = view;
-            this.toolbarView = view; // Default, might be overridden by plugins
+            this.toolbarView = view.editorViewObj || view;
+            // Activate the view
+            this.view.onActivate(null);
+            // If app is already loaded, load data to this new view
+            if (this.appIsLoaded && this.fileService.getInputData()) {
+                this.fileService.loadMEI(false);
+            }
         }
     }
     setViewByName(id) {

@@ -5,9 +5,7 @@
  */
 
 import { App } from "../app.js";
-import { DocumentView } from "../document/document-view.js";
-import { EditorPanel } from "../editor/editor-panel.js";
-import { ResponsiveView } from "../verovio/responsive-view.js";
+import { AppEvent, createAppEvent } from "../events/event-types.js";
 import { Toolbar } from "./toolbar.js";
 
 import { appendDivTo } from "../utils/functions.js";
@@ -438,31 +436,36 @@ export class AppToolbar extends Toolbar {
   }
 
   private updateAll(): void {
+    const toolbarView = this.app.getToolbarView();
+    if (!toolbarView) return;
+
     this.updateToolbarBtnEnabled(
       this.prevPage,
-      this.app.getToolbarView().getCurrentPage() > 1,
+      toolbarView.getCurrentPage() > 1,
     );
     this.updateToolbarBtnEnabled(
       this.nextPage,
-      this.app.getToolbarView().getCurrentPage() < this.app.getPageCount(),
+      toolbarView.getCurrentPage() < this.app.getPageCount(),
     );
     this.updateToolbarBtnEnabled(
       this.zoomOut,
       this.app.getPageCount() > 0 &&
-        this.app.getToolbarView().getCurrentZoomIndex() > 0,
+        toolbarView.getCurrentZoomIndex() > 0,
     );
     this.updateToolbarBtnEnabled(
       this.zoomIn,
       this.app.getPageCount() > 0 &&
-        this.app.getToolbarView().getCurrentZoomIndex() <
-          this.app.zoomLevels.length - 1,
+        toolbarView.getCurrentZoomIndex() < this.app.zoomLevels.length - 1,
     );
 
-    let isResponsive =
-      this.app.getView() instanceof ResponsiveView &&
-      !(this.app.getView() instanceof EditorPanel);
-    let isEditor = this.app.getView() instanceof EditorPanel;
-    let isDocument = this.app.getView() instanceof DocumentView;
+    const activeView = this.app.getView();
+    if (!activeView) return;
+
+    // Use ID-based checks instead of instanceof to avoid circular dependencies
+    const activeViewId = (activeView as any).id;
+    let isResponsive = activeViewId === "responsive";
+    let isEditor = activeViewId === "editor";
+    let isDocument = activeViewId === "document";
 
     const hasSelection =
       this.app.options.selection &&

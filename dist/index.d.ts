@@ -48,6 +48,8 @@ export declare class App {
     private appReset;
     private verovioRuntimeVersion;
     private resizeTimer;
+    private resolveReady;
+    readonly ready: Promise<void>;
     private readonly clientId;
     private readonly div;
     constructor(div: HTMLDivElement, options?: App.Options);
@@ -236,6 +238,14 @@ export declare interface AppEventDetailMap {
     [AppEvent.EndLoading]: undefined;
 }
 
+export declare class ContextMenuPlugin implements EditorPlugin {
+    id: string;
+    private app;
+    private contextMenuObj;
+    install(app: App): void;
+    init(): void;
+}
+
 export declare function createAppEvent<K extends AppEvent>(type: K, detail?: AppEventDetailMap[K]): AppCustomEvent<K>;
 
 declare class CustomEventManager {
@@ -248,10 +258,18 @@ declare class CustomEventManager {
     dispatch(event: Event): void;
 }
 
+export declare class DocumentViewPlugin implements EditorPlugin {
+    id: string;
+    private app;
+    private viewObj;
+    install(app: App): void;
+    init(): void;
+}
+
 /**
  * EditorPlugin is the standard interface for all Verovio Editor extensions.
  */
-declare interface EditorPlugin {
+export declare interface EditorPlugin {
     id: string;
     /**
      * Phase 1: Install
@@ -400,6 +418,17 @@ declare namespace GitHubManager {
     }
 }
 
+export declare class GitHubPlugin implements EditorPlugin {
+    private options?;
+    id: string;
+    private app;
+    private githubManager;
+    constructor(options?: GitHubManager.Options);
+    install(app: App): void;
+    import(): Promise<void>;
+    export(): Promise<void>;
+}
+
 /**
  * LoaderService for managing the loading overlay and status.
  */
@@ -460,6 +489,16 @@ declare class MidiPlayer {
     onStop(e: CustomEvent): void;
 }
 
+export declare class MidiPlayerPlugin implements EditorPlugin {
+    id: string;
+    private app;
+    private midiPlayer;
+    private midiToolbarObj;
+    install(app: App): void;
+    init(): void;
+    playMEI(): Promise<void>;
+}
+
 declare interface MidiUI {
     setMidiPlayer(player: MidiPlayer): void;
     update(player: MidiPlayer): void;
@@ -485,6 +524,13 @@ declare class NotificationService {
     private push;
 }
 
+export declare class PdfExportPlugin implements EditorPlugin {
+    id: string;
+    private app;
+    install(app: App): void;
+    init(): void;
+}
+
 declare class PDFWorkerProxy extends WorkerProxy {
     addPage: (svg: string) => Promise<void>;
     end: () => Promise<string>;
@@ -507,6 +553,14 @@ declare class ResponsiveView extends VerovioView {
     protected updateSVGDimensions(): void;
     onPage(e: CustomEvent): boolean;
     scrollListener(e: UIEvent): void;
+}
+
+export declare class ResponsiveViewPlugin implements EditorPlugin {
+    id: string;
+    private app;
+    private viewObj;
+    install(app: App): void;
+    init(): void;
 }
 
 /**
@@ -554,6 +608,23 @@ declare class RNGLoader {
     private isRng;
 }
 
+export declare class StandardToolbarPlugin implements EditorPlugin {
+    id: string;
+    private app;
+    private toolbarObj;
+    install(app: App): void;
+    init(): void;
+    private renderContributions;
+}
+
+export declare class StatusbarPlugin implements EditorPlugin {
+    id: string;
+    private app;
+    private statusbarObj;
+    install(app: App): void;
+    init(): void;
+}
+
 /**
  * The StorageProvider interface for abstraction of storage access.
  */
@@ -561,6 +632,20 @@ export declare interface StorageProvider {
     getItem(key: string): string | null;
     setItem(key: string, value: string): void;
     removeItem(key: string): void;
+}
+
+export declare interface ToolbarAction {
+    id: string;
+    label: string;
+    command: string;
+    icon?: string;
+}
+
+export declare class ValidationPlugin implements EditorPlugin {
+    id: string;
+    private app;
+    install(app: App): void;
+    init(): void;
 }
 
 declare class ValidatorWorkerProxy extends WorkerProxy {
@@ -719,6 +804,14 @@ declare class VerovioWorkerProxy extends WorkerProxy {
 declare class WorkerProxy {
     private worker;
     constructor(worker: Worker);
+}
+
+export declare class XmlEditorPlugin implements EditorPlugin {
+    id: string;
+    private app;
+    private viewObj;
+    install(app: App): void;
+    init(): void;
 }
 
 export { }

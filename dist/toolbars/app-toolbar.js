@@ -3,9 +3,6 @@
  * It uses the App.view and App.toolbarView for enabling / disabling button.
  * Events are attached to the App.eventManager
  */
-import { DocumentView } from "../document/document-view.js";
-import { EditorPanel } from "../editor/editor-panel.js";
-import { ResponsiveView } from "../verovio/responsive-view.js";
 import { Toolbar } from "./toolbar.js";
 import { appendDivTo } from "../utils/functions.js";
 export class AppToolbar extends Toolbar {
@@ -332,17 +329,23 @@ export class AppToolbar extends Toolbar {
         }
     }
     updateAll() {
-        this.updateToolbarBtnEnabled(this.prevPage, this.app.getToolbarView().getCurrentPage() > 1);
-        this.updateToolbarBtnEnabled(this.nextPage, this.app.getToolbarView().getCurrentPage() < this.app.getPageCount());
+        const toolbarView = this.app.getToolbarView();
+        if (!toolbarView)
+            return;
+        this.updateToolbarBtnEnabled(this.prevPage, toolbarView.getCurrentPage() > 1);
+        this.updateToolbarBtnEnabled(this.nextPage, toolbarView.getCurrentPage() < this.app.getPageCount());
         this.updateToolbarBtnEnabled(this.zoomOut, this.app.getPageCount() > 0 &&
-            this.app.getToolbarView().getCurrentZoomIndex() > 0);
+            toolbarView.getCurrentZoomIndex() > 0);
         this.updateToolbarBtnEnabled(this.zoomIn, this.app.getPageCount() > 0 &&
-            this.app.getToolbarView().getCurrentZoomIndex() <
-                this.app.zoomLevels.length - 1);
-        let isResponsive = this.app.getView() instanceof ResponsiveView &&
-            !(this.app.getView() instanceof EditorPanel);
-        let isEditor = this.app.getView() instanceof EditorPanel;
-        let isDocument = this.app.getView() instanceof DocumentView;
+            toolbarView.getCurrentZoomIndex() < this.app.zoomLevels.length - 1);
+        const activeView = this.app.getView();
+        if (!activeView)
+            return;
+        // Use ID-based checks instead of instanceof to avoid circular dependencies
+        const activeViewId = activeView.id;
+        let isResponsive = activeViewId === "responsive";
+        let isEditor = activeViewId === "editor";
+        let isDocument = activeViewId === "document";
         const hasSelection = this.app.options.selection &&
             Object.keys(this.app.options.selection).length !== 0;
         this.updateToolbarGrp(this.pageControls, !isDocument);

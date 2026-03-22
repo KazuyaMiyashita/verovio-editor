@@ -46,12 +46,15 @@ export class FileService {
             this.app.viewEditorObj.xmlEditorViewObj.setMode(this.inputData.length);
         }
         await this.checkSchema();
-        this.app.getView().customEventManager.dispatch(createAppEvent(AppEvent.LoadData, {
-            currentId: this.app.id,
-            caller: this.app.getView(),
-            lightEndLoading: false,
-            mei: this.inputData,
-        }));
+        const view = this.app.getView();
+        if (view) {
+            view.customEventManager.dispatch(createAppEvent(AppEvent.LoadData, {
+                currentId: this.app.id,
+                caller: view,
+                lightEndLoading: false,
+                mei: this.inputData,
+            }));
+        }
     }
     async checkSchema() {
         if (!this.app.options.enableEditor)

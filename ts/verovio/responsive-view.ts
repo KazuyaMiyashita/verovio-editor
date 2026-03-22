@@ -3,7 +3,6 @@
  */
 
 import { App } from "../app.js";
-import { EditorView } from "../editor/editor-view.js";
 import { VerovioView } from "../verovio/verovio-view.js";
 
 import { VerovioWorkerProxy } from "../utils/worker-proxy.js";
@@ -83,7 +82,8 @@ export class ResponsiveView extends VerovioView {
   }
 
   private async updateResized(): Promise<any> {
-    if (!(this instanceof EditorView)) {
+    // Check if we're not in editor mode without depending on EditorView class
+    if ((this as any).id !== "editor") {
       this.div.style.height = this.div.parentElement.style.height;
       this.div.style.width = this.div.parentElement.style.width;
     }

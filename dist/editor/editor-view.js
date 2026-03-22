@@ -40,7 +40,7 @@ export class EditorView extends ResponsiveView {
         this.lastNote = { midiPitch: 0, oct: "", pname: "" };
         // EditorAction
         this.actionManager = new ActionManager(this, app);
-        this.app.contextMenuObj.setActionManager(this.actionManager);
+        this.app.contextMenuObj?.setActionManager(this.actionManager);
         this.selectedItems = [];
     }
     ////////////////////////////////////////////////////////////////////////
@@ -325,7 +325,7 @@ export class EditorView extends ResponsiveView {
     // Event listeners
     ////////////////////////////////////////////////////////////////////////
     contextMenuListener(e) {
-        this.app.contextMenuObj.show(e);
+        this.app.contextMenuObj?.show(e);
         e.preventDefault();
     }
     keyDownListener(e) {

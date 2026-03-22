@@ -1,7 +1,6 @@
 /**
  * The ResponsiveView class implements a dynamic rendering view fitting and adjusting to the view port.
  */
-import { EditorView } from "../editor/editor-view.js";
 import { VerovioView } from "../verovio/verovio-view.js";
 import { appendDivTo } from "../utils/functions.js";
 import { AppEvent, createAppEvent } from "../events/event-types.js";
@@ -62,7 +61,8 @@ export class ResponsiveView extends VerovioView {
         await this.updateResized();
     }
     async updateResized() {
-        if (!(this instanceof EditorView)) {
+        // Check if we're not in editor mode without depending on EditorView class
+        if (this.id !== "editor") {
             this.div.style.height = this.div.parentElement.style.height;
             this.div.style.width = this.div.parentElement.style.width;
         }

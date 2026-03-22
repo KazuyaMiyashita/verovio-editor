@@ -72,8 +72,8 @@ export class EditorContentTree extends GenericTree {
         e.stopPropagation();
     }
     onContextmenu(e) {
-        this.app.contextMenuObj.buildFor("test");
-        this.app.contextMenuObj.show(e);
+        this.app.contextMenuObj?.buildFor("test");
+        this.app.contextMenuObj?.show(e);
     }
     onMouseover(e) {
         const element = e.target;

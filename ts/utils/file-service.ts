@@ -65,14 +65,17 @@ export class FileService {
 
     await this.checkSchema();
 
-    this.app.getView().customEventManager.dispatch(
-      createAppEvent(AppEvent.LoadData, {
-        currentId: this.app.id,
-        caller: this.app.getView(),
-        lightEndLoading: false,
-        mei: this.inputData,
-      }),
-    );
+    const view = this.app.getView();
+    if (view) {
+      view.customEventManager.dispatch(
+        createAppEvent(AppEvent.LoadData, {
+          currentId: this.app.id,
+          caller: view,
+          lightEndLoading: false,
+          mei: this.inputData,
+        }),
+      );
+    }
   }
 
   private async checkSchema(): Promise<void> {

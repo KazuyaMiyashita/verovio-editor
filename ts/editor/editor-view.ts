@@ -75,7 +75,7 @@ export class EditorView extends ResponsiveView {
 
     // EditorAction
     this.actionManager = new ActionManager(this, app);
-    this.app.contextMenuObj.setActionManager(this.actionManager);
+    this.app.contextMenuObj?.setActionManager(this.actionManager);
 
     this.selectedItems = [];
   }
@@ -432,7 +432,7 @@ export class EditorView extends ResponsiveView {
   ////////////////////////////////////////////////////////////////////////
 
   contextMenuListener(e: PointerEvent): void {
-    this.app.contextMenuObj.show(e);
+    this.app.contextMenuObj?.show(e);
     e.preventDefault();
   }
 

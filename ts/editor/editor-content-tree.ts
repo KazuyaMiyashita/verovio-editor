@@ -92,8 +92,8 @@ export class EditorContentTree extends GenericTree {
   }
 
   override onContextmenu(e: PointerEvent): void {
-    this.app.contextMenuObj.buildFor("test");
-    this.app.contextMenuObj.show(e);
+    this.app.contextMenuObj?.buildFor("test");
+    this.app.contextMenuObj?.show(e);
   }
 
   override onMouseover(e: MouseEvent): void {
