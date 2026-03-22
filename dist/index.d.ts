@@ -131,6 +131,8 @@ export declare class App {
 export declare namespace App {
     export interface Options {
         version: string;
+        baseUrl?: string;
+        githubClientId?: string;
         appReset?: boolean;
         isSafari?: boolean;
         viewerOnly?: boolean;
@@ -154,6 +156,11 @@ export declare namespace App {
         schema: string;
         schemaBasic: string;
         verovioVersion: string;
+        verovioUrl?: string;
+        validatorUrl?: string;
+        pdfkitUrl?: string;
+        licenseUrl?: string;
+        changelogUrl?: string;
         devFeatures: boolean;
         showDevFeatures: boolean;
     }
@@ -165,7 +172,7 @@ export declare namespace App {
         firstPage: number;
         lastPage: number;
     }
-    export function iconFor(element: string): string;
+    export function iconFor(element: string, host: string): string;
 }
 
 /**
@@ -475,7 +482,7 @@ declare class GenericView {
     readonly customEventManager: CustomEventManager;
     readonly id: string;
     protected active: boolean;
-    protected readonly app: App;
+    readonly app: App;
     protected readonly div: HTMLDivElement;
     private display;
     constructor(div: HTMLDivElement, app: App);
@@ -788,6 +795,7 @@ declare class VerovioService {
     readonly rngLoaderBasic: RNGLoader | null;
     private verovioRuntimeVersion;
     private readonly host;
+    private readonly pdfkitUrl?;
     constructor(options: VerovioServiceOptions);
     private getWorkerURL;
     init(options: VerovioServiceOptions): Promise<string>;
@@ -797,6 +805,9 @@ declare class VerovioService {
 
 declare interface VerovioServiceOptions {
     verovioVersion: string;
+    verovioUrl?: string;
+    validatorUrl?: string;
+    pdfkitUrl?: string;
     host: string;
     enableEditor: boolean;
     enableValidation: boolean;

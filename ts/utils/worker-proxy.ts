@@ -99,7 +99,6 @@ export class VerovioWorkerProxy extends WorkerProxy {
   setOptions: (options: object) => Promise<boolean>;
   getVersion: () => Promise<string>;
 
-
   onRuntimeInitialized: Function;
 
   constructor(worker: Worker) {

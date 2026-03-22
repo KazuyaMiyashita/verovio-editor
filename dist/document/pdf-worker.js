@@ -1,10 +1,6 @@
 /**
  * The Worker for PDFkit.
  */
-importScripts("https://www.verovio.org/javascript/pdfkit/pdfkit.js");
-importScripts("https://www.verovio.org/javascript/pdfkit/blobstream.js");
-importScripts("https://www.verovio.org/javascript/pdfkit/source.js");
-importScripts("https://www.verovio.org/javascript/pdfkit/Leipzig-ttf.js");
 class PDFDeferred {
     promise;
     reject;
@@ -50,6 +46,14 @@ let outStream = null;
 let docEnd = null;
 // Listen to messages send to this worker
 addEventListener("message", function (event) {
+    if (event.data.pdfkitUrl) {
+        const baseUrl = event.data.pdfkitUrl;
+        importScripts(`${baseUrl}/pdfkit.js`);
+        importScripts(`${baseUrl}/blobstream.js`);
+        importScripts(`${baseUrl}/source.js`);
+        importScripts(`${baseUrl}/Leipzig-ttf.js`);
+        return;
+    }
     // Destruct properties passed to this message event
     const { taskId, method, args } = event.data;
     // Check if verovio toolkit has passed method

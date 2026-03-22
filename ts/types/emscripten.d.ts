@@ -1,7 +1,11 @@
 declare namespace Emscripten {
   interface Module {
     onRuntimeInitialized?: () => void;
-    cwrap(ident: string, returnType: string | null, argTypes: string[]): Function;
+    cwrap(
+      ident: string,
+      returnType: string | null,
+      argTypes: string[],
+    ): Function;
   }
 }
 

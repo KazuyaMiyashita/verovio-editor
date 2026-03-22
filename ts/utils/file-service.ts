@@ -141,11 +141,11 @@ export class FileService {
     }
     return meiOutputStr;
   }
-  
+
   public setInputData(data: string) {
     this.inputData = data;
   }
-  
+
   public setFilename(filename: string) {
     this.filename = filename;
   }

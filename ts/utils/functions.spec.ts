@@ -51,11 +51,7 @@ describe("utils/functions", () => {
     });
 
     it("should set classes correctly", () => {
-      const el = appendHTMLElementTo(
-        parent,
-        { class: "test-class" },
-        "div",
-      );
+      const el = appendHTMLElementTo(parent, { class: "test-class" }, "div");
       expect(el.className).toBe("test-class");
     });
   });
@@ -71,11 +67,7 @@ describe("utils/functions", () => {
 
   describe("appendSpanTo", () => {
     it("should append a span to the parent with text", () => {
-      const span = appendSpanTo(
-        parent,
-        { class: "my-span" },
-        "Hello World",
-      );
+      const span = appendSpanTo(parent, { class: "my-span" }, "Hello World");
       expect(span.tagName.toLowerCase()).toBe("span");
       expect(span.className).toBe("my-span");
       expect(span.textContent).toBe("Hello World");

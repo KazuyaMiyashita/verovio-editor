@@ -579,4 +579,3 @@ export namespace EditorView {
     midiPitch?: number;
   }
 }
-

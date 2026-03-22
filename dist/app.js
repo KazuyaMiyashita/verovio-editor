@@ -30,9 +30,6 @@ import { LoaderService } from "./utils/loader-service.js";
 import { VerovioService } from "./verovio/verovio-service.js";
 import { FileService } from "./utils/file-service.js";
 const filter = "/svg/filter.xml";
-const host = window.location.hostname == "localhost"
-    ? `http://${window.location.host}`
-    : "https://editor.verovio.org";
 export class App {
     // public readonly members
     dialogDiv;
@@ -91,8 +88,12 @@ export class App {
     clientId;
     div;
     constructor(div, options) {
-        this.clientId = "fd81068a15354a300522";
-        this.host = host;
+        this.clientId = options?.githubClientId || "fd81068a15354a300522";
+        this.host =
+            options?.baseUrl ||
+                (window.location.hostname == "localhost"
+                    ? `http://${window.location.host}`
+                    : "https://editor.verovio.org");
         this.id = this.clientId;
         this.githubManager = new GitHubManager(this);
         this.options = Object.assign({
@@ -125,6 +126,8 @@ export class App {
             //schema: './local/mei-all.rng',
             schemaBasic: "https://music-encoding.org/schema/5.1/mei-basic.rng",
             //schemaBasic: './local/mei-basic.rng',
+            licenseUrl: "https://raw.githubusercontent.com/rism-digital/verovio-editor/refs/heads/main/LICENSE",
+            changelogUrl: "https://raw.githubusercontent.com/rism-digital/verovio-editor/refs/heads/main/CHANGELOG.md",
             defaultView: "responsive",
             isSafari: false,
         }, options);
@@ -215,6 +218,9 @@ export class App {
         this.fileService = new FileService(this);
         this.verovioService = new VerovioService({
             verovioVersion: this.options.verovioVersion,
+            verovioUrl: this.options.verovioUrl,
+            validatorUrl: this.options.validatorUrl,
+            pdfkitUrl: this.options.pdfkitUrl,
             host: this.host,
             enableEditor: this.options.enableEditor,
             enableValidation: this.options.enableValidation,
@@ -261,6 +267,9 @@ export class App {
         this.verovioService
             .init({
             verovioVersion: this.options.verovioVersion,
+            verovioUrl: this.options.verovioUrl,
+            validatorUrl: this.options.validatorUrl,
+            pdfkitUrl: this.options.pdfkitUrl,
             host: this.host,
             enableEditor: this.options.enableEditor,
             enableValidation: this.options.enableValidation,
@@ -680,7 +689,7 @@ export class App {
 // Merged namespace
 ////////////////////////////////////////////////////////////////////////
 (function (App) {
-    function iconFor(element) {
+    function iconFor(element, host) {
         const elements = [
             "accid",
             "annot",

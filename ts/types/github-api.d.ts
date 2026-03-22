@@ -21,13 +21,13 @@ declare namespace GitHubApi {
       path: string,
       content: string,
       message: string,
-      options: object
+      options: object,
     ): Promise<any>;
     listBranches(): Promise<{ data: Array<{ name: string }> }>;
     getContents(
       branch: string,
       path: string,
-      raw?: boolean
+      raw?: boolean,
     ): Promise<{ data: any }>;
   }
 

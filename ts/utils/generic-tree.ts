@@ -447,7 +447,7 @@ export class TreeNode {
       tree.eventManager.bind(this.div, "mouseover", tree.onMouseover);
       tree.eventManager.bind(this.div, "mouseout", tree.onMouseout);
       tree.eventManager.bind(this.div, "contextmenu", tree.onContextmenu);
-      this.label.style.backgroundImage = `url(${App.iconFor(this.element)})`;
+      this.label.style.backgroundImage = `url(${App.iconFor(this.element, tree.app.host)})`;
       if (tree.getFocusId() === this.id) {
         this.label.classList.add("target");
         this.label.classList.add("checked");

@@ -18,7 +18,7 @@ interface MessageEvent<T = any> extends Event {
 declare function addEventListener(
   type: string,
   listener: (event: MessageEvent) => void,
-  options?: boolean | AddEventListenerOptions
+  options?: boolean | AddEventListenerOptions,
 ): void;
 
 declare function postMessage(message: any, options?: any): void;
@@ -32,7 +32,5 @@ declare function SVGtoPDF(
   svg: string,
   x: number,
   y: number,
-  options?: object
+  options?: object,
 ): void;
-
-

@@ -16,7 +16,7 @@ export class GenericView {
 
   protected active: boolean;
 
-  protected readonly app: App;
+  public readonly app: App;
   protected readonly div: HTMLDivElement;
 
   private display: string;
@@ -49,7 +49,11 @@ export class GenericView {
     this.customEventManager.bind(this, AppEvent.Page, this.onPage);
     this.customEventManager.bind(this, AppEvent.Resized, this.onResized);
     this.customEventManager.bind(this, AppEvent.Select, this.onSelect);
-    this.customEventManager.bind(this, AppEvent.StartLoading, this.onStartLoading);
+    this.customEventManager.bind(
+      this,
+      AppEvent.StartLoading,
+      this.onStartLoading,
+    );
     this.customEventManager.bind(this, AppEvent.Zoom, this.onZoom);
   }
 

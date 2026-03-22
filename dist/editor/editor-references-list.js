@@ -26,7 +26,7 @@ export class EditorReferenceList extends GenericView {
             let item = appendDivTo(this.listWrapper, {
                 class: `vrv-reference-list-item vrv-mei-element`,
             });
-            item.style.backgroundImage = `url(${App.iconFor(reference.element)})`;
+            item.style.backgroundImage = `url(${App.iconFor(reference.element, this.app.host)})`;
             item.textContent = `${reference["element"]} @ ${reference.referenceAttribute}`;
             item.dataset.id = reference.id;
             item.dataset.element = reference.element;

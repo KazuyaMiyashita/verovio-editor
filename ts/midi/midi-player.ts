@@ -115,7 +115,9 @@ export class MidiPlayer {
 
     this.pausing = false;
     this.playing = true;
-    this.midiToolbar.customEventManager.dispatch(createAppEvent(AppEvent.EditData));
+    this.midiToolbar.customEventManager.dispatch(
+      createAppEvent(AppEvent.EditData),
+    );
   }
 
   public stop(): void {
@@ -129,7 +131,9 @@ export class MidiPlayer {
 
     this.pausing = false;
     this.playing = false;
-    this.midiToolbar.customEventManager.dispatch(createAppEvent(AppEvent.EditData));
+    this.midiToolbar.customEventManager.dispatch(
+      createAppEvent(AppEvent.EditData),
+    );
 
     if (this.view) this.view.midiStop();
   }
@@ -140,7 +144,9 @@ export class MidiPlayer {
 
     this.pausing = true;
     this.playing = false;
-    this.midiToolbar.customEventManager.dispatch(createAppEvent(AppEvent.EditData));
+    this.midiToolbar.customEventManager.dispatch(
+      createAppEvent(AppEvent.EditData),
+    );
 
     if (this.view) this.view.midiStop();
   }
@@ -217,7 +223,9 @@ export class MidiPlayer {
       this.currentTime = this.totalTime;
       this.currentTimeStr = this.samplesToTime(this.currentTime);
     }
-    this.midiToolbar.customEventManager.dispatch(createAppEvent(AppEvent.EditData));
+    this.midiToolbar.customEventManager.dispatch(
+      createAppEvent(AppEvent.EditData),
+    );
 
     if (this.view) this.view.midiStop();
   }

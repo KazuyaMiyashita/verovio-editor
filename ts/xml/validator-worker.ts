@@ -2,11 +2,6 @@
  * The Worker for XML validation.
  */
 
-importScripts(
-  "https://www.verovio.org/javascript/validator/xml-validator-2.10.3.js",
-);
-//importScripts("http://localhost:8002/xml-validator-2.10.3.js");
-
 class ValidatorDeferred {
   promise: Promise<unknown>;
   public reject!: (reason?: any) => void;
@@ -31,22 +26,44 @@ const methods: Record<string, Function | null> = {
 // Global deferred Promise that can be resolved when Module is initialized
 const isValidatorModuleReady = new ValidatorDeferred();
 
-Module.onRuntimeInitialized = function () {
-  methods.check = Module.cwrap("check", "string", ["string"]);
-  methods.setSchema = Module.cwrap("set_schema", "bool", ["string"]);
-  methods.validate = Module.cwrap("validate", "string", ["string"]);
-  methods.setRelaxNGSchema = Module.cwrap("set_relaxNG_schema", "bool", [
-    "string",
-  ]);
-  methods.validateNG = Module.cwrap("validate_NG", "string", ["string"]);
-
-  isValidatorModuleReady.resolve(null);
-};
-
 // Listen to messages send to this worker
 addEventListener(
   "message",
   function (event: MessageEvent<any>) {
+    if (event.data.validatorUrl) {
+      // Define Module before script loads if needed by Emscripten, or let the script define it.
+      // Emscripten usually does `var Module = typeof Module !== 'undefined' ? Module : {};`
+      // Wait, let's just create it to hook onRuntimeInitialized
+      if (typeof (self as any).Module === "undefined") {
+        (self as any).Module = {};
+      }
+      (self as any).Module.onRuntimeInitialized = function () {
+        methods.check = (self as any).Module.cwrap("check", "string", [
+          "string",
+        ]);
+        methods.setSchema = (self as any).Module.cwrap("set_schema", "bool", [
+          "string",
+        ]);
+        methods.validate = (self as any).Module.cwrap("validate", "string", [
+          "string",
+        ]);
+        methods.setRelaxNGSchema = (self as any).Module.cwrap(
+          "set_relaxNG_schema",
+          "bool",
+          ["string"],
+        );
+        methods.validateNG = (self as any).Module.cwrap(
+          "validate_NG",
+          "string",
+          ["string"],
+        );
+
+        isValidatorModuleReady.resolve(null);
+      };
+      importScripts(event.data.validatorUrl);
+      return;
+    }
+
     // Destruct properties passed to this message event
     const { taskId, method, args } = event.data;
 

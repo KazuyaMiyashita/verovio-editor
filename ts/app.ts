@@ -48,10 +48,6 @@ import { VerovioService } from "./verovio/verovio-service.js";
 import { FileService } from "./utils/file-service.js";
 
 const filter = "/svg/filter.xml";
-const host =
-  window.location.hostname == "localhost"
-    ? `http://${window.location.host}`
-    : "https://editor.verovio.org";
 
 declare global {
   const marked;
@@ -103,7 +99,6 @@ export class App {
   public viewEditorObj: EditorPanel;
   public viewResponsiveObj: ResponsiveView;
 
-
   private pdf: PDFWorkerProxy;
   private currentSchema: string;
 
@@ -127,8 +122,12 @@ export class App {
   private readonly div: HTMLDivElement;
 
   constructor(div: HTMLDivElement, options?: App.Options) {
-    this.clientId = "fd81068a15354a300522";
-    this.host = host;
+    this.clientId = options?.githubClientId || "fd81068a15354a300522";
+    this.host =
+      options?.baseUrl ||
+      (window.location.hostname == "localhost"
+        ? `http://${window.location.host}`
+        : "https://editor.verovio.org");
     this.id = this.clientId;
 
     this.githubManager = new GitHubManager(this);
@@ -169,6 +168,11 @@ export class App {
         //schema: './local/mei-all.rng',
         schemaBasic: "https://music-encoding.org/schema/5.1/mei-basic.rng",
         //schemaBasic: './local/mei-basic.rng',
+
+        licenseUrl:
+          "https://raw.githubusercontent.com/rism-digital/verovio-editor/refs/heads/main/LICENSE",
+        changelogUrl:
+          "https://raw.githubusercontent.com/rism-digital/verovio-editor/refs/heads/main/CHANGELOG.md",
 
         defaultView: "responsive",
 
@@ -289,6 +293,9 @@ export class App {
 
     this.verovioService = new VerovioService({
       verovioVersion: this.options.verovioVersion,
+      verovioUrl: this.options.verovioUrl,
+      validatorUrl: this.options.validatorUrl,
+      pdfkitUrl: this.options.pdfkitUrl,
       host: this.host,
       enableEditor: this.options.enableEditor,
       enableValidation: this.options.enableValidation,
@@ -346,6 +353,9 @@ export class App {
     this.verovioService
       .init({
         verovioVersion: this.options.verovioVersion,
+        verovioUrl: this.options.verovioUrl,
+        validatorUrl: this.options.validatorUrl,
+        pdfkitUrl: this.options.pdfkitUrl,
         host: this.host,
         enableEditor: this.options.enableEditor,
         enableValidation: this.options.enableValidation,
@@ -619,7 +629,10 @@ export class App {
     delete this.options["showDevFeatures"];
     window.localStorage.setItem("options", JSON.stringify(this.options));
 
-    this.fileStack.store(this.fileService.getFilename(), this.fileService.getInputData());
+    this.fileStack.store(
+      this.fileService.getFilename(),
+      this.fileService.getInputData(),
+    );
   }
 
   onResize(e: Event): void {
@@ -705,7 +718,11 @@ export class App {
     const filename = file.name;
     const convert = element.dataset.ext != "MEI" ? true : false;
     reader.onload = async function (e) {
-      readerThis.fileService.loadData(e.target.result as string, filename, convert);
+      readerThis.fileService.loadData(
+        e.target.result as string,
+        filename,
+        convert,
+      );
     };
     reader.readAsText(file);
   }
@@ -766,11 +783,13 @@ export class App {
     if (dlgRes === 1) {
       this.options.selection = dlg.getSelection();
       await this.applySelection();
-      this.customEventManager.dispatch(createAppEvent(AppEvent.LoadData, {
-        currentId: this.clientId,
-        caller: this.view,
-        reload: true,
-      }));
+      this.customEventManager.dispatch(
+        createAppEvent(AppEvent.LoadData, {
+          currentId: this.clientId,
+          caller: this.view,
+          reload: true,
+        }),
+      );
     }
   }
 
@@ -837,11 +856,13 @@ export class App {
     const dlgRes = await dlg.show();
     if (dlgRes === 1) {
       await this.verovio.setOptions(dlg.getChangedOptions());
-      this.customEventManager.dispatch(createAppEvent(AppEvent.LoadData, {
-        currentId: this.clientId,
-        caller: this.view,
-        reload: true,
-      }));
+      this.customEventManager.dispatch(
+        createAppEvent(AppEvent.LoadData, {
+          currentId: this.clientId,
+          caller: this.view,
+          reload: true,
+        }),
+      );
     }
   }
 
@@ -888,13 +909,17 @@ export class App {
 
     this.loaderService.start("Switching view ...");
     this.view.customEventManager.dispatch(createAppEvent(AppEvent.Activate));
-    this.customEventManager.dispatch(createAppEvent(AppEvent.LoadData, {
-      currentId: this.clientId,
-      caller: this.view,
-      reload: true,
-      lightEndLoading: false,
-    }));
-    this.toolbarObj.customEventManager.dispatch(createAppEvent(AppEvent.Activate));
+    this.customEventManager.dispatch(
+      createAppEvent(AppEvent.LoadData, {
+        currentId: this.clientId,
+        caller: this.view,
+        reload: true,
+        lightEndLoading: false,
+      }),
+    );
+    this.toolbarObj.customEventManager.dispatch(
+      createAppEvent(AppEvent.Activate),
+    );
   }
 }
 
@@ -905,6 +930,8 @@ export class App {
 export namespace App {
   export interface Options {
     version: string;
+    baseUrl?: string;
+    githubClientId?: string;
     appReset?: boolean;
     isSafari?: boolean;
     viewerOnly?: boolean;
@@ -928,6 +955,11 @@ export namespace App {
     schema: string;
     schemaBasic: string;
     verovioVersion: string;
+    verovioUrl?: string;
+    validatorUrl?: string;
+    pdfkitUrl?: string;
+    licenseUrl?: string;
+    changelogUrl?: string;
     devFeatures: boolean;
     showDevFeatures: boolean;
   }
@@ -941,7 +973,7 @@ export namespace App {
     lastPage: number;
   }
 
-  export function iconFor(element: string): string {
+  export function iconFor(element: string, host: string): string {
     const elements: string[] = [
       "accid",
       "annot",

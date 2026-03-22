@@ -10,16 +10,20 @@ export class VerovioService {
     rngLoaderBasic = null;
     verovioRuntimeVersion = "";
     host;
+    pdfkitUrl;
     constructor(options) {
         this.host = options.host;
+        this.pdfkitUrl = options.pdfkitUrl;
         const verovioWorkerURL = this.getWorkerURL(`${options.host}/dist/verovio/verovio-worker.js`);
         const verovioWorker = new Worker(verovioWorkerURL);
-        const verovioUrl = `https://www.verovio.org/javascript/${options.verovioVersion}/verovio-toolkit-wasm.js`;
+        const verovioUrl = options.verovioUrl || `https://www.verovio.org/javascript/${options.verovioVersion}/verovio-toolkit-wasm.js`;
         verovioWorker.postMessage({ verovioUrl });
         this.verovio = new VerovioWorkerProxy(verovioWorker);
         if (options.enableEditor) {
             const validatorWorkerURL = this.getWorkerURL(`${options.host}/dist/xml/validator-worker.js`);
             const validatorWorker = new Worker(validatorWorkerURL);
+            const validatorUrl = options.validatorUrl || "https://www.verovio.org/javascript/validator/xml-validator-2.10.3.js";
+            validatorWorker.postMessage({ validatorUrl });
             this.validator = new ValidatorWorkerProxy(validatorWorker);
             this.rngLoader = new RNGLoader();
             this.rngLoaderBasic = new RNGLoader();
@@ -52,6 +56,8 @@ export class VerovioService {
     getPDFWorker() {
         const pdfWorkerURL = this.getWorkerURL(`${this.host}/dist/document/pdf-worker.js`);
         const pdfWorker = new Worker(pdfWorkerURL);
+        const pdfkitUrl = this.pdfkitUrl || "https://www.verovio.org/javascript/pdfkit";
+        pdfWorker.postMessage({ pdfkitUrl });
         return new PDFWorkerProxy(pdfWorker);
     }
 }

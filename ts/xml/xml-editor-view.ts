@@ -349,7 +349,7 @@ export class XMLEditorView extends GenericView {
       }
       this.currentId = id[1];
     }
-    }
+  }
   keyHandled(cm, string, event): void {
     this.setEdited(true);
     if (event.key === "Enter") {

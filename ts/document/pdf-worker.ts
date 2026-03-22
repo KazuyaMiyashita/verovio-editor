@@ -2,11 +2,6 @@
  * The Worker for PDFkit.
  */
 
-importScripts("https://www.verovio.org/javascript/pdfkit/pdfkit.js");
-importScripts("https://www.verovio.org/javascript/pdfkit/blobstream.js");
-importScripts("https://www.verovio.org/javascript/pdfkit/source.js");
-importScripts("https://www.verovio.org/javascript/pdfkit/Leipzig-ttf.js");
-
 class PDFDeferred {
   promise: Promise<unknown>;
   public reject!: (reason?: any) => void;
@@ -19,7 +14,6 @@ class PDFDeferred {
     });
   }
 }
-
 
 let pdfSize = [2100, 2970];
 let pdfFormat = "A4";
@@ -60,7 +54,17 @@ let docEnd: PDFDeferred = null;
 // Listen to messages send to this worker
 addEventListener(
   "message",
-  function (event: MessageEvent) {
+  function (event: MessageEvent<any>) {
+    if (event.data.pdfkitUrl) {
+      const baseUrl = event.data.pdfkitUrl;
+      importScripts(`${baseUrl}/pdfkit.js`);
+      importScripts(`${baseUrl}/blobstream.js`);
+      importScripts(`${baseUrl}/source.js`);
+      importScripts(`${baseUrl}/Leipzig-ttf.js`);
+
+      return;
+    }
+
     // Destruct properties passed to this message event
     const { taskId, method, args } = event.data;
 
