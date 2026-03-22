@@ -186,10 +186,12 @@ export declare namespace App {
     export function iconFor(element: string, host: string): string;
 }
 
+export declare type AppCustomEvent<K extends AppEvent> = CustomEvent<AppEventDetailMap[K]>;
+
 /**
  * Application event types and their payloads.
  */
-declare enum AppEvent {
+export declare enum AppEvent {
     Activate = "onActivate",
     Deactivate = "onDeactivate",
     LoadData = "onLoadData",
@@ -201,6 +203,41 @@ declare enum AppEvent {
     Zoom = "onZoom",
     StartLoading = "onStartLoading",
     EndLoading = "onEndLoading"
+}
+
+export declare interface AppEventDetailMap {
+    [AppEvent.Activate]: undefined;
+    [AppEvent.Deactivate]: undefined;
+    [AppEvent.LoadData]: {
+        caller: any;
+        mei?: string;
+        currentId?: string;
+        reload?: boolean;
+        lightEndLoading?: boolean;
+    };
+    [AppEvent.Select]: {
+        id: string;
+        element?: string;
+        elementType?: string;
+        caller: any;
+    };
+    [AppEvent.EditData]: {
+        id?: string;
+        caller?: any;
+    };
+    [AppEvent.Resized]: undefined;
+    [AppEvent.CursorActivity]: {
+        id: string;
+        activity: string;
+        caller: any;
+    };
+    [AppEvent.Page]: undefined;
+    [AppEvent.Zoom]: undefined;
+    [AppEvent.StartLoading]: {
+        light: boolean;
+        msg: string;
+    };
+    [AppEvent.EndLoading]: undefined;
 }
 
 declare class AppToolbar extends Toolbar {
@@ -256,6 +293,8 @@ declare class ContextMenu extends GenericView {
     buildFor(id: string): void;
     insertNote(e: Event): void;
 }
+
+export declare function createAppEvent<K extends AppEvent>(type: K, detail?: AppEventDetailMap[K]): AppCustomEvent<K>;
 
 declare class CustomEventManager {
     private readonly cache;
@@ -579,6 +618,15 @@ declare class LoaderService {
     getCount(): number;
 }
 
+/**
+ * Default implementation of StorageProvider using window.localStorage.
+ */
+export declare class LocalStorageProvider implements StorageProvider {
+    getItem(key: string): string | null;
+    setItem(key: string, value: string): void;
+    removeItem(key: string): void;
+}
+
 declare class MidiPlayer {
     private playing;
     private pausing;
@@ -618,6 +666,15 @@ declare class MidiPlayer {
 declare interface MidiUI {
     setMidiPlayer(player: MidiPlayer): void;
     update(player: MidiPlayer): void;
+}
+
+/**
+ * Dummy implementation of StorageProvider that does nothing (for disabling persistence).
+ */
+export declare class NoStorageProvider implements StorageProvider {
+    getItem(key: string): string | null;
+    setItem(key: string, value: string): void;
+    removeItem(key: string): void;
 }
 
 /**
@@ -717,7 +774,7 @@ declare enum Status {
 /**
  * The StorageProvider interface for abstraction of storage access.
  */
-declare interface StorageProvider {
+export declare interface StorageProvider {
     getItem(key: string): string | null;
     setItem(key: string, value: string): void;
     removeItem(key: string): void;
