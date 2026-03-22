@@ -18,3 +18,12 @@ class MockWorker {
   removeEventListener() {}
 }
 window.Worker = MockWorker as any;
+
+// Mock fetch
+window.fetch = vi.fn().mockImplementation(() => 
+    Promise.resolve({
+        ok: true,
+        text: () => Promise.resolve(""),
+        json: () => Promise.resolve({}),
+    })
+);

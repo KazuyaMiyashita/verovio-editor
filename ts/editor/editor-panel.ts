@@ -296,7 +296,7 @@ export class EditorPanel extends GenericView {
     if (!super.onActivate(e)) return false;
     //console.debug("EditorPanel::onActivate");
 
-    if (e.detail && e.detail.loadData) {
+    if (e?.detail && e.detail.loadData) {
       this.updateSize();
     }
 

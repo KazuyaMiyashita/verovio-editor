@@ -14,20 +14,23 @@ export class StandardToolbarPlugin {
     }
     init() {
         if (this.app.options.enableToolbar !== false) {
-            // @ts-ignore - accessing internal toolbar div
-            const toolbarDiv = this.app.toolbar;
+            const toolbarDiv = this.app.toolbarElement;
             if (toolbarDiv) {
                 this.toolbarObj = new AppToolbar(toolbarDiv, this.app);
                 this.app.customEventManager.addToPropagationList(this.toolbarObj.customEventManager);
                 this.app.registerService("toolbar", this.toolbarObj);
+                // Ensure toolbar is active to receive events
+                this.toolbarObj.onActivate(null);
+                // Initial update
+                // @ts-ignore
+                this.toolbarObj.updateAll();
                 this.renderContributions();
             }
         }
     }
     renderContributions() {
         const actions = this.app.getContributions("toolbar.actions");
-        // @ts-ignore - accessing internal toolbar div for extra buttons
-        const toolbarDiv = this.app.toolbar;
+        const toolbarDiv = this.app.toolbarElement;
         if (actions.length > 0 && toolbarDiv) {
             const extraActionsContainer = appendDivTo(toolbarDiv, {
                 class: "vrv-toolbar-extra",

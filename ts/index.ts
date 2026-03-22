@@ -1,3 +1,4 @@
+export { App as VerovioEditor } from "./app.js";
 export * from "./app.js";
 export * from "./verovio-app.js";
 export * from "./utils/storage-provider.js";

@@ -10,8 +10,7 @@ export class ResponsiveViewPlugin {
     }
     init() {
         if (this.app.options.enableResponsive !== false) {
-            // @ts-ignore - accessing internal views div
-            const viewsDiv = this.app.views;
+            const viewsDiv = this.app.viewsElement;
             if (viewsDiv) {
                 const container = appendDivTo(viewsDiv, { class: "vrv-view" });
                 this.viewObj = new ResponsiveView(container, this.app, this.app.verovio);

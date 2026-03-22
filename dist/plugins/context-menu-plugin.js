@@ -8,10 +8,8 @@ export class ContextMenuPlugin {
     }
     init() {
         if (this.app.options.enableContextMenu !== false) {
-            // @ts-ignore
             const menuDiv = this.app.contextMenu;
-            // @ts-ignore
-            const underlayDiv = this.app.contextUnderlay;
+            const underlayDiv = this.app.contextUnderlayElement;
             if (menuDiv && underlayDiv) {
                 this.contextMenuObj = new ContextMenu(menuDiv, this.app, underlayDiv);
                 this.app.customEventManager.addToPropagationList(this.contextMenuObj.customEventManager);

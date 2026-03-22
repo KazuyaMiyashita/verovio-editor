@@ -13,14 +13,12 @@ export class StatusbarPlugin implements EditorPlugin {
 
   init(): void {
     if (this.app.options.enableStatusbar !== false) {
-      // @ts-ignore - accessing internal statusbar div
-      const statusbarDiv = this.app.statusbar;
+      const statusbarDiv = this.app.statusbarElement;
       if (statusbarDiv) {
         this.statusbarObj = new AppStatusbar(statusbarDiv, this.app);
         this.app.customEventManager.addToPropagationList(this.statusbarObj.customEventManager);
         
-        // @ts-ignore
-        this.statusbarObj.setVerovioVersion(this.app.verovioRuntimeVersion);
+        this.statusbarObj.setVerovioVersion(this.app.getRuntimeVersion());
       }
     }
   }

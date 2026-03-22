@@ -26,12 +26,18 @@ export class StandardToolbarPlugin implements EditorPlugin {
 
   init(): void {
     if (this.app.options.enableToolbar !== false) {
-      // @ts-ignore - accessing internal toolbar div
-      const toolbarDiv = this.app.toolbar;
+      const toolbarDiv = this.app.toolbarElement;
       if (toolbarDiv) {
         this.toolbarObj = new AppToolbar(toolbarDiv, this.app);
         this.app.customEventManager.addToPropagationList(this.toolbarObj.customEventManager);
         this.app.registerService("toolbar", this.toolbarObj);
+        
+        // Ensure toolbar is active to receive events
+        this.toolbarObj.onActivate(null as any);
+        
+        // Initial update
+        // @ts-ignore
+        this.toolbarObj.updateAll();
         
         this.renderContributions();
       }
@@ -40,8 +46,7 @@ export class StandardToolbarPlugin implements EditorPlugin {
 
   private renderContributions(): void {
     const actions = this.app.getContributions<ToolbarAction>("toolbar.actions");
-    // @ts-ignore - accessing internal toolbar div for extra buttons
-    const toolbarDiv = this.app.toolbar; 
+    const toolbarDiv = this.app.toolbarElement; 
     
     if (actions.length > 0 && toolbarDiv) {
       const extraActionsContainer = appendDivTo(toolbarDiv, {

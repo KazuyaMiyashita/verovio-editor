@@ -198,11 +198,12 @@ export class DocumentView extends VerovioView {
     pruneDocument() {
         for (let idx = 0; idx < this.app.getPageCount(); idx++) {
             let page = this.docWrapper.children[idx];
-            if (idx < this.observer.lastPageIn - this.observer.pruningMargin) {
+            if (this.observer && idx < this.observer.lastPageIn - this.observer.pruningMargin) {
                 delete page.dataset.loaded;
                 page.textContent = "";
             }
-            if (idx > this.observer.lastPageIn + this.observer.pruningMargin) {
+            else if (this.observer && idx >
+                this.observer.lastPageIn + this.observer.pruningMargin) {
                 delete page.dataset.loaded;
                 page.textContent = "";
             }

@@ -1,5 +1,5 @@
 import { 
-    App, 
+    VerovioEditor, 
     DocumentViewPlugin, 
     ResponsiveViewPlugin, 
     XmlEditorPlugin, 
@@ -45,49 +45,31 @@ if ( view != null )
 // Rescue option to reset to default before loading
 if ( getParameterByName( 'reset' ) != null ) options.appReset = true;
 
-// Create the app
-const app = new App( document.getElementById( "app" ), options );
+// Create the editor with plugins in the constructor
+const editor = new VerovioEditor(
+  document.getElementById("app"),
+  options,
+  [
+    new StandardToolbarPlugin(),
+    new ContextMenuPlugin(),
+    new StatusbarPlugin(),
+    new ValidationPlugin(),
+    new PdfExportPlugin(),
+    new MidiPlayerPlugin(),
+    new GitHubPlugin(),
+    new DocumentViewPlugin(),
+    new ResponsiveViewPlugin(),
+    new XmlEditorPlugin(),
+  ]
+);
 
-// Register Plugins (Microkernel Architecture)
-app.use(new StandardToolbarPlugin());
-app.use(new ContextMenuPlugin());
-app.use(new StatusbarPlugin());
-app.use(new ValidationPlugin());
-app.use(new PdfExportPlugin());
-app.use(new MidiPlayerPlugin());
-app.use(new GitHubPlugin());
+let file = 'examples/puccini.mei';
+let urlFile = getParameterByName( 'file' );
+if ( urlFile != null ) file = urlFile;
 
-// Views
-app.use(new DocumentViewPlugin());
-app.use(new ResponsiveViewPlugin());
-app.use(new XmlEditorPlugin());
-
-// Initialize all plugins and wait for app core to be ready
-Promise.all([app.initPlugins(), app.ready]).then(() => {
-    let file = 'examples/puccini.mei';
-    let convert = false;
-    let onlyIfEmpty = true;
-    let urlFile = getParameterByName( 'file' );
-    if (urlFile != null )
-    {
-        file = urlFile;
-        onlyIfEmpty = false;
-    }
-    if ( getParameterByName( 'musicxml' ) != null ) convert = false;
-
-    // Load a file (MEI, MusicXML, or CMME)
-    fetch( file )
-        .then( function ( response )
-        {
-            if ( response.status !== 200 )
-            {
-                alert( 'File could not be fetched, loading default file');
-                throw new Error( "Not 200 response" );
-            }
-            return response.text();
-        } )
-        .then( function ( text )
-        {
-            app.loadData( text, file.substring(file.lastIndexOf("/") + 1), convert, onlyIfEmpty );
-        } );
-});
+// Load the data - This will wait internally until the editor is ready
+fetch( file )
+    .then( response => response.text() )
+    .then( text => {
+        editor.loadData( text, file.substring(file.lastIndexOf("/") + 1) );
+    } );

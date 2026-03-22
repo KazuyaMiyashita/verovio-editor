@@ -15,8 +15,7 @@ export class XmlEditorPlugin implements EditorPlugin {
 
   init(): void {
     if (this.app.options.enableEditor !== false) {
-      // @ts-ignore - accessing internal views div
-      const viewsDiv = this.app.views;
+      const viewsDiv = this.app.viewsElement;
       if (viewsDiv) {
         const container = appendDivTo(viewsDiv, { class: "vrv-view" });
         this.viewObj = new EditorPanel(

@@ -10,8 +10,7 @@ export class XmlEditorPlugin {
     }
     init() {
         if (this.app.options.enableEditor !== false) {
-            // @ts-ignore - accessing internal views div
-            const viewsDiv = this.app.views;
+            const viewsDiv = this.app.viewsElement;
             if (viewsDiv) {
                 const container = appendDivTo(viewsDiv, { class: "vrv-view" });
                 this.viewObj = new EditorPanel(container, this.app, this.app.verovio, this.app.validator, this.app.rngLoader);
