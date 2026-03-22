@@ -40,28 +40,68 @@ pnpm run build
 
 ## Usage
 
-You can use the editor by initializing the `App` class:
+You can use the editor by initializing the `App` class. The library is designed to be customizable and extensible.
+
+### Basic Initialization
 
 ```javascript
 import { App } from 'verovio-editor';
+import 'verovio-editor/css/verovio.css'; // Import styles
 
 const options = {
-    documentViewSVG: false,
-    enableDocument: true,
-    enableResponsive: true,
-    enableEditor: true,
     defaultView: 'editor',
-    enableValidation: true
+    baseUrl: 'https://your-server.com/assets', // Path to icons and scripts
 };
 
 const app = new App(document.getElementById("app"), options);
 
 // Load an MEI file
-fetch('path/to/your/file.mei')
-    .then(response => response.text())
-    .then(text => {
-        app.loadData(text, 'file.mei', false, true);
-    });
+app.loadData(meiString, 'filename.mei');
+```
+
+### Customization Options
+
+The `App.Options` interface allows you to configure various aspects of the editor:
+
+| Option | Type | Description |
+| --- | --- | --- |
+| `baseUrl` | `string` | Base URL for fetching icons, SVG filters, and default CSS. |
+| `enableToolbar` | `boolean` | Show/hide the main application toolbar. |
+| `enableStatusbar` | `boolean` | Show/hide the bottom status bar. |
+| `enableMidiToolbar`| `boolean` | Show/hide the MIDI playback controls. |
+| `enableContextMenu`| `boolean` | Enable/disable the right-click context menu. |
+| `disableLocalStorage`| `boolean`| Disable automatic state persistence to browser storage. |
+| `storageProvider` | `StorageProvider` | Custom implementation for state persistence (see below). |
+| `verovioUrl` | `string` | Custom URL for the Verovio WebAssembly script. |
+
+### Event Handling
+
+The library provides a public event API to react to application state changes:
+
+```javascript
+app.on('onLoadData', (event) => {
+    console.log('File loaded:', event.detail.mei);
+});
+
+app.on('onSelect', (event) => {
+    console.log('Element selected:', event.detail.id);
+});
+```
+
+Available events include: `onActivate`, `onDeactivate`, `onLoadData`, `onSelect`, `onEditData`, `onResized`, `onPage`, `onZoom`, `onStartLoading`, `onEndLoading`.
+
+### Custom Storage Provider
+
+By default, the editor saves its state (options, recent files) to `localStorage`. You can provide a custom implementation of the `StorageProvider` interface:
+
+```javascript
+const myStorage = {
+    getItem(key) { /* return value */ },
+    setItem(key, value) { /* store value */ },
+    removeItem(key) { /* remove value */ }
+};
+
+const app = new App(container, { storageProvider: myStorage });
 ```
 
 ## License

@@ -1,5 +1,11 @@
 # [Unreleased]
-* **Documentation Enhancement**: Rewrote `README.md` in English to provide comprehensive information on features, installation, and library usage.
+* **Library Customization Features**:
+    - Externalized hardcoded URLs and configuration into `App.Options` (`baseUrl`, Worker URLs, GitHub Client ID, etc.).
+    - Implemented a flexible storage abstraction layer (`StorageProvider`) to allow custom state persistence.
+    - Decoupled UI components (Toolbar, Statusbar, ContextMenu) making them optional via configuration flags.
+    - Refactored `MidiPlayer` to be independent of specific UI components.
+    - Introduced a public Event API on the `App` class for easier integration with host applications.
+* **Documentation Enhancement**: Rewrote `README.md` in English to provide comprehensive information on features, installation, and library usage guides.
 * **Modern Development Environment**:
     - Integrated NPM (`pnpm`) for dependency management.
     - Added Vite for optimized local development and efficient library bundling.
