@@ -7,8 +7,6 @@ import { AppToolbar } from "./toolbars/app-toolbar.js";
 import { Dialog } from "./dialogs/dialog.js";
 import { DialogAbout } from "./dialogs/dialog-about.js";
 import { DialogExport } from "./dialogs/dialog-export.js";
-import { DialogGhExport } from "./dialogs/dialog-gh-export.js";
-import { DialogGhImport } from "./dialogs/dialog-gh-import.js";
 import { DialogSelection } from "./dialogs/dialog-selection.js";
 import { DialogSettingsEditor } from "./dialogs/dialog-settings-editor.js";
 import { DialogSettingsVerovio } from "./dialogs/dialog-settings-verovio.js";
@@ -17,9 +15,6 @@ import { CustomEventManager } from "./events/custom-event-manager.js";
 import { EditorPanel } from "./editor/editor-panel.js";
 import { EventManager } from "./events/event-manager.js";
 import { FileStack } from "./utils/file-stack.js";
-import { GitHubManager } from "./utils/github-manager.js";
-import { MidiPlayer } from "./midi/midi-player.js";
-import { MidiToolbar } from "./toolbars/midi-toolbar.js";
 import { ResponsiveView } from "./verovio/responsive-view.js";
 import { appendAnchorTo, appendDivTo, appendInputTo, appendLinkTo, appendTextAreaTo, } from "./utils/functions.js";
 import { aboutMsg, reloadMsg, resetMsg, version } from "./utils/messages.js";
@@ -43,7 +38,9 @@ export class App {
     zoomLevels;
     eventManager;
     id;
-    githubManager;
+    get githubManager() {
+        return this.getService("github-manager");
+    }
     options;
     fileStack;
     storageProvider;
@@ -56,7 +53,9 @@ export class App {
     // private members
     view;
     toolbarView;
-    midiPlayer;
+    get midiPlayer() {
+        return this.getService("midi-player");
+    }
     // services
     notificationService;
     loaderService;
@@ -105,9 +104,6 @@ export class App {
                     ? `http://${window.location.host}`
                     : "https://editor.verovio.org");
         this.id = this.clientId;
-        if (options?.enableGitHub !== false) {
-            this.githubManager = new GitHubManager(this);
-        }
         this.options = Object.assign({
             version: version,
             verovioVersion: "latest",
@@ -437,15 +433,6 @@ export class App {
             this.toolbarObj = new AppToolbar(this.toolbar, this);
             this.customEventManager.addToPropagationList(this.toolbarObj.customEventManager);
         }
-        if (this.options.enableMidiToolbar) {
-            this.midiToolbarObj = new MidiToolbar(this.toolbar, this);
-            this.midiPlayer = new MidiPlayer(this.midiToolbarObj.getDiv(), this.midiToolbarObj, this.customEventManager);
-            this.customEventManager.addToPropagationList(this.midiToolbarObj.customEventManager);
-        }
-        else {
-            // Create midi player without toolbar if needed?
-            // For now just skip if no toolbar
-        }
         if (this.options.enableContextMenu) {
             this.contextMenuObj = new ContextMenu(this.contextMenu, this, this.contextUnderlay);
             this.customEventManager.addToPropagationList(this.contextMenuObj.customEventManager);
@@ -474,13 +461,7 @@ export class App {
     // Async worker methods
     ////////////////////////////////////////////////////////////////////////
     async playMEI() {
-        if (!this.midiPlayer)
-            return;
-        const expansionMap = await this.verovio.renderToExpansionMap();
-        this.midiPlayer.setExpansionMap(expansionMap);
-        const base64midi = await this.verovio.renderToMIDI();
-        const midiFile = "data:audio/midi;base64," + base64midi;
-        this.midiPlayer.playFile(midiFile);
+        this.executeCommand("midi.playMEI");
     }
     async applySelection() {
         let selection = this.options.selection;
@@ -708,33 +689,10 @@ export class App {
         }
     }
     async githubImport(e) {
-        if (!this.githubManager)
-            return;
-        if (this.options.useCustomDialogs) {
-            const event = new CustomEvent("onGithubImportRequest", { cancelable: true });
-            this.eventTarget.dispatchEvent(event);
-            if (event.defaultPrevented)
-                return;
-        }
-        const dlg = new DialogGhImport(this.dialogDiv, this, "Import an MEI file from GitHub", {}, this.githubManager);
-        const dlgRes = await dlg.show();
-        if (dlgRes === 1) {
-            this.fileService.loadData(dlg.getData(), dlg.getFilename());
-        }
+        this.executeCommand("github.import");
     }
     async githubExport(e) {
-        if (!this.githubManager)
-            return;
-        if (this.options.useCustomDialogs) {
-            const event = new CustomEvent("onGithubExportRequest", { cancelable: true });
-            this.eventTarget.dispatchEvent(event);
-            if (event.defaultPrevented)
-                return;
-        }
-        const dlg = new DialogGhExport(this.dialogDiv, this, "Export an MEI file to GitHub", {}, this.githubManager);
-        const dlgRes = await dlg.show();
-        if (dlgRes === 1) {
-        }
+        this.executeCommand("github.export");
     }
     async settingsEditor(e) {
         if (this.options.useCustomDialogs) {

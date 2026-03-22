@@ -38,7 +38,7 @@ export declare class App {
     readonly zoomLevels: Array<number>;
     readonly eventManager: EventManager;
     readonly id: string;
-    readonly githubManager: GitHubManager;
+    get githubManager(): GitHubManager | undefined;
     readonly options: App.Options;
     readonly fileStack: FileStack;
     readonly storageProvider: StorageProvider;
@@ -50,7 +50,7 @@ export declare class App {
     readonly verovioOptions: VerovioView.Options;
     private view;
     private toolbarView;
-    private midiPlayer;
+    get midiPlayer(): MidiPlayer | undefined;
     notificationService: NotificationService;
     loaderService: LoaderService;
     verovioService: VerovioService;

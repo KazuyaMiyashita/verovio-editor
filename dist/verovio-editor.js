@@ -2601,211 +2601,7 @@ var K = class extends D {
 	reset() {
 		super.ok();
 	}
-}, J = class extends M {
-	data;
-	filename;
-	githubManager;
-	iconsBranch;
-	iconsInstitution;
-	iconsFile;
-	iconsFolder;
-	iconsRepo;
-	iconsUser;
-	tabs;
-	tabUser;
-	tabRepo;
-	tabBranch;
-	tabFile;
-	loading;
-	list;
-	selection;
-	breadCrumbs;
-	constructor(e, t, n, r, a) {
-		super(e, t, n, r), this.iconsBranch = `${t.host}/icons/dialog/branch.png`, this.iconsInstitution = `${t.host}/icons/dialog/institution.png`, this.iconsFile = `${t.host}/icons/dialog/file.png`, this.iconsFolder = `${t.host}/icons/dialog/folder.png`, this.iconsRepo = `${t.host}/icons/dialog/repo.png`, this.iconsUser = `${t.host}/icons/dialog/user.png`, this.data = null, this.filename = "", this.githubManager = a, this.tabs = i(i(this.content, { class: "vrv-tab-group" }), { class: "vrv-tab-selectors" }), this.tabUser = i(this.tabs, {
-			class: "vrv-tab-selector active",
-			dataset: { tab: "user" }
-		}), this.tabUser.textContent = "User / Organizations", this.eventManager.bind(this.tabUser, "click", this.selectTab), this.tabRepo = i(this.tabs, {
-			class: "vrv-tab-selector",
-			dataset: { tab: "rep" }
-		}), this.tabRepo.textContent = "Repositories", this.eventManager.bind(this.tabRepo, "click", this.selectTab), this.tabBranch = i(this.tabs, {
-			class: "vrv-tab-selector",
-			dataset: { tab: "branch" }
-		}), this.tabBranch.textContent = "Branches", this.eventManager.bind(this.tabBranch, "click", this.selectTab), this.tabFile = i(this.tabs, {
-			class: "vrv-tab-selector",
-			dataset: { tab: "file" }
-		}), this.tabFile.textContent = "Files", this.eventManager.bind(this.tabFile, "click", this.selectTab), this.loading = i(this.content, { class: "vrv-dialog-gh-loading" }), this.list = i(this.content, { class: "vrv-dialog-gh-list" }), this.selection = i(this.content, { class: "vrv-dialog-gh-selection" }), this.breadCrumbs = i(this.content, { class: "vrv-path-breadcrumbs" }), this.okBtn.style.display = "none", this.githubManager.getSelectedBranchName() === "" ? this.listRepos() : this.listFiles();
-	}
-	getData() {
-		return this.data;
-	}
-	getFilename() {
-		return this.filename;
-	}
-	updateSelectionAndBreadcrumbs() {
-		this.selection.style.display = "none", this.selection.textContent = "", this.selection.style.display = "none", this.breadCrumbs.textContent = "";
-		let e = this.githubManager.getSelectedOrganization() === null ? this.iconsUser : this.iconsInstitution;
-		if (!this.addSelection(this.githubManager.getSelectedAccountName(), e) || !this.addSelection(this.githubManager.getSelectedRepoName(), this.iconsRepo) || !this.addSelection(this.githubManager.getSelectedBranchName(), this.iconsBranch)) return;
-		let t = this.githubManager.getSelectedPath();
-		if (!(t.length < 2)) {
-			this.breadCrumbs.style.display = "flex";
-			for (let e = 0; e < t.length; e++) this.addCrumb(t[e], e + 1);
-		}
-	}
-	loadingStart(e) {
-		Array.from(this.tabs.querySelectorAll(".vrv-tab-selector")).forEach((e) => {
-			e.classList.remove("selected");
-		}), e.classList.add("selected"), this.list.textContent = "", this.list.style.display = "none", this.loading.style.display = "block";
-	}
-	loadingEnd() {
-		this.list.textContent = "", this.list.style.display = "flex", this.loading.style.display = "none";
-	}
-	addItemToList(e, t, n, r, a) {
-		let o = i(this.list, {
-			class: "vrv-dialog-gh-item",
-			style: { backgroundImage: `url(${t})` },
-			"data-before": `${e}`
-		}), s = Object.keys(n);
-		for (let e = 0; e < s.length; e++) o.dataset[s[e]] = n[s[e]];
-		r && o.classList.add("checked"), this.eventManager.bind(o, "click", a);
-	}
-	addSelection(e, t) {
-		if (e === "") return !1;
-		this.selection.style.display = "flex";
-		let n = i(this.selection, {
-			class: "vrv-dialog-gh-selection-item",
-			style: { backgroundImage: `url(${t})` }
-		});
-		return n.textContent = e, !0;
-	}
-	addCrumb(e, t) {
-		let n = i(this.breadCrumbs, { class: "vrv-path-breadcrumbs" });
-		n.textContent = e, n.dataset.value = t.toString(), this.eventManager.bind(n, "click", this.selectCrumb);
-	}
-	async selectFile(e) {
-		let t = e.target;
-		if (t.dataset.type === "dir") t.dataset.name === ".." ? this.githubManager.selectedPathPop() : this.githubManager.appendToPath(t.dataset.name), await this.listFiles();
-		else {
-			let e = this.githubManager.getSelectedBranchName(), n = this.githubManager.getPathString() + "/" + t.dataset.name;
-			this.data = (await this.githubManager.getSelectedRepo().getContents(e, n, !0)).data, this.filename = t.dataset.name, this.ok();
-		}
-	}
-	async listFiles() {
-		if (this.githubManager.getSelectedRepo() === null) {
-			this.app.notificationService.show("Select a repository first");
-			return;
-		}
-		this.loadingStart(this.tabFile);
-		let e = this.githubManager.getSelectedBranchName(), t = this.githubManager.getPathString(), n = await this.githubManager.getSelectedRepo().getContents(e, t);
-		n.data.sort((e, t) => e.type > t.type ? 1 : -1), this.loadingEnd(), this.githubManager.getSelectedPath().length > 1 && this.addItemToList("..", this.iconsFolder, {
-			name: "..",
-			type: "dir"
-		}, !1, this.selectFile);
-		for (let e = 0; e < n.data.length; e++) {
-			let t = n.data[e].name, r = n.data[e].type, i = r === "dir" ? this.iconsFolder : this.iconsFile;
-			this.addItemToList(t, i, {
-				name: t,
-				type: r
-			}, !1, this.selectFile);
-		}
-		this.updateSelectionAndBreadcrumbs();
-	}
-	async listUsers() {
-		this.loadingStart(this.tabUser);
-		let e = await this.githubManager.getUser().listOrgs();
-		this.loadingEnd();
-		let t = this.githubManager.getSelectedAccountName() === this.githubManager.getLogin();
-		this.addItemToList(this.githubManager.getLogin(), this.iconsUser, { login: this.githubManager.getLogin() }, t, this.selectUser);
-		for (let t = 0; t < e.data.length; t++) {
-			let n = e.data[t].login, r = this.githubManager.getSelectedAccountName() === n;
-			this.addItemToList(n, this.iconsInstitution, { login: n }, r, this.selectUser);
-		}
-		this.updateSelectionAndBreadcrumbs();
-	}
-	async listRepos() {
-		this.loadingStart(this.tabRepo);
-		let e;
-		e = this.githubManager.getSelectedOrganization() === null ? await this.githubManager.getSelectedUser().listRepos({ type: "owner" }) : await this.githubManager.getSelectedOrganization().getRepos(), e.data.sort((e, t) => e.name > t.name ? 1 : -1), this.loadingEnd();
-		for (let t = 0; t < e.data.length; t++) {
-			let n = e.data[t].name, r = this.githubManager.getSelectedRepoName() === n;
-			this.addItemToList(n, this.iconsRepo, { name: n }, r, this.selectRepo);
-		}
-		this.updateSelectionAndBreadcrumbs();
-	}
-	async listBranches() {
-		if (this.githubManager.getSelectedRepo() === null) {
-			this.app.notificationService.show("Select a repository first");
-			return;
-		}
-		this.loadingStart(this.tabBranch);
-		let e = await this.githubManager.getSelectedRepo().listBranches();
-		e.data.sort((e, t) => e.name > t.name ? 1 : -1), this.loadingEnd();
-		for (let t = 0; t < e.data.length; t++) {
-			let n = e.data[t].name, r = this.githubManager.getSelectedBranchName() === n;
-			this.addItemToList(n, this.iconsBranch, { name: n }, r, this.selectBranch);
-		}
-		this.updateSelectionAndBreadcrumbs();
-	}
-	async selectUser(e) {
-		let t = e.target;
-		await this.githubManager.selectAccount(t.dataset.login), this.listRepos();
-	}
-	async selectRepo(e) {
-		let t = e.target;
-		await this.githubManager.selectRepo(t.dataset.name), this.listBranches();
-	}
-	async selectBranch(e) {
-		let t = e.target;
-		await this.githubManager.selectBranch(t.dataset.name), this.listFiles();
-	}
-	selectCrumb(e) {
-		let t = e.target;
-		this.githubManager.slicePathTo(Number(t.dataset.value)), this.listFiles();
-	}
-	selectTab(e) {
-		switch (e.target.dataset.tab) {
-			case "user":
-				this.listUsers();
-				break;
-			case "repo":
-				this.listRepos();
-				break;
-			case "branch":
-				this.listBranches();
-				break;
-			case "file":
-				this.listFiles();
-				break;
-		}
-	}
-}, Ce = class extends J {
-	fields;
-	inputFile;
-	inputMessage;
-	constructor(e, t, n, r, a) {
-		r.okLabel = "Commit and push", super(e, t, n, r, a), this.okBtn.style.display = "flex", this.okBtn.classList.add("disabled"), this.fields = i(this.content, {
-			class: "vrv-dialog-form",
-			style: { display: "none" }
-		}), this.appendLabel(this.fields, "Filename"), this.inputFile = o(this.fields, { class: "vrv-dialog-input" }), this.inputFile.placeholder = "Name of an existing or of a new file", this.eventManager.bind(this.inputFile, "input", this.enableOk), this.appendLabel(this.fields, "Commit message"), this.inputMessage = _(this.fields, { class: "vrv-dialog-input" }), this.inputMessage.placeholder = "The commit message to be sent to GitHub", this.eventManager.bind(this.inputMessage, "input", this.enableOk);
-	}
-	async selectFile(e) {
-		let t = e.target;
-		t.dataset.type === "dir" ? (t.dataset.name === ".." ? this.githubManager.selectedPathPop() : this.githubManager.appendToPath(t.dataset.name), this.listFiles()) : this.inputFile.value = t.dataset.name;
-	}
-	isValid() {
-		return this.inputFile.value !== "" && this.inputMessage.value !== "";
-	}
-	updateSelectionAndBreadcrumbs() {
-		super.updateSelectionAndBreadcrumbs(), this.githubManager.getSelectedBranchName() === "" ? this.fields.style.display = "none" : this.fields.style.display = "grid";
-	}
-	ok() {
-		if (!this.isValid()) return;
-		let e = this.githubManager.getPathString() + "/" + this.inputFile.value, t = this.inputMessage.value;
-		this.githubManager.writeFile(e, t), super.ok();
-	}
-	enableOk(e) {
-		this.okBtn.classList.toggle("disabled", !this.isValid());
-	}
-}, we = class extends M {
+}, Ce = class extends M {
 	selection;
 	fields;
 	selectMeasureRange;
@@ -2823,7 +2619,7 @@ var K = class extends D {
 	reset() {
 		this.selection = {}, super.ok();
 	}
-}, Te = class extends M {
+}, we = class extends M {
 	reload;
 	fields;
 	appOptions;
@@ -2850,7 +2646,7 @@ var K = class extends D {
 	reset() {
 		super.ok();
 	}
-}, Ee = /* @__PURE__ */ "adjustPageHeight.adjustPageWidth.breaks.breaksSmartSb.humType.justifyVertically.landscape.mmOutput.outputFormatRaw.outputIndent.outputIndentTab.pageHeight.pageMarginLeft.pageMarginRight.pageMarginTop.pageMarginBottom.pageWidth.removeIds.scaleToPageSize.setLocale.showRuntime.shrinkToFit.svgBoundingBoxes.svgFormatRaw.svgRemoveXlink.svgViewBox.breaksNoWidow.engravingDefaults.fontLoadAll.systemMaxPerPage.transposeMdiv".split("."), De = class extends M {
+}, Te = /* @__PURE__ */ "adjustPageHeight.adjustPageWidth.breaks.breaksSmartSb.humType.justifyVertically.landscape.mmOutput.outputFormatRaw.outputIndent.outputIndentTab.pageHeight.pageMarginLeft.pageMarginRight.pageMarginTop.pageMarginBottom.pageWidth.removeIds.scaleToPageSize.setLocale.showRuntime.shrinkToFit.svgBoundingBoxes.svgFormatRaw.svgRemoveXlink.svgViewBox.breaksNoWidow.engravingDefaults.fontLoadAll.systemMaxPerPage.transposeMdiv".split("."), Ee = class extends M {
 	changedOptions;
 	currentOptions;
 	defaultOptions;
@@ -2859,7 +2655,7 @@ var K = class extends D {
 	tabGroup;
 	tabGroupObj;
 	constructor(e, t, n, r, a, o) {
-		super(e, t, n, r), this.verovioDisabled = Ee, this.verovio = o, this.tabGroup = i(this.content, { class: "vrv-tab-group" }), this.tabGroupObj = new B(this.tabGroup, t), this.box.style.maxWidth = "800px", this.addButton("Reset", this.reset);
+		super(e, t, n, r), this.verovioDisabled = Te, this.verovio = o, this.tabGroup = i(this.content, { class: "vrv-tab-group" }), this.tabGroupObj = new B(this.tabGroup, t), this.box.style.maxWidth = "800px", this.addButton("Reset", this.reset);
 	}
 	getChangedOptions() {
 		return this.changedOptions;
@@ -2926,7 +2722,7 @@ var K = class extends D {
 	reset() {
 		this.changedOptions = this.diffOptions(this.defaultOptions, !0), Object.keys(this.changedOptions).length === 0 ? super.cancel() : super.ok();
 	}
-}, Y = window.pako, Oe = class {
+}, J = window.pako, De = class {
 	stack;
 	storage;
 	constructor(e) {
@@ -2946,18 +2742,18 @@ var K = class extends D {
 			return;
 		}
 		this.stack.idx--, this.stack.idx < 0 && (this.stack.idx = this.stack.maxItems - 1), this.stack.filenames[this.stack.idx] = e;
-		let r = btoa(Y.deflate(t, { to: "string" }));
+		let r = btoa(J.deflate(t, { to: "string" }));
 		this.storage.setItem("file-" + this.stack.idx, r), this.stack.items < this.stack.maxItems - 1 && this.stack.items++, this.storage.setItem("fileStack", JSON.stringify(this.stack));
 	}
 	load(e) {
-		let t = this.storage.getItem("file-" + e), n = Y.inflate(atob(t), { to: "string" });
+		let t = this.storage.getItem("file-" + e), n = J.inflate(atob(t), { to: "string" });
 		return {
 			filename: this.stack.filenames[e],
 			data: n
 		};
 	}
 	getLast() {
-		if (Y !== void 0 && this.stack.items > 0) return this.load(this.stack.idx);
+		if (J !== void 0 && this.stack.items > 0) return this.load(this.stack.idx);
 	}
 	fileList() {
 		let e = [];
@@ -2975,278 +2771,7 @@ var K = class extends D {
 		for (let t = 0; t < e.length; t++) this.storage.removeItem("file-" + e[t].idx);
 		this.storage.removeItem("fileStack"), this.stack.items = 0;
 	}
-}, ke = class {
-	name;
-	login;
-	user;
-	selectedUser;
-	selectedOrganization;
-	selectedAccountName;
-	selectedBranchName;
-	selectedRepo;
-	selectedRepoName;
-	selectedPath;
-	gh;
-	app;
-	constructor(e) {
-		this.app = e, this.name = "GitHub", this.login = "unknown", this.user = null, this.selectedUser = null, this.selectedOrganization = null, this.selectedAccountName = "", this.selectedBranchName = "", this.selectedRepo = null, this.selectedRepoName = "", this.selectedPath = ["."], this.gh = null;
-		let t = this.getSessionCookie("ghtoken");
-		t &&= JSON.parse(atob(t)).ghtoken, t !== null && (this.gh = new GitHub({ token: t }), this.initUser());
-	}
-	getName() {
-		return this.name;
-	}
-	getLogin() {
-		return this.login;
-	}
-	getUser() {
-		return this.user;
-	}
-	getSelectedUser() {
-		return this.selectedUser;
-	}
-	getSelectedOrganization() {
-		return this.selectedOrganization;
-	}
-	getSelectedRepo() {
-		return this.selectedRepo;
-	}
-	getSelectedBranchName() {
-		return this.selectedBranchName;
-	}
-	getSelectedAccountName() {
-		return this.selectedAccountName;
-	}
-	getSelectedRepoName() {
-		return this.selectedRepoName;
-	}
-	getSelectedPath() {
-		return this.selectedPath;
-	}
-	selectedPathPop() {
-		this.selectedPath.pop();
-	}
-	getPathString() {
-		return this.selectedPath.join("/");
-	}
-	appendToPath(e) {
-		this.selectedPath.push(e), this.storeSelection();
-	}
-	slicePathTo(e) {
-		this.selectedPath = this.selectedPath.slice(0, e), this.storeSelection();
-	}
-	isLoggedIn() {
-		return this.gh !== null;
-	}
-	getSessionCookie(e) {
-		let t = document.cookie.match("(^|;) ?" + e + "=([^;]*)(;|$)");
-		return t ? t[2] : null;
-	}
-	storeSelection() {
-		this.app.options.github = {
-			login: this.login,
-			account: this.selectedAccountName,
-			repo: this.selectedRepoName,
-			branch: this.selectedBranchName,
-			path: this.selectedPath
-		};
-	}
-	resetSelectedPath() {
-		this.selectedPath = ["."];
-	}
-	async writeFile(e, t) {
-		try {
-			let n = await this.app.verovio.getMEI({});
-			await this.selectedRepo.writeFile(this.selectedBranchName, e, n, t, {}), this.app.notificationService.show("File was successfully pushed to GitHub");
-		} catch (e) {
-			console.error(e), this.app.notificationService.show("Something went wrong when pushing to GitHub");
-		}
-	}
-	async selectAccount(e) {
-		e === this.login ? (this.selectedOrganization = null, this.selectedUser = this.gh.getUser()) : (this.selectedUser = null, this.selectedOrganization = this.gh.getOrganization(e)), this.selectedAccountName = e, this.selectedBranchName = "", this.selectedRepo = null, this.selectedRepoName = "", this.resetSelectedPath(), this.storeSelection();
-	}
-	async selectBranch(e) {
-		e !== "" && (this.selectedBranchName = e, this.resetSelectedPath(), this.storeSelection());
-	}
-	async selectRepo(e) {
-		if (e !== "") try {
-			this.selectedRepo = this.gh.getRepo(this.selectedAccountName, e), this.selectedBranchName = (await this.selectedRepo.getDetails()).data.default_branch, this.selectedRepoName = e, this.resetSelectedPath(), this.storeSelection();
-		} catch (e) {
-			console.error(e);
-		}
-	}
-	async initUser() {
-		this.user = this.gh.getUser();
-		let e = await this.user.getProfile();
-		this.login = e.data.login, this.name = e.data.name === null ? e.data.login : e.data.name, this.selectedUser = this.user, this.selectedAccountName = this.login;
-		let t = this.app.options.github;
-		t && t.login === this.login && (await this.selectAccount(t.account), await this.selectRepo(t.repo), await this.selectBranch(t.branch), this.selectedPath = t.path);
-	}
-}, Ae = class {
-	playing;
-	pausing;
-	currentTime;
-	currentTimeStr;
-	totalTime;
-	totalTimeStr;
-	view;
-	progressBarTimer;
-	expansionMap;
-	midiPlayerElement;
-	midiUI;
-	customEventManager;
-	constructor(e, t, n) {
-		this.pausing = !1, this.playing = !1, this.midiUI = t || null, this.midiUI && this.midiUI.setMidiPlayer(this), this.customEventManager = n || null, this.midiPlayerElement = x(e, {}), this.midiPlayerElement.addEventListener("load", () => this.play()), this.midiPlayerElement.addEventListener("note", () => this.onUpdateNoteTime(this.midiPlayerElement.currentTime)), this.midiPlayerElement.addEventListener("stop", (e) => this.onStop(e)), this.currentTime = 0, this.currentTimeStr = "0.00", this.totalTime = 0, this.totalTimeStr = "0.00", this.progressBarTimer = null, this.view = null, this.expansionMap = {};
-	}
-	isPlaying() {
-		return this.playing;
-	}
-	isPausing() {
-		return this.pausing;
-	}
-	getCurrentTime() {
-		return this.currentTime;
-	}
-	getCurrentTimeStr() {
-		return this.currentTimeStr;
-	}
-	getTotalTime() {
-		return this.totalTime;
-	}
-	getTotalTimeStr() {
-		return this.totalTimeStr;
-	}
-	setView(e) {
-		this.view = e;
-	}
-	setExpansionMap(e) {
-		this.expansionMap = e || {};
-	}
-	getExpansionMap() {
-		return this.expansionMap;
-	}
-	playFile(e) {
-		this.midiPlayerElement.setAttribute("src", e);
-	}
-	play() {
-		this.midiPlayerElement.start(), this.totalTime = this.midiPlayerElement.duration * 1e3, this.totalTimeStr = this.samplesToTime(this.totalTime), this.currentTime = this.midiPlayerElement.currentTime * 1e3, this.currentTimeStr = this.samplesToTime(this.currentTime), this.startTimer(), this.pausing = !1, this.playing = !0, this.customEventManager && this.customEventManager.dispatch(E(T.EditData)), this.midiUI && this.midiUI.update(this);
-	}
-	stop() {
-		this.currentTime = 0, this.currentTimeStr = "0.00", this.totalTime = 0, this.totalTimeStr = "0.00", this.midiPlayerElement.stop(), this.stopTimer(), this.pausing = !1, this.playing = !1, this.customEventManager && this.customEventManager.dispatch(E(T.EditData)), this.midiUI && this.midiUI.update(this), this.view && this.view.midiStop();
-	}
-	pause() {
-		this.midiPlayerElement.stop(), this.stopTimer(), this.pausing = !0, this.playing = !1, this.customEventManager && this.customEventManager.dispatch(E(T.EditData)), this.midiUI && this.midiUI.update(this), this.view && this.view.midiStop();
-	}
-	seekToPercent(e) {
-		if (!this.midiPlayerElement.playing) return;
-		let t = this.totalTime * e;
-		this.stopTimer(), this.midiPlayerElement.currentTime = t / 1e3;
-	}
-	onUpdateNoteTime(e) {
-		let t = e * 1e3;
-		this.currentTime < t && (this.currentTime = t, this.onUpdate(this.currentTime));
-	}
-	onUpdate(e) {
-		this.currentTime = e, this.currentTimeStr = this.samplesToTime(this.currentTime), this.midiUI && this.midiUI.update(this), this.view && this.view.midiUpdate(e);
-	}
-	startTimer() {
-		this.progressBarTimer === null && (this.progressBarTimer = setInterval(() => {
-			if (this.totalTime > 0 && this.currentTime >= this.totalTime) {
-				this.midiPlayerElement.stop();
-				return;
-			}
-			this.onUpdate(this.currentTime), this.currentTime += 50;
-		}, 50));
-	}
-	stopTimer() {
-		this.progressBarTimer !== null && (clearInterval(this.progressBarTimer), this.progressBarTimer = null);
-	}
-	samplesToTime(e) {
-		let t = Math.floor(e / 1e3), n = t % 60;
-		return (t / 60 | 0) + ":" + (n === 0 ? "00" : n < 10 ? "0" + n : n);
-	}
-	onStop(e) {
-		let t = !!(e && e.detail && e.detail.finished);
-		this.stopTimer(), this.pausing = !1, this.playing = !1, t && (this.currentTime = this.totalTime, this.currentTimeStr = this.samplesToTime(this.currentTime)), this.customEventManager && this.customEventManager.dispatch(E(T.EditData)), this.midiUI && this.midiUI.update(this), this.view && this.view.midiStop();
-	}
-}, je = class extends I {
-	midiPlayer;
-	pageDragStart;
-	barDragStart;
-	barWidth;
-	midiControls;
-	play;
-	pause;
-	stop;
-	progressControl;
-	midiCurrentTime;
-	midiBar;
-	midiBarPercent;
-	midiTotalTime;
-	constructor(e, t, n) {
-		let r = `${t.host}/icons/toolbar/play.png`, a = `${t.host}/icons/toolbar/pause.png`, o = `${t.host}/icons/toolbar/stop.png`;
-		super(e, t), this.midiPlayer = null, this.active = !0, this.pageDragStart = 0, this.barDragStart = 0, this.barWidth = 200;
-		let s = n;
-		!s && this.app.toolbarObj && (s = this.app.toolbarObj.getMidiPlayerSubToolbar()), s ||= e, this.midiControls = i(s, { class: "vrv-btn-group" }), i(this.midiControls, { class: "vrv-h-separator" }), this.play = i(this.midiControls, {
-			class: "vrv-btn-icon-large",
-			style: { backgroundImage: `url(${r})` }
-		}), this.pause = i(this.midiControls, {
-			class: "vrv-btn-icon-large",
-			style: { backgroundImage: `url(${a})` }
-		}), this.stop = i(this.midiControls, {
-			class: "vrv-btn-icon-large",
-			style: { backgroundImage: `url(${o})` }
-		}), this.progressControl = i(this.midiControls, { class: "vrv-midi-progress" }), i(this.progressControl, { class: "vrv-h-separator" }), this.midiCurrentTime = i(this.progressControl, { class: "vrv-midi-current-time" }), this.midiBar = i(this.progressControl, { class: "vrv-midi-bar" }), this.midiBarPercent = i(this.midiBar, { class: "vrv-midi-bar-percent" }), this.midiTotalTime = i(this.progressControl, { class: "vrv-midi-total-time" }), this.eventManager.bind(this.play, "click", this.onPlay), this.eventManager.bind(this.pause, "click", this.onPause), this.eventManager.bind(this.stop, "click", this.onStop), this.eventManager.bind(this.midiBar, "mousedown", this.onProgressBarDown), this.eventManager.bind(this.midiBar, "mousemove", this.onProgressBarMove), this.eventManager.bind(this.midiBar, "mouseup", this.onProgressBarUp), this.updateToolbarBtnDisplay(this.pause, !1), this.updateToolbarBtnDisplay(this.stop, !1), this.updateToolbarGrp(this.progressControl, !1);
-	}
-	setMidiPlayer(e) {
-		this.midiPlayer = e;
-	}
-	update() {
-		this.updateAll();
-	}
-	updateProgressBar() {
-		this.midiTotalTime.textContent = this.midiPlayer.getTotalTimeStr(), this.midiCurrentTime.textContent = this.midiPlayer.getCurrentTimeStr();
-		let e = this.midiPlayer.getTotalTime() ? this.midiPlayer.getCurrentTime() / this.midiPlayer.getTotalTime() * 100 : 0;
-		this.midiBarPercent.style.width = `${e}%`;
-	}
-	updateDragging(e) {
-		let t = this.barDragStart + (e - this.pageDragStart);
-		if (t >= 0 && t <= this.barWidth) {
-			let e = t / this.barWidth;
-			this.midiPlayer.seekToPercent(e);
-		}
-	}
-	updateAll() {
-		this.updateProgressBar(), this.updateToolbarGrp(this.midiControls, this.app.getPageCount() > 0), this.updateToolbarBtnDisplay(this.play, !this.midiPlayer.isPlaying() || this.midiPlayer.isPausing()), this.updateToolbarBtnDisplay(this.pause, !this.midiPlayer.isPausing() && this.midiPlayer.isPlaying()), this.updateToolbarBtnDisplay(this.stop, this.midiPlayer.isPlaying() || this.midiPlayer.isPausing()), this.updateToolbarGrp(this.progressControl, this.midiPlayer.isPlaying() || this.midiPlayer.isPausing());
-	}
-	onPlay(e) {
-		this.midiPlayer.isPausing() ? this.midiPlayer.play() : this.app.playMEI();
-	}
-	onPause(e) {
-		this.midiPlayer.pause();
-	}
-	onStop(e) {
-		this.midiPlayer.stop();
-	}
-	onProgressBarDown(e) {
-		this.midiPlayer.getTotalTime() !== 0 && (this.pageDragStart = e.pageX, this.barDragStart = e.offsetX, this.updateDragging(e.pageX));
-	}
-	onProgressBarMove(e) {
-		this.pageDragStart !== 0 && (this.midiPlayer.pause(), this.updateDragging(e.pageX));
-	}
-	onProgressBarUp(e) {
-		this.pageDragStart !== 0 && this.midiPlayer.getTotalTime() !== 0 && (this.pageDragStart = 0, this.midiPlayer.play());
-	}
-	onActivate(e) {
-		return super.onActivate(e) ? (this.updateAll(), !0) : !1;
-	}
-	onEditData(e) {
-		return super.onEditData(e) ? (this.updateAll(), !0) : !1;
-	}
-	onEndLoading(e) {
-		return super.onEndLoading(e) ? (this.updateAll(), !0) : !1;
-	}
-}, Me = class extends D {
+}, Oe = class extends D {
 	actionManager;
 	underlay;
 	eventManager;
@@ -3307,7 +2832,7 @@ var K = class extends D {
 		let t = e.target;
 		this.actionManager.insert(t.dataset.elementName, t.dataset.insertMode);
 	}
-}, Ne = class {
+}, ke = class {
 	element;
 	stack;
 	constructor(e) {
@@ -3321,7 +2846,7 @@ var K = class extends D {
 			this.element.classList.add("disabled"), this.stack.shift(), this.stack.length > 0 && this.push();
 		}, 3500));
 	}
-}, Pe = class {
+}, Ae = class {
 	loader;
 	loaderText;
 	views;
@@ -3342,31 +2867,31 @@ var K = class extends D {
 	getCount() {
 		return this.loadingCount;
 	}
-}, Fe = 1, X = /* @__PURE__ */ new Map(), Z = class {
+}, je = 1, Y = /* @__PURE__ */ new Map(), X = class {
 	worker;
 	constructor(e) {
 		return this.worker = e, this.worker.addEventListener("message", (e) => {
-			let { taskId: t, result: n } = e.data, r = X.get(t);
-			r && (r.resolve(n), X.delete(t));
+			let { taskId: t, result: n } = e.data, r = Y.get(t);
+			r && (r.resolve(n), Y.delete(t));
 		}, !1), new Proxy(this, { get: (e, t) => function() {
-			let n = Fe++, r = Array.prototype.slice.call(arguments);
+			let n = je++, r = Array.prototype.slice.call(arguments);
 			e.worker.postMessage({
 				taskId: n,
 				method: t,
 				args: r
 			});
 			let i = new j();
-			return X.set(n, i), i.promise;
+			return Y.set(n, i), i.promise;
 		} });
 	}
-}, Ie = class extends Z {
+}, Me = class extends X {
 	addPage;
 	end;
 	start;
 	constructor(e) {
 		super(e);
 	}
-}, Le = class extends Z {
+}, Ne = class extends X {
 	check;
 	validate;
 	validateNG;
@@ -3376,7 +2901,7 @@ var K = class extends D {
 	constructor(e) {
 		super(e);
 	}
-}, Re = class extends Z {
+}, Pe = class extends X {
 	edit;
 	editInfo;
 	getAvailableOptions;
@@ -3401,7 +2926,7 @@ var K = class extends D {
 	constructor(e) {
 		super(e);
 	}
-}, Q = class {
+}, Z = class {
 	tags;
 	rngNs;
 	constructor() {
@@ -3516,7 +3041,7 @@ var K = class extends D {
 	isRng(e, t) {
 		return e.namespaceURI === this.rngNs && e.localName === t;
 	}
-}, ze = class {
+}, Fe = class {
 	verovio;
 	validator = null;
 	rngLoader = null;
@@ -3527,9 +3052,9 @@ var K = class extends D {
 	constructor(e) {
 		this.host = e.host, this.pdfkitUrl = e.pdfkitUrl;
 		let t = this.getWorkerURL(`${e.host}/dist/verovio/verovio-worker.js`), n = new Worker(t), r = e.verovioUrl || `https://www.verovio.org/javascript/${e.verovioVersion}/verovio-toolkit-wasm.js`;
-		if (n.postMessage({ verovioUrl: r }), this.verovio = new Re(n), e.enableEditor) {
+		if (n.postMessage({ verovioUrl: r }), this.verovio = new Pe(n), e.enableEditor) {
 			let t = this.getWorkerURL(`${e.host}/dist/xml/validator-worker.js`), n = new Worker(t), r = e.validatorUrl || "https://www.verovio.org/javascript/validator/xml-validator-2.10.3.js";
-			n.postMessage({ validatorUrl: r }), this.validator = new Le(n), this.rngLoader = new Q(), this.rngLoaderBasic = new Q();
+			n.postMessage({ validatorUrl: r }), this.validator = new Ne(n), this.rngLoader = new Z(), this.rngLoaderBasic = new Z();
 		}
 	}
 	getWorkerURL(e) {
@@ -3551,9 +3076,9 @@ var K = class extends D {
 	}
 	getPDFWorker() {
 		let e = this.getWorkerURL(`${this.host}/dist/document/pdf-worker.js`), t = new Worker(e), n = this.pdfkitUrl || "https://www.verovio.org/javascript/pdfkit";
-		return t.postMessage({ pdfkitUrl: n }), new Ie(t);
+		return t.postMessage({ pdfkitUrl: n }), new Me(t);
 	}
-}, Be = class {
+}, Ie = class {
 	pdf;
 	currentScale;
 	verovio;
@@ -3585,7 +3110,7 @@ var K = class extends D {
 		let n = await this.pdf.end();
 		return await this.verovio.setOptions(e), await this.verovio.redoLayout(), n;
 	}
-}, Ve = class {
+}, Le = class {
 	app;
 	fileStack;
 	inputData = "";
@@ -3633,7 +3158,7 @@ var K = class extends D {
 	}
 	async generatePDF(e) {
 		this.app.pdfWorker || (this.app.pdfWorker = this.app.verovioService.getPDFWorker());
-		let t = await new Be(this.app.verovio, this.app.pdfWorker, this.app.verovioOptions.scale).generateFile();
+		let t = await new Ie(this.app.verovio, this.app.pdfWorker, this.app.verovioOptions.scale).generateFile();
 		this.app.loaderService.end(), e.href = `${t}`, e.download = this.filename.replace(/\.[^\.]*$/, ".pdf"), e.click();
 	}
 	async generateMIDI(e) {
@@ -3650,7 +3175,7 @@ var K = class extends D {
 	setFilename(e) {
 		this.filename = e;
 	}
-}, He = class {
+}, Re = class {
 	getItem(e) {
 		return window.localStorage.getItem(e);
 	}
@@ -3660,13 +3185,13 @@ var K = class extends D {
 	removeItem(e) {
 		window.localStorage.removeItem(e);
 	}
-}, Ue = class {
+}, Q = class {
 	getItem(e) {
 		return null;
 	}
 	setItem(e, t) {}
 	removeItem(e) {}
-}, We = "/svg/filter.xml", $ = class {
+}, ze = "/svg/filter.xml", $ = class {
 	plugins;
 	services;
 	commands;
@@ -3676,7 +3201,9 @@ var K = class extends D {
 	zoomLevels;
 	eventManager;
 	id;
-	githubManager;
+	get githubManager() {
+		return this.getService("github-manager");
+	}
 	options;
 	fileStack;
 	storageProvider;
@@ -3688,7 +3215,9 @@ var K = class extends D {
 	verovioOptions;
 	view;
 	toolbarView;
-	midiPlayer;
+	get midiPlayer() {
+		return this.getService("midi-player");
+	}
 	notificationService;
 	loaderService;
 	verovioService;
@@ -3726,7 +3255,7 @@ var K = class extends D {
 	clientId;
 	div;
 	constructor(n, r) {
-		this.plugins = /* @__PURE__ */ new Map(), this.services = /* @__PURE__ */ new Map(), this.commands = /* @__PURE__ */ new Map(), this.clientId = r?.githubClientId || "fd81068a15354a300522", this.host = r?.baseUrl || (window.location.hostname == "localhost" ? `http://${window.location.host}` : "https://editor.verovio.org"), this.id = this.clientId, r?.enableGitHub !== !1 && (this.githubManager = new ke(this)), this.options = Object.assign({
+		this.plugins = /* @__PURE__ */ new Map(), this.services = /* @__PURE__ */ new Map(), this.commands = /* @__PURE__ */ new Map(), this.clientId = r?.githubClientId || "fd81068a15354a300522", this.host = r?.baseUrl || (window.location.hostname == "localhost" ? `http://${window.location.host}` : "https://editor.verovio.org"), this.id = this.clientId, this.options = Object.assign({
 			version: V,
 			verovioVersion: "latest",
 			documentViewMargin: 100,
@@ -3756,14 +3285,14 @@ var K = class extends D {
 			defaultView: "responsive",
 			isSafari: !1,
 			disableLocalStorage: !1
-		}, r || {}), this.eventTarget = new EventTarget(), this.storageProvider = this.options.storageProvider ? this.options.storageProvider : this.options.disableLocalStorage ? new Ue() : new He(), this.options.appReset && this.storageProvider.removeItem("options");
+		}, r || {}), this.eventTarget = new EventTarget(), this.storageProvider = this.options.storageProvider ? this.options.storageProvider : this.options.disableLocalStorage ? new Q() : new Re(), this.options.appReset && this.storageProvider.removeItem("options");
 		let a = this.storageProvider.getItem("options");
 		if (a) {
 			let e = JSON.parse(a), [t, n] = (e.version === void 0 ? "1.3.0" : e.version).split(".").map(Number), [r, i] = this.options.version.split(".").map(Number);
 			t < r || n < i ? console.warn(`Version ${this.options.version} is new, options not reloaded`) : this.options = Object.assign(this.options, e);
 		}
 		let c = this.storageProvider.getItem("showDevFeatures");
-		for (c === null ? this.options.devFeatures = !1 : this.options.showDevFeatures = c === "true", this.fileStack = new Oe(this.storageProvider), this.options.appReset && this.fileStack.reset(), this.div = n, this.zoomLevels = [
+		for (c === null ? this.options.devFeatures = !1 : this.options.showDevFeatures = c === "true", this.fileStack = new De(this.storageProvider), this.options.appReset && this.fileStack.reset(), this.div = n, this.zoomLevels = [
 			5,
 			10,
 			20,
@@ -3785,7 +3314,7 @@ var K = class extends D {
 		}), this.toolbarObj = null, this.options.enableFilter && this.createFilter(), this.input = o(this.div, {
 			type: "file",
 			class: "vrv-file-input"
-		}), this.input.onchange = this.fileInput.bind(this), this.output = t(this.div, { class: "vrv-file-output" }), this.fileCopy = _(this.div, { class: "vrv-file-copy" }), this.wrapper = i(this.div, { class: "vrv-wrapper" }), this.notification = i(this.wrapper, { class: "vrv-notification disabled" }), this.contextUnderlay = i(this.wrapper, { class: "vrv-context-underlay" }), this.contextMenu = i(this.wrapper, { class: "vrv-context-menu" }), this.dialogDiv = i(this.wrapper, { class: "vrv-dialog" }), this.toolbar = i(this.wrapper, { class: "vrv-toolbar" }), !this.options.enableToolbar && !this.options.enableMidiToolbar && (this.toolbar.style.display = "none"), this.views = i(this.wrapper, { class: "vrv-views" }), this.loader = i(this.views, { class: "vrv-loading" }), this.loaderText = i(this.loader, { class: "vrv-loading-text" }), this.statusbar = i(this.wrapper, { class: "vrv-statusbar" }), this.options.enableStatusbar || (this.statusbar.style.display = "none", this.statusbar.style.minHeight = "0px"), this.notificationService = new Ne(this.notification), this.loaderService = new Pe(this.loader, this.loaderText, this.views, this.customEventManager), this.fileService = new Ve(this), this.verovioService = new ze({
+		}), this.input.onchange = this.fileInput.bind(this), this.output = t(this.div, { class: "vrv-file-output" }), this.fileCopy = _(this.div, { class: "vrv-file-copy" }), this.wrapper = i(this.div, { class: "vrv-wrapper" }), this.notification = i(this.wrapper, { class: "vrv-notification disabled" }), this.contextUnderlay = i(this.wrapper, { class: "vrv-context-underlay" }), this.contextMenu = i(this.wrapper, { class: "vrv-context-menu" }), this.dialogDiv = i(this.wrapper, { class: "vrv-dialog" }), this.toolbar = i(this.wrapper, { class: "vrv-toolbar" }), !this.options.enableToolbar && !this.options.enableMidiToolbar && (this.toolbar.style.display = "none"), this.views = i(this.wrapper, { class: "vrv-views" }), this.loader = i(this.views, { class: "vrv-loading" }), this.loaderText = i(this.loader, { class: "vrv-loading-text" }), this.statusbar = i(this.wrapper, { class: "vrv-statusbar" }), this.options.enableStatusbar || (this.statusbar.style.display = "none", this.statusbar.style.minHeight = "0px"), this.notificationService = new ke(this.notification), this.loaderService = new Ae(this.loader, this.loaderText, this.views, this.customEventManager), this.fileService = new Le(this), this.verovioService = new Fe({
 			verovioVersion: this.options.verovioVersion,
 			verovioUrl: this.options.verovioUrl,
 			validatorUrl: this.options.validatorUrl,
@@ -3876,7 +3405,7 @@ var K = class extends D {
 		this.loaderService.end(), this.view.customEventManager.dispatch(E(T.Activate));
 	}
 	createToolbar() {
-		this.options.enableToolbar && (this.toolbarObj = new xe(this.toolbar, this), this.customEventManager.addToPropagationList(this.toolbarObj.customEventManager)), this.options.enableMidiToolbar && (this.midiToolbarObj = new je(this.toolbar, this), this.midiPlayer = new Ae(this.midiToolbarObj.getDiv(), this.midiToolbarObj, this.customEventManager), this.customEventManager.addToPropagationList(this.midiToolbarObj.customEventManager)), this.options.enableContextMenu && (this.contextMenuObj = new Me(this.contextMenu, this, this.contextUnderlay), this.customEventManager.addToPropagationList(this.contextMenuObj.customEventManager)), this.div.addEventListener("contextmenu", (e) => e.preventDefault());
+		this.options.enableToolbar && (this.toolbarObj = new xe(this.toolbar, this), this.customEventManager.addToPropagationList(this.toolbarObj.customEventManager)), this.options.enableContextMenu && (this.contextMenuObj = new Oe(this.contextMenu, this, this.contextUnderlay), this.customEventManager.addToPropagationList(this.contextMenuObj.customEventManager)), this.div.addEventListener("contextmenu", (e) => e.preventDefault());
 	}
 	createStatusbar() {
 		this.options.enableStatusbar && (this.statusbarObj = new ee(this.statusbar, this), this.customEventManager.addToPropagationList(this.statusbarObj.customEventManager), this.statusbarObj.setVerovioVersion(this.verovioRuntimeVersion));
@@ -3886,14 +3415,10 @@ var K = class extends D {
 		var t = new XMLHttpRequest();
 		t.onreadystatechange = function() {
 			this.readyState == 4 && this.status == 200 && e.appendChild(this.responseXML.documentElement);
-		}, t.open("GET", `${this.host}${We}`, !0), t.send();
+		}, t.open("GET", `${this.host}${ze}`, !0), t.send();
 	}
 	async playMEI() {
-		if (!this.midiPlayer) return;
-		let e = await this.verovio.renderToExpansionMap();
-		this.midiPlayer.setExpansionMap(e);
-		let t = "data:audio/midi;base64," + await this.verovio.renderToMIDI();
-		this.midiPlayer.playFile(t);
+		this.executeCommand("midi.playMEI");
 	}
 	async applySelection() {
 		let e = this.options.selection;
@@ -4000,7 +3525,7 @@ var K = class extends D {
 			let e = new CustomEvent("onSelectionRequest", { cancelable: !0 });
 			if (this.eventTarget.dispatchEvent(e), e.defaultPrevented) return;
 		}
-		let t = new we(this.dialogDiv, this, "Apply a selection to the file currently loaded", {
+		let t = new Ce(this.dialogDiv, this, "Apply a selection to the file currently loaded", {
 			okLabel: "Apply",
 			icon: "info",
 			type: M.Type.OKCancel
@@ -4012,22 +3537,10 @@ var K = class extends D {
 		})));
 	}
 	async githubImport(e) {
-		if (!this.githubManager) return;
-		if (this.options.useCustomDialogs) {
-			let e = new CustomEvent("onGithubImportRequest", { cancelable: !0 });
-			if (this.eventTarget.dispatchEvent(e), e.defaultPrevented) return;
-		}
-		let t = new J(this.dialogDiv, this, "Import an MEI file from GitHub", {}, this.githubManager);
-		await t.show() === 1 && this.fileService.loadData(t.getData(), t.getFilename());
+		this.executeCommand("github.import");
 	}
 	async githubExport(e) {
-		if (this.githubManager) {
-			if (this.options.useCustomDialogs) {
-				let e = new CustomEvent("onGithubExportRequest", { cancelable: !0 });
-				if (this.eventTarget.dispatchEvent(e), e.defaultPrevented) return;
-			}
-			await new Ce(this.dialogDiv, this, "Export an MEI file to GitHub", {}, this.githubManager).show();
-		}
+		this.executeCommand("github.export");
 	}
 	async settingsEditor(e) {
 		if (this.options.useCustomDialogs) {
@@ -4037,7 +3550,7 @@ var K = class extends D {
 			});
 			if (this.eventTarget.dispatchEvent(e), e.defaultPrevented) return;
 		}
-		let t = new Te(this.dialogDiv, this, "Editor options", {
+		let t = new we(this.dialogDiv, this, "Editor options", {
 			okLabel: "Apply",
 			icon: "info",
 			type: M.Type.OKCancel
@@ -4059,7 +3572,7 @@ var K = class extends D {
 			});
 			if (this.eventTarget.dispatchEvent(e), e.defaultPrevented) return;
 		}
-		let t = new De(this.dialogDiv, this, "Verovio options", {
+		let t = new Ee(this.dialogDiv, this, "Verovio options", {
 			okLabel: "Apply",
 			icon: "info",
 			type: M.Type.OKCancel
@@ -4130,10 +3643,10 @@ var K = class extends D {
 })($ ||= {});
 //#endregion
 //#region ts/verovio-app.ts
-var Ge = class extends $ {
+var Be = class extends $ {
 	constructor(e, t) {
 		t.enableEditor = !1, super(e, t);
 	}
 };
 //#endregion
-export { $ as App, T as AppEvent, He as LocalStorageProvider, Ue as NoStorageProvider, Ge as VerovioApp, E as createAppEvent };
+export { $ as App, T as AppEvent, Re as LocalStorageProvider, Q as NoStorageProvider, Be as VerovioApp, E as createAppEvent };

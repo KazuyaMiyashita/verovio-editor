@@ -72,7 +72,9 @@ export class App {
   public readonly zoomLevels: Array<number>;
   public readonly eventManager: EventManager;
   public readonly id: string;
-  public readonly githubManager: GitHubManager;
+  public get githubManager(): GitHubManager | undefined {
+    return this.getService("github-manager");
+  }
   public readonly options: App.Options;
   public readonly fileStack: FileStack;
   public readonly storageProvider: StorageProvider;
@@ -89,7 +91,9 @@ export class App {
   // private members
   private view: GenericView;
   private toolbarView: VerovioView;
-  private midiPlayer: MidiPlayer;
+  public get midiPlayer(): MidiPlayer | undefined {
+    return this.getService("midi-player");
+  }
 
   // services
   public notificationService: NotificationService;
@@ -147,10 +151,6 @@ export class App {
         ? `http://${window.location.host}`
         : "https://editor.verovio.org");
     this.id = this.clientId;
-
-    if (options?.enableGitHub !== false) {
-      this.githubManager = new GitHubManager(this);
-    }
 
     this.options = Object.assign(
       {
@@ -603,21 +603,6 @@ export class App {
       );
     }
 
-    if (this.options.enableMidiToolbar) {
-      this.midiToolbarObj = new MidiToolbar(this.toolbar, this);
-      this.midiPlayer = new MidiPlayer(
-        this.midiToolbarObj.getDiv(),
-        this.midiToolbarObj,
-        this.customEventManager,
-      );
-      this.customEventManager.addToPropagationList(
-        this.midiToolbarObj.customEventManager,
-      );
-    } else {
-      // Create midi player without toolbar if needed?
-      // For now just skip if no toolbar
-    }
-
     if (this.options.enableContextMenu) {
       this.contextMenuObj = new ContextMenu(
         this.contextMenu,
@@ -659,12 +644,7 @@ export class App {
   ////////////////////////////////////////////////////////////////////////
 
   public async playMEI(): Promise<void> {
-    if (!this.midiPlayer) return;
-    const expansionMap = await this.verovio.renderToExpansionMap();
-    this.midiPlayer.setExpansionMap(expansionMap);
-    const base64midi = await this.verovio.renderToMIDI();
-    const midiFile = "data:audio/midi;base64," + base64midi;
-    this.midiPlayer.playFile(midiFile);
+    this.executeCommand("midi.playMEI");
   }
 
   private async applySelection(): Promise<void> {
@@ -949,44 +929,11 @@ export class App {
   }
 
   async githubImport(e: Event): Promise<void> {
-    if (!this.githubManager) return;
-    if (this.options.useCustomDialogs) {
-      const event = new CustomEvent("onGithubImportRequest", { cancelable: true });
-      this.eventTarget.dispatchEvent(event);
-      if (event.defaultPrevented) return;
-    }
-
-    const dlg = new DialogGhImport(
-      this.dialogDiv,
-      this,
-      "Import an MEI file from GitHub",
-      {},
-      this.githubManager,
-    );
-    const dlgRes = await dlg.show();
-    if (dlgRes === 1) {
-      this.fileService.loadData(dlg.getData() as string, dlg.getFilename());
-    }
+    this.executeCommand("github.import");
   }
 
   async githubExport(e: Event): Promise<void> {
-    if (!this.githubManager) return;
-    if (this.options.useCustomDialogs) {
-      const event = new CustomEvent("onGithubExportRequest", { cancelable: true });
-      this.eventTarget.dispatchEvent(event);
-      if (event.defaultPrevented) return;
-    }
-
-    const dlg = new DialogGhExport(
-      this.dialogDiv,
-      this,
-      "Export an MEI file to GitHub",
-      {},
-      this.githubManager,
-    );
-    const dlgRes = await dlg.show();
-    if (dlgRes === 1) {
-    }
+    this.executeCommand("github.export");
   }
 
   async settingsEditor(e: Event): Promise<void> {
