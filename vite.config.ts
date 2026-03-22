@@ -6,6 +6,7 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     include: ['ts/**/*.spec.ts', 'ts/**/*.test.ts'],
+    setupFiles: ['./tests/setup.ts'],
   },
   build: {
     emptyOutDir: false,

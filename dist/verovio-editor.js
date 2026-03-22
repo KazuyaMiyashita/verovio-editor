@@ -3667,6 +3667,9 @@ var K = class extends D {
 	setItem(e, t) {}
 	removeItem(e) {}
 }, We = "/svg/filter.xml", $ = class {
+	plugins;
+	services;
+	commands;
 	dialogDiv;
 	host;
 	customEventManager;
@@ -3723,7 +3726,7 @@ var K = class extends D {
 	clientId;
 	div;
 	constructor(n, r) {
-		this.clientId = r?.githubClientId || "fd81068a15354a300522", this.host = r?.baseUrl || (window.location.hostname == "localhost" ? `http://${window.location.host}` : "https://editor.verovio.org"), this.id = this.clientId, r?.enableGitHub !== !1 && (this.githubManager = new ke(this)), this.options = Object.assign({
+		this.plugins = /* @__PURE__ */ new Map(), this.services = /* @__PURE__ */ new Map(), this.commands = /* @__PURE__ */ new Map(), this.clientId = r?.githubClientId || "fd81068a15354a300522", this.host = r?.baseUrl || (window.location.hostname == "localhost" ? `http://${window.location.host}` : "https://editor.verovio.org"), this.id = this.clientId, r?.enableGitHub !== !1 && (this.githubManager = new ke(this)), this.options = Object.assign({
 			version: V,
 			verovioVersion: "latest",
 			documentViewMargin: 100,
@@ -4086,6 +4089,37 @@ var K = class extends D {
 			reload: !0,
 			lightEndLoading: !1
 		})), this.toolbarObj && this.toolbarObj.customEventManager.dispatch(E(T.Activate));
+	}
+	use(e) {
+		return this.plugins.has(e.id) ? (console.warn(`Plugin with id '${e.id}' is already registered.`), this) : (this.plugins.set(e.id, e), e.install(this), this);
+	}
+	getPlugin(e) {
+		return this.plugins.get(e);
+	}
+	async initPlugins() {
+		for (let e of this.plugins.values()) e.init && await e.init();
+	}
+	registerService(e, t) {
+		if (this.services.has(e)) {
+			console.warn(`Service with id '${e}' is already registered.`);
+			return;
+		}
+		this.services.set(e, t);
+	}
+	getService(e) {
+		return this.services.get(e);
+	}
+	registerCommand(e, t) {
+		if (this.commands.has(e)) {
+			console.warn(`Command with id '${e}' is already registered.`);
+			return;
+		}
+		this.commands.set(e, t);
+	}
+	executeCommand(e, ...t) {
+		let n = this.commands.get(e);
+		if (n) return n(...t);
+		console.warn(`Command with id '${e}' not found.`);
 	}
 };
 (function(e) {

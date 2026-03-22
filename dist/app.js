@@ -32,6 +32,10 @@ import { FileService } from "./utils/file-service.js";
 import { LocalStorageProvider, NoStorageProvider, } from "./utils/storage-provider.js";
 const filter = "/svg/filter.xml";
 export class App {
+    // Plugin System Foundation
+    plugins;
+    services;
+    commands;
     // public readonly members
     dialogDiv;
     host;
@@ -91,6 +95,9 @@ export class App {
     clientId;
     div;
     constructor(div, options) {
+        this.plugins = new Map();
+        this.services = new Map();
+        this.commands = new Map();
         this.clientId = options?.githubClientId || "fd81068a15354a300522";
         this.host =
             options?.baseUrl ||
@@ -819,6 +826,54 @@ export class App {
         }));
         if (this.toolbarObj) {
             this.toolbarObj.customEventManager.dispatch(createAppEvent(AppEvent.Activate));
+        }
+    }
+    ////////////////////////////////////////////////////////////////////////
+    // Plugin System Methods
+    ////////////////////////////////////////////////////////////////////////
+    use(plugin) {
+        if (this.plugins.has(plugin.id)) {
+            console.warn(`Plugin with id '${plugin.id}' is already registered.`);
+            return this;
+        }
+        this.plugins.set(plugin.id, plugin);
+        plugin.install(this);
+        return this;
+    }
+    getPlugin(id) {
+        return this.plugins.get(id);
+    }
+    async initPlugins() {
+        for (const plugin of this.plugins.values()) {
+            if (plugin.init) {
+                await plugin.init();
+            }
+        }
+    }
+    registerService(id, service) {
+        if (this.services.has(id)) {
+            console.warn(`Service with id '${id}' is already registered.`);
+            return;
+        }
+        this.services.set(id, service);
+    }
+    getService(id) {
+        return this.services.get(id);
+    }
+    registerCommand(id, handler) {
+        if (this.commands.has(id)) {
+            console.warn(`Command with id '${id}' is already registered.`);
+            return;
+        }
+        this.commands.set(id, handler);
+    }
+    executeCommand(id, ...args) {
+        const handler = this.commands.get(id);
+        if (handler) {
+            return handler(...args);
+        }
+        else {
+            console.warn(`Command with id '${id}' not found.`);
         }
     }
 }

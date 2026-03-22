@@ -46,6 +46,7 @@ import { NotificationService } from "./utils/notification-service.js";
 import { LoaderService } from "./utils/loader-service.js";
 import { VerovioService } from "./verovio/verovio-service.js";
 import { FileService } from "./utils/file-service.js";
+import { EditorPlugin } from "./plugins/plugin.js";
 import {
   StorageProvider,
   LocalStorageProvider,
@@ -59,6 +60,11 @@ declare global {
 }
 
 export class App {
+  // Plugin System Foundation
+  private readonly plugins: Map<string, EditorPlugin>;
+  private readonly services: Map<string, any>;
+  private readonly commands: Map<string, Function>;
+
   // public readonly members
   public readonly dialogDiv: HTMLDivElement;
   public readonly host: string;
@@ -130,6 +136,10 @@ export class App {
   private readonly div: HTMLDivElement;
 
   constructor(div: HTMLDivElement, options?: App.Options) {
+    this.plugins = new Map<string, EditorPlugin>();
+    this.services = new Map<string, any>();
+    this.commands = new Map<string, Function>();
+
     this.clientId = options?.githubClientId || "fd81068a15354a300522";
     this.host =
       options?.baseUrl ||
@@ -1092,6 +1102,61 @@ export class App {
       this.toolbarObj.customEventManager.dispatch(
         createAppEvent(AppEvent.Activate),
       );
+    }
+  }
+
+  ////////////////////////////////////////////////////////////////////////
+  // Plugin System Methods
+  ////////////////////////////////////////////////////////////////////////
+
+  public use(plugin: EditorPlugin): this {
+    if (this.plugins.has(plugin.id)) {
+      console.warn(`Plugin with id '${plugin.id}' is already registered.`);
+      return this;
+    }
+    this.plugins.set(plugin.id, plugin);
+    plugin.install(this);
+    return this;
+  }
+
+  public getPlugin<T extends EditorPlugin>(id: string): T | undefined {
+    return this.plugins.get(id) as T | undefined;
+  }
+
+  public async initPlugins(): Promise<void> {
+    for (const plugin of this.plugins.values()) {
+      if (plugin.init) {
+        await plugin.init();
+      }
+    }
+  }
+
+  public registerService<T>(id: string, service: T): void {
+    if (this.services.has(id)) {
+      console.warn(`Service with id '${id}' is already registered.`);
+      return;
+    }
+    this.services.set(id, service);
+  }
+
+  public getService<T>(id: string): T | undefined {
+    return this.services.get(id) as T | undefined;
+  }
+
+  public registerCommand(id: string, handler: Function): void {
+    if (this.commands.has(id)) {
+      console.warn(`Command with id '${id}' is already registered.`);
+      return;
+    }
+    this.commands.set(id, handler);
+  }
+
+  public executeCommand(id: string, ...args: any[]): any {
+    const handler = this.commands.get(id);
+    if (handler) {
+      return handler(...args);
+    } else {
+      console.warn(`Command with id '${id}' not found.`);
     }
   }
 }

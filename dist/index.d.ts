@@ -29,6 +29,9 @@ declare class ActionManager {
 }
 
 export declare class App {
+    private readonly plugins;
+    private readonly services;
+    private readonly commands;
     readonly dialogDiv: HTMLDivElement;
     readonly host: string;
     readonly customEventManager: CustomEventManager;
@@ -140,6 +143,13 @@ export declare class App {
     helpAbout(e: Event): Promise<void>;
     helpReset(e: Event): Promise<void>;
     setView(e: Event): Promise<void>;
+    use(plugin: EditorPlugin): this;
+    getPlugin<T extends EditorPlugin>(id: string): T | undefined;
+    initPlugins(): Promise<void>;
+    registerService<T>(id: string, service: T): void;
+    getService<T>(id: string): T | undefined;
+    registerCommand(id: string, handler: Function): void;
+    executeCommand(id: string, ...args: any[]): any;
 }
 
 export declare namespace App {
@@ -424,6 +434,31 @@ declare class EditorPanel extends GenericView {
     onToggleOrientation(e: Event): void;
     onToggle(e: Event): Promise<any>;
     onForceReload(e: Event): void;
+}
+
+/**
+ * EditorPlugin is the standard interface for all Verovio Editor extensions.
+ */
+declare interface EditorPlugin {
+    id: string;
+    /**
+     * Phase 1: Install
+     * Called immediately when the plugin is added via `app.use()`.
+     * Use this to register services, commands, or subscribe to events.
+     * Do NOT manipulate the DOM here.
+     */
+    install(app: App): void;
+    /**
+     * Phase 2: Initialize (Optional)
+     * Called after all plugins have been installed and the app is ready.
+     * Use this to build UI or access services provided by other plugins.
+     */
+    init?(): Promise<void> | void;
+    /**
+     * Teardown (Optional)
+     * Called when the app or the plugin is destroyed.
+     */
+    destroy?(): void;
 }
 
 declare class EditorScorePanel extends GenericView {
