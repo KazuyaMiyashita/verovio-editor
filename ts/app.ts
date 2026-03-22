@@ -71,6 +71,8 @@ export class App {
   public readonly fileStack: FileStack;
   public readonly storageProvider: StorageProvider;
 
+  private readonly eventTarget: EventTarget;
+
   public readonly verovio: VerovioWorkerProxy;
   public readonly validator: ValidatorWorkerProxy;
   public readonly rngLoader: RNGLoader;
@@ -193,6 +195,8 @@ export class App {
       options || ({} as App.Options),
     );
 
+    this.eventTarget = new EventTarget();
+
     this.storageProvider = this.options.storageProvider
       ? this.options.storageProvider
       : this.options.disableLocalStorage
@@ -250,6 +254,17 @@ export class App {
 
     this.eventManager = new EventManager(this);
     this.customEventManager = new CustomEventManager();
+
+    // Bridge internal events to public eventTarget
+    // Use a unique ID for the bridge to avoid blocking other bindings on 'this'
+    const bridgeObj = { id: `bridge-${this.id}` };
+    Object.values(AppEvent).forEach((ev) => {
+      this.customEventManager.bind(bridgeObj as any, ev, (e: CustomEvent) => {
+        this.eventTarget.dispatchEvent(
+          new CustomEvent(ev, { detail: e.detail }),
+        );
+      });
+    });
 
     this.toolbarObj = null;
 
@@ -425,6 +440,26 @@ export class App {
 
   public isLoaded(): boolean {
     return this.appIsLoaded;
+  }
+
+  public on(
+    type: string,
+    callback: EventListenerOrEventListenerObject | null,
+    options?: boolean | AddEventListenerOptions,
+  ): void {
+    this.eventTarget.addEventListener(type, callback, options);
+  }
+
+  public off(
+    type: string,
+    callback: EventListenerOrEventListenerObject | null,
+    options?: boolean | EventListenerOptions,
+  ): void {
+    this.eventTarget.removeEventListener(type, callback, options);
+  }
+
+  public dispatchEvent(event: Event): boolean {
+    return this.eventTarget.dispatchEvent(event);
   }
 
   public getCurrentSchema(): string {

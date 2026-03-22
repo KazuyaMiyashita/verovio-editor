@@ -39,6 +39,7 @@ export declare class App {
     readonly options: App.Options;
     readonly fileStack: FileStack;
     readonly storageProvider: StorageProvider;
+    private readonly eventTarget;
     readonly verovio: VerovioWorkerProxy;
     readonly validator: ValidatorWorkerProxy;
     readonly rngLoader: RNGLoader;
@@ -91,6 +92,9 @@ export declare class App {
     setPageCount(pageCount: number): void;
     getCurrentZoomIndex(): number;
     isLoaded(): boolean;
+    on(type: string, callback: EventListenerOrEventListenerObject | null, options?: boolean | AddEventListenerOptions): void;
+    off(type: string, callback: EventListenerOrEventListenerObject | null, options?: boolean | EventListenerOptions): void;
+    dispatchEvent(event: Event): boolean;
     getCurrentSchema(): string;
     setCurrentSchema(schema: string): void;
     get pdfWorker(): PDFWorkerProxy;

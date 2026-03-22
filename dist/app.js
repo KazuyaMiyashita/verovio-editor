@@ -43,6 +43,7 @@ export class App {
     options;
     fileStack;
     storageProvider;
+    eventTarget;
     verovio;
     validator;
     rngLoader;
@@ -138,6 +139,7 @@ export class App {
             isSafari: false,
             disableLocalStorage: false,
         }, options || {});
+        this.eventTarget = new EventTarget();
         this.storageProvider = this.options.storageProvider
             ? this.options.storageProvider
             : this.options.disableLocalStorage
@@ -187,6 +189,14 @@ export class App {
         });
         this.eventManager = new EventManager(this);
         this.customEventManager = new CustomEventManager();
+        // Bridge internal events to public eventTarget
+        // Use a unique ID for the bridge to avoid blocking other bindings on 'this'
+        const bridgeObj = { id: `bridge-${this.id}` };
+        Object.values(AppEvent).forEach((ev) => {
+            this.customEventManager.bind(bridgeObj, ev, (e) => {
+                this.eventTarget.dispatchEvent(new CustomEvent(ev, { detail: e.detail }));
+            });
+        });
         this.toolbarObj = null;
         if (this.options.enableFilter) {
             // Create and load the SVG filter
@@ -323,6 +333,15 @@ export class App {
     }
     isLoaded() {
         return this.appIsLoaded;
+    }
+    on(type, callback, options) {
+        this.eventTarget.addEventListener(type, callback, options);
+    }
+    off(type, callback, options) {
+        this.eventTarget.removeEventListener(type, callback, options);
+    }
+    dispatchEvent(event) {
+        return this.eventTarget.dispatchEvent(event);
     }
     getCurrentSchema() {
         return this.currentSchema;

@@ -3668,6 +3668,7 @@ var K = class extends D {
 	options;
 	fileStack;
 	storageProvider;
+	eventTarget;
 	verovio;
 	validator;
 	rngLoader;
@@ -3743,7 +3744,7 @@ var K = class extends D {
 			defaultView: "responsive",
 			isSafari: !1,
 			disableLocalStorage: !1
-		}, r || {}), this.storageProvider = this.options.storageProvider ? this.options.storageProvider : this.options.disableLocalStorage ? new Ue() : new He(), this.options.appReset && this.storageProvider.removeItem("options");
+		}, r || {}), this.eventTarget = new EventTarget(), this.storageProvider = this.options.storageProvider ? this.options.storageProvider : this.options.disableLocalStorage ? new Ue() : new He(), this.options.appReset && this.storageProvider.removeItem("options");
 		let a = this.storageProvider.getItem("options");
 		if (a) {
 			let e = JSON.parse(a), [t, n] = (e.version === void 0 ? "1.3.0" : e.version).split(".").map(Number), [r, i] = this.options.version.split(".").map(Number);
@@ -3763,7 +3764,13 @@ var K = class extends D {
 		s(document.head, {
 			href: `${this.host}/css/verovio.css`,
 			rel: "stylesheet"
-		}), this.eventManager = new O(this), this.customEventManager = new e(), this.toolbarObj = null, this.options.enableFilter && this.createFilter(), this.input = o(this.div, {
+		}), this.eventManager = new O(this), this.customEventManager = new e();
+		let l = { id: `bridge-${this.id}` };
+		Object.values(T).forEach((e) => {
+			this.customEventManager.bind(l, e, (t) => {
+				this.eventTarget.dispatchEvent(new CustomEvent(e, { detail: t.detail }));
+			});
+		}), this.toolbarObj = null, this.options.enableFilter && this.createFilter(), this.input = o(this.div, {
 			type: "file",
 			class: "vrv-file-input"
 		}), this.input.onchange = this.fileInput.bind(this), this.output = t(this.div, { class: "vrv-file-output" }), this.fileCopy = _(this.div, { class: "vrv-file-copy" }), this.wrapper = i(this.div, { class: "vrv-wrapper" }), this.notification = i(this.wrapper, { class: "vrv-notification disabled" }), this.contextUnderlay = i(this.wrapper, { class: "vrv-context-underlay" }), this.contextMenu = i(this.wrapper, { class: "vrv-context-menu" }), this.dialogDiv = i(this.wrapper, { class: "vrv-dialog" }), this.toolbar = i(this.wrapper, { class: "vrv-toolbar" }), !this.options.enableToolbar && !this.options.enableMidiToolbar && (this.toolbar.style.display = "none"), this.views = i(this.wrapper, { class: "vrv-views" }), this.loader = i(this.views, { class: "vrv-loading" }), this.loaderText = i(this.loader, { class: "vrv-loading-text" }), this.statusbar = i(this.wrapper, { class: "vrv-statusbar" }), this.options.enableStatusbar || (this.statusbar.style.display = "none", this.statusbar.style.minHeight = "0px"), this.notificationService = new Ne(this.notification), this.loaderService = new Pe(this.loader, this.loaderText, this.views, this.customEventManager), this.fileService = new Ve(this), this.verovioService = new ze({
@@ -3786,8 +3793,8 @@ var K = class extends D {
 			scale: 100,
 			xmlIdSeed: 1
 		}, this.pageCount = 0, this.currentZoomIndex = 4, this.verovioRuntimeVersion = "", this.appIsLoaded = !1, this.appReset = !1;
-		let l = this.fileStack.getLast();
-		l && (console.log("Reloading", l.filename), this.fileService.loadData(l.data, l.filename)), this.loaderService.start("Loading Verovio ..."), this.verovioService.init({
+		let u = this.fileStack.getLast();
+		u && (console.log("Reloading", u.filename), this.fileService.loadData(u.data, u.filename)), this.loaderService.start("Loading Verovio ..."), this.verovioService.init({
 			verovioVersion: this.options.verovioVersion,
 			verovioUrl: this.options.verovioUrl,
 			validatorUrl: this.options.validatorUrl,
@@ -3821,6 +3828,15 @@ var K = class extends D {
 	}
 	isLoaded() {
 		return this.appIsLoaded;
+	}
+	on(e, t, n) {
+		this.eventTarget.addEventListener(e, t, n);
+	}
+	off(e, t, n) {
+		this.eventTarget.removeEventListener(e, t, n);
+	}
+	dispatchEvent(e) {
+		return this.eventTarget.dispatchEvent(e);
 	}
 	getCurrentSchema() {
 		return this.currentSchema;
