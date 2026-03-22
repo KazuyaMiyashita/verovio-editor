@@ -3,7 +3,6 @@
  * It requires a HTMLDivElement to be put on.
  */
 import { AppStatusbar } from "./app-statusbar.js";
-import { AppToolbar } from "./toolbars/app-toolbar.js";
 import { Dialog } from "./dialogs/dialog.js";
 import { DialogAbout } from "./dialogs/dialog-about.js";
 import { DialogExport } from "./dialogs/dialog-export.js";
@@ -31,6 +30,7 @@ export class App {
     plugins;
     services;
     commands;
+    extensions;
     // public readonly members
     dialogDiv;
     host;
@@ -97,6 +97,7 @@ export class App {
         this.plugins = new Map();
         this.services = new Map();
         this.commands = new Map();
+        this.extensions = new Map();
         this.clientId = options?.githubClientId || "fd81068a15354a300522";
         this.host =
             options?.baseUrl ||
@@ -429,10 +430,6 @@ export class App {
         this.view.customEventManager.dispatch(createAppEvent(AppEvent.Activate));
     }
     createToolbar() {
-        if (this.options.enableToolbar) {
-            this.toolbarObj = new AppToolbar(this.toolbar, this);
-            this.customEventManager.addToPropagationList(this.toolbarObj.customEventManager);
-        }
         if (this.options.enableContextMenu) {
             this.contextMenuObj = new ContextMenu(this.contextMenu, this, this.contextUnderlay);
             this.customEventManager.addToPropagationList(this.contextMenuObj.customEventManager);
@@ -833,6 +830,15 @@ export class App {
         else {
             console.warn(`Command with id '${id}' not found.`);
         }
+    }
+    contribute(point, contribution) {
+        if (!this.extensions.has(point)) {
+            this.extensions.set(point, []);
+        }
+        this.extensions.get(point).push(contribution);
+    }
+    getContributions(point) {
+        return (this.extensions.get(point) || []);
     }
 }
 ////////////////////////////////////////////////////////////////////////

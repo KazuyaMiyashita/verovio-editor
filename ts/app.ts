@@ -64,6 +64,7 @@ export class App {
   private readonly plugins: Map<string, EditorPlugin>;
   private readonly services: Map<string, any>;
   private readonly commands: Map<string, Function>;
+  private readonly extensions: Map<string, any[]>;
 
   // public readonly members
   public readonly dialogDiv: HTMLDivElement;
@@ -143,6 +144,7 @@ export class App {
     this.plugins = new Map<string, EditorPlugin>();
     this.services = new Map<string, any>();
     this.commands = new Map<string, Function>();
+    this.extensions = new Map<string, any[]>();
 
     this.clientId = options?.githubClientId || "fd81068a15354a300522";
     this.host =
@@ -596,13 +598,6 @@ export class App {
   }
 
   private createToolbar(): void {
-    if (this.options.enableToolbar) {
-      this.toolbarObj = new AppToolbar(this.toolbar, this);
-      this.customEventManager.addToPropagationList(
-        this.toolbarObj.customEventManager,
-      );
-    }
-
     if (this.options.enableContextMenu) {
       this.contextMenuObj = new ContextMenu(
         this.contextMenu,
@@ -1105,6 +1100,17 @@ export class App {
     } else {
       console.warn(`Command with id '${id}' not found.`);
     }
+  }
+
+  public contribute(point: string, contribution: any): void {
+    if (!this.extensions.has(point)) {
+      this.extensions.set(point, []);
+    }
+    this.extensions.get(point).push(contribution);
+  }
+
+  public getContributions<T>(point: string): T[] {
+    return (this.extensions.get(point) || []) as T[];
   }
 }
 

@@ -32,6 +32,7 @@ export declare class App {
     private readonly plugins;
     private readonly services;
     private readonly commands;
+    private readonly extensions;
     readonly dialogDiv: HTMLDivElement;
     readonly host: string;
     readonly customEventManager: CustomEventManager;
@@ -150,6 +151,8 @@ export declare class App {
     getService<T>(id: string): T | undefined;
     registerCommand(id: string, handler: Function): void;
     executeCommand(id: string, ...args: any[]): any;
+    contribute(point: string, contribution: any): void;
+    getContributions<T>(point: string): T[];
 }
 
 export declare namespace App {

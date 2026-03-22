@@ -15,6 +15,12 @@ export class GitHubPlugin {
         app.registerService("github-manager", this.githubManager);
         app.registerCommand("github.import", this.import.bind(this));
         app.registerCommand("github.export", this.export.bind(this));
+        app.contribute("toolbar.actions", {
+            id: "github-import",
+            label: "Import from GitHub",
+            command: "github.import",
+            icon: "github" // icon handling needs to be implemented in the toolbar plugin
+        });
     }
     async import() {
         if (this.app.options.useCustomDialogs) {
