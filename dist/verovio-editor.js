@@ -3829,6 +3829,9 @@ var K = class extends D {
 	isLoaded() {
 		return this.appIsLoaded;
 	}
+	loadData(e, t = "untitled.xml", n = !1, r = !1) {
+		this.fileService.loadData(e, t, n, r);
+	}
 	on(e, t, n) {
 		this.eventTarget.addEventListener(e, t, n);
 	}

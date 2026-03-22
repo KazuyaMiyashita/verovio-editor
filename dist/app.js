@@ -334,6 +334,9 @@ export class App {
     isLoaded() {
         return this.appIsLoaded;
     }
+    loadData(data, filename = "untitled.xml", convert = false, onlyIfEmpty = false) {
+        this.fileService.loadData(data, filename, convert, onlyIfEmpty);
+    }
     on(type, callback, options) {
         this.eventTarget.addEventListener(type, callback, options);
     }

@@ -442,6 +442,15 @@ export class App {
     return this.appIsLoaded;
   }
 
+  public loadData(
+    data: string,
+    filename: string = "untitled.xml",
+    convert: boolean = false,
+    onlyIfEmpty: boolean = false,
+  ): void {
+    this.fileService.loadData(data, filename, convert, onlyIfEmpty);
+  }
+
   public on(
     type: string,
     callback: EventListenerOrEventListenerObject | null,
@@ -1013,30 +1022,30 @@ export namespace App {
     appReset?: boolean;
     isSafari?: boolean;
     viewerOnly?: boolean;
-    selection: Object;
-    editorial: Object;
-    defaultView: string;
-    documentViewPageBorder: number;
-    documentViewSVG: boolean;
-    documentViewMargin: number;
-    documentZoom: number;
-    editorSplitterHorizontal: boolean;
-    editorZoom: number;
-    enableDocument: boolean;
-    enableEditor: boolean;
-    enableResponsive: boolean;
-    enableStatusbar: boolean;
-    enableToolbar: boolean;
-    enableMidiToolbar: boolean;
-    enableContextMenu: boolean;
-    enableFilter: boolean;
-    enableValidation: boolean;
-    github: GitHubManager.Options;
-    responsiveZoom: number;
-    schemaDefault: string;
-    schema: string;
-    schemaBasic: string;
-    verovioVersion: string;
+    selection?: Object;
+    editorial?: Object;
+    defaultView?: string;
+    documentViewPageBorder?: number;
+    documentViewSVG?: boolean;
+    documentViewMargin?: number;
+    documentZoom?: number;
+    editorSplitterHorizontal?: boolean;
+    editorZoom?: number;
+    enableDocument?: boolean;
+    enableEditor?: boolean;
+    enableResponsive?: boolean;
+    enableStatusbar?: boolean;
+    enableToolbar?: boolean;
+    enableMidiToolbar?: boolean;
+    enableContextMenu?: boolean;
+    enableFilter?: boolean;
+    enableValidation?: boolean;
+    github?: GitHubManager.Options;
+    responsiveZoom?: number;
+    schemaDefault?: string;
+    schema?: string;
+    schemaBasic?: string;
+    verovioVersion?: string;
     verovioUrl?: string;
     validatorUrl?: string;
     pdfkitUrl?: string;
@@ -1044,8 +1053,8 @@ export namespace App {
     changelogUrl?: string;
     disableLocalStorage?: boolean;
     storageProvider?: StorageProvider;
-    devFeatures: boolean;
-    showDevFeatures: boolean;
+    devFeatures?: boolean;
+    showDevFeatures?: boolean;
   }
 
   export interface MEIExportOptions {
