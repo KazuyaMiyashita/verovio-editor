@@ -19,6 +19,7 @@ export class StandardToolbarPlugin {
             if (toolbarDiv) {
                 this.toolbarObj = new AppToolbar(toolbarDiv, this.app);
                 this.app.customEventManager.addToPropagationList(this.toolbarObj.customEventManager);
+                this.app.registerService("toolbar", this.toolbarObj);
                 this.renderContributions();
             }
         }

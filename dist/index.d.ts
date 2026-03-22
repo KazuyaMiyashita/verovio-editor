@@ -1,38 +1,9 @@
-declare class ActionManager {
-    readonly eventManager: EventManager;
-    protected readonly app: App;
-    private inProgress;
-    private readonly editorViewObj;
-    private canUndoCache;
-    private canRedoCache;
-    constructor(view: EditorView, app: App);
-    canUndo(): boolean;
-    canRedo(): boolean;
-    commit(caller: GenericView): Promise<void>;
-    editRefresh(): Promise<void>;
-    drag(x: number, y: number): Promise<void>;
-    keyDown(key: number, shiftKey: boolean, ctrlKey: boolean): Promise<void>;
-    keyUp(key: number, shiftKey: boolean, ctrlKey: boolean): Promise<void>;
-    insert(elementName: string, insertMode: string): Promise<void>;
-    formCres(): Promise<void>;
-    formDim(): Promise<void>;
-    placeAbove(): Promise<void>;
-    placeBelow(): Promise<void>;
-    placeAuto(): Promise<void>;
-    stemDirUp(): Promise<void>;
-    stemDirDown(): Promise<void>;
-    stemDirAuto(): Promise<void>;
-    undo(): Promise<void>;
-    redo(): Promise<void>;
-    setAttrValue(attribute: string, value: string, id: string): Promise<void>;
-    setAttrValueForTypes(attribute: string, value: string, elementTypes?: Array<string>): Promise<void>;
-}
-
 export declare class App {
     private readonly plugins;
     private readonly services;
     private readonly commands;
     private readonly extensions;
+    private readonly viewsRegistry;
     readonly dialogDiv: HTMLDivElement;
     readonly host: string;
     readonly customEventManager: CustomEventManager;
@@ -40,14 +11,16 @@ export declare class App {
     readonly eventManager: EventManager;
     readonly id: string;
     get githubManager(): GitHubManager | undefined;
+    get validator(): ValidatorWorkerProxy | undefined;
+    get rngLoader(): RNGLoader | undefined;
+    get rngLoaderBasic(): RNGLoader | undefined;
+    get pdfWorker(): PDFWorkerProxy | undefined;
+    set pdfWorker(pdf: PDFWorkerProxy | undefined);
     readonly options: App.Options;
     readonly fileStack: FileStack;
     readonly storageProvider: StorageProvider;
     private readonly eventTarget;
     readonly verovio: VerovioWorkerProxy;
-    readonly validator: ValidatorWorkerProxy;
-    readonly rngLoader: RNGLoader;
-    readonly rngLoaderBasic: RNGLoader;
     readonly verovioOptions: VerovioView.Options;
     private view;
     private toolbarView;
@@ -58,18 +31,6 @@ export declare class App {
     fileService: FileService;
     private pageCount;
     private currentZoomIndex;
-    toolbarObj: AppToolbar;
-    contextMenuObj: ContextMenu;
-    private statusbarObj;
-    private midiToolbarObj;
-    private resizeTimer;
-    private appIsLoaded;
-    private appReset;
-    private verovioRuntimeVersion;
-    viewDocumentObj: DocumentView;
-    viewEditorObj: EditorPanel;
-    viewResponsiveObj: ResponsiveView;
-    private pdf;
     private currentSchema;
     private input;
     private output;
@@ -83,15 +44,25 @@ export declare class App {
     private loader;
     private loaderText;
     private statusbar;
-    private view1;
-    private view2;
-    private view3;
+    private appIsLoaded;
+    private appReset;
+    private verovioRuntimeVersion;
+    private resizeTimer;
     private readonly clientId;
     private readonly div;
     constructor(div: HTMLDivElement, options?: App.Options);
-    getView(): GenericView;
+    get container(): HTMLDivElement;
+    get toolbarElement(): HTMLDivElement;
+    get viewsElement(): HTMLDivElement;
+    get statusbarElement(): HTMLDivElement;
+    get dialogElement(): HTMLDivElement;
+    get toolbarObj(): any;
+    get contextMenuObj(): any;
+    get viewEditorObj(): any;
+    getView(): GenericView & VerovioView;
     getToolbarView(): VerovioView;
-    getMidiPlayer(): MidiPlayer | null;
+    getMidiPlayer(): any;
+    getRuntimeVersion(): string;
     getPageCount(): number;
     setPageCount(pageCount: number): void;
     getCurrentZoomIndex(): number;
@@ -102,8 +73,6 @@ export declare class App {
     dispatchEvent(event: Event): boolean;
     getCurrentSchema(): string;
     setCurrentSchema(schema: string): void;
-    get pdfWorker(): PDFWorkerProxy;
-    set pdfWorker(pdf: PDFWorkerProxy);
     destroy(): void;
     private createInterfaceAndLoadData;
     private createViews;
@@ -151,6 +120,8 @@ export declare class App {
     getService<T>(id: string): T | undefined;
     registerCommand(id: string, handler: Function): void;
     executeCommand(id: string, ...args: any[]): any;
+    registerView(id: string, view: GenericView & VerovioView): void;
+    setViewByName(id: string): void;
     contribute(point: string, contribution: any): void;
     getContributions<T>(point: string): T[];
 }
@@ -265,60 +236,6 @@ export declare interface AppEventDetailMap {
     [AppEvent.EndLoading]: undefined;
 }
 
-declare class AppToolbar extends Toolbar {
-    private readonly viewDocument;
-    private readonly viewResponsive;
-    private readonly viewSelector;
-    private readonly viewEditor;
-    private readonly subSubMenu;
-    private readonly editorSubToolbar;
-    private readonly midiPlayerSubToolbar;
-    private readonly pageControls;
-    private readonly nextPage;
-    private readonly prevPage;
-    private readonly fileImportMusicXML;
-    private readonly fileImportCMME;
-    private readonly fileImport;
-    private readonly fileMenuBtn;
-    private readonly fileRecent;
-    private readonly fileSelection;
-    private readonly zoomControls;
-    private readonly zoomIn;
-    private readonly zoomOut;
-    private readonly settingsEditor;
-    private readonly settingsVerovio;
-    private readonly helpReset;
-    private readonly helpAbout;
-    private readonly loginGroup;
-    private readonly login;
-    private readonly logout;
-    private readonly githubMenu;
-    private readonly githubImport;
-    private readonly githubExport;
-    constructor(div: HTMLDivElement, app: App);
-    getMidiPlayerSubToolbar(): HTMLDivElement;
-    updateRecent(): void;
-    private updateAll;
-    onMouseOver(e: CustomEvent): void;
-    onClick(e: CustomEvent): void;
-    onActivate(e: CustomEvent): boolean;
-    onEndLoading(e: CustomEvent): boolean;
-    onStartLoading(e: CustomEvent): boolean;
-}
-
-declare class ContextMenu extends GenericView {
-    private actionManager;
-    private readonly underlay;
-    readonly eventManager: EventManager;
-    constructor(div: HTMLDivElement, app: App, underlay: HTMLDivElement);
-    setActionManager(actionManager: ActionManager): void;
-    show(e: PointerEvent): void;
-    hide(): void;
-    onDismiss(e: MouseEvent): void;
-    buildFor(id: string): void;
-    insertNote(e: Event): void;
-}
-
 export declare function createAppEvent<K extends AppEvent>(type: K, detail?: AppEventDetailMap[K]): AppCustomEvent<K>;
 
 declare class CustomEventManager {
@@ -329,114 +246,6 @@ declare class CustomEventManager {
     bind(obj: GenericView | App, ev: AppEvent | string, fct: Function): void;
     addToPropagationList(customEventManager: CustomEventManager): void;
     dispatch(event: Event): void;
-}
-
-declare class DocumentView extends VerovioView {
-    protected currentPageHeight: number;
-    protected currentPageWidth: number;
-    protected currentDocHeight: number;
-    protected currentDocWidth: number;
-    protected currentDocMargin: number;
-    private pruning;
-    private readonly observer;
-    private readonly docWrapper;
-    constructor(div: HTMLDivElement, app: App, verovio: VerovioWorkerProxy);
-    refreshView(update: VerovioView.Refresh, lightEndLoading?: boolean, mei?: string, reload?: boolean): Promise<any>;
-    updateActivate(): Promise<any>;
-    updateLoadData(redoLayout: boolean, mei: string, reload: boolean): Promise<any>;
-    updateResized(): Promise<any>;
-    updateZoom(): Promise<any>;
-    private handleObserver;
-    private loadPage;
-    private pruneDocument;
-    private renderPage;
-}
-
-declare class EditorCursorPointer {
-    private readonly editorViewObj;
-    private activated;
-    private pixPerPix;
-    private viewTop;
-    private viewLeft;
-    private lastEvent;
-    private scrollTop;
-    private scrollLeft;
-    private staffNode;
-    private initX;
-    private initY;
-    private marginLeft;
-    private marginTop;
-    private MEIUnit;
-    constructor(editorView: EditorView);
-    setLastEvent(lastEvent: MouseEvent): void;
-    getLastEvent(): MouseEvent;
-    setScrollTop(scrollTop: number): void;
-    setScrollLeft(scrollLeft: number): void;
-    xToMEI(x: number): number;
-    yToMEI(y: number): number;
-    xToView(x: number): number;
-    yToView(y: number): number;
-    init(svgRoot: SVGElement, top: number, left: number): void;
-    initEvent(event: MouseEvent, node: SVGElement): void;
-    initStaff(node: SVGElement): void;
-    distFromLastEvent(): [number, number];
-}
-
-declare class EditorPanel extends GenericView {
-    readonly eventManager: EventManager;
-    readonly xmlEditorViewObj: XMLEditorView;
-    readonly editorViewObj: EditorView;
-    private draggingSplitter;
-    private draggingX;
-    private draggingY;
-    private splitterX;
-    private splitterY;
-    private splitterSize;
-    private resizeTimer;
-    private readonly toolbar;
-    private readonly toolbarObj;
-    private readonly hSplit;
-    private readonly toolPanel;
-    private readonly tabGroup;
-    private readonly tabGroupObj;
-    private readonly vSplit;
-    private readonly keyboard;
-    HTMLDivElement: any;
-    private readonly keyboardObj;
-    private readonly split;
-    private readonly scorePanel;
-    scorePanelObj: EditorScorePanel;
-    private readonly contentPanel;
-    private readonly contentPanelObj;
-    private readonly editorView;
-    private readonly splitter;
-    private xmlEditorEnabled;
-    private readonly xmlEditorView;
-    private readonly verovio;
-    private readonly validator;
-    private readonly rngLoader;
-    private readonly boundMouseMove;
-    private readonly boundMouseUp;
-    constructor(div: HTMLDivElement, app: App, verovio: VerovioWorkerProxy, validator: ValidatorWorkerProxy, rngLoader: RNGLoader);
-    setXmlEditorEnabled(xmlEditorEnabled: boolean): void;
-    isXmlEditorEnabled(): boolean;
-    private updateSplitterSize;
-    private updateSize;
-    onActivate(e: CustomEvent): boolean;
-    onDeactivate(e: CustomEvent): boolean;
-    onSelect(e: CustomEvent): boolean;
-    onStartLoading(e: CustomEvent): boolean;
-    onEditData(e: CustomEvent): boolean;
-    onEndLoading(e: CustomEvent): boolean;
-    onResized(e: CustomEvent): boolean;
-    onLoadData(e: CustomEvent): boolean;
-    private propagateEvent;
-    onDragInit(e: MouseEvent): void;
-    onDragMove(e: MouseEvent): void;
-    onDragUp(e: MouseEvent): void;
-    onToggleOrientation(e: Event): void;
-    onToggle(e: Event): Promise<any>;
-    onForceReload(e: Event): void;
 }
 
 /**
@@ -462,68 +271,6 @@ declare interface EditorPlugin {
      * Called when the app or the plugin is destroyed.
      */
     destroy?(): void;
-}
-
-declare class EditorScorePanel extends GenericView {
-    private readonly sectionTree;
-    private readonly sectionTreeObj;
-    private readonly tab;
-    constructor(div: HTMLDivElement, app: App, tab: Tab);
-    private updateContent;
-    onActivate(e: CustomEvent): boolean;
-    onEndLoading(e: CustomEvent): boolean;
-}
-
-declare class EditorView extends ResponsiveView {
-    readonly cursorPointerObj: EditorCursorPointer;
-    readonly actionManager: ActionManager;
-    private readonly midiPlayerElement;
-    private svgOverlay;
-    private mouseMoveTimer;
-    private draggingActive;
-    private mouseOverId;
-    private lastNote;
-    private selectedItems;
-    constructor(div: HTMLDivElement, app: App, verovio: VerovioWorkerProxy);
-    getActionManager(): ActionManager;
-    private initCursor;
-    updateSVGDimensions(): void;
-    renderPage(lightEndLoading?: boolean, createOverlay?: boolean): Promise<any>;
-    private select;
-    private playNoteSound;
-    clearSelection(): void;
-    hasSelection(): boolean;
-    getSelection(): Array<SelectedItem>;
-    addNodeToSelection(node: SVGElement): void;
-    addToSelection(element: string, id: string, x?: number, y?: number): void;
-    getClosestMEIElement(node: SVGElement, elementType?: string): SVGElement;
-    private createOverlay;
-    private highlightMouseOver;
-    private highlightMouseOverReset;
-    private highlightSelected;
-    private highlightSelectedReset;
-    private highlightWithColor;
-    onCursorActivity(e: CustomEvent): boolean;
-    onEndLoading(e: CustomEvent): boolean;
-    onSelect(e: CustomEvent): boolean;
-    contextMenuListener(e: PointerEvent): void;
-    keyDownListener(e: KeyboardEvent): void;
-    keyUpListener(e: KeyboardEvent): void;
-    mouseDownListener(e: MouseEvent): void;
-    mouseEnterListener(e: MouseEvent): void;
-    mouseLeaveListener(e: MouseEvent): void;
-    mouseMoveListener(e: MouseEvent): void;
-    mouseUpListener(e: MouseEvent): void;
-    scrollListener(e: Event): void;
-}
-
-declare namespace EditorView {
-    interface NoteAttributes {
-        pname?: string;
-        oct?: string;
-        accid?: string;
-        midiPitch?: number;
-    }
 }
 
 /**
@@ -807,20 +554,6 @@ declare class RNGLoader {
     private isRng;
 }
 
-declare interface SelectedItem {
-    element: string;
-    id: string;
-    x: number;
-    y: number;
-}
-
-declare enum Status {
-    Validating = 0,
-    Valid = 1,
-    Invalid = 2,
-    Unknown = 3
-}
-
 /**
  * The StorageProvider interface for abstraction of storage access.
  */
@@ -828,51 +561,6 @@ export declare interface StorageProvider {
     getItem(key: string): string | null;
     setItem(key: string, value: string): void;
     removeItem(key: string): void;
-}
-
-declare class Tab extends GenericView {
-    private tabGroupObj;
-    private tabSelector;
-    loaded: boolean;
-    constructor(div: HTMLDivElement, app: App, tabGroup: TabGroup, label: string);
-    select(): void;
-    deselect(): void;
-    isSelected(): boolean;
-}
-
-declare class TabGroup extends GenericView {
-    readonly tabSelectors: HTMLDivElement;
-    readonly eventManager: EventManager;
-    private selectedTab;
-    private tabs;
-    constructor(div: HTMLDivElement, app: App);
-    getSelectedTab(): Tab;
-    addTab(label: string): Tab;
-    setHeight(height: number): void;
-    select(id: string): void;
-    resetTabs(): void;
-    /**
-     *  The tabs are not added to the tabGroup custom event propagation list.
-     *  Events are propagated by hand as appropriate to all tabs or only to the selected tab.
-     */
-    onActivate(e: CustomEvent): boolean;
-    onDeactivate(e: CustomEvent): boolean;
-    onEditData(e: CustomEvent): boolean;
-    onEndLoading(e: CustomEvent): boolean;
-    onLoadData(e: CustomEvent): boolean;
-    onSelect(e: CustomEvent): boolean;
-    private dispatchToAll;
-    onSelectTab(e: MouseEvent): void;
-}
-
-declare class Toolbar extends GenericView {
-    readonly eventManager: EventManager;
-    constructor(div: HTMLDivElement, app: App);
-    protected updateToolbarGrp(grp: HTMLElement, condition: boolean): void;
-    protected updateToolbarBtnEnabled(btn: HTMLElement, condition: boolean): void;
-    protected updateToolbarBtnDisplay(btn: HTMLElement, condition: boolean): void;
-    protected updateToolbarBtnToggled(btn: HTMLElement, condition: boolean): void;
-    protected updateToolbarSubmenuBtn(btn: HTMLElement, condition: boolean): void;
 }
 
 declare class ValidatorWorkerProxy extends WorkerProxy {
@@ -1031,45 +719,6 @@ declare class VerovioWorkerProxy extends WorkerProxy {
 declare class WorkerProxy {
     private worker;
     constructor(worker: Worker);
-}
-
-declare class XMLEditorView extends GenericView {
-    private currentId;
-    private updateLinting;
-    private timestamp;
-    private autoMode;
-    private autoModeNotification;
-    private edited;
-    private formatting;
-    private CMeditor;
-    private lintOptions;
-    private originalText;
-    private readonly validator;
-    private readonly rngLoader;
-    private readonly xmlValid;
-    private readonly xmlEditorView;
-    constructor(div: HTMLDivElement, app: App, validator: ValidatorWorkerProxy, rngLoader: RNGLoader);
-    isEdited(): boolean;
-    setEdited(edited: boolean): void;
-    isAutoMode(): boolean;
-    setMode(fileSize: number): void;
-    isAutoModeNotification(): boolean;
-    setAutoModeNotification(autoModeNotification: boolean): void;
-    validate(text: string, updateLinting: Function, options: any): Promise<any>;
-    replaceSchema(schemaFile: string): Promise<any>;
-    setStatus(status: Status): void;
-    setCurrent(id: string): void;
-    highlightValidation(text: string, validation: string, timestamp: number): void;
-    formatXML(): void;
-    triggerValidation(): void;
-    suspendValidation(): void;
-    getValue(): string;
-    onXMLCursorActivity(cm: any): void;
-    keyHandled(cm: any, string: any, event: any): void;
-    onActivate(e: CustomEvent): boolean;
-    onLoadData(e: CustomEvent): boolean;
-    onResized(e: CustomEvent): boolean;
-    onSelect(e: CustomEvent): boolean;
 }
 
 export { }

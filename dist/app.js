@@ -2,22 +2,17 @@
  * The App class is the main class of the application.
  * It requires a HTMLDivElement to be put on.
  */
-import { AppStatusbar } from "./app-statusbar.js";
 import { Dialog } from "./dialogs/dialog.js";
 import { DialogAbout } from "./dialogs/dialog-about.js";
 import { DialogExport } from "./dialogs/dialog-export.js";
 import { DialogSelection } from "./dialogs/dialog-selection.js";
 import { DialogSettingsEditor } from "./dialogs/dialog-settings-editor.js";
 import { DialogSettingsVerovio } from "./dialogs/dialog-settings-verovio.js";
-import { DocumentView } from "./document/document-view.js";
 import { CustomEventManager } from "./events/custom-event-manager.js";
-import { EditorPanel } from "./editor/editor-panel.js";
 import { EventManager } from "./events/event-manager.js";
 import { FileStack } from "./utils/file-stack.js";
-import { ResponsiveView } from "./verovio/responsive-view.js";
 import { appendAnchorTo, appendDivTo, appendInputTo, appendLinkTo, appendTextAreaTo, } from "./utils/functions.js";
 import { aboutMsg, reloadMsg, resetMsg, version } from "./utils/messages.js";
-import { ContextMenu } from "./toolbars/context-menu.js";
 import { AppEvent, createAppEvent } from "./events/event-types.js";
 import { NotificationService } from "./utils/notification-service.js";
 import { LoaderService } from "./utils/loader-service.js";
@@ -31,6 +26,7 @@ export class App {
     services;
     commands;
     extensions;
+    viewsRegistry;
     // public readonly members
     dialogDiv;
     host;
@@ -41,14 +37,26 @@ export class App {
     get githubManager() {
         return this.getService("github-manager");
     }
+    get validator() {
+        return this.getService("validator");
+    }
+    get rngLoader() {
+        return this.getService("rng-loader");
+    }
+    get rngLoaderBasic() {
+        return this.getService("rng-loader-basic");
+    }
+    get pdfWorker() {
+        return this.getService("pdf-worker");
+    }
+    set pdfWorker(pdf) {
+        this.registerService("pdf-worker", pdf);
+    }
     options;
     fileStack;
     storageProvider;
     eventTarget;
     verovio;
-    validator;
-    rngLoader;
-    rngLoaderBasic;
     verovioOptions;
     // private members
     view;
@@ -63,18 +71,6 @@ export class App {
     fileService;
     pageCount;
     currentZoomIndex;
-    toolbarObj;
-    contextMenuObj;
-    statusbarObj;
-    midiToolbarObj;
-    resizeTimer;
-    appIsLoaded;
-    appReset;
-    verovioRuntimeVersion;
-    viewDocumentObj;
-    viewEditorObj;
-    viewResponsiveObj;
-    pdf;
     currentSchema;
     input;
     output;
@@ -88,9 +84,10 @@ export class App {
     loader;
     loaderText;
     statusbar;
-    view1;
-    view2;
-    view3;
+    appIsLoaded = false;
+    appReset = false;
+    verovioRuntimeVersion = "";
+    resizeTimer;
     clientId;
     div;
     constructor(div, options) {
@@ -98,6 +95,7 @@ export class App {
         this.services = new Map();
         this.commands = new Map();
         this.extensions = new Map();
+        this.viewsRegistry = new Map();
         this.clientId = options?.githubClientId || "fd81068a15354a300522";
         this.host =
             options?.baseUrl ||
@@ -205,9 +203,7 @@ export class App {
                 this.eventTarget.dispatchEvent(new CustomEvent(ev, { detail: e.detail }));
             });
         });
-        this.toolbarObj = null;
         if (this.options.enableFilter) {
-            // Create and load the SVG filter
             this.createFilter();
         }
         // Create input for reading files
@@ -264,11 +260,8 @@ export class App {
             schemaBasic: this.options.schemaBasic,
         });
         this.verovio = this.verovioService.verovio;
-        this.validator = this.verovioService.validator;
-        this.rngLoader = this.verovioService.rngLoader;
-        this.rngLoaderBasic = this.verovioService.rngLoaderBasic;
         // PDF object - will be created only if necessary
-        this.pdf = null;
+        // this.pdf = null; // Property removed, handled by setter/service
         // Handling the resizing of the window
         this.resizeTimer = 0; // Used to prevent per-pixel re-render events when the window is resized
         window.onresize = this.onResize.bind(this);
@@ -288,11 +281,6 @@ export class App {
         };
         this.pageCount = 0;
         this.currentZoomIndex = 4;
-        this.verovioRuntimeVersion = "";
-        // Set to true when everything is loaded
-        this.appIsLoaded = false;
-        // Use to avoid saving config when resetting the app
-        this.appReset = false;
         const last = this.fileStack.getLast();
         if (last) {
             console.log("Reloading", last.filename);
@@ -321,6 +309,14 @@ export class App {
     ////////////////////////////////////////////////////////////////////////
     // Getters and setters
     ////////////////////////////////////////////////////////////////////////
+    get container() { return this.div; }
+    get toolbarElement() { return this.toolbar; }
+    get viewsElement() { return this.views; }
+    get statusbarElement() { return this.statusbar; }
+    get dialogElement() { return this.dialogDiv; }
+    get toolbarObj() { return this.getService("toolbar"); }
+    get contextMenuObj() { return this.getService("context-menu"); }
+    get viewEditorObj() { return this.getService("xml-editor-view"); }
     getView() {
         return this.view;
     }
@@ -329,6 +325,9 @@ export class App {
     }
     getMidiPlayer() {
         return this.midiPlayer;
+    }
+    getRuntimeVersion() {
+        return this.verovioRuntimeVersion;
     }
     getPageCount() {
         return this.pageCount;
@@ -360,12 +359,6 @@ export class App {
     setCurrentSchema(schema) {
         this.currentSchema = schema;
     }
-    get pdfWorker() {
-        return this.pdf;
-    }
-    set pdfWorker(pdf) {
-        this.pdf = pdf;
-    }
     ////////////////////////////////////////////////////////////////////////
     // Class-specific methods
     ////////////////////////////////////////////////////////////////////////
@@ -374,8 +367,8 @@ export class App {
     }
     createInterfaceAndLoadData() {
         this.loaderService.start("Create the interface ...");
-        this.createToolbar();
         this.createViews();
+        this.createToolbar();
         this.createStatusbar();
         this.customEventManager.bind(this, AppEvent.Resized, this.onResized);
         this.customEventManager.dispatch(createAppEvent(AppEvent.Resized));
@@ -389,70 +382,15 @@ export class App {
         }
     }
     createViews() {
-        this.loaderService.start("Loading the views ...");
         this.view = null;
         this.toolbarView = null;
-        if (this.options.enableDocument) {
-            this.currentZoomIndex = this.options.documentZoom;
-            this.view1 = appendDivTo(this.views, { class: `vrv-view` });
-            this.viewDocumentObj = new DocumentView(this.view1, this, this.verovio);
-            this.customEventManager.addToPropagationList(this.viewDocumentObj.customEventManager);
-            if (this.options.defaultView === "document") {
-                this.view = this.viewDocumentObj;
-                this.toolbarView = this.viewDocumentObj;
-            }
-        }
-        if (this.options.enableEditor) {
-            this.currentZoomIndex = this.options.editorZoom;
-            this.view2 = appendDivTo(this.views, { class: `vrv-view` });
-            this.viewEditorObj = new EditorPanel(this.view2, this, this.verovio, this.validator, this.rngLoader);
-            this.customEventManager.addToPropagationList(this.viewEditorObj.customEventManager);
-            if (this.options.defaultView === "editor") {
-                this.view = this.viewEditorObj;
-                this.toolbarView = this.viewEditorObj.editorViewObj;
-            }
-        }
-        if (this.options.enableResponsive) {
-            this.currentZoomIndex = this.options.responsiveZoom;
-            this.view3 = appendDivTo(this.views, { class: `vrv-view` });
-            this.viewResponsiveObj = new ResponsiveView(this.view3, this, this.verovio);
-            this.customEventManager.addToPropagationList(this.viewResponsiveObj.customEventManager);
-            if (this.options.defaultView === "responsive") {
-                this.view = this.viewResponsiveObj;
-                this.toolbarView = this.viewResponsiveObj;
-            }
-        }
-        // Root element in which verovio-ui is created
-        if (!this.view) {
-            throw `No view enabled or unknown default view '${this.options.defaultView}' selected.`;
-        }
-        this.loaderService.end();
-        this.view.customEventManager.dispatch(createAppEvent(AppEvent.Activate));
     }
     createToolbar() {
-        if (this.options.enableContextMenu) {
-            this.contextMenuObj = new ContextMenu(this.contextMenu, this, this.contextUnderlay);
-            this.customEventManager.addToPropagationList(this.contextMenuObj.customEventManager);
-        }
         this.div.addEventListener("contextmenu", (e) => e.preventDefault());
     }
     createStatusbar() {
-        if (!this.options.enableStatusbar)
-            return;
-        this.statusbarObj = new AppStatusbar(this.statusbar, this);
-        this.customEventManager.addToPropagationList(this.statusbarObj.customEventManager);
-        this.statusbarObj.setVerovioVersion(this.verovioRuntimeVersion);
     }
     createFilter() {
-        const filterDiv = appendDivTo(this.div, { class: `vrv-filter` });
-        var xHttp = new XMLHttpRequest();
-        xHttp.onreadystatechange = function () {
-            if (this.readyState == 4 && this.status == 200) {
-                filterDiv.appendChild(this.responseXML.documentElement);
-            }
-        };
-        xHttp.open("GET", `${this.host}${filter}`, true);
-        xHttp.send();
     }
     ////////////////////////////////////////////////////////////////////////
     // Async worker methods
@@ -492,21 +430,21 @@ export class App {
         if (this.appReset)
             return;
         // Store zoom of each view
-        if (this.viewDocumentObj)
-            this.options.documentZoom = this.viewDocumentObj.getCurrentZoomIndex();
-        if (this.viewResponsiveObj)
-            this.options.responsiveZoom =
-                this.viewResponsiveObj.getCurrentZoomIndex();
-        if (this.viewEditorObj)
-            this.options.editorZoom =
-                this.viewEditorObj.editorViewObj.getCurrentZoomIndex();
+        for (const [id, view] of this.viewsRegistry.entries()) {
+            if (id === "document")
+                this.options.documentZoom = view.getCurrentZoomIndex();
+            else if (id === "responsive")
+                this.options.responsiveZoom = view.getCurrentZoomIndex();
+            else if (id === "editor")
+                this.options.editorZoom = view.getCurrentZoomIndex();
+        }
         // Store current view
-        if (this.view == this.viewDocumentObj)
-            this.options.defaultView = "document";
-        else if (this.view == this.viewResponsiveObj)
-            this.options.defaultView = "responsive";
-        else if (this.view == this.viewEditorObj)
-            this.options.defaultView = "editor";
+        for (const [id, view] of this.viewsRegistry.entries()) {
+            if (this.view === view) {
+                this.options.defaultView = id;
+                break;
+            }
+        }
         // Do not store selection and editorial
         delete this.options["selection"];
         delete this.options["editorial"];
@@ -755,32 +693,9 @@ export class App {
     }
     async setView(e) {
         const element = e.target;
-        if (this.midiPlayer && this.midiPlayer.isPlaying()) {
-            this.midiPlayer.stop();
-        }
-        this.view.customEventManager.dispatch(createAppEvent(AppEvent.Deactivate));
-        if (element.dataset.view == "document") {
-            this.view = this.viewDocumentObj;
-            this.toolbarView = this.viewDocumentObj;
-        }
-        else if (element.dataset.view == "editor") {
-            this.view = this.viewEditorObj;
-            this.toolbarView = this.viewEditorObj.editorViewObj;
-        }
-        else if (element.dataset.view == "responsive") {
-            this.view = this.viewResponsiveObj;
-            this.toolbarView = this.viewResponsiveObj;
-        }
-        this.loaderService.start("Switching view ...");
-        this.view.customEventManager.dispatch(createAppEvent(AppEvent.Activate));
-        this.customEventManager.dispatch(createAppEvent(AppEvent.LoadData, {
-            currentId: this.clientId,
-            caller: this.view,
-            reload: true,
-            lightEndLoading: false,
-        }));
-        if (this.toolbarObj) {
-            this.toolbarObj.customEventManager.dispatch(createAppEvent(AppEvent.Activate));
+        const viewName = element.dataset.view;
+        if (viewName) {
+            this.setViewByName(viewName);
         }
     }
     ////////////////////////////////////////////////////////////////////////
@@ -830,6 +745,39 @@ export class App {
         else {
             console.warn(`Command with id '${id}' not found.`);
         }
+    }
+    registerView(id, view) {
+        this.viewsRegistry.set(id, view);
+        if (this.options.defaultView === id || !this.view) {
+            this.view = view;
+            this.toolbarView = view; // Default, might be overridden by plugins
+        }
+    }
+    setViewByName(id) {
+        const newView = this.viewsRegistry.get(id);
+        if (!newView) {
+            console.warn(`View with id '${id}' not found.`);
+            return;
+        }
+        if (this.midiPlayer && this.midiPlayer.isPlaying()) {
+            this.midiPlayer.stop();
+        }
+        if (this.view) {
+            this.view.customEventManager.dispatch(createAppEvent(AppEvent.Deactivate));
+        }
+        this.view = newView;
+        // For EditorPanel, the toolbarView is actually an internal property, 
+        // we might need a better way to handle this.
+        // Let's assume the view knows what its toolbarView is.
+        this.toolbarView = newView.editorViewObj || newView;
+        this.loaderService.start("Switching view ...");
+        this.view.customEventManager.dispatch(createAppEvent(AppEvent.Activate));
+        this.customEventManager.dispatch(createAppEvent(AppEvent.LoadData, {
+            currentId: this.clientId,
+            caller: this.view,
+            reload: true,
+            lightEndLoading: false,
+        }));
     }
     contribute(point, contribution) {
         if (!this.extensions.has(point)) {
