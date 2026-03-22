@@ -2926,14 +2926,16 @@ var K = class extends D {
 	}
 }, Y = window.pako, Oe = class {
 	stack;
-	constructor() {
-		let e = window.localStorage.getItem("fileStack");
+	storage;
+	constructor(e) {
+		this.storage = e;
+		let t = this.storage.getItem("fileStack");
 		this.stack = Object.assign({
 			idx: 0,
 			items: 0,
 			maxItems: 6,
 			filenames: []
-		}, JSON.parse(e));
+		}, JSON.parse(t || "{}"));
 	}
 	store(e, t) {
 		let n = this.fileList();
@@ -2943,10 +2945,10 @@ var K = class extends D {
 		}
 		this.stack.idx--, this.stack.idx < 0 && (this.stack.idx = this.stack.maxItems - 1), this.stack.filenames[this.stack.idx] = e;
 		let r = btoa(Y.deflate(t, { to: "string" }));
-		window.localStorage.setItem("file-" + this.stack.idx, r), this.stack.items < this.stack.maxItems - 1 && this.stack.items++, window.localStorage.setItem("fileStack", JSON.stringify(this.stack));
+		this.storage.setItem("file-" + this.stack.idx, r), this.stack.items < this.stack.maxItems - 1 && this.stack.items++, this.storage.setItem("fileStack", JSON.stringify(this.stack));
 	}
 	load(e) {
-		let t = window.localStorage.getItem("file-" + e), n = Y.inflate(atob(t), { to: "string" });
+		let t = this.storage.getItem("file-" + e), n = Y.inflate(atob(t), { to: "string" });
 		return {
 			filename: this.stack.filenames[e],
 			data: n
@@ -2968,8 +2970,8 @@ var K = class extends D {
 	}
 	reset() {
 		let e = this.fileList();
-		for (let t = 0; t < e.length; t++) window.localStorage.removeItem("file-" + e[t][0]);
-		window.localStorage.removeItem("fileStack"), this.stack.items = 0;
+		for (let t = 0; t < e.length; t++) this.storage.removeItem("file-" + e[t].idx);
+		this.storage.removeItem("fileStack"), this.stack.items = 0;
 	}
 }, ke = class {
 	name;
@@ -3631,7 +3633,23 @@ var K = class extends D {
 	setFilename(e) {
 		this.filename = e;
 	}
-}, He = "/svg/filter.xml", $ = class {
+}, He = class {
+	getItem(e) {
+		return window.localStorage.getItem(e);
+	}
+	setItem(e, t) {
+		window.localStorage.setItem(e, t);
+	}
+	removeItem(e) {
+		window.localStorage.removeItem(e);
+	}
+}, Ue = class {
+	getItem(e) {
+		return null;
+	}
+	setItem(e, t) {}
+	removeItem(e) {}
+}, We = "/svg/filter.xml", $ = class {
 	dialogDiv;
 	host;
 	customEventManager;
@@ -3641,6 +3659,7 @@ var K = class extends D {
 	githubManager;
 	options;
 	fileStack;
+	storageProvider;
 	verovio;
 	validator;
 	rngLoader;
@@ -3710,15 +3729,16 @@ var K = class extends D {
 			licenseUrl: "https://raw.githubusercontent.com/rism-digital/verovio-editor/refs/heads/main/LICENSE",
 			changelogUrl: "https://raw.githubusercontent.com/rism-digital/verovio-editor/refs/heads/main/CHANGELOG.md",
 			defaultView: "responsive",
-			isSafari: !1
-		}, r), r.appReset && window.localStorage.removeItem("options");
-		let a = localStorage.getItem("options");
+			isSafari: !1,
+			disableLocalStorage: !1
+		}, r || {}), this.storageProvider = this.options.storageProvider ? this.options.storageProvider : this.options.disableLocalStorage ? new Ue() : new He(), this.options.appReset && this.storageProvider.removeItem("options");
+		let a = this.storageProvider.getItem("options");
 		if (a) {
-			let e = JSON.parse(a), [t, n] = (e.version === void 0 ? "1.3.0" : e.version).split(".").map(Number), [i, o] = this.options.version.split(".").map(Number);
-			t < i || n < o ? console.warn(`Version ${r.version} is new, options not reloaded`) : this.options = Object.assign(this.options, e);
+			let e = JSON.parse(a), [t, n] = (e.version === void 0 ? "1.3.0" : e.version).split(".").map(Number), [r, i] = this.options.version.split(".").map(Number);
+			t < r || n < i ? console.warn(`Version ${this.options.version} is new, options not reloaded`) : this.options = Object.assign(this.options, e);
 		}
-		let c = localStorage.getItem("showDevFeatures");
-		for (c === null ? this.options.devFeatures = !1 : this.options.showDevFeatures = c === "true", this.fileStack = new Oe(), r.appReset && this.fileStack.reset(), this.div = n, this.zoomLevels = [
+		let c = this.storageProvider.getItem("showDevFeatures");
+		for (c === null ? this.options.devFeatures = !1 : this.options.showDevFeatures = c === "true", this.fileStack = new Oe(this.storageProvider), this.options.appReset && this.fileStack.reset(), this.div = n, this.zoomLevels = [
 			5,
 			10,
 			20,
@@ -3823,7 +3843,7 @@ var K = class extends D {
 		var t = new XMLHttpRequest();
 		t.onreadystatechange = function() {
 			this.readyState == 4 && this.status == 200 && e.appendChild(this.responseXML.documentElement);
-		}, t.open("GET", `${this.host}${He}`, !0), t.send();
+		}, t.open("GET", `${this.host}${We}`, !0), t.send();
 	}
 	async playMEI() {
 		let e = await this.verovio.renderToExpansionMap();
@@ -3840,7 +3860,7 @@ var K = class extends D {
 		return t < parseInt(this.views.style.minHeight, 10) && (t = Number(this.views.style.minHeight), this.div.style.height = `${t + this.toolbar.clientHeight}px`), this.views.style.height = `${t}px`, this.views.style.width = `${this.div.clientWidth}px`, this.statusbar.style.top = `${t}px`, !0;
 	}
 	onBeforeUnload(e) {
-		this.appReset || (this.viewDocumentObj && (this.options.documentZoom = this.viewDocumentObj.getCurrentZoomIndex()), this.viewResponsiveObj && (this.options.responsiveZoom = this.viewResponsiveObj.getCurrentZoomIndex()), this.viewEditorObj && (this.options.editorZoom = this.viewEditorObj.editorViewObj.getCurrentZoomIndex()), this.view == this.viewDocumentObj ? this.options.defaultView = "document" : this.view == this.viewResponsiveObj ? this.options.defaultView = "responsive" : this.view == this.viewEditorObj && (this.options.defaultView = "editor"), delete this.options.selection, delete this.options.editorial, delete this.options.showDevFeatures, window.localStorage.setItem("options", JSON.stringify(this.options)), this.fileStack.store(this.fileService.getFilename(), this.fileService.getInputData()));
+		this.appReset || (this.viewDocumentObj && (this.options.documentZoom = this.viewDocumentObj.getCurrentZoomIndex()), this.viewResponsiveObj && (this.options.responsiveZoom = this.viewResponsiveObj.getCurrentZoomIndex()), this.viewEditorObj && (this.options.editorZoom = this.viewEditorObj.editorViewObj.getCurrentZoomIndex()), this.view == this.viewDocumentObj ? this.options.defaultView = "document" : this.view == this.viewResponsiveObj ? this.options.defaultView = "responsive" : this.view == this.viewEditorObj && (this.options.defaultView = "editor"), delete this.options.selection, delete this.options.editorial, delete this.options.showDevFeatures, this.storageProvider.setItem("options", JSON.stringify(this.options)), this.fileStack.store(this.fileService.getFilename(), this.fileService.getInputData()));
 	}
 	onResize(e) {
 		clearTimeout(this.resizeTimer);
@@ -3954,7 +3974,7 @@ var K = class extends D {
 			okLabel: "Yes",
 			icon: "question"
 		});
-		t.setContent(marked.parse(ge)), await t.show() !== 0 && (this.fileStack.reset(), window.localStorage.removeItem("options"), this.appReset = !0, location.reload());
+		t.setContent(marked.parse(ge)), await t.show() !== 0 && (this.fileStack.reset(), this.storageProvider.removeItem("options"), this.appReset = !0, location.reload());
 	}
 	async setView(e) {
 		let t = e.target;
@@ -3974,10 +3994,10 @@ var K = class extends D {
 })($ ||= {});
 //#endregion
 //#region ts/verovio-app.ts
-var Ue = class extends $ {
+var Ge = class extends $ {
 	constructor(e, t) {
 		t.enableEditor = !1, super(e, t);
 	}
 };
 //#endregion
-export { $ as App, Ue as VerovioApp };
+export { $ as App, Ge as VerovioApp };

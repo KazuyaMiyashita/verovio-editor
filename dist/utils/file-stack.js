@@ -1,19 +1,21 @@
 /**
- * The FileStack class for storing previously loading files in the window.localStorage.
+ * The FileStack class for storing previously loading files in a storage provider.
  */
 //@ts-ignore
 const pako = window.pako;
 export class FileStack {
     stack;
-    constructor() {
-        const cache = window.localStorage.getItem("fileStack");
+    storage;
+    constructor(storage) {
+        this.storage = storage;
+        const cache = this.storage.getItem("fileStack");
         //console.debug( cache );
         this.stack = Object.assign({
             idx: 0,
             items: 0,
             maxItems: 6,
             filenames: [],
-        }, JSON.parse(cache));
+        }, JSON.parse(cache || "{}"));
         //console.debug( this.stack );
     }
     store(filename, data) {
@@ -34,14 +36,14 @@ export class FileStack {
         this.stack.filenames[this.stack.idx] = filename;
         //let compressedData = zlib.deflateSync( data ).toString( 'base64' );
         let compressedData = btoa(pako.deflate(data, { to: "string" }));
-        window.localStorage.setItem("file-" + this.stack.idx, compressedData);
+        this.storage.setItem("file-" + this.stack.idx, compressedData);
         // Increase the stack items if not full
         if (this.stack.items < this.stack.maxItems - 1)
             this.stack.items++;
-        window.localStorage.setItem("fileStack", JSON.stringify(this.stack));
+        this.storage.setItem("fileStack", JSON.stringify(this.stack));
     }
     load(idx) {
-        let data = window.localStorage.getItem("file-" + idx);
+        let data = this.storage.getItem("file-" + idx);
         //let decompressedData = zlib.inflateSync( new Buffer( data, 'base64' ) ).toString();
         let decompressedData = pako.inflate(atob(data), { to: "string" });
         return { filename: this.stack.filenames[idx], data: decompressedData };
@@ -63,9 +65,9 @@ export class FileStack {
     reset() {
         let list = this.fileList();
         for (let i = 0; i < list.length; i++) {
-            window.localStorage.removeItem("file-" + list[i][0]);
+            this.storage.removeItem("file-" + list[i].idx);
         }
-        window.localStorage.removeItem("fileStack");
+        this.storage.removeItem("fileStack");
         this.stack.items = 0;
     }
 }

@@ -46,6 +46,11 @@ import { NotificationService } from "./utils/notification-service.js";
 import { LoaderService } from "./utils/loader-service.js";
 import { VerovioService } from "./verovio/verovio-service.js";
 import { FileService } from "./utils/file-service.js";
+import {
+  StorageProvider,
+  LocalStorageProvider,
+  NoStorageProvider,
+} from "./utils/storage-provider.js";
 
 const filter = "/svg/filter.xml";
 
@@ -64,6 +69,7 @@ export class App {
   public readonly githubManager: GitHubManager;
   public readonly options: App.Options;
   public readonly fileStack: FileStack;
+  public readonly storageProvider: StorageProvider;
 
   public readonly verovio: VerovioWorkerProxy;
   public readonly validator: ValidatorWorkerProxy;
@@ -177,13 +183,21 @@ export class App {
         defaultView: "responsive",
 
         isSafari: false,
+
+        disableLocalStorage: false,
       },
-      options,
+      options || ({} as App.Options),
     );
 
-    if (options.appReset) window.localStorage.removeItem("options");
+    this.storageProvider = this.options.storageProvider
+      ? this.options.storageProvider
+      : this.options.disableLocalStorage
+        ? new NoStorageProvider()
+        : new LocalStorageProvider();
 
-    const storedOptions = localStorage.getItem("options");
+    if (this.options.appReset) this.storageProvider.removeItem("options");
+
+    const storedOptions = this.storageProvider.getItem("options");
     if (storedOptions) {
       let jsonStoredOptions = JSON.parse(storedOptions);
       // Options.version introduce after 1.3.0
@@ -197,20 +211,23 @@ export class App {
       // Do not reload options if we have a new minor release
       if (major1 < major2 || minor1 < minor2) {
         // We cannot show a notification at this stage
-        console.warn(`Version ${options.version} is new, options not reloaded`);
+        console.warn(
+          `Version ${this.options.version} is new, options not reloaded`,
+        );
       } else {
         this.options = Object.assign(this.options, jsonStoredOptions);
       }
     }
-    const storedShowDevFeatures = localStorage.getItem("showDevFeatures");
+    const storedShowDevFeatures =
+      this.storageProvider.getItem("showDevFeatures");
     if (storedShowDevFeatures !== null) {
       this.options.showDevFeatures = storedShowDevFeatures === "true";
     } else {
       this.options.devFeatures = false;
     }
 
-    this.fileStack = new FileStack();
-    if (options.appReset) this.fileStack.reset();
+    this.fileStack = new FileStack(this.storageProvider);
+    if (this.options.appReset) this.fileStack.reset();
 
     // Root element in which verovio-ui is created
     this.div = div;
@@ -627,7 +644,7 @@ export class App {
     delete this.options["selection"];
     delete this.options["editorial"];
     delete this.options["showDevFeatures"];
-    window.localStorage.setItem("options", JSON.stringify(this.options));
+    this.storageProvider.setItem("options", JSON.stringify(this.options));
 
     this.fileStack.store(
       this.fileService.getFilename(),
@@ -882,7 +899,7 @@ export class App {
     dlg.setContent(marked.parse(resetMsg));
     if ((await dlg.show()) === 0) return;
     this.fileStack.reset();
-    window.localStorage.removeItem("options");
+    this.storageProvider.removeItem("options");
     this.appReset = true;
     location.reload();
   }
@@ -960,6 +977,8 @@ export namespace App {
     pdfkitUrl?: string;
     licenseUrl?: string;
     changelogUrl?: string;
+    disableLocalStorage?: boolean;
+    storageProvider?: StorageProvider;
     devFeatures: boolean;
     showDevFeatures: boolean;
   }

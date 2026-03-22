@@ -16,13 +16,15 @@ export class VerovioService {
         this.pdfkitUrl = options.pdfkitUrl;
         const verovioWorkerURL = this.getWorkerURL(`${options.host}/dist/verovio/verovio-worker.js`);
         const verovioWorker = new Worker(verovioWorkerURL);
-        const verovioUrl = options.verovioUrl || `https://www.verovio.org/javascript/${options.verovioVersion}/verovio-toolkit-wasm.js`;
+        const verovioUrl = options.verovioUrl ||
+            `https://www.verovio.org/javascript/${options.verovioVersion}/verovio-toolkit-wasm.js`;
         verovioWorker.postMessage({ verovioUrl });
         this.verovio = new VerovioWorkerProxy(verovioWorker);
         if (options.enableEditor) {
             const validatorWorkerURL = this.getWorkerURL(`${options.host}/dist/xml/validator-worker.js`);
             const validatorWorker = new Worker(validatorWorkerURL);
-            const validatorUrl = options.validatorUrl || "https://www.verovio.org/javascript/validator/xml-validator-2.10.3.js";
+            const validatorUrl = options.validatorUrl ||
+                "https://www.verovio.org/javascript/validator/xml-validator-2.10.3.js";
             validatorWorker.postMessage({ validatorUrl });
             this.validator = new ValidatorWorkerProxy(validatorWorker);
             this.rngLoader = new RNGLoader();

@@ -27,16 +27,20 @@ addEventListener("message", function (event) {
         // Define Module before script loads if needed by Emscripten, or let the script define it.
         // Emscripten usually does `var Module = typeof Module !== 'undefined' ? Module : {};`
         // Wait, let's just create it to hook onRuntimeInitialized
-        if (typeof self.Module === 'undefined') {
+        if (typeof self.Module === "undefined") {
             self.Module = {};
         }
         self.Module.onRuntimeInitialized = function () {
-            methods.check = self.Module.cwrap("check", "string", ["string"]);
-            methods.setSchema = self.Module.cwrap("set_schema", "bool", ["string"]);
-            methods.validate = self.Module.cwrap("validate", "string", ["string"]);
-            methods.setRelaxNGSchema = self.Module.cwrap("set_relaxNG_schema", "bool", [
+            methods.check = self.Module.cwrap("check", "string", [
                 "string",
             ]);
+            methods.setSchema = self.Module.cwrap("set_schema", "bool", [
+                "string",
+            ]);
+            methods.validate = self.Module.cwrap("validate", "string", [
+                "string",
+            ]);
+            methods.setRelaxNGSchema = self.Module.cwrap("set_relaxNG_schema", "bool", ["string"]);
             methods.validateNG = self.Module.cwrap("validate_NG", "string", ["string"]);
             isValidatorModuleReady.resolve(null);
         };

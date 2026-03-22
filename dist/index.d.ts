@@ -38,6 +38,7 @@ export declare class App {
     readonly githubManager: GitHubManager;
     readonly options: App.Options;
     readonly fileStack: FileStack;
+    readonly storageProvider: StorageProvider;
     readonly verovio: VerovioWorkerProxy;
     readonly validator: ValidatorWorkerProxy;
     readonly rngLoader: RNGLoader;
@@ -161,6 +162,8 @@ export declare namespace App {
         pdfkitUrl?: string;
         licenseUrl?: string;
         changelogUrl?: string;
+        disableLocalStorage?: boolean;
+        storageProvider?: StorageProvider;
         devFeatures: boolean;
         showDevFeatures: boolean;
     }
@@ -467,7 +470,8 @@ declare class FileService {
 
 declare class FileStack {
     private readonly stack;
-    constructor();
+    private readonly storage;
+    constructor(storage: StorageProvider);
     store(filename: string, data: string): void;
     load(idx: number): File_2;
     getLast(): File_2;
@@ -724,6 +728,15 @@ declare enum Status {
     Valid = 1,
     Invalid = 2,
     Unknown = 3
+}
+
+/**
+ * The StorageProvider interface for abstraction of storage access.
+ */
+declare interface StorageProvider {
+    getItem(key: string): string | null;
+    setItem(key: string, value: string): void;
+    removeItem(key: string): void;
 }
 
 declare class Tab extends GenericView {
